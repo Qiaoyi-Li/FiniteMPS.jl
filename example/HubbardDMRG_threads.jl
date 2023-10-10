@@ -1,12 +1,12 @@
 using MKL
 using FiniteMPS, FiniteLattices
 using LinearAlgebra.BLAS
-using JLD2
 
-include("/Users/qyli/FiniteMPS/example/Models/Hubbard.jl")
+include("Models/Hubbard.jl")
 
 # show julia nthreads (set by -t)
 @show Threads.nthreads()
+@assert Threads.nthreads() > 1
 
 @show TensorKit.Strided.set_num_threads(1)
 # set MKL nthreads
@@ -15,27 +15,26 @@ BLAS.set_num_threads(1)
 
 flush(stdout)
 
-@show Latt = SquaLatt(4, 2; BCY = :OBC)
-disk = true
+@show Latt = SquaLatt(8, 4; BCY = :PBC)
+disk = false # store local tensors in disk or memory
 
-# Ψ = load("/Users/qyli/FiniteMPS/test/CL4x4_t2=-0.2_hole0.125_D8192.jld2", "Ψ")
 Ψ = nothing
 
 function mainDMRG(Ψ=nothing)
 
      Para = (t=1, t′=-0.2, U=8)
-     Ndop = 0 # number of hole doping, negative value means elec doping
+     Ndop = 4 # number of hole doping, negative value means elec doping
 
      # =============== list D ====================
-     lsD = broadcast(Int64 ∘ round, 2 .^ vcat(6:8))
+     lsD = broadcast(Int64 ∘ round, 2 .^ vcat(6:10))
      Nsweep = 1
      lsD = repeat(lsD, inner=Nsweep)
      # ===========================================
 
      # initial state
      if isnothing(Ψ)
-          aspace = Rep[U₁×SU₂]((i, j) => 2 for i in -(abs(Ndop) + 1):(abs(Ndop)+1) for j in 0:1//2:1)
-          Ψ = randMPS(length(Latt), U₁SU₂Fermion.pspace, aspace; disk = disk)
+          aspace = vcat(Rep[U₁×SU₂]((Ndop, 0) => 1),repeat([Rep[U₁×SU₂]((i, j) => 2 for i in -(abs(Ndop) + 1):(abs(Ndop)+1) for j in 0:1//2:1), ], length(Latt) - 1))
+          Ψ = randMPS(U₁SU₂Fermion.pspace, aspace; disk = disk)
      end
 
      H = AutomataMPO(U₁SU₂Hubbard(Latt; Para...))
@@ -58,7 +57,7 @@ function mainDMRG(Ψ=nothing)
 end
 
 function mainObs(Ψ::MPS)
-     # Obs
+
      Tree = ObservableTree(;disk = disk)
      for i in 1:length(Latt)
           addObs!(Tree, U₁SU₂Fermion.n, i, 1; name=:n)
@@ -86,46 +85,3 @@ end
 
 Ψ, Env, lsD, lsEn, info = mainDMRG(Ψ);
 Obs = mainObs(Ψ)
-
-# show Obs
-# println("n:")
-# for i = 1:Latt.N
-#      println("$i: ", Obs.n[(i,)])
-# end
-# println("nd:")
-# for i = 1:Latt.N
-#      println("$i: ", Obs.nd[(i,)])
-# end
-# # ============== S⋅S ==============
-# println("S⋅S:")
-# for i = 1:Latt.N, j = i+1:Latt.N
-#      println("($i,$j): ", Obs.SS[(i, j)])
-# end
-# # ============== nn ==============
-# println("nn:")
-# for i = 1:Latt.N, j = i+1:Latt.N
-#      println("($i,$j): ", Obs.nn[(i, j)])
-# end
-# # ============== FdagF====================
-# println("FdagF:")
-# for i = 1:Latt.N, j = i+1:Latt.N
-#      println("($i,$j): ", Obs.FdagF[(i, j)])
-# end
-# # ============== Singlet pairing ========
-# println("Singlet pairing:")
-# for (i, j) in NN(Latt), (k, l) in NN(Latt)
-#      key = (i, j, k, l)
-#      haskey(Obs.FdagFdagFF, key) && println("$key: ", Obs.FdagFdagFF[key])
-# end
-
-# if disk 
-#      Ψ = MPS(Ψ.A, Center(Ψ), coef(Ψ))
-# end
-# jldsave("/Users/qyli/FiniteMPS/test/OS3x2.jld2"; Ψ)
-
-
-
-
-
-
-
