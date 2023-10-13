@@ -22,4 +22,4 @@ module MPSDefault
      tol = 1e-8 
 end
 
-const GlobalTimer = TimerOutput()
+

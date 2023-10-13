@@ -1,6 +1,5 @@
 using MKL
 using FiniteMPS, FiniteLattices
-using LinearAlgebra.BLAS
 
 include("Models/Hubbard.jl")
 
@@ -23,7 +22,7 @@ disk = false # store local tensors in disk or memory
 function mainDMRG(Ψ=nothing)
 
      Para = (t=1, t′=-0.2, U=8)
-     Ndop = 4 # number of hole doping, negative value means elec doping
+     Ndop = 0 # number of hole doping, negative value means elec doping
 
      # =============== list D ====================
      lsD = broadcast(Int64 ∘ round, 2 .^ vcat(6:10))

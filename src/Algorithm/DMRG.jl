@@ -93,7 +93,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
      canonicalize!(Ψ, L - 1)
 
      # GC manually
-     GCsweep && GC.gc()
+     GCsweep && @everywhere GC.gc()
 
      # right to left sweep, skip [L-1, L]
      Ar::MPSTensor = Ψ[L-1]
@@ -116,7 +116,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
      Ψ[1] = Ar
 
      # GC manually
-     GCsweep && GC.gc()
+     GCsweep && @everywhere GC.gc()
 
      return info
 
@@ -156,7 +156,7 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
      end
 
      # GC manually
-     GCsweep && GC.gc()
+     GCsweep && @everywhere GC.gc()
 
      # right to left sweep, skip L
      for si = reverse(1:L-1)
@@ -171,7 +171,7 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
      end
 
      # GC manually
-     GCsweep && GC.gc()
+     GCsweep && @everywhere GC.gc()
 
      return info
 

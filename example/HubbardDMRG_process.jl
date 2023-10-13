@@ -1,21 +1,20 @@
 using MKL
 using Distributed
 using FiniteMPS, FiniteLattices
-using LinearAlgebra.BLAS
 
 NWORKERS = 4 # number of workers
-NTHREADS = 1 # number of threads of subworkers, suggestion = 1
+NTHREADS = 2 # number of threads of subworkers, suggestion = 1
 
 include("Models/Hubbard.jl")
 
-addprocs(NWORKERS,exeflags=["--threads=$(NTHREADS)"])
+addprocs(NWORKERS, exeflags=["--threads=$(NTHREADS)"])
 
 
 @show Distributed.workers()
 
 @everywhere begin
-     using MKL, FiniteMPS, LinearAlgebra.BLAS
-     @show Threads.nthreads()
+     using MKL, FiniteMPS
+     @show FiniteMPS.get_num_threads_julia()
      @show BLAS.get_config()
      BLAS.set_num_threads(1) # set MKL nthreads, suggestion = 1
      @show BLAS.get_num_threads()
@@ -56,7 +55,7 @@ function mainDMRG(Ψ=nothing)
      midsi = Int64(round(length(Latt) / 2))
      for (i, D) in enumerate(lsD)
           @time info[i] = DMRGSweep2!(Env;
-               distributed = true,
+               distributed=true,
                GCstep=false, GCsweep=true,
                trunc=truncdim(D) & truncbelow(1e-6),
                LanczosOpt=(krylovdim=8, maxiter=1, tol=1e-4, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
@@ -67,11 +66,11 @@ function mainDMRG(Ψ=nothing)
 
      for i in 1:Nsweep_DMRG1
           @time info_DMRG1 = DMRGSweep1!(Env;
-               distributed = true,
+               distributed=true,
                GCstep=false, GCsweep=true,
                LanczosOpt=(krylovdim=8, maxiter=1, tol=1e-4, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
-               push!(lsEn, info_DMRG1[2][1].Eg)
-               push!(info, info_DMRG1)
+          push!(lsEn, info_DMRG1[2][1].Eg)
+          push!(info, info_DMRG1)
           println("1-site DMRG: En = $(lsEn[end]), K = $(info_DMRG1[2][midsi].Lanczos.numops)")
           flush(stdout)
 

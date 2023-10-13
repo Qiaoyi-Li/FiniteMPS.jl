@@ -8,9 +8,11 @@ using Base.Threads, FLoops, FoldsThreads, Distributed
 @reexport using TensorKit, KrylovKit, TensorKit.TensorOperations
 @reexport import Base: +, -, *, /, ==, promote_rule, convert, length, show, getindex, setindex!, lastindex, keys, similar
 @reexport import TensorKit: ×, one, zero, dim, inner, scalar, domain, codomain, eltype, scalartype, leftorth, rightorth, tsvd, adjoint, normalize!, norm, axpy!, axpby!, dot, mul!, rmul!
-@reexport import LinearAlgebra: rank, qr
+@reexport import LinearAlgebra: BLAS, rank, qr
 
-# Default settings
+
+# global settings
+include("Globals.jl")
 include("Defaults.jl")
 
 # Utils

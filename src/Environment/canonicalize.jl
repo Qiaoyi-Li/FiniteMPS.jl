@@ -14,7 +14,7 @@ function canonicalize!(obj::AbstractEnvironment{L}, siL::Int64, siR::Int64; kwar
 
      @assert siL ≥ 1 && siR ≤ L
      # pushleft/right if needed
-     @sync begin
+     Threads.@sync begin
           L2R = Threads.@spawn begin
                while obj.Center[1] < siL
                     pushright!(obj)
