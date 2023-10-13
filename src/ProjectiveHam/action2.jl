@@ -16,7 +16,7 @@ function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}
 
           tasks = map(obj.validIdx) do (i, j, k)
                let x = x, El = obj.El[i], Hl = obj.H[1][i, j], Hr = obj.H[2][j, k], Er = obj.Er[k]
-                    @spawnat :any _action2(x, El, Hl, Hr, Er)
+                    @spawnat :any _action2(x, El, Hl, Hr, Er; kwargs...)
                end
           end
           Hx = mapreduce(fetch, (x, y) -> axpy!(true, x, y), tasks)
