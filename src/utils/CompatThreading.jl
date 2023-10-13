@@ -1,5 +1,4 @@
 # replace some TensorKit functions to avoid conflict of multi-threading
-# TODO add more parameters to control the 3-layer nested multi-threading
 function TensorKit._add_general_kernel!(tdst, tsrc, p, fusiontreetransform, α, β, backend...)
     if iszero(β)
         zerovector!(tdst)
@@ -28,7 +27,6 @@ function TensorKit._add_abelian_kernel!(tdst, tsrc, p, fusiontreetransform, α, 
     return tdst
 end
 
-# TODO maybe add multi-threading for tensor contraction is meaningful
 function TensorKit.mul!(tC::AbstractTensorMap,
     tA::AbstractTensorMap,
     tB::AbstractTensorMap, α=true, β=false)
@@ -42,7 +40,6 @@ function TensorKit.mul!(tC::AbstractTensorMap,
     if get_num_workers() > 1 && get_num_threads_julia() > 1
 
         @floop GlobalThreadsExecutors for c in filter(c -> TensorKit.hasblock(tA, c), blocksectors(tC))
-            println(Threads.threadid())
             mul!(TensorKit.StridedView(block(tC, c)), TensorKit.StridedView(block(tA, c)), TensorKit.StridedView(block(tB, c)), α, β)
         end
 
