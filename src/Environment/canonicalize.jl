@@ -9,22 +9,18 @@ Canonicalize the environment s.t. at least `El[i ≤ siL]` and `Er[i ≥ siR]` a
      free::Bool = true
 If `true`, call `free!(obj)` to free the local environment tensors which are no longer required. Details see `free!`.
 """
-function canonicalize!(obj::AbstractEnvironment{L}, siL::Int64, siR::Int64; kwargs...) where L
+function canonicalize!(obj::AbstractEnvironment{L}, siL::Int64, siR::Int64; kwargs...) where {L}
      free::Bool = get(kwargs, :free, true)
 
      @assert siL ≥ 1 && siR ≤ L
      # pushleft/right if needed
-     Threads.@sync begin
-          L2R = Threads.@spawn begin
-               while obj.Center[1] < siL
-                    pushright!(obj)
-               end
-          end
-          R2L = Threads.@spawn begin
-               while obj.Center[2] > siR
-                    pushleft!(obj)
-               end
-          end
+
+     while obj.Center[1] < siL
+          pushright!(obj)
+     end
+
+     while obj.Center[2] > siR
+          pushleft!(obj)
      end
 
      if free

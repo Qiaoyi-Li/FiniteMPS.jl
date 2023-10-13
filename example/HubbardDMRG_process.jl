@@ -2,8 +2,8 @@ using MKL
 using Distributed
 using FiniteMPS, FiniteLattices
 
-NWORKERS = 4 # number of workers
-NTHREADS = 2 # number of threads of subworkers, suggestion = 1
+NWORKERS = 2 # number of workers
+NTHREADS = 4 # number of threads of subworkers, suggestion = 1
 
 include("Models/Hubbard.jl")
 
@@ -33,7 +33,7 @@ function mainDMRG(Ψ=nothing)
      Ndop = 0 # number of hole doping, negative value means elec doping
 
      # =============== list D ====================
-     lsD = broadcast(Int64 ∘ round, 2 .^ vcat(6:10))
+     lsD = broadcast(Int64 ∘ round, 2 .^ vcat(6:12))
      Nsweep = 1
      lsD = repeat(lsD, inner=Nsweep)
      # ===========================================

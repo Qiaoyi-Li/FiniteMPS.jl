@@ -6,9 +6,6 @@ Action of 2-site projective Hamiltonian on the 2-site local tensors, wrapped by 
 # Kwargs
      distributed::Bool = false
 If `ture`, use multi-processing, instead of multi-threading, for parallel computing.
-
-     ntasks::Int64 = Threads.nthreads() - 1
-Number ot tasks in multi-threading computation, details see `FoldsThreads.TaskPoolEx`.
 """
 function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}; kwargs...) where {T<:NTuple{2,MPSTensor}}
 
@@ -22,9 +19,8 @@ function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}
           Hx = mapreduce(fetch, (x, y) -> axpy!(true, x, y), tasks)
 
      else # multi-threading
-          ntasks = get(kwargs, :ntasks, Threads.nthreads() - 1)
 
-          @floop TaskPoolEx(; ntasks=ntasks, simd=true) for (i, j, k) in obj.validIdx
+          @floop GlobalThreadsExecutors for (i, j, k) in obj.validIdx
                tmp = _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k]; kwargs...)
                @reduce() do (Hx = nothing; tmp)
                     Hx = axpy!(true, tmp, Hx)

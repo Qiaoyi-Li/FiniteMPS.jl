@@ -18,9 +18,8 @@ function pushleft!(obj::SparseEnvironment{L,3,T}) where {L,T<:Tuple{AdjointMPS,S
 
      sz = size(obj[2][si])
      Er_next = SparseRightTensor(nothing, sz[1])
-
-     @threads for j in 1:sz[1]
-          @floop TaskPoolEx(; simd=true) for i in filter(x -> !isnothing(obj[2][si][j, x]) && !isnothing(obj.Er[si][x]), 1:sz[2])
+     for j in 1:sz[1]
+          @floop GlobalThreadsExecutors for i in filter(x -> !isnothing(obj[2][si][j, x]) && !isnothing(obj.Er[si][x]), 1:sz[2])
 
                Er = _pushleft(obj.Er[si][i], obj[1][si], obj[2][si][j, i], obj[3][si]; sparse=true)
                @reduce() do (Er_cum = nothing; Er)

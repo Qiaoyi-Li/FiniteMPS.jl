@@ -18,8 +18,12 @@ function trivial(V::GradedSpace{I, D}) where {I, D}
      return GradedSpace{I,D}(dims, false)
 end
 
-function trivial(V::ElementarySpace{F}) where F 
-     return F^1
+function trivial(V::CartesianSpace)
+     return ℝ^1
+end
+
+function trivial(V::ComplexSpace)
+     return ℂ^1
 end
 
 

@@ -25,7 +25,7 @@ function mainDMRG(Ψ=nothing)
      Ndop = 0 # number of hole doping, negative value means elec doping
 
      # =============== list D ====================
-     lsD = broadcast(Int64 ∘ round, 2 .^ vcat(6:10))
+     lsD = broadcast(Int64 ∘ round, 2 .^ vcat(6:12))
      Nsweep = 1
      lsD = repeat(lsD, inner=Nsweep)
      # ===========================================
@@ -83,4 +83,4 @@ function mainObs(Ψ::MPS)
 end
 
 Ψ, Env, lsD, lsEn, info = mainDMRG(Ψ);
-Obs = mainObs(Ψ)
+# Obs = mainObs(Ψ)
