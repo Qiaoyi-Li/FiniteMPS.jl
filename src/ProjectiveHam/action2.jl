@@ -11,12 +11,17 @@ function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}
 
      if get(kwargs, :distributed, false)  # multi-processing
 
-          tasks = map(obj.validIdx) do (i, j, k)
-               let x = x, El = obj.El[i], Hl = obj.H[1][i, j], Hr = obj.H[2][j, k], Er = obj.Er[k]
-                    @spawnat :any _action2(x, El, Hl, Hr, Er; kwargs...)
-               end
+          # data = [(obj.El[i], obj.H[1][i,j], obj.H[2][j,k], obj.Er[k]) for (i, j, k) in obj.validIdx]
+
+          # lsHx = pmap(data; batch_size = get(kwargs, :batch_size, 1)) do (El, Hl, Hr, Er)
+          #      _action2(x, El, Hl, Hr, Er; kwargs...)
+          # end
+          # Hx = reduce((x, y) -> axpy!(true, x, y), lsHx)
+
+          f = (x, y) -> axpy!(true, x, y)
+          Hx = @distributed (f) for (i, j, k) in obj.validIdx
+               _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k]; kwargs...)
           end
-          Hx = mapreduce(fetch, (x, y) -> axpy!(true, x, y), tasks)
 
      else # multi-threading
 

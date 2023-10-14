@@ -3,7 +3,7 @@ module FiniteMPS
 using TimerOutputs
 using Reexport
 using AbstractTrees, SerializedElementArrays
-using Base.Threads, FLoops, FoldsThreads, Distributed
+using Base.Threads, FLoops, FoldsThreads, Distributed, SharedArrays
 @reexport import SerializedElementArrays: SerializedElementArray,  SerializedElementVector
 @reexport using TensorKit, KrylovKit, TensorKit.TensorOperations
 @reexport import Base: +, -, *, /, ==, promote_rule, convert, length, show, getindex, setindex!, lastindex, keys, similar

@@ -33,7 +33,7 @@ end
 function _scalar(obj::SparseEnvironment{L,3,T}, si::Int64; kwargs...)  where {L,T<:Tuple{AdjointMPS,SparseMPO,MPS}}
      @assert si > 1
      idx = filter(x -> !isnothing(obj.El[si][x]) && !isnothing(obj.Er[si-1][x]), eachindex(obj.El[si]))
-     @floop WorkStealingEx() for i in idx
+     @floop GlobalThreadsExecutors for i in idx
           tmp = obj.El[si][i] * obj.Er[si-1][i]
           @reduce() do (acc = 0; tmp)
                acc += tmp

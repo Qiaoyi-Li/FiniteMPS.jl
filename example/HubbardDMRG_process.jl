@@ -2,8 +2,8 @@ using MKL
 using Distributed
 using FiniteMPS, FiniteLattices
 
-NWORKERS = 2 # number of workers
-NTHREADS = 4 # number of threads of subworkers, suggestion = 1
+NWORKERS = 4 # number of workers
+NTHREADS = 2 # number of threads of subworkers, suggestion = 1
 
 include("Models/Hubbard.jl")
 
@@ -34,7 +34,7 @@ function mainDMRG(Ψ=nothing)
 
      # =============== list D ====================
      lsD = broadcast(Int64 ∘ round, 2 .^ vcat(6:12))
-     Nsweep = 1
+     Nsweep = 2
      lsD = repeat(lsD, inner=Nsweep)
      # ===========================================
 
@@ -56,9 +56,9 @@ function mainDMRG(Ψ=nothing)
      for (i, D) in enumerate(lsD)
           @time info[i] = DMRGSweep2!(Env;
                distributed=true,
-               GCstep=false, GCsweep=true,
+               GCstep=true, GCsweep=true,
                trunc=truncdim(D) & truncbelow(1e-6),
-               LanczosOpt=(krylovdim=8, maxiter=1, tol=1e-4, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
+               LanczosOpt=(krylovdim=5, maxiter=1, tol=1e-4, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
           lsEn[i] = info[i][2][1].Eg
           println("D = $D, En = $(lsEn[i]), K = $(info[i][2][midsi].Lanczos.numops), TrunErr2 = $(info[i][2][midsi].TrunErr^2)")
           flush(stdout)
@@ -67,7 +67,7 @@ function mainDMRG(Ψ=nothing)
      for i in 1:Nsweep_DMRG1
           @time info_DMRG1 = DMRGSweep1!(Env;
                distributed=true,
-               GCstep=false, GCsweep=true,
+               GCstep=true, GCsweep=true,
                LanczosOpt=(krylovdim=8, maxiter=1, tol=1e-4, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
           push!(lsEn, info_DMRG1[2][1].Eg)
           push!(info, info_DMRG1)
@@ -108,6 +108,6 @@ function mainObs(Ψ::MPS)
 end
 
 Ψ, Env, lsD, lsEn, info = mainDMRG(Ψ);
-Obs = mainObs(Ψ)
+# Obs = mainObs(Ψ)
 
 rmprocs(workers())

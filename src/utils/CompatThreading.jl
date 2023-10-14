@@ -17,7 +17,6 @@ function TensorKit._add_general_kernel!(tdst, tsrc, p, fusiontreetransform, α, 
 end
 
 
-
 function TensorKit._add_abelian_kernel!(tdst, tsrc, p, fusiontreetransform, α, β, backend...)
 
     for (f₁, f₂) in fusiontrees(tsrc)
@@ -44,7 +43,7 @@ function TensorKit.mul!(tC::AbstractTensorMap,
         end
 
         if β != one(β)
-            for c in filter(c -> !TensorKit.hasblock(tA, c), blocksectors(tC))
+            @floop GlobalThreadsExecutors for c in filter(c -> !TensorKit.hasblock(tA, c), blocksectors(tC))
                 rmul!(block(tC, c), β)
             end
         end

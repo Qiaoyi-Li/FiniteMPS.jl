@@ -19,6 +19,7 @@ function pushright!(obj::SparseEnvironment{L,3,T}) where {L,T<:Tuple{AdjointMPS,
      sz = size(obj[2][si])
      El_next = SparseLeftTensor(nothing, sz[2])
 
+     # TODO add multi-processing version
      for j in 1:sz[2]
           @floop GlobalThreadsExecutors for i in filter(x -> !isnothing(obj[2][si][x, j]) && !isnothing(obj.El[si][x]), 1:sz[1])
                El = _pushright(obj.El[si][i], obj[1][si], obj[2][si][i, j], obj[3][si]; sparse=true)

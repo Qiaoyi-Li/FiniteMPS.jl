@@ -11,12 +11,17 @@ function action1(obj::SparseProjectiveHamiltonian{1}, x::MPSTensor; kwargs...)
 
      if get(kwargs, :distributed, false) # multi-processing
 
-          tasks = map(obj.validIdx) do (i, j)
-               let x = x, El = obj.El[i], H = obj.H[1][i, j], Er = obj.Er[j]
-                    @spawnat :any _action1(x, El, H, Er; kwargs...)
-               end
+          # tasks = map(obj.validIdx) do (i, j)
+          #      let x = x, El = obj.El[i], H = obj.H[1][i, j], Er = obj.Er[j]
+          #           @spawnat :any _action1(x, El, H, Er; kwargs...)
+          #      end
+          # end
+          # Hx = mapreduce(fetch, (x,y) -> axpy!(true, x, y), tasks)
+
+          f = (x, y) -> axpy!(true, x, y)
+          Hx = @distributed (f) for (i, j) in obj.validIdx
+               _action1(x, obj.El[i], obj.H[1][i, j], obj.Er[j]; kwargs...)
           end
-          Hx = mapreduce(fetch, (x,y) -> axpy!(true, x, y), tasks)
 
      else # multi-threading
          
