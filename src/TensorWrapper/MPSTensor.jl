@@ -31,7 +31,7 @@ struct MPSTensor{R} <: AbstractMPSTensor
      function MPSTensor{R}(A::AbstractTensorMap) where R
           @assert R == rank(A) ≥ 2
           if R ≥ 3 && rank(A, 1) != 2
-               @timeit GlobalTimer "MPSTensor_permute" A = permute(A, (1, 2), Tuple(3:R))
+               A = permute(A, (1, 2), Tuple(3:R))
           end
           return new{R}(A)
      end

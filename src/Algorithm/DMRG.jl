@@ -87,13 +87,13 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
           info[1][si] = DMRG2Info(eg, info_Lanczos, ϵ)
 
           # GC manually
-          GCstep && @everywhere GC.gc()
+          GCstep && manualGC()
      end
      Ψ[L] = Al
      canonicalize!(Ψ, L - 1)
 
      # GC manually
-     GCsweep && @everywhere GC.gc()
+     GCsweep && manualGC()
 
      # right to left sweep, skip [L-1, L]
      Ar::MPSTensor = Ψ[L-1]
@@ -111,12 +111,12 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
           info[2][si-1] = DMRG2Info(eg, info_Lanczos, ϵ)
 
           # GC manually
-          GCstep && @everywhere GC.gc()
+          GCstep && manualGC()
      end
      Ψ[1] = Ar
 
      # GC manually
-     GCsweep && @everywhere GC.gc()
+     GCsweep && manualGC()
 
      return info
 
@@ -152,11 +152,11 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
           info[1][si] = DMRG1Info(eg, info_Lanczos)
 
           # GC manually
-          GCstep && @everywhere GC.gc()
+          GCstep && manualGC()
      end
 
      # GC manually
-     GCsweep && @everywhere GC.gc()
+     GCsweep && manualGC()
 
      # right to left sweep, skip L
      for si = reverse(1:L-1)
@@ -167,30 +167,28 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
           info[2][si] = DMRG1Info(eg, info_Lanczos)
 
           # GC manually
-          GCstep && @everywhere GC.gc()
+          GCstep && manualGC()
      end
 
      # GC manually
-     GCsweep && @everywhere GC.gc()
+     GCsweep && manualGC()
 
      return info
 
 end
 
-function _DMRGUpdate2(H::SparseProjectiveHamiltonian{2}, Al::MPSTensor, Ar::MPSTensor; kwargs...)
-     # 2-site update of DMRG 
+function _DMRGUpdate2(H::SparseProjectiveHamiltonian{2}, Al::MPSTensor, Ar::MPSTensor; kwargs...) 
 
      x2 = CompositeMPSTensor(Al, Ar)
-     @timeit GlobalTimer "LanczosGS2" eg, xg, info = eigsolve(x -> action2(H, x; kwargs...), x2, 1, :SR, _getLanczos(; kwargs...))
+     @timeit GlobalTimer "LanczosGS2" eg, xg, info = eigsolve(x -> action(H, x; kwargs...), x2, 1, :SR, _getLanczos(; kwargs...))
 
      return eg[1], xg[1], info
 
 end
 
 function _DMRGUpdate1(H::SparseProjectiveHamiltonian{1}, A::MPSTensor; kwargs...)
-     # 1-site update of DMRG
 
-     @timeit GlobalTimer "LanczosGS1" eg, xg, info = eigsolve(x -> action1(H, x; kwargs...), A, 1, :SR, _getLanczos(; kwargs...))
+     @timeit GlobalTimer "LanczosGS1" eg, xg, info = eigsolve(x -> action(H, x; kwargs...), A, 1, :SR, _getLanczos(; kwargs...))
      return eg[1], xg[1], info
 
 end

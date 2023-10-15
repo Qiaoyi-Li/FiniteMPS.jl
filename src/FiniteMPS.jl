@@ -22,6 +22,7 @@ include("utils/TensorMap.jl")
 include("utils/Random.jl")
 include("utils/CompatThreading.jl")
 include("utils/SerializedElementArrays.jl")
+include("utils/manualGC.jl")
 
 # Wrapper types for classifying tensors
 export AbstractTensorWrapper, AbstractMPSTensor, MPSTensor, CompositeMPSTensor, AdjointMPSTensor, AbstractEnvironmentTensor, LocalLeftTensor, LocalRightTensor, SimpleLeftTensor, SimpleRightTensor, SparseLeftTensor, SparseRightTensor, AbstractLocalOperator, hastag, getOpName, IdentityOperator, tag2Tuple, LocalOperator, SparseMPOTensor, AbstractStoreType, StoreMemory, StoreDisk
@@ -56,8 +57,9 @@ include("Environment/canonicalize.jl")
 include("Environment/scalar.jl")
 
 # Projective Hamiltonian
-export AbstractProjectiveHamiltonian, SparseProjectiveHamiltonian, ProjHam, action1, action2
+export AbstractProjectiveHamiltonian, SparseProjectiveHamiltonian, ProjHam, action, action1, action2
 include("ProjectiveHam/ProjectiveHam.jl")
+include("ProjectiveHam/action.jl")
 include("ProjectiveHam/action1.jl")
 include("ProjectiveHam/action2.jl")
 
