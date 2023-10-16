@@ -19,14 +19,14 @@ disk = false # store local tensors in disk or memory
 
 Ψ = nothing
 
-function mainDMRG(Ψ=nothing)
+function mainDMRG(Ψ=nothing);
 
      Para = (t=1, t′=-0.2, U=8)
      Ndop = 0 # number of hole doping, negative value means elec doping
 
      # =============== list D ====================
      lsD = broadcast(Int64 ∘ round, 2 .^ vcat(6:12))
-     Nsweep = 1
+     Nsweep = 2
      lsD = repeat(lsD, inner=Nsweep)
      # ===========================================
 
@@ -44,11 +44,12 @@ function mainDMRG(Ψ=nothing)
      midsi = Int64(round(length(Latt) / 2))
      for (i, D) in enumerate(lsD)
           @time info[i] = DMRGSweep2!(Env;
-               GCstep=false, GCsweep=true,
+               GCstep=true, GCsweep=true,
                trunc=truncdim(D) & truncbelow(1e-6),
-               LanczosOpt=(krylovdim=8, maxiter=1, tol=1e-4, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
+               LanczosOpt=(krylovdim=5, maxiter=1, tol=1e-4, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
           lsEn[i] = info[i][2][1].Eg
           println("D = $D, En = $(lsEn[i]), K = $(info[i][2][midsi].Lanczos.numops), TrunErr2 = $(info[i][2][midsi].TrunErr^2)")
+          @show FiniteMPS.GlobalTimer
           flush(stdout)
      end
      GC.gc()

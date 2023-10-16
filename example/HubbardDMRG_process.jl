@@ -1,15 +1,10 @@
-using MKL
 using Distributed
-using FiniteMPS, FiniteLattices
+using FiniteLattices
 
 NWORKERS = 4 # number of workers
 NTHREADS = 2 # number of threads of subworkers, suggestion = 1
 
-include("Models/Hubbard.jl")
-
 addprocs(NWORKERS, exeflags=["--threads=$(NTHREADS)"])
-
-
 @show Distributed.workers()
 
 @everywhere begin
@@ -22,8 +17,10 @@ end
 
 flush(stdout)
 
+include("Models/Hubbard.jl")
+
 @show Latt = SquaLatt(8, 4; BCY=:PBC)
-disk = false # store local tensors in disk or memory
+disk = true # store local tensors in disk or memory
 
 Ψ = nothing
 
@@ -33,7 +30,7 @@ function mainDMRG(Ψ=nothing)
      Ndop = 0 # number of hole doping, negative value means elec doping
 
      # =============== list D ====================
-     lsD = broadcast(Int64 ∘ round, 2 .^ vcat(6:12))
+     lsD = broadcast(Int64 ∘ round, 2 .^ vcat(6:13))
      Nsweep = 2
      lsD = repeat(lsD, inner=Nsweep)
      # ===========================================
@@ -55,23 +52,23 @@ function mainDMRG(Ψ=nothing)
      midsi = Int64(round(length(Latt) / 2))
      for (i, D) in enumerate(lsD)
           @time info[i] = DMRGSweep2!(Env;
-               distributed=true,
                GCstep=true, GCsweep=true,
                trunc=truncdim(D) & truncbelow(1e-6),
                LanczosOpt=(krylovdim=5, maxiter=1, tol=1e-4, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
           lsEn[i] = info[i][2][1].Eg
           println("D = $D, En = $(lsEn[i]), K = $(info[i][2][midsi].Lanczos.numops), TrunErr2 = $(info[i][2][midsi].TrunErr^2)")
+          @show FiniteMPS.GlobalTimer
           flush(stdout)
      end
 
      for i in 1:Nsweep_DMRG1
           @time info_DMRG1 = DMRGSweep1!(Env;
-               distributed=true,
                GCstep=true, GCsweep=true,
                LanczosOpt=(krylovdim=8, maxiter=1, tol=1e-4, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
           push!(lsEn, info_DMRG1[2][1].Eg)
           push!(info, info_DMRG1)
           println("1-site DMRG: En = $(lsEn[end]), K = $(info_DMRG1[2][midsi].Lanczos.numops)")
+          @show FiniteMPS.GlobalTimer
           flush(stdout)
 
      end

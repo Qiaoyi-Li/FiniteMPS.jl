@@ -45,13 +45,17 @@ function free!(obj::SimpleEnvironment)
      obj.Er[1:obj.Center[2]-1] .= nothing
      return obj
 end
-function free!(obj::SparseEnvironment{L,N,T}) where {L,N,T}
+function free!(obj::SparseEnvironment{L,N,T,StoreMemory}) where {L,N,T}
      for i in filter(i -> isassigned(obj.El, i), obj.Center[1]+1:L)
           obj.El[i] .= nothing
      end
      for i in filter(i -> isassigned(obj.Er, i), 1:obj.Center[2]-1)
           obj.Er[i] .= nothing
      end
+     return obj
+end
+function free!(obj::SparseEnvironment{L,N,T,StoreDisk}) where {L,N,T}
+     # freeing memory is not needed if the local tensors are stored in disk
      return obj
 end
 

@@ -196,7 +196,7 @@ version = "0.1.0"
 deps = ["AbstractTrees", "Distributed", "FLoops", "FoldsThreads", "JLD2", "KrylovKit", "LinearAlgebra", "MKL", "Reexport", "SerializedElementArrays", "SharedArrays", "TensorKit", "TimerOutputs"]
 path = ".."
 uuid = "6b572690-f317-4dad-a5fe-5fe73a0b7d42"
-version = "0.2.0"
+version = "0.2.2"
 
 [[deps.FoldsThreads]]
 deps = ["Accessors", "FunctionWrappers", "InitialValues", "SplittablesBase", "Transducers"]
@@ -525,10 +525,14 @@ uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
 version = "1.10.0"
 
 [[deps.TensorKit]]
-deps = ["HalfIntegers", "LRUCache", "LinearAlgebra", "Strided", "TensorOperations", "TupleTools", "VectorInterface", "WignerSymbols"]
-git-tree-sha1 = "58516f1105729451c5099665cf9ebd6e39bae49c"
+deps = ["HalfIntegers", "LRUCache", "LinearAlgebra", "PackageExtensionCompat", "Strided", "TensorOperations", "TupleTools", "VectorInterface", "WignerSymbols"]
+git-tree-sha1 = "819a71e3cf1f968aa9060d46e2b7260c8a99dec9"
 uuid = "07d1fe3e-3e46-537d-9eac-e9e13d0d4cec"
-version = "0.11.2"
+version = "0.12.0"
+weakdeps = ["ChainRulesCore"]
+
+    [deps.TensorKit.extensions]
+    TensorKitChainRulesCoreExt = "ChainRulesCore"
 
 [[deps.TensorOperations]]
 deps = ["LRUCache", "LinearAlgebra", "PackageExtensionCompat", "Strided", "StridedViews", "TupleTools", "VectorInterface"]

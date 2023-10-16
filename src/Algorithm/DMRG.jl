@@ -145,10 +145,10 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
      info = (Vector{DMRG1Info}(undef, L), Vector{DMRG1Info}(undef, L))
      # left to right sweep
      for si = 1:L
-          canonicalize!(Ψ, si)
-          canonicalize!(Env, si)
+          @timeit GlobalTimer "canonicalizeMPS" canonicalize!(Ψ, si)
+          @timeit GlobalTimer "pushEnv" canonicalize!(Env, si)
 
-          eg, Ψ[si], info_Lanczos = _DMRGUpdate1(ProjHam(Env, si), Ψ[si]; kwargs...)
+          @timeit GlobalTimer "DMRGUpdate1" eg, Ψ[si], info_Lanczos = _DMRGUpdate1(ProjHam(Env, si), Ψ[si]; kwargs...)
           info[1][si] = DMRG1Info(eg, info_Lanczos)
 
           # GC manually
@@ -160,10 +160,10 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
 
      # right to left sweep, skip L
      for si = reverse(1:L-1)
-          canonicalize!(Ψ, si)
-          canonicalize!(Env, si)
+          @timeit GlobalTimer "canonicalizeMPS" canonicalize!(Ψ, si)
+          @timeit GlobalTimer "pushEnv" canonicalize!(Env, si)
 
-          eg, Ψ[si], info_Lanczos = _DMRGUpdate1(ProjHam(Env, si), Ψ[si]; kwargs...)
+          @timeit GlobalTimer "DMRGUpdate1" eg, Ψ[si], info_Lanczos = _DMRGUpdate1(ProjHam(Env, si), Ψ[si]; kwargs...)
           info[2][si] = DMRG1Info(eg, info_Lanczos)
 
           # GC manually
@@ -180,7 +180,7 @@ end
 function _DMRGUpdate2(H::SparseProjectiveHamiltonian{2}, Al::MPSTensor, Ar::MPSTensor; kwargs...) 
 
      x2 = CompositeMPSTensor(Al, Ar)
-     @timeit GlobalTimer "LanczosGS2" eg, xg, info = eigsolve(x -> action(H, x; kwargs...), x2, 1, :SR, _getLanczos(; kwargs...))
+     eg, xg, info = eigsolve(x -> action(H, x; kwargs...), x2, 1, :SR, _getLanczos(; kwargs...))
 
      return eg[1], xg[1], info
 
@@ -188,7 +188,7 @@ end
 
 function _DMRGUpdate1(H::SparseProjectiveHamiltonian{1}, A::MPSTensor; kwargs...)
 
-     @timeit GlobalTimer "LanczosGS1" eg, xg, info = eigsolve(x -> action(H, x; kwargs...), A, 1, :SR, _getLanczos(; kwargs...))
+     eg, xg, info = eigsolve(x -> action(H, x; kwargs...), A, 1, :SR, _getLanczos(; kwargs...))
      return eg[1], xg[1], info
 
 end

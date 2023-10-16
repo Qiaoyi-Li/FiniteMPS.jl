@@ -2,21 +2,10 @@
      action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2, T}; kwargs...) -> ::CompositeMPSTensor{2, T}
 
 Action of 2-site projective Hamiltonian on the 2-site local tensors, wrapped by `CompositeMPSTensor{2, T}` where `T<:NTuple{2,MPSTensor}`.
-
-# Kwargs
-     distributed::Bool = false
-If `ture`, use multi-processing, instead of multi-threading, for parallel computing.
 """
 function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}; kwargs...) where {T<:NTuple{2,MPSTensor}}
 
-     if get(kwargs, :distributed, false)  # multi-processing
-
-          # data = [(obj.El[i], obj.H[1][i,j], obj.H[2][j,k], obj.Er[k]) for (i, j, k) in obj.validIdx]
-
-          # lsHx = pmap(data; batch_size = get(kwargs, :batch_size, 1)) do (El, Hl, Hr, Er)
-          #      _action2(x, El, Hl, Hr, Er; kwargs...)
-          # end
-          # Hx = reduce((x, y) -> axpy!(true, x, y), lsHx)
+     if get_num_workers() > 1  # multi-processing
 
           f = (x, y) -> axpy!(true, x, y)
           Hx = @distributed (f) for (i, j, k) in obj.validIdx

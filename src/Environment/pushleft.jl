@@ -17,16 +17,34 @@ function pushleft!(obj::SparseEnvironment{L,3,T}) where {L,T<:Tuple{AdjointMPS,S
      @assert si > 1
 
      sz = size(obj[2][si])
-     Er_next = SparseRightTensor(nothing, sz[1])
-     for j in 1:sz[1]
-          @floop GlobalThreadsExecutors for i in filter(x -> !isnothing(obj[2][si][j, x]) && !isnothing(obj.Er[si][x]), 1:sz[2])
 
-               Er = _pushleft(obj.Er[si][i], obj[1][si], obj[2][si][j, i], obj[3][si]; sparse=true)
-               @reduce() do (Er_cum = nothing; Er)
-                    Er_cum = axpy!(true, Er, Er_cum)
+     Er_next = SparseRightTensor(nothing, sz[1])
+     if get_num_workers() > 1 # multi-processing
+
+          lsEr = let Er = obj.Er[si], A = obj[1][si], H = obj[2][si], B = obj[3][si]
+               valid_idx = [(j, i) for j in 1:sz[1] for i in filter(x -> !isnothing(H[j, x]) && !isnothing(Er[x]), 1:sz[2])]
+               pmap(valid_idx) do (j, i)
+                    _pushleft(Er[i], A, H[j, i], B), j, i
                end
           end
-          Er_next[j] = Er_cum
+
+          for (Er, j, i) in lsEr
+               Er_next[j] = axpy!(true, Er, Er_next[j])
+          end
+
+     else
+          let Er = obj.Er[si], A = obj[1][si], H = obj[2][si], B = obj[3][si]
+               @threads for j in 1:sz[1]
+                    @floop GlobalThreadsExecutors for i in filter(x -> !isnothing(H[j, x]) && !isnothing(Er[x]), 1:sz[2])
+
+                         Er_i = _pushleft(Er[i], A, H[j, i], B)
+                         @reduce() do (Er_cum = nothing; Er_i)
+                              Er_cum = axpy!(true, Er_i, Er_cum)
+                         end
+                    end
+                    Er_next[j] = Er_cum
+               end
+          end
      end
      obj.Er[si-1] = Er_next
 
@@ -35,61 +53,52 @@ function pushleft!(obj::SparseEnvironment{L,3,T}) where {L,T<:Tuple{AdjointMPS,S
 end
 
 function _pushleft(Er::LocalRightTensor{2}, A::AdjointMPSTensor{3}, B::MPSTensor{3}; kwargs...)
-     if rank(A, 1) == 1
-          @tensor Er[e; b] := (B.A[e c d] * Er.A[d a]) * A.A[a b c]
-     else
-          @tensor Er[e; b] := (B.A[e c d] * Er.A[d a]) * A.A[c a b]
-     end
-     return Er
+     # if rank(A, 1) == 1
+     @tensor tmp[e; b] := (B.A[e c d] * Er.A[d a]) * A.A[a b c]
+     # else
+     #      @tensor tmp[e; b] := (B.A[e c d] * Er.A[d a]) * A.A[c a b]
+     # end
+     return LocalRightTensor(tmp, Er.tag)
 end
 function _pushleft(Er::LocalRightTensor{2}, A::AdjointMPSTensor{3}, H::IdentityOperator, B::MPSTensor{3}; kwargs...)
      return _pushleft(Er, A, B) * H.strength
 end
 
 function _pushleft(Er::LocalRightTensor{2}, A::AdjointMPSTensor{3}, H::LocalOperator{2,1}, B::MPSTensor{3}; kwargs...)
-     
-     if get(kwargs, :sparse, true)
-          # D^3d + D^2d^2χ + D^3dχ
-          if rank(A, 1) == 1
-               @tensor Er[e g; b] := ((B.A[e f d] * Er.A[d a]) * H.A[g c f]) * A.A[a b c]
-          else
-               @tensor Er[e g; b] := ((B.A[e f d] * Er.A[d a]) * H.A[g c f]) * A.A[c a b]
-          end
-     else
-          # D^3d + D^3d^2 + D^2d^2χ
-          if rank(A, 1) == 1
-               @tensor Er[e g; b] := ((B.A[e f d] * Er.A[d a]) * A.A[a b c]) * H.A[g c f]
-          else
-               @tensor Er[e g; b] := ((B.A[e f d] * Er.A[d a]) * A.A[c a b]) * H.A[g c f]
-          end
 
-     end
-     return Er * H.strength
+     # D^3d + D^2d^2χ + D^3dχ
+     # if rank(A, 1) == 1
+          @tensor tmp[e g; b] := ((B.A[e f d] * Er.A[d a]) * H.A[g c f]) * A.A[a b c]
+     # else
+     #      @tensor Er[e g; b] := ((B.A[e f d] * Er.A[d a]) * H.A[g c f]) * A.A[c a b]
+     # end
+
+     return LocalRightTensor(tmp * H.strength, (Er.tag[1], H.tag[1][1], Er.tag[2]))
 end
 
 function _pushleft(Er::LocalRightTensor{2}, A::AdjointMPSTensor{3}, H::LocalOperator{1,1}, B::MPSTensor{3}; kwargs...)
-     if rank(A, 1) == 1
-          @tensor Er[e; b] := ((B.A[e f d] * Er.A[d a]) * H.A[c f]) * A.A[a b c]
-     else
-          @tensor Er[e; b] := ((B.A[e f d] * Er.A[d a]) * H.A[c f]) * A.A[c a b]
-     end
-     return Er * H.strength
+     # if rank(A, 1) == 1
+          @tensor tmp[e; b] := ((B.A[e f d] * Er.A[d a]) * H.A[c f]) * A.A[a b c]
+     # else
+     #      @tensor Er[e; b] := ((B.A[e f d] * Er.A[d a]) * H.A[c f]) * A.A[c a b]
+     # end
+     return LocalRightTensor(tmp * H.strength, Er.tag)
 end
 
 function _pushleft(Er::LocalRightTensor{3}, A::AdjointMPSTensor{3}, H::LocalOperator{1,1}, B::MPSTensor{3}; kwargs...)
-     if rank(A, 1) == 1
-          @tensor Er[e g; b] := ((B.A[e f d] * H.A[c f]) * Er.A[d g a]) * A.A[a b c]
-     else
-          @tensor Er[e g; b] := ((B.A[e f d] * H.A[c f]) * Er.A[d g a]) * A.A[c a b]
-     end
-     return Er * H.strength
+     # if rank(A, 1) == 1
+          @tensor tmp[e g; b] := ((B.A[e f d] * H.A[c f]) * Er.A[d g a]) * A.A[a b c]
+     # else
+     #      @tensor Er[e g; b] := ((B.A[e f d] * H.A[c f]) * Er.A[d g a]) * A.A[c a b]
+     # end
+     return LocalRightTensor(tmp * H.strength, Er.tag)
 end
 
 function _pushleft(Er::LocalRightTensor{3}, A::AdjointMPSTensor{3}, H::LocalOperator{1,2}, B::MPSTensor{3}; kwargs...)
-     if rank(A, 1) == 1
-          @tensor Er[e; b] := ((B.A[e f d] * Er.A[d g a]) * H.A[c f g]) * A.A[a b c]
-     else
-          @tensor Er[e; b] := ((B.A[e f d] * Er.A[d g a]) * H.A[c f g]) * A.A[c a b]
-     end
-     return Er * H.strength
+     # if rank(A, 1) == 1
+          @tensor tmp[e; b] := ((B.A[e f d] * Er.A[d g a]) * H.A[c f g]) * A.A[a b c]
+     # else
+     #      @tensor Er[e; b] := ((B.A[e f d] * Er.A[d g a]) * H.A[c f g]) * A.A[c a b]
+     # end
+     return LocalRightTensor(tmp * H.strength, (Er.tag[1], Er.tag[3]))
 end
