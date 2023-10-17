@@ -20,7 +20,7 @@ flush(stdout)
 include("Models/Hubbard.jl")
 
 @show Latt = SquaLatt(8, 4; BCY=:PBC)
-disk = true # store local tensors in disk or memory
+disk = false # store local tensors in disk or memory
 
 Ψ = nothing
 
@@ -30,7 +30,7 @@ function mainDMRG(Ψ=nothing)
      Ndop = 0 # number of hole doping, negative value means elec doping
 
      # =============== list D ====================
-     lsD = broadcast(Int64 ∘ round, 2 .^ vcat(6:13))
+     lsD = broadcast(Int64 ∘ round, 2 .^ vcat(6:12))
      Nsweep = 2
      lsD = repeat(lsD, inner=Nsweep)
      # ===========================================
@@ -95,7 +95,7 @@ function mainObs(Ψ::MPS)
           addObs!(Tree, U₁SU₂Fermion.ΔₛdagΔₛ, (i, j, k, l), 1; Z=U₁SU₂Fermion.Z, name=(:Fdag, :Fdag, :F, :F))
      end
 
-     @time calObs!(Tree, Ψ)
+     @time calObs!(Tree, Ψ; GCstep = true, verbose = true)
 
      Obs = convert(Dict, Tree, [(:n,), (:nd,), (:S, :S), (:n, :n), (:Fdag, :F), (:Fdag, :Fdag, :F, :F)])
      GC.gc()

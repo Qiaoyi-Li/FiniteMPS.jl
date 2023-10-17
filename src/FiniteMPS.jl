@@ -9,6 +9,7 @@ using Base.Threads, FLoops, FoldsThreads, Distributed, SharedArrays
 @reexport import Base: +, -, *, /, ==, promote_rule, convert, length, show, getindex, setindex!, lastindex, keys, similar
 @reexport import TensorKit: ×, one, zero, dim, inner, scalar, domain, codomain, eltype, scalartype, leftorth, rightorth, tsvd, adjoint, normalize!, norm, axpy!, axpby!, dot, mul!, rmul!
 @reexport import LinearAlgebra: BLAS, rank, qr
+@reexport import AbstractTrees: parent, isroot
 
 
 # global settings

@@ -74,7 +74,7 @@ function mainObs(Ψ::MPS)
           addObs!(Tree, U₁SU₂Fermion.ΔₛdagΔₛ, (i, j, k, l), 1; Z=U₁SU₂Fermion.Z, name=(:Fdag, :Fdag, :F, :F))
      end
      
-     @time calObs!(Tree, Ψ)
+     @time calObs!(Tree, Ψ; GCstep = true, verbose = true)
 
      Obs = convert(Dict, Tree, [(:n,), (:nd,), (:S, :S), (:n, :n), (:Fdag, :F), (:Fdag, :Fdag, :F, :F)])
      GC.gc()
