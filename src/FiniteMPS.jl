@@ -58,9 +58,8 @@ include("Environment/canonicalize.jl")
 include("Environment/scalar.jl")
 
 # Projective Hamiltonian
-export AbstractProjectiveHamiltonian, SparseProjectiveHamiltonian, ProjHam, action, action1, action2
+export AbstractProjectiveHamiltonian, SparseProjectiveHamiltonian, ProjHam, action1, action2
 include("ProjectiveHam/ProjectiveHam.jl")
-include("ProjectiveHam/action.jl")
 include("ProjectiveHam/action1.jl")
 include("ProjectiveHam/action2.jl")
 

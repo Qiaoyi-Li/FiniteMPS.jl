@@ -4,8 +4,8 @@
 Calculate observables respect to state `Ψ`, the info to tell which observables to calculate is stored in `Tree`. The results are stored in each leave node of `Tree`. 
 
 # Kwargs
-     verbose::Bool == false
-Print the `TimerOutput` of each site if `true`.
+     verbose::Int64 == 0
+Print the `TimerOutput` of each site if `verbose > 0`.
 
      GCstep::Bool == false
 Call `manualGC()` after each site if `true`.
@@ -25,8 +25,6 @@ end
 function calObs!(Root::InteractionTreeNode, Ψ::AbstractMPS{L}; kwargs...) where {L}
      @assert isroot(Root) && treeheight(Root) == L + 1
      @assert Center(Ψ)[2] == 1 # note right-canonical form is used
-
-     GCstep::Bool = get(kwargs, :GCstep, false)
 
      si = 0
      # generate a stack to store the nodes with the same si
@@ -52,7 +50,6 @@ function calObs!(Root::InteractionTreeNode, Ψ::AbstractMPS{L}; kwargs...) where
                     while !isempty(stack)
                          push!(stack_pre, pop!(stack))
                     end
-                    GCstep && manualGC()
 
                end
 
@@ -71,8 +68,10 @@ end
 
 function _calObs_stack!(stack::Vector{InteractionTreeNode}, A::AdjointMPSTensor, B::MPSTensor; kwargs...)
 
-     verbose::Bool = get(kwargs, :verbose, false)
+     GCstep::Bool = get(kwargs, :GCstep, false)
+     verbose::Int64 = get(kwargs, :verbose, 0)
      LocalTimer = TimerOutput()
+
 
      if get_num_workers() > 1
 
@@ -83,8 +82,10 @@ function _calObs_stack!(stack::Vector{InteractionTreeNode}, A::AdjointMPSTensor,
                     if i > 1 && parent(stack[i-1]) != parent(stack[i])
                          El = parent(stack[i]).value[1]
                     end
-                    let El = El, Op = stack[i].Op
-                         tasks[i] = @spawnat :any _update_node(Op, El, A, B)
+                    @timeit LocalTimer "spawn_task" begin
+                         let El = El, Op = stack[i].Op
+                              tasks[i] = @spawnat :any _update_node(Op, El, A, B)
+                         end
                     end
 
                end
@@ -99,21 +100,14 @@ function _calObs_stack!(stack::Vector{InteractionTreeNode}, A::AdjointMPSTensor,
           merge!(LocalTimer, lsTimer...; tree_point=["calObs_stack!"])
 
      else
-          # classify the nodes with the same parent 
-          lsEl = Vector{LocalLeftTensor}(undef, 0)
-          El_idx = Vector{Int64}(undef, length(stack))
-          for i in 1:length(stack)
-               if i == 1 || parent(stack[i-1]) != parent(stack[i])
-                    push!(lsEl, parent(stack[i]).value[1])
-               end
-               El_idx[i] = length(lsEl)
-          end
 
           @timeit LocalTimer "calObs_stack!" begin
-               @floop GlobalThreadsExecutors for (i, idx) in enumerate(El_idx)
-                    tmp = _update_node!(stack[i], lsEl[idx], A, B)
+               @floop GlobalThreadsExecutor for node in stack
+                    tmp = let El = parent(node).value[1]
+                         _update_node!(node, El, A, B)
+                    end  
                     @reduce() do (Timer_acc = TimerOutput(); tmp)
-                         Timer_acc  = merge!(Timer_acc, tmp)
+                         Timer_acc = merge!(Timer_acc, tmp)
                     end
                end
           end
@@ -121,11 +115,12 @@ function _calObs_stack!(stack::Vector{InteractionTreeNode}, A::AdjointMPSTensor,
 
      end
 
-     merge!(GlobalTimer, LocalTimer)
+     GCstep && manualGC(LocalTimer)
 
-     if verbose
+     if verbose > 0
           show(LocalTimer; title="site $(stack[1].Op.si)")
           println()
+          flush(stdout)
      end
 
      return nothing

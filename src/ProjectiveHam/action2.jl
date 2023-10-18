@@ -14,7 +14,7 @@ function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}
 
      else # multi-threading
 
-          @floop GlobalThreadsExecutors for (i, j, k) in obj.validIdx
+          @floop GlobalThreadsExecutor for (i, j, k) in obj.validIdx
                tmp = _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k]; kwargs...)
                @reduce() do (Hx = nothing; tmp)
                     Hx = axpy!(true, tmp, Hx)

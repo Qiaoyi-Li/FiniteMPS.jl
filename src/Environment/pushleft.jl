@@ -35,7 +35,7 @@ function pushleft!(obj::SparseEnvironment{L,3,T}) where {L,T<:Tuple{AdjointMPS,S
      else
           let Er = obj.Er[si], A = obj[1][si], H = obj[2][si], B = obj[3][si]
                @threads for j in 1:sz[1]
-                    @floop GlobalThreadsExecutors for i in filter(x -> !isnothing(H[j, x]) && !isnothing(Er[x]), 1:sz[2])
+                    @floop GlobalThreadsExecutor for i in filter(x -> !isnothing(H[j, x]) && !isnothing(Er[x]), 1:sz[2])
 
                          Er_i = _pushleft(Er[i], A, H[j, i], B)
                          @reduce() do (Er_cum = nothing; Er_i)

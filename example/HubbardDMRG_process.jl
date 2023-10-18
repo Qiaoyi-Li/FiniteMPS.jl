@@ -3,6 +3,7 @@ using FiniteLattices
 
 NWORKERS = 4 # number of workers
 NTHREADS = 2 # number of threads of subworkers, suggestion = 1
+verbose = 1
 
 addprocs(NWORKERS, exeflags=["--threads=$(NTHREADS)"])
 @show Distributed.workers()
@@ -51,24 +52,19 @@ function mainDMRG(Ψ=nothing)
      info = Vector{Tuple}(undef, length(lsD))
      midsi = Int64(round(length(Latt) / 2))
      for (i, D) in enumerate(lsD)
-          @time info[i] = DMRGSweep2!(Env;
-               GCstep=true, GCsweep=true,
+          info[i] = DMRGSweep2!(Env;
+               GCstep=true, GCsweep=true, verbose = verbose,
                trunc=truncdim(D) & truncbelow(1e-6),
                LanczosOpt=(krylovdim=5, maxiter=1, tol=1e-4, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
           lsEn[i] = info[i][2][1].Eg
-          println("D = $D, En = $(lsEn[i]), K = $(info[i][2][midsi].Lanczos.numops), TrunErr2 = $(info[i][2][midsi].TrunErr^2)")
-          @show FiniteMPS.GlobalTimer
-          flush(stdout)
      end
 
      for i in 1:Nsweep_DMRG1
-          @time info_DMRG1 = DMRGSweep1!(Env;
-               GCstep=true, GCsweep=true,
+          info_DMRG1 = DMRGSweep1!(Env;
+               GCstep=true, GCsweep=true, verbose = verbose,
                LanczosOpt=(krylovdim=8, maxiter=1, tol=1e-4, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
           push!(lsEn, info_DMRG1[2][1].Eg)
           push!(info, info_DMRG1)
-          println("1-site DMRG: En = $(lsEn[end]), K = $(info_DMRG1[2][midsi].Lanczos.numops)")
-          @show FiniteMPS.GlobalTimer
           flush(stdout)
 
      end
@@ -95,7 +91,7 @@ function mainObs(Ψ::MPS)
           addObs!(Tree, U₁SU₂Fermion.ΔₛdagΔₛ, (i, j, k, l), 1; Z=U₁SU₂Fermion.Z, name=(:Fdag, :Fdag, :F, :F))
      end
 
-     @time calObs!(Tree, Ψ; GCstep = true, verbose = true)
+     @time calObs!(Tree, Ψ; GCstep = true, verbose = verbose)
 
      Obs = convert(Dict, Tree, [(:n,), (:nd,), (:S, :S), (:n, :n), (:Fdag, :F), (:Fdag, :Fdag, :F, :F)])
      GC.gc()
@@ -105,6 +101,6 @@ function mainObs(Ψ::MPS)
 end
 
 Ψ, Env, lsD, lsEn, info = mainDMRG(Ψ);
-# Obs = mainObs(Ψ)
+Obs = mainObs(Ψ)
 
 rmprocs(workers())

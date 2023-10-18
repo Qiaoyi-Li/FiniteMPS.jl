@@ -38,12 +38,12 @@ function TensorKit.mul!(tC::AbstractTensorMap,
     # parellel this function only in multi-processing mode
     if get_num_workers() > 1 && get_num_threads_julia() > 1
 
-        @floop GlobalThreadsExecutors for c in filter(c -> TensorKit.hasblock(tA, c), blocksectors(tC))
+        @floop GlobalThreadsExecutor for c in filter(c -> TensorKit.hasblock(tA, c), blocksectors(tC))
             mul!(TensorKit.StridedView(block(tC, c)), TensorKit.StridedView(block(tA, c)), TensorKit.StridedView(block(tB, c)), α, β)
         end
 
         if β != one(β)
-            @floop GlobalThreadsExecutors for c in filter(c -> !TensorKit.hasblock(tA, c), blocksectors(tC))
+            @floop GlobalThreadsExecutor for c in filter(c -> !TensorKit.hasblock(tA, c), blocksectors(tC))
                 rmul!(block(tC, c), β)
             end
         end
@@ -91,7 +91,7 @@ function TensorKit.tsvd!(t::TensorMap;
         lsΣ = Vector{Vector{real(scalartype(t))}}(undef, length(lsc))
         lsV = Vector{A}(undef, length(lsc))
 
-        @floop GlobalThreadsExecutors for i in 1:length(lsc)
+        @floop GlobalThreadsExecutor for i in 1:length(lsc)
             U, Σ, V = TensorKit._svd!(blocks(t)[lsc[i]], alg)
             lsU[i] = U
             lsΣ[i] = Σ

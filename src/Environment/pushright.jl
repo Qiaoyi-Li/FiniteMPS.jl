@@ -36,7 +36,7 @@ function pushright!(obj::SparseEnvironment{L,3,T}) where {L,T<:Tuple{AdjointMPS,
      else # multi-threading
           let El = obj.El[si], A = obj[1][si], H = obj[2][si], B = obj[3][si]
                @threads for j in 1:sz[2]
-                    @floop GlobalThreadsExecutors for i in filter(x -> !isnothing(H[x, j]) && !isnothing(El[x]), 1:sz[1])
+                    @floop GlobalThreadsExecutor for i in filter(x -> !isnothing(H[x, j]) && !isnothing(El[x]), 1:sz[1])
                          El_i = _pushright(El[i], A, H[i, j], B; sparse=true)
                          @reduce() do (El_cum = nothing; El_i)
                               El_cum = axpy!(true, El_i, El_cum)
