@@ -36,14 +36,14 @@ function canonicalize!(obj::AbstractEnvironment, si::Vector{Int64}; kwargs...)
 end
 
 """
-     free!(obj::AbstractEnvironment)
+     free!(obj::AbstractEnvironment) -> nothing
 
 Free the local tensors in `El[Center[1] + : end]` and `Er[1 : Center[2] - 1]`.
 """
 function free!(obj::SimpleEnvironment)
      obj.El[obj.Center[1]+1:end] .= nothing
      obj.Er[1:obj.Center[2]-1] .= nothing
-     return obj
+     return nothing
 end
 function free!(obj::SparseEnvironment{L,N,T,StoreMemory}) where {L,N,T}
      for i in filter(i -> isassigned(obj.El, i), obj.Center[1]+1:L)
@@ -52,11 +52,13 @@ function free!(obj::SparseEnvironment{L,N,T,StoreMemory}) where {L,N,T}
      for i in filter(i -> isassigned(obj.Er, i), 1:obj.Center[2]-1)
           obj.Er[i] .= nothing
      end
-     return obj
+     return nothing
 end
 function free!(obj::SparseEnvironment{L,N,T,StoreDisk}) where {L,N,T}
-     # freeing memory is not needed if the local tensors are stored in disk
-     return obj
+     # clear the files in disk
+     cleanup!(obj.El, obj.Center[1]+1:L)
+     cleanup!(obj.Er, 1:obj.Center[2]-1)
+     return nothing
 end
 
 

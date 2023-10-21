@@ -44,7 +44,7 @@ function calObs!(Root::InteractionTreeNode, Ψ::AbstractMPS{L}; kwargs...) where
                     # free
                     while !isempty(stack_pre)
                          node_pop = pop!(stack_pre)
-                         node_pop.value = nothing
+                         _free!(node_pop)
                     end
 
                     while !isempty(stack)
@@ -171,4 +171,13 @@ function _update_node!(node::InteractionTreeNode, El::LocalLeftTensor, A::Adjoin
 
      return LocalTimer
 
+end
+
+function _free!(node::InteractionTreeNode{Vector{LocalLeftTensor}})
+     node.value = nothing
+     return nothing
+end
+function _free!(node::InteractionTreeNode{SerializedElementVector{LocalLeftTensor}})
+     # cleanup the folder of the SerializedElementVector
+     return cleanup!(node.value)
 end
