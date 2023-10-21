@@ -21,7 +21,7 @@ flush(stdout)
 include("Models/Hubbard.jl")
 
 @show Latt = SquaLatt(8, 4; BCY=:PBC)
-disk = false # store local tensors in disk or memory
+disk = true # store local tensors in disk or memory
 
 Ψ = nothing
 
