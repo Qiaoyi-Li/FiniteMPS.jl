@@ -95,6 +95,15 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
+     Hl::LocalOperator{1,1}, Hr::LocalOperator{1,1},
+     Er::LocalRightTensor{2}; kwargs...) where {T<:NTuple{2,MPSTensor{3}}}
+     # TODO
+     @tensor Hx[a d; g i] := (((El.A[a c] * x.A[c e h k]) * Hl.A[d e]) * Hr.A[g h]) * Er.A[k i] 
+
+     return Hl.strength * Hr.strength * _permute2(Hx, x.A)
+end
+
+function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
      Hl::LocalOperator{1,2}, Hr::LocalOperator{1,1},
      Er::LocalRightTensor{3}; kwargs...) where {T<:NTuple{2,MPSTensor{3}}}
 

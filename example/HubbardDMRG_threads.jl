@@ -1,7 +1,7 @@
 using MKL
 using FiniteMPS, FiniteLattices
 
-verbose = 2
+verbose = 1
 
 include("Models/Hubbard.jl")
 
@@ -16,12 +16,12 @@ BLAS.set_num_threads(1)
 
 flush(stdout)
 
-@show Latt = SquaLatt(8, 4; BCY = :PBC)
+@show Latt = SquaLatt(8, 4; BCY=:PBC)
 disk = false # store local tensors in disk or memory
 
 Ψ = nothing
 
-function mainDMRG(Ψ=nothing);
+function mainDMRG(Ψ=nothing)
 
      Para = (t=1, t′=-0.2, U=8)
      Ndop = 0 # number of hole doping, negative value means elec doping
@@ -32,32 +32,45 @@ function mainDMRG(Ψ=nothing);
      lsD = repeat(lsD, inner=Nsweep)
      # ===========================================
 
+     # finish with 1-DMRG 
+     Nsweep_DMRG1 = 2
+
      # initial state
      if isnothing(Ψ)
-          aspace = vcat(Rep[U₁×SU₂]((Ndop, 0) => 1),repeat([Rep[U₁×SU₂]((i, j) => 2 for i in -(abs(Ndop) + 1):(abs(Ndop)+1) for j in 0:1//2:1), ], length(Latt) - 1))
-          Ψ = randMPS(U₁SU₂Fermion.pspace, aspace; disk = disk)
+          aspace = vcat(Rep[U₁×SU₂]((Ndop, 0) => 1), repeat([Rep[U₁×SU₂]((i, j) => 2 for i in -(abs(Ndop) + 1):(abs(Ndop)+1) for j in 0:1//2:1),], length(Latt) - 1))
+          Ψ = randMPS(U₁SU₂Fermion.pspace, aspace; disk=disk)
      end
 
      H = AutomataMPO(U₁SU₂Hubbard(Latt; Para...))
-     Env = Environment(Ψ', H, Ψ; disk = disk)
+     Env = Environment(Ψ', H, Ψ; disk=disk)
 
      lsEn = zeros(length(lsD))
      info = Vector{Tuple}(undef, length(lsD))
      midsi = Int64(round(length(Latt) / 2))
      for (i, D) in enumerate(lsD)
           @time info[i] = DMRGSweep2!(Env;
-               GCstep=true, GCsweep=true, verbose = verbose,
+               GCstep=true, GCsweep=true, verbose=verbose,
                trunc=truncdim(D) & truncbelow(1e-6),
                LanczosOpt=(krylovdim=5, maxiter=1, tol=1e-4, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
           lsEn[i] = info[i][2][1].Eg
      end
+
+     for i in 1:Nsweep_DMRG1
+          info_DMRG1 = DMRGSweep1!(Env;
+               GCstep=true, GCsweep=true, verbose=verbose,
+               LanczosOpt=(krylovdim=8, maxiter=1, tol=1e-4, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
+          push!(lsEn, info_DMRG1[2][1].Eg)
+          push!(info, info_DMRG1)
+          flush(stdout)
+     end
+
      GC.gc()
      return Ψ, Env, lsD, lsEn, info
 end
 
 function mainObs(Ψ::MPS)
 
-     Tree = ObservableTree(;disk = disk)
+     Tree = ObservableTree(; disk=disk)
      for i in 1:length(Latt)
           addObs!(Tree, U₁SU₂Fermion.n, i, 1; name=:n)
           addObs!(Tree, U₁SU₂Fermion.nd, i, 1; name=:nd)
@@ -72,8 +85,8 @@ function mainObs(Ψ::MPS)
           i > j && continue # note ⟨Δᵢⱼ^dag Δₖₗ⟩ = ⟨Δₖₗ^dag Δᵢⱼ⟩
           addObs!(Tree, U₁SU₂Fermion.ΔₛdagΔₛ, (i, j, k, l), 1; Z=U₁SU₂Fermion.Z, name=(:Fdag, :Fdag, :F, :F))
      end
-     
-     @time calObs!(Tree, Ψ; GCstep = true, verbose = verbose)
+
+     @time calObs!(Tree, Ψ; GCstep=true, verbose=verbose)
 
      Obs = convert(Dict, Tree, [(:n,), (:nd,), (:S, :S), (:n, :n), (:Fdag, :F), (:Fdag, :Fdag, :F, :F)])
      GC.gc()
