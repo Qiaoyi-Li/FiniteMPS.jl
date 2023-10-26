@@ -1,5 +1,5 @@
 """
-     mutable struct MPS{L, T <:Union{Float64, ComplexF64}, C} <: DenseMPS{L}
+     mutable struct MPS{L, T <:Union{Float64, ComplexF64}, C} <: DenseMPS{L, T}
           const A::AbstractVector{AbstractMPSTensor}
           const Center::Vector{Int64} 
           c::T 
@@ -36,7 +36,7 @@ Initialize an MPS{L, T} with the local tensors `A` to be filled. Note we initial
 
 Newest update, kwargs `disk::Bool = false` can be added to each constructor to control how to store the local tensors.
 """
-mutable struct MPS{L, T <:Union{Float64, ComplexF64}, C} <: DenseMPS{L}
+mutable struct MPS{L, T <:Union{Float64, ComplexF64}, C} <: DenseMPS{L, T}
      const A::AbstractVector{AbstractMPSTensor}
      const Center::Vector{Int64} 
      c::T 

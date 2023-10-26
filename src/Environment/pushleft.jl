@@ -53,11 +53,8 @@ function pushleft!(obj::SparseEnvironment{L,3,T}) where {L,T<:Tuple{AdjointMPS,S
 end
 
 function _pushleft(Er::LocalRightTensor{2}, A::AdjointMPSTensor{3}, B::MPSTensor{3}; kwargs...)
-     # if rank(A, 1) == 1
+
      @tensor tmp[e; b] := (B.A[e c d] * Er.A[d a]) * A.A[a b c]
-     # else
-     #      @tensor tmp[e; b] := (B.A[e c d] * Er.A[d a]) * A.A[c a b]
-     # end
      return LocalRightTensor(tmp, Er.tag)
 end
 function _pushleft(Er::LocalRightTensor{2}, A::AdjointMPSTensor{3}, H::IdentityOperator, B::MPSTensor{3}; kwargs...)
@@ -66,39 +63,31 @@ end
 
 function _pushleft(Er::LocalRightTensor{2}, A::AdjointMPSTensor{3}, H::LocalOperator{2,1}, B::MPSTensor{3}; kwargs...)
 
-     # D^3d + D^2d^2χ + D^3dχ
-     # if rank(A, 1) == 1
-          @tensor tmp[e g; b] := ((B.A[e f d] * Er.A[d a]) * H.A[g c f]) * A.A[a b c]
-     # else
-     #      @tensor Er[e g; b] := ((B.A[e f d] * Er.A[d a]) * H.A[g c f]) * A.A[c a b]
-     # end
+     @tensor tmp[e g; b] := ((B.A[e f d] * Er.A[d a]) * H.A[g c f]) * A.A[a b c]
 
      return LocalRightTensor(tmp * H.strength, (Er.tag[1], H.tag[1][1], Er.tag[2]))
 end
 
 function _pushleft(Er::LocalRightTensor{2}, A::AdjointMPSTensor{3}, H::LocalOperator{1,1}, B::MPSTensor{3}; kwargs...)
-     # if rank(A, 1) == 1
-          @tensor tmp[e; b] := ((B.A[e f d] * Er.A[d a]) * H.A[c f]) * A.A[a b c]
-     # else
-     #      @tensor Er[e; b] := ((B.A[e f d] * Er.A[d a]) * H.A[c f]) * A.A[c a b]
-     # end
+
+     @tensor tmp[e; b] := ((B.A[e f d] * Er.A[d a]) * H.A[c f]) * A.A[a b c]
      return LocalRightTensor(tmp * H.strength, Er.tag)
 end
 
 function _pushleft(Er::LocalRightTensor{3}, A::AdjointMPSTensor{3}, H::LocalOperator{1,1}, B::MPSTensor{3}; kwargs...)
-     # if rank(A, 1) == 1
-          @tensor tmp[e g; b] := ((B.A[e f d] * H.A[c f]) * Er.A[d g a]) * A.A[a b c]
-     # else
-     #      @tensor Er[e g; b] := ((B.A[e f d] * H.A[c f]) * Er.A[d g a]) * A.A[c a b]
-     # end
+
+     @tensor tmp[e g; b] := ((B.A[e f d] * H.A[c f]) * Er.A[d g a]) * A.A[a b c]
      return LocalRightTensor(tmp * H.strength, Er.tag)
 end
 
 function _pushleft(Er::LocalRightTensor{3}, A::AdjointMPSTensor{3}, H::LocalOperator{1,2}, B::MPSTensor{3}; kwargs...)
-     # if rank(A, 1) == 1
-          @tensor tmp[e; b] := ((B.A[e f d] * Er.A[d g a]) * H.A[c f g]) * A.A[a b c]
-     # else
-     #      @tensor Er[e; b] := ((B.A[e f d] * Er.A[d g a]) * H.A[c f g]) * A.A[c a b]
-     # end
+
+     @tensor tmp[e; b] := ((B.A[e f d] * Er.A[d g a]) * H.A[c f g]) * A.A[a b c]
      return LocalRightTensor(tmp * H.strength, (Er.tag[1], Er.tag[3]))
+end
+
+# ========================= MPO ===========================
+function _pushleft(Er::LocalRightTensor{2}, A::AdjointMPSTensor{4}, B::MPSTensor{4}; kwargs...)
+     @tensor tmp[b; a] := (B.A[f g a c] * Er.A[e g]) * A.A[b c d e]
+     return LocalRightTensor(tmp, Er.tag) 
 end

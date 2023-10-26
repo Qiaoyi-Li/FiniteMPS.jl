@@ -18,12 +18,20 @@ Check if a MPS/MPO object is sparse, e.g. `::MPS` -> `false`, `::SparseMPO` -> `
 issparse(::AbstractMPS) = false
 
 """
-     abstract type DenseMPS{L} <: AbstractMPS{L}
+     abstract type DenseMPS{L, T <:Union{Float64, ComplexF64}} <: AbstractMPS{L}
 
 Abstract type of dense MPS/MPO with length `L`.
 """
-abstract type DenseMPS{L} <: AbstractMPS{L} end
+abstract type DenseMPS{L, T <:Union{Float64, ComplexF64}} <: AbstractMPS{L} end
 
+# promote local tensors
+function Base.setindex!(obj::DenseMPS{L, ComplexF64}, A::T, si::Int64) where {L, T <:Union{AbstractTensorMap, AbstractMPSTensor}}
+     if scalartype(A) != ComplexF64
+          return setindex!(obj.A, A*one(ComplexF64), si)
+     else
+          return setindex!(obj.A, A, si)
+     end
+end
 
 """  
      normalize!(obj::DenseMPS) -> obj

@@ -37,13 +37,16 @@ include("TensorWrapper/LocalOperator.jl")
 include("TensorWrapper/SparseMPOTensor.jl")
 include("TensorWrapper/StoreType.jl")
 
-# Dense MPS and MPO
+# Dense MPS
 export AbstractMPS, DenseMPS, AdjointMPS, coef, Center, MPS, randMPS, canonicalize!
 include("MPS/AbstractMPS.jl")
 include("MPS/AdjointMPS.jl")
 include("MPS/MPS.jl")
 include("MPS/canonicalize.jl")
-# TODO MPO
+
+# Dense MPO
+export MPO, identityMPO
+include("MPO/MPO.jl")
 
 # Sparse MPO
 export SparseMPO, issparse

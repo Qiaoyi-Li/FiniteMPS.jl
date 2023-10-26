@@ -1,5 +1,5 @@
 """
-     mutable struct MPO{L, T <:Union{Float64, ComplexF64}, C} <: DenseMPS{L}
+     mutable struct MPO{L, T <:Union{Float64, ComplexF64}, C} <: DenseMPS{L, T}
           const A::AbstractVector{AbstractMPSTensor}
           const Center::Vector{Int64} 
           c::T 
@@ -9,7 +9,7 @@ All the fields and constructors are exactly the same to those of `MPS`, we redef
 
 Details of constructors please see `MPS`. 
 """
-mutable struct MPO{L, T <:Union{Float64, ComplexF64}, C} <: DenseMPS{L}
+mutable struct MPO{L, T <:Union{Float64, ComplexF64}, C} <: DenseMPS{L, T}
      const A::AbstractVector{AbstractMPSTensor}
      const Center::Vector{Int64} 
      c::T 
@@ -80,20 +80,35 @@ mutable struct MPO{L, T <:Union{Float64, ComplexF64}, C} <: DenseMPS{L}
 
 end
 
+"""
+     identityMPO(::Type{T} = Float64, L::Int64, pspace::AbstractVector; kwargs...)
 
-# # initialize an identity MPO
-# # TODO from pspace, from MPS/MPO ...
-# function identityMPO(::Type{T}, L::Int64, pspace::VectorSpace) where T <: Union{Float64, ComplexF64}
-#      A = Vector{MPSTensor}(undef, L) 
-#      aspace = trivial(pspace)
-#      for si in eachindex(A)
-#           A[si] = TensorMap(ones, T, aspace⊗pspace, pspace⊗aspace)
-#      end
-#      obj = MPO(A)
-#      # canonicalize and normalize
-#      canonicalize!(obj, L)
-#      canonicalize!(obj, 1)
-#      return obj
-# end
-# identityMPO(L::Int64, pspace::VectorSpace) = identityMPO(Float64, L, pspace) # default = Float64
+Construct an identity MPO where the physical spaces are informed by a length `L` vertor of `VectorSpace`.
 
+     identityMPO(::Type{T} = Float64, L::Int64, pspace::VectorSpace; kwargs...)
+Assume the all the physical spaces are the same.
+
+     identityMPO(obj::DenseMPS{L, T}; kwargs...)
+Deduce the scalar type `T` and physical spaces from a MPS/MPO.
+"""
+function identityMPO(::Type{T}, L::Int64, pspace::AbstractVector; kwargs...) where T <: Union{Float64, ComplexF64}
+     @assert length(pspace) == L
+
+     aspace = trivial(pspace[1])
+     obj = MPO(L, T; kwargs...)  
+     for si in 1:L
+          obj[si] = permute(isometry(aspace, aspace) ⊗ isometry(pspace[si], pspace[si]), (1, 2), (4, 3))  
+     end
+
+     canonicalize!(obj, L)
+     canonicalize!(obj, 1)
+     return obj
+end
+function identityMPO(::Type{T}, L::Int64, pspace::VectorSpace; kwargs...) where T <: Union{Float64, ComplexF64}
+     return identityMPO(T, L, [pspace for i in 1:L]; kwargs...)
+end
+identityMPO(L::Int64, pspace::Union{AbstractVector, VectorSpace}; kwargs...) = identityMPO(Float64, L, pspace; kwargs...) # default = Float64
+
+function identityMPO(obj::DenseMPS{L, T}; kwargs...) where {L, T}
+     return identityMPO(T, L, [codomain(obj[si])[2] for si in 1:L]; kwargs...)
+end
