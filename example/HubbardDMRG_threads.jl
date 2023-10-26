@@ -48,7 +48,7 @@ function mainDMRG(Ψ=nothing)
      info = Vector{Tuple}(undef, length(lsD))
      midsi = Int64(round(length(Latt) / 2))
      for (i, D) in enumerate(lsD)
-          @time info[i] = DMRGSweep2!(Env;
+          info[i] = DMRGSweep2!(Env;
                GCstep=true, GCsweep=true, verbose=verbose,
                trunc=truncdim(D) & truncbelow(1e-6),
                LanczosOpt=(krylovdim=5, maxiter=1, tol=1e-4, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))

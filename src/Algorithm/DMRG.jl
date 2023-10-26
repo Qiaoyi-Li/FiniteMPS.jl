@@ -1,52 +1,4 @@
 """
-     struct LanczosInfo 
-          converged::Bool
-          normres::Vector{Float64}    
-          numiter::Int64    
-          numops::Int64
-     end
-
-Similar to `KrylovKit.ConvergenceInfo` but delete `residuals` to save memory.
-"""
-struct LanczosInfo
-     converged::Bool
-     normres::Vector{Float64}
-     numiter::Int64
-     numops::Int64
-end
-function convert(::Type{LanczosInfo}, Info::KrylovKit.ConvergenceInfo)
-     return LanczosInfo(Info.converged > 0, Info.normres, Info.numiter, Info.numops)
-end
-
-"""
-     struct DMRG2Info
-          Eg::Float64
-          Lanczos::LanczosInfo 
-          TrunErr::Float64
-     end
-
-Information of 2-site DMRG.
-"""
-struct DMRG2Info
-     Eg::Float64
-     Lanczos::LanczosInfo
-     TrunErr::Float64
-end
-
-"""
-     struct DMRG1Info
-          Eg::Float64
-          Lanczos::LanczosInfo 
-     end
-
-Information of 1-site DMRG.
-"""
-struct DMRG1Info
-     Eg::Float64
-     Lanczos::LanczosInfo
-end
-
-"""
      DMRGSweep2!(Env::SparseEnvironment{L,3,T}; kwargs...)
 
 2-site DMRG sweep from left to right and sweep back from right to left.  
@@ -72,7 +24,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
      verbose::Int64 = get(kwargs, :verbose, 0)
      TimerSweep = TimerOutput()
      # info, (L, R)
-     info = (Vector{DMRG2Info}(undef, L - 1), Vector{DMRG2Info}(undef, L - 1))
+     info = (Vector{DMRGInfo}(undef, L - 1), Vector{DMRGInfo}(undef, L - 1))
 
      Ψ = Env[3]
      canonicalize!(Ψ, 1, 2)
@@ -89,7 +41,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
           Al = s * vd
           # remember to change Center of Ψ manually
           Center(Ψ)[:] = [si + 1, si + 1]
-          info[1][si] = DMRG2Info(eg, info_Lanczos, ϵ)
+          info[1][si] = DMRGInfo(eg, info_Lanczos, BondInfo(s, ϵ))
 
           # GC manually
           GCstep && manualGC(TimerStep)
@@ -124,7 +76,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
           # remember to change Center of Ψ manually
           Center(Ψ)[:] = [si - 1, si - 1]
 
-          info[2][si-1] = DMRG2Info(eg, info_Lanczos, ϵ)
+          info[2][si-1] = DMRGInfo(eg, info_Lanczos, BondInfo(s, ϵ))
 
           # GC manually
           GCstep && manualGC(TimerStep)
@@ -147,11 +99,11 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
 
      if verbose ≥ 1
           show(TimerSweep; title="sweep $(GlobalCountDMRGSweep2)")
-          let midsi = div(L, 2)
-               D, DD = dim(Ψ[midsi+1], 1)
-               K = info[2][midsi].Lanczos.numops
+          let 
+               D, DD = mapreduce(x -> dim(x, 1), (x, y) -> max.(x, y), Ψ.A)
+               K = maximum(x -> x.Lanczos.numops, info[2])
                Eg = info[2][1].Eg
-               TrunErr2 = info[2][midsi].TrunErr^2
+               TrunErr2 = maximum(x -> x.Bond.TrunErr^2, info[2])
                println("\n D = $(D) -> $(DD), K = $(K), Eg = $(Eg), TrunErr2 = $(TrunErr2)")
           end
           flush(stdout)
@@ -183,7 +135,7 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
      verbose::Int64 = get(kwargs, :verbose, 0)
      TimerSweep = TimerOutput()
      # info, (L, R)
-     info = (Vector{DMRG1Info}(undef, L), Vector{DMRG1Info}(undef, L))
+     info = (Vector{DMRGInfo}(undef, L), Vector{DMRGInfo}(undef, L))
 
      Ψ = Env[3]
      # left to right sweep
@@ -194,7 +146,7 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
 
           @timeit TimerStep "DMRGUpdate1" eg, xg, info_Lanczos = _DMRGUpdate1(ProjHam(Env, si), Ψ[si]; kwargs...)
           Ψ[si] = xg
-          info[1][si] = DMRG1Info(eg, info_Lanczos)
+          info[1][si] = DMRGInfo(eg, info_Lanczos, BondInfo(xg, :R))
 
           # GC manually
           GCstep && manualGC(TimerStep)
@@ -221,7 +173,7 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
 
           @timeit TimerStep "DMRGUpdate1" eg, xg, info_Lanczos = _DMRGUpdate1(ProjHam(Env, si), Ψ[si]; kwargs...)
           Ψ[si] = xg
-          info[2][si] = DMRG1Info(eg, info_Lanczos)
+          info[2][si] = DMRGInfo(eg, info_Lanczos, BondInfo(xg, :L))
 
           # GC manually
           GCstep && manualGC(TimerStep)
@@ -244,9 +196,9 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
 
      if verbose ≥ 1
           show(TimerSweep; title="sweep $(GlobalCountDMRGSweep1)")
-          let midsi = div(L, 2)
-               D, DD = dim(Ψ[midsi+1], 1)
-               K = info[2][midsi].Lanczos.numops
+          let 
+               D, DD = mapreduce(x -> dim(x, 1), (x, y) -> max.(x, y), Ψ.A)
+               K = maximum(x -> x.Lanczos.numops, info[2])
                Eg = info[2][1].Eg
                println("\n D = $(D) -> $(DD), K = $(K), Eg = $(Eg)")
           end

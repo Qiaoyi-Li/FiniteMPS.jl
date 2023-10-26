@@ -8,7 +8,7 @@ using Base.Threads, FLoops, FoldsThreads, Distributed, SharedArrays
 @reexport using TensorKit, KrylovKit, TensorKit.TensorOperations
 @reexport import Base: +, -, *, /, ==, promote_rule, convert, length, show, getindex, setindex!, lastindex, keys, similar
 @reexport import TensorKit: ×, one, zero, dim, inner, scalar, domain, codomain, eltype, scalartype, leftorth, rightorth, tsvd, adjoint, normalize!, norm, axpy!, axpby!, dot, mul!, rmul!
-@reexport import LinearAlgebra: BLAS, rank, qr
+@reexport import LinearAlgebra: BLAS, rank, qr, diag
 @reexport import AbstractTrees: parent, isroot
 
 
@@ -65,7 +65,8 @@ include("ProjectiveHam/action1.jl")
 include("ProjectiveHam/action2.jl")
 
 # Algorithm
-export LanczosInfo, DMRG2Info, DMRG1Info,  DMRGSweep2!, DMRGSweep1!
+export LanczosInfo, BondInfo, DMRGInfo, DMRGSweep2!, DMRGSweep1!
+include("Algorithm/Info.jl")
 include("Algorithm/DMRG.jl")
 
 # Interaction tree for generating Hamiltonian MPO and calculate observables
