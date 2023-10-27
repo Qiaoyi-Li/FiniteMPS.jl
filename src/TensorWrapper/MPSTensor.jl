@@ -57,7 +57,9 @@ promote_rule(::Type{<:MPSTensor}, ::Type{<:AbstractTensorMap}) = MPSTensor
 *(A::Union{MPSTensor, AbstractTensorMap}, B::Union{MPSTensor, AbstractTensorMap}) = *(promote(A, B)...)
 
 """
-     leftorth(A::MPSTensor; trunc = notrunc(), kwargs...) -> Q::AbstractTensorMap, R::AbstractTensorMap, ϵ::Float64
+     leftorth(A::MPSTensor; 
+          trunc = notrunc(),
+          kwargs...) -> Q::AbstractTensorMap, R::AbstractTensorMap, ϵ::Float64
 
 Left canonicalize a on-site MPS tensor. 
 
@@ -67,13 +69,21 @@ function leftorth(A::MPSTensor{R₁}; trunc = notrunc(), kwargs...) where R₁
      if trunc == notrunc()
           return leftorth(A.A, Tuple(1:R₁-1), (R₁,); kwargs...)..., 0.0
      else
-          u, s, vd, ϵ = tsvd(A.A, Tuple(1:R₁-1), (R₁,); trunc = trunc, kwargs...)
+          alg = get(kwargs, :alg, nothing)
+          if isnothing(alg) 
+               u, s, vd, ϵ = tsvd(A.A, Tuple(1:R₁-1), (R₁,); trunc = trunc)
+          else
+          u, s, vd, ϵ = tsvd(A.A, Tuple(1:R₁-1), (R₁,); trunc = trunc, alg = alg)
+          end
           return u, s*vd, ϵ
      end
+
 end
 
 """
-     rightorth(A::MPSTensor) -> L::AbstractTensorMap, Q::AbstractTensorMap
+     rightorth(A::MPSTensor;
+          trunc = notrunc(),
+          kwargs...) -> L::AbstractTensorMap, Q::AbstractTensorMap, ϵ::Float64
 
 Right canonicalize a on-site MPS tensor. 
 
@@ -81,9 +91,14 @@ If `trunc = notrunc()`, use `TensorKit.rightorth`, otherwise, use `TensorKit.tsv
 """
 function rightorth(A::MPSTensor{R₂}; trunc = notrunc(), kwargs...) where R₂
      if trunc == notrunc()
-          return rightorth(A.A, (1,), Tuple(2:R₂); kwargs...)
+          return rightorth(A.A, (1,), Tuple(2:R₂); kwargs...)..., 0.0
      else
-          u, s, vd, ϵ = tsvd(A.A, (1,), Tuple(2:R₂); trunc = trunc, kwargs...)
+          alg = get(kwargs, :alg, nothing)
+          if isnothing(alg)
+               u, s, vd, ϵ = tsvd(A.A, (1,), Tuple(2:R₂); trunc = trunc)
+          else
+               u, s, vd, ϵ = tsvd(A.A, (1,), Tuple(2:R₂); trunc = trunc, alg = alg)
+          end
           return u*s, vd, ϵ
      end
 end

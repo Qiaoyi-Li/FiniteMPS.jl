@@ -80,6 +80,9 @@ mutable struct MPO{L, T <:Union{Float64, ComplexF64}, C} <: DenseMPS{L, T}
 
 end
 
+similar(A::MPO{L, T, StoreMemory}) where {L, T} = MPO{L, T}()
+similar(A::MPO{L, T, StoreDisk}) where {L, T} = MPO{L, T}(;disk = true)
+
 """
      identityMPO(::Type{T} = Float64, L::Int64, pspace::AbstractVector; kwargs...)
 

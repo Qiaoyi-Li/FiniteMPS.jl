@@ -2,6 +2,9 @@
      action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2, T}; kwargs...) -> ::CompositeMPSTensor{2, T}
 
 Action of 2-site projective Hamiltonian on the 2-site local tensors, wrapped by `CompositeMPSTensor{2, T}` where `T<:NTuple{2,MPSTensor}`.
+
+     action2(obj::IdentityProjectiveHamiltonian{2}, x::CompositeMPSTensor{2, T}; kwargs...) -> ::CompositeMPSTensor{2, T}
+Special case for `IdentityProjectiveHamiltonian`.
 """
 function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}; kwargs...) where {T<:NTuple{2,MPSTensor}}
 
@@ -24,9 +27,19 @@ function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}
      end
      return CompositeMPSTensor{2,T}(Hx)
 end
-function action2(obj::SparseProjectiveHamiltonian{2}, x::AbstractVector{<:MPSTensor}; kwargs...)
+function action2(obj::IdentityProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}; kwargs...) where {T<:NTuple{2,MPSTensor}}
+     Hx = _action2(x, obj.El,
+          IdentityOperator(obj.si[1], 1),
+          IdentityOperator(obj.si[2], 1),
+          obj.Er; kwargs...)
+     return CompositeMPSTensor{2,T}(Hx)
+end
+function action2(obj::AbstractProjectiveHamiltonian, x::AbstractVector{<:MPSTensor}; kwargs...)
      @assert length(x) == 2
      return action2(obj, CompositeMPSTensor(x[1], x[2]); kwargs...)
+end
+function action2(obj::AbstractProjectiveHamiltonian, xl::MPSTensor, xr::MPSTensor; kwargs...)
+     return action2(obj, CompositeMPSTensor(xl, xr); kwargs...)
 end
 
 # ========================= 2 rank-3 MPS tensors ========================

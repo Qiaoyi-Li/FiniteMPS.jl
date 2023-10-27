@@ -8,7 +8,7 @@ using Base.Threads, FLoops, FoldsThreads, Distributed, SharedArrays
 @reexport using TensorKit, KrylovKit, TensorKit.TensorOperations
 @reexport import Base: +, -, *, /, ==, promote_rule, convert, length, show, getindex, setindex!, lastindex, keys, similar
 @reexport import TensorKit: ×, one, zero, dim, inner, scalar, domain, codomain, eltype, scalartype, leftorth, rightorth, tsvd, adjoint, normalize!, norm, axpy!, axpby!, dot, mul!, rmul!
-@reexport import LinearAlgebra: BLAS, rank, qr, diag
+@reexport import LinearAlgebra: BLAS, rank, qr, diag, I
 @reexport import AbstractTrees: parent, isroot
 
 
@@ -51,6 +51,7 @@ include("MPO/MPO.jl")
 # Sparse MPO
 export SparseMPO, issparse
 include("SparseMPO/SparseMPO.jl")
+include("SparseMPO/algebra.jl")
 
 # Environment
 export AbstractEnvironment, SimpleEnvironment, SparseEnvironment, Environment, pushleft!, pushright!, canonicalize!, free!, scalar!
@@ -62,7 +63,7 @@ include("Environment/canonicalize.jl")
 include("Environment/scalar.jl")
 
 # Projective Hamiltonian
-export AbstractProjectiveHamiltonian, SparseProjectiveHamiltonian, ProjHam, action1, action2
+export AbstractProjectiveHamiltonian, IdentityProjectiveHamiltonian, SparseProjectiveHamiltonian, ProjHam, action1, action2
 include("ProjectiveHam/ProjectiveHam.jl")
 include("ProjectiveHam/action1.jl")
 include("ProjectiveHam/action2.jl")

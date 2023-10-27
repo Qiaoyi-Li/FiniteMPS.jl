@@ -144,6 +144,10 @@ function randMPS(A::Any, args...; kwargs...)
      return randMPS(Float64, A, args...; kwargs...)
 end
 
+similar(A::MPS{L, T, StoreMemory}) where {L, T} = MPS{L, T}()
+similar(A::MPS{L, T, StoreDisk}) where {L, T} = MPS{L, T}(;disk = true)
+#TODO deepcopy for StoreDisk MPS
+
 
 
 

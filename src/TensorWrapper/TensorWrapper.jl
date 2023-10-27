@@ -26,12 +26,18 @@ function normalize!(A::AbstractTensorWrapper)
      return A
 end
 
+==(A::AbstractTensorWrapper, B::AbstractTensorWrapper) = A.A == B.A
+
 *(A::AbstractTensorWrapper, B::AbstractTensorWrapper) = A.A*B.A
 
 # linear algebra 
 +(A::T, B::T) where T <: AbstractTensorWrapper = convert(T, A.A + B.A)
 +(A::AbstractTensorWrapper, ::Nothing) = A
 +(::Nothing, A::AbstractTensorWrapper) = A
+-(A::T) where T <: AbstractTensorWrapper = convert(T, -A.A)
+-(A::T, B::T) where T <: AbstractTensorWrapper = convert(T, A.A - B.A)
+-(A::AbstractTensorWrapper, ::Nothing) = A
+-(::Nothing, A::AbstractTensorWrapper) = -A
 
 *(A::T, a::Number) where T <: AbstractTensorWrapper = convert(T, a*A.A)
 *(a::Number, A::AbstractTensorWrapper ) = A*a 
@@ -56,6 +62,8 @@ function axpby!(α::Number, A::T, β::Number, B::T) where T <: AbstractTensorWra
      axpby!(α, A.A, β, B.A)
      return B
 end
+axpby!(α::Number, ::Nothing, β::Number, A::AbstractTensorWrapper) = rmul!(A, β)
+axpby!(α::Number, A::AbstractTensorWrapper, β::Number, ::Nothing) = axpy!(α, A, nothing)
 
 
 

@@ -15,37 +15,51 @@ Directly construct.
      CompositeMPSTensor(::MPSTensor, ::MPSTensor, ...)
 Contract N on-site tensors to get the N-site tensor. 
 """
-struct CompositeMPSTensor{N, T <: NTuple{N, MPSTensor}} <: AbstractMPSTensor
+struct CompositeMPSTensor{N,T<:NTuple{N,MPSTensor}} <: AbstractMPSTensor
      A::AbstractTensorMap
 
-     function CompositeMPSTensor{N, T}(A::AbstractTensorMap) where {N, T <: NTuple{N, MPSTensor}}
-          return new{N, T}(A)
+     function CompositeMPSTensor{N,T}(A::AbstractTensorMap) where {N,T<:NTuple{N,MPSTensor}}
+          return new{N,T}(A)
      end
 
-     function CompositeMPSTensor(x::T) where {N, T <:NTuple{N, MPSTensor}}
+     function CompositeMPSTensor(x::T) where {N,T<:NTuple{N,MPSTensor}}
           @assert N ≥ 2
           A = reduce(*, x)
-          return new{N, T}(A)
+          return new{N,T}(A)
      end
      CompositeMPSTensor(x::MPSTensor...) = CompositeMPSTensor(x)
 end
 
 """
-     leftorth(::CompositeMPSTensor{2, ...}) -> Q::AbstractTensorMap, R::AbstractTensorMap
+     leftorth(::CompositeMPSTensor{2, ...};
+          trunc = notrunc(),
+          kwargs...) -> Q::AbstractTensorMap, R::AbstractTensorMap, ϵ::Float64
 
 Split a 2-site local tensor s.t. the left one is canonical.
 """
-function leftorth(A::CompositeMPSTensor{2, Tuple{MPSTensor{R₁}, MPSTensor{R₂}}}) where {R₁, R₂}
-     return leftorth(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)))
+function leftorth(A::CompositeMPSTensor{2,Tuple{MPSTensor{R₁},MPSTensor{R₂}}}; trunc=notrunc(), kwargs...) where {R₁,R₂}
+     if trunc == notrunc()
+          return leftorth(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)))..., 0.0
+     else
+          u, s, vd, ϵ = tsvd(A; trunc=trunc, kwargs...)
+          return u, s * vd, ϵ
+     end
 end
 
 """
-     rightorth(::CompositeMPSTensor{2, ...}) -> L::AbstractTensorMap, Q::AbstractTensorMap
+     rightorth(::CompositeMPSTensor{2, ...};
+          trunc = notrunc(),
+          kwargs...) -> L::AbstractTensorMap, Q::AbstractTensorMap, ϵ::Float64
 
 Split a 2-site local tensor s.t. the right one is canonical.
 """
-function rightorth(A::CompositeMPSTensor{2, Tuple{MPSTensor{R₁}, MPSTensor{R₂}}}) where {R₁, R₂}
-     return rightorth(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)))
+function rightorth(A::CompositeMPSTensor{2,Tuple{MPSTensor{R₁},MPSTensor{R₂}}}; trunc=notrunc(), kwargs...) where {R₁,R₂}
+     if trunc == notrunc()
+          return rightorth(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)))..., 0.0
+     else
+          u, s, vd, ϵ = tsvd(A; trunc=trunc, kwargs...)
+          return u * s, vd, ϵ
+     end
 end
 
 """
@@ -54,6 +68,12 @@ end
 
 Use SVD to split a 2-site local tensor, details see TensorKit.tsvd.
 """
-function tsvd(A::CompositeMPSTensor{2, Tuple{MPSTensor{R₁}, MPSTensor{R₂}}}; kwargs...) where {R₁, R₂}
-     return tsvd(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)); kwargs...)
+function tsvd(A::CompositeMPSTensor{2,Tuple{MPSTensor{R₁},MPSTensor{R₂}}}; kwargs...) where {R₁,R₂}
+     trunc = get(kwargs, :trunc, notrunc())
+     alg = get(kwargs, :alg, nothing)
+     if isnothing(alg)
+          return tsvd(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)); trunc=trunc)
+     else
+          return tsvd(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)); trunc=trunc, alg=alg)
+     end
 end
