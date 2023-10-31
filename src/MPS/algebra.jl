@@ -1,4 +1,5 @@
 # MPS is an element of Hilbert space, the algebra struct of Hilbert space should be implemented
+
 # TODO, LinearCombination, +, -, /, inner, adjoint, \oplus
 # function LinearCombination(A::AbstractMPS, cA::Number, B::AbstractMPS, cB::Number)
 #      # return C = cA*A + cB*B
@@ -73,14 +74,5 @@
 #      @assert a != 0
 #      return *(A, 1/a) 
 # end
-
-# inner product ⟨A,B⟩
-function inner(A::AbstractMPS{L}, B::AbstractMPS{L}) where L
-     @assert codomain(A[1])[1] == codomain(B[1])[1] && domain(A[end])[end] == domain(B[end])[end]
-
-     Env = Environment(A', B)
-     return scalar!(Env; normalize = false)
-end
-
 
 

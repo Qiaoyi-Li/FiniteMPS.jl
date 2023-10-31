@@ -68,6 +68,10 @@ include("ProjectiveHam/ProjectiveHam.jl")
 include("ProjectiveHam/action1.jl")
 include("ProjectiveHam/action2.jl")
 
+# Algebra operations
+include("Algebra/inner.jl")
+include("Algebra/mul.jl")
+
 # Algorithm
 export LanczosInfo, BondInfo, DMRGInfo, DMRGSweep2!, DMRGSweep1!
 include("Algorithm/Info.jl")

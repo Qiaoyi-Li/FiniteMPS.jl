@@ -3,7 +3,7 @@
 
 Push right the given environment object, i.e. `Center == [i, j]` to `[i + 1, j]`.
 """
-function pushright!(obj::SimpleEnvironment{L,2,T}) where {L,T<:Tuple{AdjointMPS,MPS}}
+function pushright!(obj::SimpleEnvironment{L,2,T}) where {L,T<:Tuple{AdjointMPS,DenseMPS}}
      si = obj.Center[1]
      @assert si < L
 
@@ -12,7 +12,7 @@ function pushright!(obj::SimpleEnvironment{L,2,T}) where {L,T<:Tuple{AdjointMPS,
      return obj
 end
 
-function pushright!(obj::SparseEnvironment{L,3,T}) where {L,T<:Tuple{AdjointMPS,SparseMPO,MPS}}
+function pushright!(obj::SparseEnvironment{L,3,T}) where {L,T<:Tuple{AdjointMPS,SparseMPO,DenseMPS}}
      si = obj.Center[1]
      @assert si < L
 
@@ -20,7 +20,7 @@ function pushright!(obj::SparseEnvironment{L,3,T}) where {L,T<:Tuple{AdjointMPS,
 
      El_next = SparseLeftTensor(nothing, sz[2])
      if get_num_workers() > 1 # multi-processing
-         
+
           # use pmap to dispatch interactions
           lsEl = let El = obj.El[si], A = obj[1][si], H = obj[2][si], B = obj[3][si]
                valid_idx = [(i, j) for j in 1:sz[2] for i in filter(x -> !isnothing(H[x, j]) && !isnothing(El[x]), 1:sz[1])]
@@ -28,7 +28,7 @@ function pushright!(obj::SparseEnvironment{L,3,T}) where {L,T<:Tuple{AdjointMPS,
                     _pushright(El[i], A, H[i, j], B; sparse=true), i, j
                end
           end
-     
+
           for (El, i, j) in lsEl
                El_next[j] = axpy!(true, El, El_next[j])
           end
@@ -304,7 +304,32 @@ end
 
 # ========================= MPO ===========================
 function _pushright(El::LocalLeftTensor{2}, A::AdjointMPSTensor{4}, B::MPSTensor{4}; kwargs...)
-     @tensor tmp[g; e] := (El.A[a b] * A.A[f g a c]) * B.A[b c d e]
+     @tensor tmp[f; e] := (El.A[a b] * A.A[d f a c]) * B.A[b c d e]
      return LocalLeftTensor(tmp, El.tag)
 end
+
+function _pushright(El::LocalLeftTensor{2}, A::AdjointMPSTensor{4}, H::IdentityOperator, B::MPSTensor{4}; kwargs...)
+     return rmul!(_pushright(El, A, B), H.strength)
+end
+
+function _pushright(El::LocalLeftTensor{2}, A::AdjointMPSTensor{4}, H::LocalOperator{1,1}, B::MPSTensor{4}; kwargs...)
+     @tensor tmp[f; e] := ((El.A[a b] * A.A[d f a g]) * H.A[g c]) * B.A[b c d e]
+     return LocalLeftTensor(rmul!(tmp, H.strength), El.tag)
+end
+
+function _pushright(El::LocalLeftTensor{2}, A::AdjointMPSTensor{4}, H::LocalOperator{1,2}, B::MPSTensor{4}; kwargs...)
+     @tensor tmp[f; h e] := ((El.A[a b] * A.A[d f a g]) * H.A[g c h]) * B.A[b c d e]
+     return LocalLeftTensor(rmul!(tmp, H.strength), (El.tag[1], H.tag[2][2], El.tag[2]))
+end
+
+function _pushright(El::LocalLeftTensor{3}, A::AdjointMPSTensor{4}, H::LocalOperator{1,1}, B::MPSTensor{4}; kwargs...)
+     @tensor tmp[f; h e] := ((El.A[a h b] * A.A[d f a g]) * H.A[g c]) * B.A[b c d e]
+     return LocalLeftTensor(rmul!(tmp, H.strength), El.tag)
+end
+
+function _pushright(El::LocalLeftTensor{3}, A::AdjointMPSTensor{4}, H::LocalOperator{2,1}, B::MPSTensor{4}; kwargs...)
+     @tensor tmp[f; e] := ((El.A[a h b] * A.A[d f a g]) * H.A[h g c]) * B.A[b c d e]
+     return LocalLeftTensor(rmul!(tmp, H.strength), (El.tag[1], El.tag[3]))
+end
+
 

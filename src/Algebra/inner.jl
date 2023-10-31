@@ -1,0 +1,11 @@
+"""
+     inner(A::DenseMPS, B::DenseMPS)
+
+Return the inner product `⟨A, B⟩` between MPS/MPO `A` and `B`.
+"""
+function inner(A::T, B::T) where {L, T<:DenseMPS{L}}
+     @assert codomain(A[1])[1] == codomain(B[1])[1] && domain(A[end])[end] == domain(B[end])[end]
+
+     Env = Environment(A', B)
+     return scalar!(Env; normalize = false)
+end

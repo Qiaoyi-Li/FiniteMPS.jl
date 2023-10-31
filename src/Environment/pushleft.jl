@@ -3,7 +3,7 @@
 
 Push left the given environment object, i.e. `Center == [i, j]` to `[i, j - 1]`.
 """
-function pushleft!(obj::SimpleEnvironment{L,2,T}) where {L,T<:Tuple{AdjointMPS,MPS}}
+function pushleft!(obj::SimpleEnvironment{L,2,T}) where {L,T<:Tuple{AdjointMPS,DenseMPS}}
      si = obj.Center[2]
      @assert si > 1
 
@@ -12,7 +12,7 @@ function pushleft!(obj::SimpleEnvironment{L,2,T}) where {L,T<:Tuple{AdjointMPS,M
      return obj
 end
 
-function pushleft!(obj::SparseEnvironment{L,3,T}) where {L,T<:Tuple{AdjointMPS,SparseMPO,MPS}}
+function pushleft!(obj::SparseEnvironment{L,3,T}) where {L,T<:Tuple{AdjointMPS,SparseMPO,DenseMPS}}
      si = obj.Center[2]
      @assert si > 1
 
@@ -88,6 +88,30 @@ end
 
 # ========================= MPO ===========================
 function _pushleft(Er::LocalRightTensor{2}, A::AdjointMPSTensor{4}, B::MPSTensor{4}; kwargs...)
-     @tensor tmp[b; a] := (B.A[f g a c] * Er.A[e g]) * A.A[b c d e]
+     @tensor tmp[b; a] := (B.A[b c d e] * Er.A[e f]) * A.A[d f a c]
      return LocalRightTensor(tmp, Er.tag) 
+end
+
+function _pushleft(Er::LocalRightTensor{2}, A::AdjointMPSTensor{4}, H::IdentityOperator, B::MPSTensor{4}; kwargs...)
+     return rmul!(_pushleft(Er, A, B), H.strength)
+end
+
+function _pushleft(Er::LocalRightTensor{2}, A::AdjointMPSTensor{4}, H::LocalOperator{2, 1}, B::MPSTensor{4}; kwargs...)
+     @tensor tmp[b g; a] := ((B.A[b c d e] * Er.A[e f]) * H.A[g h c]) * A.A[d f a h]
+     return LocalRightTensor(rmul!(tmp, H.strength), (Er.tag[1], H.tag[1][1], Er.tag[2]))
+end
+
+function _pushleft(Er::LocalRightTensor{2}, A::AdjointMPSTensor{4}, H::LocalOperator{1, 1}, B::MPSTensor{4}; kwargs...)
+     @tensor tmp[b; a] := ((B.A[b c d e] * Er.A[e f]) * H.A[h c]) * A.A[d f a h]
+     return LocalRightTensor(rmul!(tmp, H.strength), Er.tag)
+end
+
+function _pushleft(Er::LocalRightTensor{3}, A::AdjointMPSTensor{4}, H::LocalOperator{1, 1}, B::MPSTensor{4}; kwargs...)
+     @tensor tmp[b g; a] := ((B.A[b c d e] * H.A[h c]) * Er.A[e g f]) * A.A[d f a h]
+     return LocalRightTensor(rmul!(tmp, H.strength), Er.tag)
+end
+
+function _pushleft(Er::LocalRightTensor{3}, A::AdjointMPSTensor{4}, H::LocalOperator{1, 2}, B::MPSTensor{4}; kwargs...)
+     @tensor tmp[b; a] := ((B.A[b c d e] * Er.A[e g f]) * H.A[h c g]) * A.A[d f a h]
+     return LocalRightTensor(rmul!(tmp, H.strength), (Er.tag[1], Er.tag[3]))
 end

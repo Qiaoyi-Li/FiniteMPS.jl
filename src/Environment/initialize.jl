@@ -7,15 +7,15 @@ function _initializeEnv!(obj::AbstractEnvironment{L}; kwargs...) where L
 end
 
 # ⟨Ψ₁, Ψ₂⟩
-function _defaultEl(obj::SimpleEnvironment{L, 2, T}) where {L, T<:Tuple{AdjointMPS, MPS}}
+function _defaultEl(obj::SimpleEnvironment{L, 2, T}) where {L, T<:Tuple{AdjointMPS, DenseMPS}}
      return isometry(domain(obj[1][1])[1], codomain(obj[2][1])[1])
 end
-function _defaultEr(obj::SimpleEnvironment{L, 2, T}) where {L, T<:Tuple{AdjointMPS, MPS}}
+function _defaultEr(obj::SimpleEnvironment{L, 2, T}) where {L, T<:Tuple{AdjointMPS, DenseMPS}}
      return isometry(domain(obj[2][end])[end], codomain(obj[1][end])[end])
 end
 
 # ================ ⟨Ψ₁, H, Ψ₂⟩, sparse case ==================
-function _defaultEl(obj::SparseEnvironment{L, 3, T}) where {L, T<:Tuple{AdjointMPS, SparseMPO, MPS}}
+function _defaultEl(obj::SparseEnvironment{L, 3, T}) where {L, T<:Tuple{AdjointMPS, SparseMPO, DenseMPS}}
      n = size(obj[2][1], 1)
      El = SparseLeftTensor(undef, n)
      for i = 1:n
@@ -34,7 +34,7 @@ function _simpleEl(A::AdjointMPSTensor, H::LocalOperator{2, R₂}, B::MPSTensor)
      return isometry(domain(A)[1], codomain(H)[1] ⊗ codomain(B)[1])
 end
 
-function _defaultEr(obj::SparseEnvironment{L, 3, T}) where {L, T<:Tuple{AdjointMPS, SparseMPO, MPS}}
+function _defaultEr(obj::SparseEnvironment{L, 3, T}) where {L, T<:Tuple{AdjointMPS, SparseMPO, DenseMPS}}
      n = size(obj[2][end], 2)
      Er = SparseRightTensor(undef, n)
      for i = 1:n

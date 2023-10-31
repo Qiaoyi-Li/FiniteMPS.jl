@@ -1,5 +1,23 @@
+"""
+     mul!(C::DenseMPS, A::SparseMPO, B::DenseMPS, α::Number, β::Number; kwargs...) 
+
+Compute `C = α A*B + β C` variationally via 2-site update, where `A` is a sparse MPO, `B` and `C` are dense MPS.
+Note 'C' is the initial state, and variational optimization may not converge for abitrarily chosen `C`.  
+
+     mul!(C::DenseMPS, A::SparseMPO, B::DenseMPS; kwargs...)
+
+Compute `C = A*B` by letting `α = 1` and `β = 0`.
+
+# Kwargs
+     trunc::TruncationScheme = notrunc()
+     GCstep::Bool = false
+     GCsweep::Bool = false
+     maxiter::Int64 = 8
+     disk::Bool = false
+     tol::Float64 = 1e-8
+     verbose::Int64 = 0
+"""
 function mul!(C::T, A::SparseMPO, B::T, α::Number, β::Number; kwargs...) where {L,T<:DenseMPS{L}}
-     # compute C = α A*B + β C variationally
      @assert α != 0 || β != 0
 
      TimerSweep = TimerOutput()
@@ -101,3 +119,7 @@ function mul!(C::T, A::SparseMPO, B::T, α::Number, β::Number; kwargs...) where
 
 end
 
+function mul!(C::T, A::SparseMPO, B::T; kwargs...) where T<:DenseMPS
+     # C = A*B
+     return mul!(C, A, B, 1, 0; kwargs...)
+end

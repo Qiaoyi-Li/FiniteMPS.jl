@@ -22,7 +22,7 @@ function scalar!(obj::AbstractEnvironment; kwargs...)
 
 end
 
-function _scalar(obj::SimpleEnvironment{L,2,T}, si::Int64; kwargs...) where {L,T<:Tuple{AdjointMPS,MPS}}
+function _scalar(obj::SimpleEnvironment{L,2,T}, si::Int64; kwargs...) where {L,T<:Tuple{AdjointMPS,DenseMPS}}
      fac = coef(obj[1]) * coef(obj[2])
      if get(kwargs, :normalize, false) && (fac != 0)
           fac /= abs(fac)
@@ -30,7 +30,7 @@ function _scalar(obj::SimpleEnvironment{L,2,T}, si::Int64; kwargs...) where {L,T
      return (obj.El[si] * obj.Er[si-1]) * fac
 end
 
-function _scalar(obj::SparseEnvironment{L,3,T}, si::Int64; kwargs...)  where {L,T<:Tuple{AdjointMPS,SparseMPO,MPS}}
+function _scalar(obj::SparseEnvironment{L,3,T}, si::Int64; kwargs...)  where {L,T<:Tuple{AdjointMPS,SparseMPO,DenseMPS}}
      @assert si > 1
      idx = filter(x -> !isnothing(obj.El[si][x]) && !isnothing(obj.Er[si-1][x]), eachindex(obj.El[si]))
      @floop GlobalThreadsExecutor for i in idx
