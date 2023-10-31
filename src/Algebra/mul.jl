@@ -1,15 +1,14 @@
 """
      mul!(C::DenseMPS, A::SparseMPO, B::DenseMPS, α::Number, β::Number; kwargs...) 
 
-Compute `C = α A*B + β C` variationally via 2-site update, where `A` is a sparse MPO, `B` and `C` are dense MPS.
-Note 'C' is the initial state, and variational optimization may not converge for abitrarily chosen `C`.  
+Compute `C = α A*B + β C` variationally via 2-site update, where `A` is a sparse MPO, `B` and `C` are dense MPS/MPO. Note 'B' cannot reference to the same MPS/MPO with `C`.  
 
      mul!(C::DenseMPS, A::SparseMPO, B::DenseMPS; kwargs...)
 
 Compute `C = A*B` by letting `α = 1` and `β = 0`.
 
 # Kwargs
-     trunc::TruncationScheme = notrunc()
+     trunc::TruncationScheme = truncbelow(MPSDefault.tol)
      GCstep::Bool = false
      GCsweep::Bool = false
      maxiter::Int64 = 8
@@ -17,11 +16,11 @@ Compute `C = A*B` by letting `α = 1` and `β = 0`.
      tol::Float64 = 1e-8
      verbose::Int64 = 0
 """
-function mul!(C::T, A::SparseMPO, B::T, α::Number, β::Number; kwargs...) where {L,T<:DenseMPS{L}}
+function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Number; kwargs...) where L
      @assert α != 0 || β != 0
+     @assert !(B === C)
 
-     TimerSweep = TimerOutput()
-     trunc::TruncationScheme = get(kwargs, :trunc, notrunc())
+     trunc::TruncationScheme = get(kwargs, :trunc, truncbelow(MPSDefault.tol))
      GCstep::Bool = get(kwargs, :GCstep, false)
      GCsweep::Bool = get(kwargs, :GCsweep, false)
      maxiter::Int64 = get(kwargs, :maxiter, 8)
@@ -43,8 +42,10 @@ function mul!(C::T, A::SparseMPO, B::T, α::Number, β::Number; kwargs...) where
      @assert coef(C) != 0
      # 2-site sweeps
      for iter = 1:maxiter
+          TimerSweep = TimerOutput()
           direction::Symbol = :L2R
           convergence::Float64 = 0
+          lsinfo = BondInfo[]
           @timeit TimerSweep "Sweep2" for si = vcat(1:L-1, reverse(1:L-1))
 
                TimerStep = TimerOutput()
@@ -76,12 +77,13 @@ function mul!(C::T, A::SparseMPO, B::T, α::Number, β::Number; kwargs...) where
 
                # svd
                if direction == :L2R
-                    @timeit TimerStep "svd" C[si], C[si+1], ϵ = leftorth(x; trunc=trunc, kwargs...)
+                    @timeit TimerStep "svd" C[si], C[si+1], svdinfo = leftorth(x; trunc=trunc, kwargs...)
                     Center(C)[:] = [si + 1, si + 1]
                else
-                    @timeit TimerStep "svd" C[si], C[si+1], ϵ = rightorth(x; trunc=trunc, kwargs...)
+                    @timeit TimerStep "svd" C[si], C[si+1], svdinfo = rightorth(x; trunc=trunc, kwargs...)
                     Center(C)[:] = [si, si]
                end
+               push!(lsinfo, svdinfo)
 
                # check convergence
                if convergence < tol
@@ -98,7 +100,7 @@ function mul!(C::T, A::SparseMPO, B::T, α::Number, β::Number; kwargs...) where
                if verbose ≥ 2
                     ar = direction == :L2R ? "->" : "<-"
                     show(TimerStep; title="site $(si) $(ar) $(si+1)")
-                    println("\niter $(iter), site $(si) $(ar) $(si+1), max convergence = $(convergence)")
+                    println("\niter $(iter), site $(si) $(ar) $(si+1), $(lsinfo[end]), max convergence = $(convergence)")
                end
 
                # change direction
@@ -108,8 +110,8 @@ function mul!(C::T, A::SparseMPO, B::T, α::Number, β::Number; kwargs...) where
 
           GCsweep && manualGC(TimerSweep)
           if verbose ≥ 1
-               show(TimerSweep; title="sweep $(iter)")
-               println("\niter $(iter), max convergence = $(convergence) (tol = $(tol))")
+               show(TimerSweep; title="iter $(iter)")
+               println("\niter $(iter), $(merge(lsinfo)), max convergence = $(convergence) (tol = $(tol))")
           end
 
           convergence < tol && break
@@ -119,7 +121,7 @@ function mul!(C::T, A::SparseMPO, B::T, α::Number, β::Number; kwargs...) where
 
 end
 
-function mul!(C::T, A::SparseMPO, B::T; kwargs...) where T<:DenseMPS
+function mul!(C::DenseMPS, A::SparseMPO, B::DenseMPS; kwargs...) 
      # C = A*B
      return mul!(C, A, B, 1, 0; kwargs...)
 end

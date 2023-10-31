@@ -36,12 +36,12 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
           Ar = Ψ[si+1]
 
           @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = _DMRGUpdate2(ProjHam(Env, si, si + 1), Al, Ar; kwargs...)
-          @timeit TimerStep "svd" Ψ[si], s, vd, ϵ = tsvd(xg; trunc=trunc)
+          @timeit TimerStep "svd" Ψ[si], s, vd, info_svd = tsvd(xg; trunc=trunc)
           # next Al
           Al = s * vd
           # remember to change Center of Ψ manually
           Center(Ψ)[:] = [si + 1, si + 1]
-          info[1][si] = DMRGInfo(eg, info_Lanczos, BondInfo(s, ϵ))
+          info[1][si] = DMRGInfo(eg, info_Lanczos, info_svd)
 
           # GC manually
           GCstep && manualGC(TimerStep)
@@ -50,8 +50,8 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
           merge!(TimerSweep, TimerStep; tree_point=["DMRGSweep2>>"])
           if verbose ≥ 2
                show(TimerStep; title="site $(si)->$(si+1)")
-               let (D, DD) = dim(s, 1), K = info_Lanczos.numops, Eg = eg, TrunErr2 = ϵ^2
-                    println("\n D = $(D) -> $(DD), K = $(K), Eg = $(Eg), TrunErr2 = $(TrunErr2)")
+               let K = info_Lanczos.numops
+                    println("\nK = $(K), $(info_svd), Eg = $(eg)")
                end
                flush(stdout)
           end
@@ -70,13 +70,13 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
           Al = Ψ[si-1]
 
           @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = _DMRGUpdate2(ProjHam(Env, si - 1, si), Al, Ar; kwargs...)
-          @timeit TimerStep "svd" u, s, Ψ[si], ϵ = tsvd(xg; trunc=trunc)
+          @timeit TimerStep "svd" u, s, Ψ[si], info_svd = tsvd(xg; trunc=trunc)
           # next Ar
           Ar = u * s
           # remember to change Center of Ψ manually
           Center(Ψ)[:] = [si - 1, si - 1]
 
-          info[2][si-1] = DMRGInfo(eg, info_Lanczos, BondInfo(s, ϵ))
+          info[2][si-1] = DMRGInfo(eg, info_Lanczos, info_svd)
 
           # GC manually
           GCstep && manualGC(TimerStep)
@@ -85,8 +85,8 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
           merge!(TimerSweep, TimerStep; tree_point=["DMRGSweep2<<"])
           if verbose ≥ 2
                show(TimerStep; title="site $(si-1)<-$(si)")
-               let (D, DD) = dim(s, 1), K = info_Lanczos.numops, Eg = eg, TrunErr2 = ϵ^2
-                    println("\n D = $(D) -> $(DD), K = $(K), Eg = $(Eg), TrunErr2 = $(TrunErr2)")
+               let K = info_Lanczos.numops
+                    println("\nK = $(K), $(info_svd), Eg = $(eg)")
                end
                flush(stdout)
           end
@@ -99,12 +99,9 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
 
      if verbose ≥ 1
           show(TimerSweep; title="sweep $(GlobalCountDMRGSweep2)")
-          let 
-               D, DD = mapreduce(x -> dim(x, 1), (x, y) -> max.(x, y), Ψ.A)
-               K = maximum(x -> x.Lanczos.numops, info[2])
-               Eg = info[2][1].Eg
-               TrunErr2 = maximum(x -> x.Bond.TrunErr^2, info[2])
-               println("\n D = $(D) -> $(DD), K = $(K), Eg = $(Eg), TrunErr2 = $(TrunErr2)")
+          let K = maximum(x -> x.Lanczos.numops, info[2]), Eg = info[2][1].Eg
+               bondinfo_merge = merge(map(x -> x.Bond, info[2]))
+               println("\nK = $(K), $(bondinfo_merge), Eg = $(Eg)")
           end
           flush(stdout)
      end
@@ -155,8 +152,8 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
           merge!(TimerSweep, TimerStep; tree_point=["DMRGSweep1>>"])
           if verbose ≥ 2
                show(TimerStep; title="site $(si)->")
-               let (D, DD) = dim(xg, rank(xg)), K = info_Lanczos.numops, Eg = eg
-                    println("\n D = $(D) -> $(DD), K = $(K), Eg = $(Eg)")
+               let K = info_Lanczos.numops
+                    println("\nK = $(K), $(info[1][si].Bond), Eg = $(eg)")
                end
                flush(stdout)
           end
@@ -182,8 +179,8 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
           merge!(TimerSweep, TimerStep; tree_point=["DMRGSweep1<<"])
           if verbose ≥ 2
                show(TimerStep; title="site <-$(si)")
-               let (D, DD) = dim(xg, 1), K = info_Lanczos.numops, Eg = eg
-                    println("\n D = $(D) -> $(DD), K = $(K), Eg = $(Eg)")
+               let K = info_Lanczos.numops
+                    println("\nK = $(K), $(info[2][si].Bond), Eg = $(eg)")
                end
                flush(stdout)
           end
@@ -196,11 +193,9 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
 
      if verbose ≥ 1
           show(TimerSweep; title="sweep $(GlobalCountDMRGSweep1)")
-          let 
-               D, DD = mapreduce(x -> dim(x, 1), (x, y) -> max.(x, y), Ψ.A)
-               K = maximum(x -> x.Lanczos.numops, info[2])
-               Eg = info[2][1].Eg
-               println("\n D = $(D) -> $(DD), K = $(K), Eg = $(Eg)")
+          let K = maximum(x -> x.Lanczos.numops, info[2]), Eg = info[2][1].Eg
+               bondinfo_merge = merge(map(x -> x.Bond, info[2]))
+               println("\nK = $(K), $(bondinfo_merge), Eg = $(Eg)")
           end
           flush(stdout)
      end

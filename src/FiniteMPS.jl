@@ -6,7 +6,7 @@ using AbstractTrees, SerializedElementArrays
 using Base.Threads, FLoops, FoldsThreads, Distributed, SharedArrays
 @reexport import SerializedElementArrays: SerializedElementArray,  SerializedElementVector
 @reexport using TensorKit, KrylovKit, TensorKit.TensorOperations
-@reexport import Base: +, -, *, /, ==, promote_rule, convert, length, show, getindex, setindex!, lastindex, keys, similar
+@reexport import Base: +, -, *, /, ==, promote_rule, convert, length, show, getindex, setindex!, lastindex, keys, similar, merge
 @reexport import TensorKit: ×, one, zero, dim, inner, scalar, domain, codomain, eltype, scalartype, leftorth, rightorth, tsvd, adjoint, normalize!, norm, axpy!, axpby!, dot, mul!, rmul!
 @reexport import LinearAlgebra: BLAS, rank, qr, diag, I
 @reexport import AbstractTrees: parent, isroot
@@ -51,7 +51,6 @@ include("MPO/MPO.jl")
 # Sparse MPO
 export SparseMPO, issparse
 include("SparseMPO/SparseMPO.jl")
-include("SparseMPO/algebra.jl")
 
 # Environment
 export AbstractEnvironment, SimpleEnvironment, SparseEnvironment, Environment, pushleft!, pushright!, canonicalize!, free!, scalar!
@@ -71,6 +70,7 @@ include("ProjectiveHam/action2.jl")
 # Algebra operations
 include("Algebra/inner.jl")
 include("Algebra/mul.jl")
+include("Algebra/axpby.jl")
 
 # Algorithm
 export LanczosInfo, BondInfo, DMRGInfo, DMRGSweep2!, DMRGSweep1!

@@ -59,7 +59,7 @@ promote_rule(::Type{<:MPSTensor}, ::Type{<:AbstractTensorMap}) = MPSTensor
 """
      leftorth(A::MPSTensor; 
           trunc = notrunc(),
-          kwargs...) -> Q::AbstractTensorMap, R::AbstractTensorMap, ϵ::Float64
+          kwargs...) -> Q::AbstractTensorMap, R::AbstractTensorMap, info::BondInfo
 
 Left canonicalize a on-site MPS tensor. 
 
@@ -67,7 +67,8 @@ If `trunc = notrunc()`, use `TensorKit.leftorth`, otherwise, use `TensorKit.tsvd
 """
 function leftorth(A::MPSTensor{R₁}; trunc = notrunc(), kwargs...) where R₁ 
      if trunc == notrunc()
-          return leftorth(A.A, Tuple(1:R₁-1), (R₁,); kwargs...)..., 0.0
+          Q, R = leftorth(A.A, Tuple(1:R₁-1), (R₁,); kwargs...)
+          return Q, R, BondInfo(Q, :R)
      else
           alg = get(kwargs, :alg, nothing)
           if isnothing(alg) 
@@ -75,7 +76,7 @@ function leftorth(A::MPSTensor{R₁}; trunc = notrunc(), kwargs...) where R₁
           else
           u, s, vd, ϵ = tsvd(A.A, Tuple(1:R₁-1), (R₁,); trunc = trunc, alg = alg)
           end
-          return u, s*vd, ϵ
+          return u, s*vd, BondInfo(s, ϵ)
      end
 
 end
@@ -83,7 +84,7 @@ end
 """
      rightorth(A::MPSTensor;
           trunc = notrunc(),
-          kwargs...) -> L::AbstractTensorMap, Q::AbstractTensorMap, ϵ::Float64
+          kwargs...) -> L::AbstractTensorMap, Q::AbstractTensorMap, info::BondInfo
 
 Right canonicalize a on-site MPS tensor. 
 
@@ -91,7 +92,8 @@ If `trunc = notrunc()`, use `TensorKit.rightorth`, otherwise, use `TensorKit.tsv
 """
 function rightorth(A::MPSTensor{R₂}; trunc = notrunc(), kwargs...) where R₂
      if trunc == notrunc()
-          return rightorth(A.A, (1,), Tuple(2:R₂); kwargs...)..., 0.0
+          L, Q = rightorth(A.A, (1,), Tuple(2:R₂); kwargs...)
+          return L, Q, BondInfo(Q, :L)
      else
           alg = get(kwargs, :alg, nothing)
           if isnothing(alg)
@@ -99,7 +101,7 @@ function rightorth(A::MPSTensor{R₂}; trunc = notrunc(), kwargs...) where R₂
           else
                u, s, vd, ϵ = tsvd(A.A, (1,), Tuple(2:R₂); trunc = trunc, alg = alg)
           end
-          return u*s, vd, ϵ
+          return u*s, vd, BondInfo(s, ϵ)
      end
 end
 

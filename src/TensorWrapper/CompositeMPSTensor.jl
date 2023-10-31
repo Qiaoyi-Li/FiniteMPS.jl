@@ -33,38 +33,40 @@ end
 """
      leftorth(::CompositeMPSTensor{2, ...};
           trunc = notrunc(),
-          kwargs...) -> Q::AbstractTensorMap, R::AbstractTensorMap, ϵ::Float64
+          kwargs...) -> Q::AbstractTensorMap, R::AbstractTensorMap, info::BondInfo
 
 Split a 2-site local tensor s.t. the left one is canonical.
 """
 function leftorth(A::CompositeMPSTensor{2,Tuple{MPSTensor{R₁},MPSTensor{R₂}}}; trunc=notrunc(), kwargs...) where {R₁,R₂}
      if trunc == notrunc()
-          return leftorth(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)))..., 0.0
+          Q, R = leftorth(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)))
+          return Q, R, BondInfo(Q, :R)
      else
-          u, s, vd, ϵ = tsvd(A; trunc=trunc, kwargs...)
-          return u, s * vd, ϵ
+          u, s, vd, info = tsvd(A; trunc=trunc, kwargs...)
+          return u, s * vd, info
      end
 end
 
 """
      rightorth(::CompositeMPSTensor{2, ...};
           trunc = notrunc(),
-          kwargs...) -> L::AbstractTensorMap, Q::AbstractTensorMap, ϵ::Float64
+          kwargs...) -> L::AbstractTensorMap, Q::AbstractTensorMap, info::BondInfo
 
 Split a 2-site local tensor s.t. the right one is canonical.
 """
 function rightorth(A::CompositeMPSTensor{2,Tuple{MPSTensor{R₁},MPSTensor{R₂}}}; trunc=notrunc(), kwargs...) where {R₁,R₂}
      if trunc == notrunc()
-          return rightorth(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)))..., 0.0
+          L, Q = rightorth(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)))
+          return L, Q, BondInfo(Q, :L)
      else
-          u, s, vd, ϵ = tsvd(A; trunc=trunc, kwargs...)
-          return u * s, vd, ϵ
+          u, s, vd, info = tsvd(A; trunc=trunc, kwargs...)
+          return u * s, vd, info
      end
 end
 
 """
      tsvd(::CompositeMPSTensor{2, ...}; kwargs...) 
-          -> u::AbstractTensorMap, s::AbstractTensorMap, vd::AbstractTensorMap, ϵ::Float64
+          -> u::AbstractTensorMap, s::AbstractTensorMap, vd::AbstractTensorMap, info::BondInfo
 
 Use SVD to split a 2-site local tensor, details see TensorKit.tsvd.
 """
@@ -72,8 +74,9 @@ function tsvd(A::CompositeMPSTensor{2,Tuple{MPSTensor{R₁},MPSTensor{R₂}}}; k
      trunc = get(kwargs, :trunc, notrunc())
      alg = get(kwargs, :alg, nothing)
      if isnothing(alg)
-          return tsvd(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)); trunc=trunc)
+          u,s,v,ϵ = tsvd(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)); trunc=trunc)
      else
-          return tsvd(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)); trunc=trunc, alg=alg)
+          u,s,v,ϵ = tsvd(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)); trunc=trunc, alg=alg)
      end
+     return u, s, v, BondInfo(s, ϵ)
 end
