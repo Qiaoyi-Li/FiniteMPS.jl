@@ -98,7 +98,7 @@ function axpby!(α::Number, x::DenseMPS{L}, β::Number, y::DenseMPS{L}; kwargs..
 
           GCsweep && manualGC(TimerSweep)
           if verbose ≥ 1
-               show(TimerSweep; title="iter $(iter)")
+               show(TimerSweep; title="axpby! iter $(iter)")
                println("\niter $(iter), $(merge(lsinfo)), max convergence = $(convergence) (tol = $(tol))")
           end
 

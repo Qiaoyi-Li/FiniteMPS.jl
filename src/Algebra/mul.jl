@@ -110,7 +110,7 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
 
           GCsweep && manualGC(TimerSweep)
           if verbose ≥ 1
-               show(TimerSweep; title="iter $(iter)")
+               show(TimerSweep; title="mul! iter $(iter)")
                println("\niter $(iter), $(merge(lsinfo)), max convergence = $(convergence) (tol = $(tol))")
           end
 

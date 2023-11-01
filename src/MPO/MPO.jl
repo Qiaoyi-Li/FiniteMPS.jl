@@ -98,7 +98,7 @@ function identityMPO(::Type{T}, L::Int64, pspace::AbstractVector; kwargs...) whe
      @assert length(pspace) == L
 
      aspace = trivial(pspace[1])
-     obj = MPO(L, T; kwargs...)  
+     obj = MPO(L, T; disk = get(kwargs, :disk, false))  
      for si in 1:L
           obj[si] = permute(isometry(aspace, aspace) ⊗ isometry(pspace[si], pspace[si]), (1, 2), (4, 3))  
      end
