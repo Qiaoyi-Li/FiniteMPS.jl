@@ -93,13 +93,20 @@ Assume the all the physical spaces are the same.
 
      identityMPO(obj::DenseMPS{L, T}; kwargs...)
 Deduce the scalar type `T` and physical spaces from a MPS/MPO.
+
+# Kwargs
+     disk::Bool = false
+     bspace::VectorSpace
+Space of left boundary bond, default = trivial space.
 """
 function identityMPO(::Type{T}, L::Int64, pspace::AbstractVector; kwargs...) where T <: Union{Float64, ComplexF64}
      @assert length(pspace) == L
 
-     aspace = trivial(pspace[1])
      obj = MPO(L, T; disk = get(kwargs, :disk, false))  
-     for si in 1:L
+     aspace = trivial(pspace[1])
+     bspace = get(kwargs, :bspace, aspace)
+     obj[1] = permute(isometry(bspace, aspace) ⊗ isometry(pspace[1], pspace[1]), (1, 2), (4, 3))
+     for si in 2:L
           obj[si] = permute(isometry(aspace, aspace) ⊗ isometry(pspace[si], pspace[si]), (1, 2), (4, 3))  
      end
 

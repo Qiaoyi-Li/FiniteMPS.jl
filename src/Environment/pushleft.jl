@@ -106,6 +106,11 @@ function _pushleft(Er::LocalRightTensor{2}, A::AdjointMPSTensor{4}, H::LocalOper
      return LocalRightTensor(rmul!(tmp, H.strength), Er.tag)
 end
 
+function _pushleft(Er::LocalRightTensor{3}, A::AdjointMPSTensor{4}, H::IdentityOperator, B::MPSTensor{4}; kwargs...)
+     @tensor tmp[b g; a] := (B.A[b c d e] * Er.A[e g f]) * A.A[d f a c]
+     return LocalRightTensor(rmul!(tmp, H.strength), Er.tag)
+end
+
 function _pushleft(Er::LocalRightTensor{3}, A::AdjointMPSTensor{4}, H::LocalOperator{1, 1}, B::MPSTensor{4}; kwargs...)
      @tensor tmp[b g; a] := ((B.A[b c d e] * H.A[h c]) * Er.A[e g f]) * A.A[d f a h]
      return LocalRightTensor(rmul!(tmp, H.strength), Er.tag)
@@ -114,4 +119,9 @@ end
 function _pushleft(Er::LocalRightTensor{3}, A::AdjointMPSTensor{4}, H::LocalOperator{1, 2}, B::MPSTensor{4}; kwargs...)
      @tensor tmp[b; a] := ((B.A[b c d e] * Er.A[e g f]) * H.A[h c g]) * A.A[d f a h]
      return LocalRightTensor(rmul!(tmp, H.strength), (Er.tag[1], Er.tag[3]))
+end
+
+function _pushleft(Er::LocalRightTensor{3}, A::AdjointMPSTensor{4}, H::LocalOperator{2, 2}, B::MPSTensor{4}; kwargs...)
+     @tensor tmp[b g; a] := ((B.A[b c d e] * Er.A[e i f]) * H.A[g h c i]) * A.A[d f a h]
+     return LocalRightTensor(rmul!(tmp, H.strength), (Er.tag[1], H.tag[1][1], Er.tag[3]))
 end

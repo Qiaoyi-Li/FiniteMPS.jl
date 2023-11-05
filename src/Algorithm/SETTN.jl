@@ -6,13 +6,13 @@ Use series-expansion thermal tensor network (SETTN)`[https://doi.org/10.1103/Phy
 # Kwargs
      disk::Bool = false
      maxorder::Int64 = 4
+     bspace::VectorSpace (details please see identityMPO)
 
 Note we use `mul!` and `axpby!` to implement `H^n -> H^(n+1)` and `ρ -> ρ + (-βH/2)^n / n!`, respectively. All kwargs of these two functions are valid and will be propagated to them appropriately.
 """
 function SETTN(H::SparseMPO{L}, β::Number; kwargs...) where {L}
      @assert β ≥ 0
 
-     disk::Bool = get(kwargs, :disk, false)
      maxorder::Int64 = get(kwargs, :maxorder, 4)
      verbose::Int64 = get(kwargs, :verbose, 0)
      tol::Float64 = get(kwargs, :tol, 1e-8)
@@ -24,8 +24,8 @@ function SETTN(H::SparseMPO{L}, β::Number; kwargs...) where {L}
           domain(M[idx])[1]
      end
 
-     Hn = identityMPO(L, lspspace; disk=disk) # H0 = Id
-     ρ = identityMPO(L, lspspace; disk=disk)
+     Hn = identityMPO(L, lspspace; kwargs...) # H0 = Id
+     ρ = identityMPO(L, lspspace; kwargs...)
 
      lsF = zeros(Float64, maxorder)
      for n = 1:maxorder
@@ -35,7 +35,7 @@ function SETTN(H::SparseMPO{L}, β::Number; kwargs...) where {L}
           axpy!((-β / 2)^n / factorial(n), Hn, ρ; kwargs...)
           lsF[n] = -norm(ρ)^2 / (β)
 
-          @everywhere manualGC()
+          manualGC()
 
           n > 1 && (δF = (lsF[n] - lsF[n-1]) / abs(lsF[n]))
           if verbose ≥ 1

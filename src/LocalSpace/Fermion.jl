@@ -29,6 +29,10 @@ Two rank-`3` operators of hopping `c↑ c↑^dag + c↓ c↓^dag`.
 
      ΔₛdagΔₛ::NTuple{4, TensorMap}
 Four operators of singlet pairing correlation `Δₛ^dagΔₛ`, where `Δₛ = (c↓c↑ - c↑c↓)/√2`. Rank = `(3, 4, 4, 3)`.
+
+     Δₛ::NTuple{2, TensorMap}
+     Δₛdag::NTuple{2, TensorMap}
+Singlet pairing operators `Δₛ` and `Δₛ^dag`. Rank = `(4, 3)`. Note the first operator has nontrivial left bond index.
 """
 module U₁SU₂Fermion
 
@@ -86,7 +90,7 @@ module U₁SU₂Fermion
           F, Fdag
      end
 
-     # singlet pairing Δᵢⱼ^dag Δₖₗ
+     # singlet pairing correlation Δᵢⱼ^dag Δₖₗ
      const ΔₛdagΔₛ = let 
           A = FdagF[1]
           aspace = Rep[U₁ × SU₂]((1, 1/2) => 1)
@@ -98,6 +102,16 @@ module U₁SU₂Fermion
           A, B, C, D 
      end
 
+     # singlet pairing operator
+     const Δₛ = (ΔₛdagΔₛ[3], ΔₛdagΔₛ[4])
+     
+     const Δₛdag = let (A, B) = Δₛ 
+        Adag = permute(A', (3, 1), (4, 2))
+        iso = isometry(flip(codomain(Adag)[1]), codomain(Adag)[1])
+        @tensor Adag[a c; d e] := iso[a b] * Adag[b c; d e]
+        Bdag = permute(B', (2, 1), (3,))
+        Adag, -Bdag
+     end
 
 end
 

@@ -24,17 +24,16 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
      GCstep::Bool = get(kwargs, :GCstep, false)
      GCsweep::Bool = get(kwargs, :GCsweep, false)
      maxiter::Int64 = get(kwargs, :maxiter, 8)
-     disk::Bool = get(kwargs, :disk, false)
      tol::Float64 = get(kwargs, :tol, 1e-8)
      verbose::Int64 = get(kwargs, :verbose, 0)
 
      if α != 0
-          Env_mul = Environment(C', A, B; disk=disk)
+          Env_mul = Environment(C', A, B; kwargs...)
           canonicalize!(Env_mul, 1)
      end
      if β != 0
           C₀ = deepcopy(C)
-          Env_add = Environment(C', C₀; disk=disk)
+          Env_add = Environment(C', C₀; kwargs...)
           canonicalize!(Env_add, 1)
      end
 
