@@ -33,7 +33,7 @@ function SETTN(H::SparseMPO{L}, β::Number; kwargs...) where {L}
           mul!(Hn, H, deepcopy(Hn), 1, 0; kwargs...)
           # ρ -> ρ + Hn * (-β/2)^n/ n!     
           axpy!((-β / 2)^n / factorial(n), Hn, ρ; kwargs...)
-          lsF[n] = -norm(ρ)^2 / (β)
+          lsF[n] = - 2*log(norm(ρ)) / β
 
           manualGC()
 

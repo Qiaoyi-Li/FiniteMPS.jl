@@ -15,7 +15,12 @@ struct LanczosInfo
      numops::Int64
 end
 function convert(::Type{LanczosInfo}, Info::KrylovKit.ConvergenceInfo)
-     return LanczosInfo(Info.converged > 0, Info.normres, Info.numiter, Info.numops)
+     if isa(Info.normres, Float64)
+          normres = [Info.normres,]
+     else
+          normres = Info.normres
+     end
+     return LanczosInfo(Info.converged > 0, normres, Info.numiter, Info.numops)
 end
 
 """
@@ -71,9 +76,9 @@ function show(io::IO, info::BondInfo)
 end
 
 function merge(info1::BondInfo, info2::BondInfo)
-     return BondInfo(max(info1.D,info2.D),
+     return BondInfo(max(info1.D, info2.D),
           max(info1.DD, info2.DD),
-          max(info1.TrunErr, info2.TrunErr), 
+          max(info1.TrunErr, info2.TrunErr),
           max(info1.SE, info2.SE))
 end
 merge(info1::BondInfo, info2::BondInfo, args...) = merge(merge(info1, info2), args...)
@@ -92,4 +97,26 @@ struct DMRGInfo
      Eg::Float64
      Lanczos::LanczosInfo
      Bond::BondInfo
+end
+
+"""
+     struct TDVPInfo{N,T}
+          dt::T
+          Lanczos::LanczosInfo
+          Bond::BondInfo
+     end
+
+Information of each `N`-site TDVP update.
+
+# Constructors
+     TDVPInfo{N}(dt::Number, Lanczos::LanczosInfo, Bond::BondInfo)
+"""
+struct TDVPInfo{N, T}
+     dt::T
+     Lanczos::LanczosInfo
+     Bond::BondInfo
+     function TDVPInfo{N}(dt::Number, Lanczos::LanczosInfo, Bond::BondInfo) where N
+          T = isa(dt, Real) ? Float64 : ComplexF64
+          return new{N, T}(convert(T, dt), Lanczos, Bond)
+     end
 end

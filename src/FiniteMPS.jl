@@ -73,10 +73,11 @@ include("Algebra/mul.jl")
 include("Algebra/axpby.jl")
 
 # Algorithm
-export LanczosInfo, BondInfo, DMRGInfo, DMRGSweep2!, DMRGSweep1!, SETTN
+export LanczosInfo, BondInfo, DMRGInfo, DMRGSweep2!, DMRGSweep1!, SETTN, TDVPSweep2!
 include("Algorithm/Info.jl")
 include("Algorithm/DMRG.jl")
 include("Algorithm/SETTN.jl")
+include("Algorithm/TDVP.jl")
 
 # Interaction tree for generating Hamiltonian MPO and calculate observables
 export InteractionTreeNode, InteractionTree, addchild!, addIntr!, addIntr1!, addIntr2!, addIntr4!, AutomataMPO

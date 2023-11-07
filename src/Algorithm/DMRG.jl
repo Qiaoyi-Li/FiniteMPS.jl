@@ -206,8 +206,7 @@ end
 
 function _DMRGUpdate2(H::SparseProjectiveHamiltonian{2}, Al::MPSTensor, Ar::MPSTensor; kwargs...)
 
-     x2 = CompositeMPSTensor(Al, Ar)
-     eg, xg, info = eigsolve(x -> action2(H, x; kwargs...), x2, 1, :SR, _getLanczos(; kwargs...))
+     eg, xg, info = eigsolve(x -> action2(H, x; kwargs...), CompositeMPSTensor(Al, Ar), 1, :SR, _getLanczos(; kwargs...))
 
      return eg[1], xg[1], info
 

@@ -124,3 +124,9 @@ function mul!(C::DenseMPS, A::SparseMPO, B::DenseMPS; kwargs...)
      # C = A*B
      return mul!(C, A, B, 1, 0; kwargs...)
 end
+
+function rmul!(A::DenseMPS, b::Number)
+     # A -> b*A
+     A.c *= b
+     return A
+end

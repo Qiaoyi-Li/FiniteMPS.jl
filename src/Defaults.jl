@@ -2,7 +2,7 @@ module KrylovDefault
      using KrylovKit
 
      krylovdim = 16
-     maxiter = 2
+     maxiter = 1
      tol = 1e-8
      orth=ModifiedGramSchmidt()
 end
