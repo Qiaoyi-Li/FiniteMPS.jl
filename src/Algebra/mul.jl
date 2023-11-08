@@ -100,6 +100,7 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
                     ar = direction == :L2R ? "->" : "<-"
                     show(TimerStep; title="site $(si) $(ar) $(si+1)")
                     println("\niter $(iter), site $(si) $(ar) $(si+1), $(lsinfo[end]), max convergence = $(convergence)")
+                    flush(stdout)
                end
 
                # change direction
@@ -111,6 +112,7 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
           if verbose ≥ 1
                show(TimerSweep; title="mul! iter $(iter)")
                println("\niter $(iter), $(merge(lsinfo)), max convergence = $(convergence) (tol = $(tol))")
+               flush(stdout)
           end
 
           convergence < tol && break

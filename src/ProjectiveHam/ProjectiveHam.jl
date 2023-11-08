@@ -35,9 +35,10 @@ end
           H::NTuple{N, SparseMPOTensor}
           si::Vector{Int64}
           validIdx::Vector{Tuple}
+          E₀::Float64
      end
 
-`N`-site projective Hamiltonian, sparse version.
+`N`-site projective Hamiltonian, sparse version. Note we shift `H` to `H - E₀` to avoid numerical overflow.
 
 Convention:
       --               --       --                          --
@@ -54,20 +55,22 @@ struct SparseProjectiveHamiltonian{N} <: AbstractProjectiveHamiltonian
      H::NTuple{N,SparseMPOTensor}
      si::Vector{Int64}
      validIdx::Vector{Tuple}
+     E₀::Float64
      function SparseProjectiveHamiltonian(El::SparseLeftTensor,
           Er::SparseRightTensor,
           H::NTuple{N,SparseMPOTensor},
-          si::Vector{Int64}
+          si::Vector{Int64},
+          E₀::Float64 = 0.0
      ) where {N}
           validIdx = NTuple{N + 1,Int64}[]
-          obj = new{N}(El, Er, H, si, validIdx)
+          obj = new{N}(El, Er, H, si, validIdx, E₀)
           push!(obj.validIdx, _countIntr(obj)...)
           return obj
      end
 end
 
 """
-     ProjHam(Env::SparseEnvironment, siL::Int64 [, siR::Int64 = siL])
+     ProjHam(Env::SparseEnvironment, siL::Int64 [, siR::Int64 = siL]; E₀::Number = 0.0)
 
 Generic constructor for N-site projective Hamiltonian, where `N = siL - siR + 1`.
 
@@ -75,17 +78,17 @@ Generic constructor for N-site projective Hamiltonian, where `N = siL - siR + 1`
 
 Construct the special `IdentityProjectiveHamiltonian` from a simple environment.
 """
-function ProjHam(Env::SparseEnvironment{L,3,T}, siL::Int64, siR::Int64) where {L,T<:Tuple{AdjointMPS,SparseMPO,DenseMPS}}
+function ProjHam(Env::SparseEnvironment{L,3,T}, siL::Int64, siR::Int64; E₀::Number = 0.0) where {L,T<:Tuple{AdjointMPS,SparseMPO,DenseMPS}}
      @assert 1 ≤ siL ≤ Env.Center[1] && Env.Center[2] ≤ siR ≤ L # make sure El and Er are valid
      N = siR - siL + 1
      @assert N ≥ 0
-     return SparseProjectiveHamiltonian(Env.El[siL], Env.Er[siR], Tuple(Env[2][siL:siR]), [siL, siR])
+     return SparseProjectiveHamiltonian(Env.El[siL], Env.Er[siR], Tuple(Env[2][siL:siR]), [siL, siR], convert(Float64, E₀))
 end
 function ProjHam(Env::SimpleEnvironment{L,2,T}, siL::Int64, siR::Int64) where {L,T<:Tuple{AdjointMPS,DenseMPS}}
      @assert siL ≤ Center(Env)[1] && siR ≥ Center(Env)[2] # make sure El and Er are valid
      return IdentityProjectiveHamiltonian(Env.El[siL], Env.Er[siR], [siL, siR])
 end
-ProjHam(Env::AbstractEnvironment, si::Int64) = ProjHam(Env, si, si)
+ProjHam(Env::AbstractEnvironment, si::Int64; kwargs...) = ProjHam(Env, si, si; kwargs...)
 
 function show(io::IO, obj::SparseProjectiveHamiltonian)
      println(io, "$(typeof(obj)): site = $(obj.si), total channels = $(length(_countIntr(obj)))")

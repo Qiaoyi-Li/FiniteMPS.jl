@@ -41,10 +41,12 @@ function SETTN(H::SparseMPO{L}, β::Number; kwargs...) where {L}
           if verbose ≥ 1
                dF_str = n > 1 ? ", δF/|F| = $(δF)" : ""
                println("SETTN order = $(n), F = $(lsF[n])", dF_str)
+               flush(stdout)
           end
 
           if n > 1 && abs(δF) < tol
                println("SETTN converged at order = $(n), δF/|F| = $(δF) (tol = $(tol))!")
+               flush(stdout)
                return ρ, lsF[1:n]
           end
      end

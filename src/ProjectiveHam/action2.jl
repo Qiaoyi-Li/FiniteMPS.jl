@@ -25,6 +25,10 @@ function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}
           end
 
      end
+
+     # x -> (H - E₀)x
+     !iszero(obj.E₀) && axpy!(-obj.E₀, x.A, Hx)
+
      return CompositeMPSTensor{2,T}(Hx)
 end
 function action2(obj::IdentityProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}; kwargs...) where {T<:NTuple{2,MPSTensor}}
@@ -168,6 +172,7 @@ end
 #  |       d(d)     g(d)      |
 #  |                          |
 #   --a(D)              i(D)--
+# TODO test performance and optimize contraction order, try prefusing El-Hl and Er-Hr
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
      Hl::LocalOperator{1,1}, Hr::IdentityOperator,
      Er::LocalRightTensor{2}; kwargs...) where {T<:NTuple{2,MPSTensor{4}}}

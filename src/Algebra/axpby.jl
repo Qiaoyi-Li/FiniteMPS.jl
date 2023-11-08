@@ -89,6 +89,7 @@ function axpby!(α::Number, x::DenseMPS{L}, β::Number, y::DenseMPS{L}; kwargs..
                     ar = direction == :L2R ? "->" : "<-"
                     show(TimerStep; title="site $(si) $(ar) $(si+1)")
                     println("\niter $(iter), site $(si) $(ar) $(si+1), $(lsinfo[end]), max convergence = $(convergence)")
+                    flush(stdout)
                end
 
                # change direction
@@ -100,6 +101,7 @@ function axpby!(α::Number, x::DenseMPS{L}, β::Number, y::DenseMPS{L}; kwargs..
           if verbose ≥ 1
                show(TimerSweep; title="axpby! iter $(iter)")
                println("\niter $(iter), $(merge(lsinfo)), max convergence = $(convergence) (tol = $(tol))")
+               flush(stdout)
           end
 
           convergence < tol && break
