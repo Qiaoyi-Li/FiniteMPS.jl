@@ -14,9 +14,14 @@ for func in (:dim, :rank, :domain, :codomain, :eltype, :norm, :scalartype, :data
      @eval $func(obj::AbstractTensorWrapper, args...) = $func(obj.A, args...)
 end
 for func in (:similar, :one, :zero)
-     # Tensor -> Tensor
+     # Tensor -> Tensor(wrapped)
      @eval $func(obj::T) where T <: AbstractTensorWrapper = convert(T, $func(obj.A))
 end
+for func in (:leftnull, :rightnull)
+     # Tensor -> Tensor
+     @eval $func(obj::T, args...; kwargs...) where T <: AbstractTensorWrapper = $func(obj.A, args...; kwargs...)
+end
+
 for func in (:dot, :inner)
      # Tensor × Tensor -> Number
      @eval $func(A::T, B::T) where T <: AbstractTensorWrapper = $func(A.A, B.A)

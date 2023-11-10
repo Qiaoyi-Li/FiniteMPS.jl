@@ -63,6 +63,7 @@ function TDVPSweep2!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Symbo
                GCstep && manualGC(TimerStep)
 
                # show
+               merge!(TimerStep, get_timer("action2"); tree_point=["TDVPUpdate2"])
                merge!(TimerSweep, TimerStep; tree_point=["TDVPSweep2>>"])
                if verbose ≥ 2
                     show(TimerStep; title="site $(si)->$(si+1)")
@@ -111,6 +112,7 @@ function TDVPSweep2!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Symbo
                GCstep && manualGC(TimerStep)
 
                # show
+               merge!(TimerStep, get_timer("action2"); tree_point=["TDVPUpdate2"])
                merge!(TimerSweep, TimerStep; tree_point=["TDVPSweep2<<"])
                if verbose ≥ 2
                     show(TimerStep; title="site $(si-1)<-$(si)")
@@ -160,6 +162,7 @@ end
 
 function _TDVPUpdate2(H::SparseProjectiveHamiltonian{2}, Al::MPSTensor, Ar::MPSTensor, dt::Number; kwargs...)
 
+     reset_timer!(get_timer("action2"))
      expx, info = _LanczosExp(x -> action2(H, x; kwargs...),
           dt,
           CompositeMPSTensor(Al, Ar),

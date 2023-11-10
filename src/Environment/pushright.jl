@@ -16,41 +16,43 @@ function pushright!(obj::SparseEnvironment{L,3,T}) where {L,T<:Tuple{AdjointMPS,
      si = obj.Center[1]
      @assert si < L
 
-     sz = size(obj[2][si])
+     obj.El[si+1] = _pushright(obj.El[si], obj[1][si], obj[2][si], obj[3][si])
+     obj.Center[1] += 1
+     return obj
+end
 
+function _pushright(El::SparseLeftTensor, A::AdjointMPSTensor, H::SparseMPOTensor, B::MPSTensor; kwargs...)
+     sz = size(H)
      El_next = SparseLeftTensor(nothing, sz[2])
+
      if get_num_workers() > 1 # multi-processing
 
           # use pmap to dispatch interactions
-          lsEl = let El = obj.El[si], A = obj[1][si], H = obj[2][si], B = obj[3][si]
-               valid_idx = [(i, j) for j in 1:sz[2] for i in filter(x -> !isnothing(H[x, j]) && !isnothing(El[x]), 1:sz[1])]
-               pmap(valid_idx) do (i, j)
-                    _pushright(El[i], A, H[i, j], B; sparse=true), i, j
-               end
+          valid_idx = [(i, j) for j in 1:sz[2] for i in filter(x -> !isnothing(H[x, j]) && !isnothing(El[x]), 1:sz[1])]
+          lsEl = pmap(valid_idx) do (i, j)
+               _pushright(El[i], A, H[i, j], B; sparse=true), j
           end
 
-          for (El, i, j) in lsEl
+          for (El, j) in lsEl
                El_next[j] = axpy!(true, El, El_next[j])
           end
 
      else # multi-threading
-          let El = obj.El[si], A = obj[1][si], H = obj[2][si], B = obj[3][si]
-               @threads for j in 1:sz[2]
-                    @floop GlobalThreadsExecutor for i in filter(x -> !isnothing(H[x, j]) && !isnothing(El[x]), 1:sz[1])
-                         El_i = _pushright(El[i], A, H[i, j], B; sparse=true)
-                         @reduce() do (El_cum = nothing; El_i)
-                              El_cum = axpy!(true, El_i, El_cum)
-                         end
+
+          @threads for j in 1:sz[2]
+               @floop GlobalThreadsExecutor for i in filter(x -> !isnothing(H[x, j]) && !isnothing(El[x]), 1:sz[1])
+                    El_i = _pushright(El[i], A, H[i, j], B; sparse=true)
+                    @reduce() do (El_cum = nothing; El_i)
+                         El_cum = axpy!(true, El_i, El_cum)
                     end
-                    El_next[j] = El_cum
                end
+               El_next[j] = El_cum
           end
+
      end
 
-     obj.El[si+1] = El_next
+     return El_next
 
-     obj.Center[1] += 1
-     return obj
 end
 
 function _pushright(El::LocalLeftTensor{2}, A::AdjointMPSTensor{3}, B::MPSTensor{3}; kwargs...)

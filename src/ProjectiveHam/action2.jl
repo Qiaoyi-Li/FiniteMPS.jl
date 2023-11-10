@@ -8,23 +8,28 @@ Special case for `IdentityProjectiveHamiltonian`.
 """
 function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}; kwargs...) where {T<:NTuple{2,MPSTensor}}
 
-     if get_num_workers() > 1  # multi-processing
+     Timer_action2 = get_timer("action2")
+     @timeit Timer_action2 "action2" begin
+          if get_num_workers() > 1  # multi-processing
 
-          f = (x, y) -> axpy!(true, x, y)
-          Hx = @distributed (f) for (i, j, k) in obj.validIdx
-               _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k]; kwargs...)
-          end
+               f = (x, y) -> axpy!(true, x, y)
+               Hx = @distributed (f) for (i, j, k) in obj.validIdx
+                    _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k]; kwargs...)
+               end
 
-     else # multi-threading
+          else # multi-threading
 
-          @floop GlobalThreadsExecutor for (i, j, k) in obj.validIdx
-               tmp = _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k]; kwargs...)
-               @reduce() do (Hx = nothing; tmp)
-                    Hx = axpy!(true, tmp, Hx)
+               @floop GlobalThreadsExecutor for (i, j, k) in obj.validIdx
+                    tmp, to = _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k], true; kwargs...)
+                    @reduce() do (Hx = nothing; tmp), (Timer_acc = TimerOutput(); to)
+                         Hx = axpy!(true, tmp, Hx)
+                         Timer_acc = merge!(Timer_acc, to)
+                    end
                end
           end
-
      end
+
+     merge!(Timer_action2, Timer_acc; tree_point=["action2"])
 
      # x -> (H - E₀)x
      !iszero(obj.E₀) && axpy!(-obj.E₀, x.A, Hx)
@@ -45,6 +50,56 @@ end
 function action2(obj::AbstractProjectiveHamiltonian, xl::MPSTensor, xr::MPSTensor; kwargs...)
      return action2(obj, CompositeMPSTensor(xl, xr); kwargs...)
 end
+
+# ====================== wrap _action2 to test performance ==================
+function _action2(x::CompositeMPSTensor, El::LocalLeftTensor{N₁}, Hl::LocalOperator{N₂,N₃}, Hr::LocalOperator{N₄,N₅}, Er::LocalRightTensor{N₆},
+     timeit::Bool; kwargs...) where {N₁,N₂,N₃,N₄,N₅,N₆}
+
+     !timeit && return _action2(x, El, Hl, Hr, Er; kwargs...), TimerOutput()
+
+     LocalTimer = TimerOutput()
+     name = "_action2_$(N₁)_$(N₂)$(N₃)_$(N₄)$(N₅)_$(N₆)"
+     @timeit LocalTimer name Hx = _action2(x, El, Hl, Hr, Er; kwargs...)
+
+     return Hx, LocalTimer
+end
+
+function _action2(x::CompositeMPSTensor, El::LocalLeftTensor{N₁}, Hl::IdentityOperator, Hr::LocalOperator{N₄,N₅}, Er::LocalRightTensor{N₆},
+     timeit::Bool; kwargs...) where {N₁,N₄,N₅,N₆}
+
+     !timeit && return _action2(x, El, Hl, Hr, Er; kwargs...), TimerOutput()
+
+     LocalTimer = TimerOutput()
+     name = "_action2_$(N₁)_0_$(N₄)$(N₅)_$(N₆)"
+     @timeit LocalTimer name Hx = _action2(x, El, Hl, Hr, Er; kwargs...)
+
+     return Hx, LocalTimer
+end
+
+function _action2(x::CompositeMPSTensor, El::LocalLeftTensor{N₁}, Hl::LocalOperator{N₂,N₃}, Hr::IdentityOperator, Er::LocalRightTensor{N₆},
+     timeit::Bool; kwargs...) where {N₁,N₂,N₃,N₆}
+
+     !timeit && return _action2(x, El, Hl, Hr, Er; kwargs...), TimerOutput()
+
+     LocalTimer = TimerOutput()
+     name = "_action2_$(N₁)_$(N₂)$(N₃)_0_$(N₆)"
+     @timeit LocalTimer name Hx = _action2(x, El, Hl, Hr, Er; kwargs...)
+
+     return Hx, LocalTimer
+end
+
+function _action2(x::CompositeMPSTensor, El::LocalLeftTensor{N₁}, Hl::IdentityOperator, Hr::IdentityOperator, Er::LocalRightTensor{N₆},
+     timeit::Bool; kwargs...) where {N₁,N₆}
+
+     !timeit && return _action2(x, El, Hl, Hr, Er; kwargs...), TimerOutput()
+
+     LocalTimer = TimerOutput()
+     name = "_action2_$(N₁)_0_0_$(N₆)"
+     @timeit LocalTimer name Hx = _action2(x, El, Hl, Hr, Er; kwargs...)
+
+     return Hx, LocalTimer
+end
+# -----------------------------------------------------------------------
 
 # ========================= 2 rank-3 MPS tensors ========================
 #   --c(D)-- -------- --k(D)--
@@ -68,7 +123,6 @@ end
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      Hl::LocalOperator{2,1}, Hr::IdentityOperator,
      Er::LocalRightTensor{2}; kwargs...) where {T<:NTuple{2,MPSTensor{3}}}
-
      # @tensor Hx[a d; h i] := (El.A[a b c] * Hl.A[b d e]) * x.A[c e h k] * Er.A[k i] #2.6s/10(D=8192)
      # @tensor Hx[a d; h i] := (El.A[a b c] * Hl.A[b d e]) * (x.A[c e h k] * Er.A[k i]) #2.6s/10(D=8192)
      @tensor Hx[a d; h i] := ((El.A[a b c] * x.A[c e h k]) * Hl.A[b d e]) * Er.A[k i] #1.9s/10(D=8192)
@@ -229,7 +283,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      Hl::LocalOperator{2,1}, Hr::IdentityOperator,
      Er::LocalRightTensor{2}; kwargs...) where {T<:NTuple{2,MPSTensor{4}}}
 
-     @tensor Hx[a d l; h m i] := ((El.A[a b c] * x.A[c e l h m k]) * Hl.A[b d e]) * Er.A[k i]
+     @tensor Hx[a d l; h m i] := El.A[a b c] * ((x.A[c e l h m k] * Er.A[k i]) * Hl.A[b d e])
 
      return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
 end
@@ -238,7 +292,8 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      Hl::LocalOperator{1,1}, Hr::LocalOperator{1,1},
      Er::LocalRightTensor{3}; kwargs...) where {T<:NTuple{2,MPSTensor{4}}}
 
-     @tensor Hx[a d l; g m i] := (((El.A[a b c] * x.A[c e l h m k]) * Hl.A[d e]) * Hr.A[g h]) * Er.A[k b i]
+     # @tensor Hx[a d l; g m i] := (((El.A[a b c] * x.A[c e l h m k]) * Hl.A[d e]) * Hr.A[g h]) * Er.A[k b i]
+     @tensor Hx[a d l; g m i] := El.A[a b c] * ((x.A[c e l h m k] * Hl.A[d e]) * Hr.A[g h]) * Er.A[k b i]
 
      return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
 end
@@ -263,7 +318,9 @@ end
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      Hl::LocalOperator{2,2}, Hr::LocalOperator{1,1},
      Er::LocalRightTensor{3}; kwargs...) where {T<:NTuple{2,MPSTensor{4}}}
-     @tensor Hx[a d l; g m i] := (((El.A[a b c] * x.A[c e l h m k]) * Hl.A[b d e f]) * Hr.A[g h]) * Er.A[k f i]
+
+     # @tensor Hx[a d l; g m i] := (((El.A[a b c] * x.A[c e l h m k]) * Hl.A[b d e f]) * Hr.A[g h]) * Er.A[k f i]
+     @tensor Hx[a d l; g m i] := (El.A[a b c] * (x.A[c e l h m k] * Hr.A[g h])) * Hl.A[b d e f] * Er.A[k f i]
 
      return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
 end

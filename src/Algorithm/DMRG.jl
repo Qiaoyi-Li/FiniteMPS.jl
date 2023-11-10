@@ -30,6 +30,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
      canonicalize!(Ψ, 1, 2)
      # left to right sweep
      Al::MPSTensor = Ψ[1]
+     # TODO, shift E₀
      @timeit TimerSweep "DMRGSweep2>>" for si = 1:L-1
           TimerStep = TimerOutput()
           @timeit TimerStep "pushEnv" canonicalize!(Env, si, si + 1)

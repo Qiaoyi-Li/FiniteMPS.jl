@@ -136,5 +136,13 @@ function *(A::LocalLeftTensor{R}, B::LocalRightTensor{R}) where R
      return scalar(TensorOperations.tensorcontract(A.A, 1:R, B.A, reverse(1:R)))
 end
 
+""" 
+     *(El::LocalLeftTensor, A::MPSTensor)
+
+Conctract a MPS tensor to a left environment tensor.
+"""
+function *(El::LocalLeftTensor{R₁}, A::MPSTensor{R₂}) where {R₁, R₂}
+     return permute(El.A, Tuple(1:R₁-1), (R₁,)) * permute(A.A, (1,), Tuple(2:R₂))
+end
 
 
