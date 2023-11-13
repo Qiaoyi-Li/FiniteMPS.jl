@@ -111,9 +111,4 @@ function axpby!(α::Number, x::DenseMPS{L}, β::Number, y::DenseMPS{L}; kwargs..
 
 end
 
-function rmul!(A::DenseMPS, b::Number)
-     A.c *= b
-     return A
-end
-
 axpy!(α::Number, x::DenseMPS, y::DenseMPS; kwargs...) = axpby!(α, x, 1, y; kwargs...)
