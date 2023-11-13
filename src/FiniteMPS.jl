@@ -17,7 +17,7 @@ include("Globals.jl")
 include("Defaults.jl")
 
 # Utils
-export trivial, istrivial, data, UniformDistribution, GaussianDistribution, NormalDistribution, randStiefel, randisometry, randisometry!, cleanup!
+export trivial, istrivial, data, UniformDistribution, GaussianDistribution, NormalDistribution, randStiefel, randisometry, randisometry!, cleanup!,  oplusEmbed
 include("utils/trivial.jl")
 include("utils/TensorMap.jl")
 include("utils/Random.jl")
@@ -25,6 +25,7 @@ include("utils/CompatThreading.jl")
 include("utils/SerializedElementArrays.jl")
 include("utils/manualGC.jl")
 include("utils/cleanup.jl")
+include("utils/oplus.jl")
 
 # Wrapper types for classifying tensors
 export AbstractTensorWrapper, AbstractMPSTensor, MPSTensor, CompositeMPSTensor, AdjointMPSTensor, AbstractEnvironmentTensor, LocalLeftTensor, LocalRightTensor, SimpleLeftTensor, SimpleRightTensor, SparseLeftTensor, SparseRightTensor, AbstractLocalOperator, hastag, getOpName, IdentityOperator, tag2Tuple, LocalOperator, SparseMPOTensor, AbstractStoreType, StoreMemory, StoreDisk

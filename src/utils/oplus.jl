@@ -19,7 +19,7 @@ function oplusEmbed(A::AbstractTensorMap{F}, B::AbstractTensorMap{F}, idx::Int64
           for i in eachindex(dataB)
                sz = size(dataB[i])
                @assert sz[1] ≥ sz[2]
-               dataB[i] = vcat(zeros(eltype(B), sz[1] - sz[2], sz[2]), Matrix{eltype(B)}(I, sz[2], sz[2]))
+               dataB[i] = vcat(zeros(scalartype(B), sz[1] - sz[2], sz[2]), Matrix{scalartype(B)}(I, sz[2], sz[2]))
           end
      else
           sumspace = domain(A)[idx-rA] ⊕ domain(B)[idx-rA]
@@ -30,7 +30,7 @@ function oplusEmbed(A::AbstractTensorMap{F}, B::AbstractTensorMap{F}, idx::Int64
           for i in eachindex(dataB)
                sz = size(dataB[i])
                @assert sz[1] ≥ sz[2]
-               dataB[i] = vcat(zeros(eltype(B), sz[1] - sz[2], sz[2]), Matrix{eltype(B)}(I, sz[2], sz[2]))
+               dataB[i] = vcat(zeros(scalartype(B), sz[1] - sz[2], sz[2]), Matrix{scalartype(B)}(I, sz[2], sz[2]))
           end
      end
      return EmbA, EmbB

@@ -145,4 +145,13 @@ function *(El::LocalLeftTensor{R₁}, A::MPSTensor{R₂}) where {R₁, R₂}
      return permute(El.A, Tuple(1:R₁-1), (R₁,)) * permute(A.A, (1,), Tuple(2:R₂))
 end
 
+""" 
+     *(A::MPSTensor, Er::LocalRightTensor)
+
+Conctract a MPS tensor to a right environment tensor.
+"""
+function *(A::MPSTensor{R₁}, Er::LocalRightTensor{R₂}) where {R₁, R₂}
+     return permute(A.A, Tuple(1:R₁-1), (R₁,)) * permute(Er.A, (1,), Tuple(2:R₂))
+end
+
 
