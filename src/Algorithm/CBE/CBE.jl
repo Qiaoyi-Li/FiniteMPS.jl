@@ -1,36 +1,19 @@
-"""
-     abstract type CBEDirection end
-
-Direction of CBE, wrapped as a type to be passed as a type parameter. 
-"""
-abstract type CBEDirection end
-
-"""
-     struct L2RCBE <: CBEDirection end
-"""
-struct L2RCBE <: CBEDirection end
-
-"""
-     struct R2LCBE <: CBEDirection end
-"""
-struct R2LCBE <: CBEDirection end
-
 """ 
-     abstract type CBEAlgorithm{T <: CBEDirection}
+     abstract type CBEAlgorithm{T <: SweepDirection}
 
 Abstract type of all (controlled bond expansion) CBE algorithms.
 """
-abstract type CBEAlgorithm{T<:CBEDirection} end
+abstract type CBEAlgorithm{T<:SweepDirection} end
 
 """
-     struct StandardCBE{T} <: CBEAlgorithm{T} where T <: CBEDirection
+     struct StandardCBE{T <: SweepDirection} <: CBEAlgorithm{T}
           D::Int64
           tol::Int64
      end
 
 Standard CBE algorithm, details see [PhysRevLett.130.246402](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.130.246402).
 """
-struct StandardCBE{T <: CBEDirection} <: CBEAlgorithm{T}
+struct StandardCBE{T <: SweepDirection} <: CBEAlgorithm{T}
      D::Int64
      tol::Float64
      function StandardCBE(Direction::Symbol, D::Int64, tol::Float64)
@@ -38,15 +21,15 @@ struct StandardCBE{T <: CBEDirection} <: CBEAlgorithm{T}
           @assert D > 0
           @assert tol ≥ 0
           if Direction == :L
-               return new{L2RCBE}(D, tol)
+               return new{SweepL2R}(D, tol)
           else
-               return new{R2LCBE}(D, tol)
+               return new{SweepR2L}(D, tol)
           end
      end
 end
 
 
-function CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor, Ar::MPSTensor, Alg::StandardCBE{L2RCBE}; kwargs...)
+function CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor, Ar::MPSTensor, Alg::StandardCBE{SweepL2R}; kwargs...)
 
      info = Vector{BondInfo}(undef, 4) # truncate info of 4 times svd
 
@@ -85,7 +68,7 @@ function CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor, Ar::MPSTensor, A
      return Al_ex, Ar_ex, info
 end
 
-function CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor, Ar::MPSTensor, Alg::StandardCBE{R2LCBE}; kwargs...)
+function CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor, Ar::MPSTensor, Alg::StandardCBE{SweepR2L}; kwargs...)
 
      info = Vector{BondInfo}(undef, 4) # truncate info of 4 times svd
 

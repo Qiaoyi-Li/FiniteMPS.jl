@@ -28,7 +28,7 @@ In particular, R == 2 for bond tensor.
 """
 struct MPSTensor{R} <: AbstractMPSTensor
      A::AbstractTensorMap
-     function MPSTensor{R}(A::AbstractTensorMap) where R
+     function MPSTensor{R}(A::AbstractTensorMap) where {R}
           @assert R == rank(A) ≥ 2
           if R ≥ 3 && rank(A, 1) != 2
                A = permute(A, (1, 2), Tuple(3:R))
@@ -36,17 +36,17 @@ struct MPSTensor{R} <: AbstractMPSTensor
           return new{R}(A)
      end
      function MPSTensor(A::AbstractTensorMap)
-          R = rank(A)  
+          R = rank(A)
           return MPSTensor{R}(A)
      end
 end
-    
+
 """
      *(A::MPSTensor, B::MPSTensor) -> ::AbstractTensorMap
 
 Contract the virtual bond between 2 neighbor local tensors.
 """
-function *(A::MPSTensor{R₁}, B::MPSTensor{R₂}) where {R₁, R₂}
+function *(A::MPSTensor{R₁}, B::MPSTensor{R₂}) where {R₁,R₂}
      C = TensorOperations.tensorcontract(
           (Tuple(1:R₁-1), Tuple(R₁:(R₁+R₂-2))),
           A.A, (Tuple(1:R₁-1), (R₁,)), :N,
@@ -54,7 +54,7 @@ function *(A::MPSTensor{R₁}, B::MPSTensor{R₂}) where {R₁, R₂}
      return C
 end
 promote_rule(::Type{<:MPSTensor}, ::Type{<:AbstractTensorMap}) = MPSTensor
-*(A::Union{MPSTensor, AbstractTensorMap}, B::Union{MPSTensor, AbstractTensorMap}) = *(promote(A, B)...)
+*(A::Union{MPSTensor,AbstractTensorMap}, B::Union{MPSTensor,AbstractTensorMap}) = *(promote(A, B)...)
 
 """
      leftorth(A::MPSTensor; 
@@ -65,18 +65,18 @@ Left canonicalize a on-site MPS tensor.
 
 If `trunc = notrunc()`, use `TensorKit.leftorth`, otherwise, use `TensorKit.tsvd`. Propagate `kwargs` to the TensorKit functions.
 """
-function leftorth(A::MPSTensor{R₁}; trunc = notrunc(), kwargs...) where R₁ 
+function leftorth(A::MPSTensor{R₁}; trunc=notrunc(), kwargs...) where {R₁}
      if trunc == notrunc()
           Q, R = leftorth(A.A, Tuple(1:R₁-1), (R₁,); kwargs...)
           return Q, R, BondInfo(Q, :R)
      else
           alg = get(kwargs, :alg, nothing)
-          if isnothing(alg) 
-               u, s, vd, ϵ = tsvd(A.A, Tuple(1:R₁-1), (R₁,); trunc = trunc)
+          if isnothing(alg)
+               u, s, vd, ϵ = tsvd(A.A, Tuple(1:R₁-1), (R₁,); trunc=trunc)
           else
-          u, s, vd, ϵ = tsvd(A.A, Tuple(1:R₁-1), (R₁,); trunc = trunc, alg = alg)
+               u, s, vd, ϵ = tsvd(A.A, Tuple(1:R₁-1), (R₁,); trunc=trunc, alg=alg)
           end
-          return u, s*vd, BondInfo(s, ϵ)
+          return u, s * vd, BondInfo(s, ϵ)
      end
 
 end
@@ -90,18 +90,18 @@ Right canonicalize a on-site MPS tensor.
 
 If `trunc = notrunc()`, use `TensorKit.rightorth`, otherwise, use `TensorKit.tsvd`. Propagate `kwargs` to the TensorKit functions.
 """
-function rightorth(A::MPSTensor{R₂}; trunc = notrunc(), kwargs...) where R₂
+function rightorth(A::MPSTensor{R₂}; trunc=notrunc(), kwargs...) where {R₂}
      if trunc == notrunc()
           L, Q = rightorth(A.A, (1,), Tuple(2:R₂); kwargs...)
           return L, Q, BondInfo(Q, :L)
      else
           alg = get(kwargs, :alg, nothing)
           if isnothing(alg)
-               u, s, vd, ϵ = tsvd(A.A, (1,), Tuple(2:R₂); trunc = trunc)
+               u, s, vd, ϵ = tsvd(A.A, (1,), Tuple(2:R₂); trunc=trunc)
           else
-               u, s, vd, ϵ = tsvd(A.A, (1,), Tuple(2:R₂); trunc = trunc, alg = alg)
+               u, s, vd, ϵ = tsvd(A.A, (1,), Tuple(2:R₂); trunc=trunc, alg=alg)
           end
-          return u*s, vd, BondInfo(s, ϵ)
+          return u * s, vd, BondInfo(s, ϵ)
      end
 end
 
