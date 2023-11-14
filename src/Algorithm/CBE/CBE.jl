@@ -1,35 +1,53 @@
-""" 
-     abstract type CBEAlgorithm{T <: SweepDirection}
+# TODO add Timers
+function CBE(Al::MPSTensor, Ar::MPSTensor, Alg::NoCBE; kwargs...)
+     return Al, Ar, nothing
+end
 
-Abstract type of all (controlled bond expansion) CBE algorithms.
-"""
-abstract type CBEAlgorithm{T<:SweepDirection} end
+function CBE(Al::MPSTensor, Ar::MPSTensor, Alg::FullCBE{SweepL2R}; kwargs...)
 
-"""
-     struct StandardCBE{T <: SweepDirection} <: CBEAlgorithm{T}
-          D::Int64
-          tol::Int64
-     end
 
-Standard CBE algorithm, details see [PhysRevLett.130.246402](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.130.246402).
-"""
-struct StandardCBE{T <: SweepDirection} <: CBEAlgorithm{T}
-     D::Int64
-     tol::Float64
-     function StandardCBE(Direction::Symbol, D::Int64, tol::Float64)
-          @assert Direction ∈ (:L, :R)
-          @assert D > 0
-          @assert tol ≥ 0
-          if Direction == :L
-               return new{SweepL2R}(D, tol)
-          else
-               return new{SweepR2L}(D, tol)
-          end
+     if get(kwargs, :reverse, false)
+          Al_ex, tmp, ~ = CBE(Al, Ar, FullCBE(SweepR2L()))
+          # canonicalize without truncation  
+          S::MPSTensor, Ar_ex::MPSTensor, info = rightorth(tmp; trunc=notrunc())
+          return convert(MPSTensor, Al_ex * S), Ar_ex, info
+     else
+          Ar_ex = _isometry_Ar(Ar)
+          Al_ex = _expand_Al(Ar, Ar_ex, Al)
+          return Al_ex, Ar_ex, nothing
      end
 end
 
+function CBE(Al::MPSTensor, Ar::MPSTensor, Alg::FullCBE{SweepR2L}; kwargs...)
 
-function CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor, Ar::MPSTensor, Alg::StandardCBE{SweepL2R}; kwargs...)
+     if get(kwargs, :reverse, false)
+          tmp, Ar_ex, ~ = CBE(Al, Ar, FullCBE(SweepL2R()))
+          # canonicalize without truncation  
+          Al_ex::MPSTensor, S::MPSTensor, info = leftorth(tmp; trunc=notrunc())
+          return Al_ex, convert(MPSTensor, S * Ar_ex), info
+     else
+          Al_ex = _isometry_Al(Al)
+          Ar_ex = _expand_Ar(Al, Al_ex, Ar)
+          return Al_ex, Ar_ex, nothing
+     end
+end
+
+function CBE(::SparseProjectiveHamiltonian{2}, Al::MPSTensor, Ar::MPSTensor, Alg::T; kwargs...) where {T<:Union{NoCBE,FullCBE}}
+     return CBE(Al, Ar, Alg; kwargs...)
+end
+
+function CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar::MPSTensor{R₂}, Alg::StandardCBE{SweepL2R}; kwargs...) where {R₁,R₂}
+
+     Dl = mapreduce(idx -> dim(Al, idx)[2], *, 1:R₁-1)
+     Dr = mapreduce(idx -> dim(Ar, idx)[2], *, 2:R₂)
+     if Dl == dim(Al, R₁)[2] # already full
+          return CBE(Al, Ar, NoCBE(SweepL2R()))
+     elseif Dr ≤ Alg.D # full cbe is not expensive
+          return CBE(Al, Ar, FullCBE(SweepL2R()))
+     elseif Dl < Alg.D
+          return CBE(Al, Ar, FullCBE(SweepL2R()); reverse=true)
+     end
+
 
      info = Vector{BondInfo}(undef, 4) # truncate info of 4 times svd
 
@@ -64,11 +82,21 @@ function CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor, Ar::MPSTensor, A
      # direct sum
      Ar_ex::MPSTensor = _directsum_Ar(Ar, Ar_final)
      Al_ex::MPSTensor = _expand_Al(Ar, Ar_ex, Al)
-     
+
      return Al_ex, Ar_ex, info
 end
 
-function CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor, Ar::MPSTensor, Alg::StandardCBE{SweepR2L}; kwargs...)
+function CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar::MPSTensor{R₂}, Alg::StandardCBE{SweepR2L}; kwargs...) where {R₁,R₂}
+
+     Dl = mapreduce(idx -> dim(Al, idx)[2], *, 1:R₁-1)
+     Dr = mapreduce(idx -> dim(Ar, idx)[2], *, 2:R₂)
+     if Dr == dim(Al, 1)[2] # already full
+          return CBE(Al, Ar, NoCBE(SweepR2L()))
+     elseif Dl ≤ Alg.D # full cbe is not expensive
+          return CBE(Al, Ar, FullCBE(SweepR2L()))
+     elseif Dr < Alg.D
+          return CBE(Al, Ar, FullCBE(SweepR2L()); reverse=true)
+     end
 
      info = Vector{BondInfo}(undef, 4) # truncate info of 4 times svd
 

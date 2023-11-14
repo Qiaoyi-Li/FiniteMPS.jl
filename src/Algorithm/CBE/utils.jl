@@ -48,21 +48,41 @@ function _directsum_Ar(Ar::MPSTensor{R}, Ar_f::MPSTensor{R}) where {R}
      return EmbA * permute(Ar.A, (1,), Tuple(2:R)) + EmbB * permute(Ar_f.A, (1,), Tuple(2:R))
 end
 
-function _expand_Ar(Al::MPSTensor{3}, Al_ex::MPSTensor{3}, Ar::MPSTensor{3})
+function _expand_Ar(Al::MPSTensor{3}, Al_ex::MPSTensor{3}, Ar::MPSTensor{3})::MPSTensor{3}
      @tensor Ar_ex[d e; f] := (Al.A[a b c] * Al_ex.A'[d a b]) * Ar.A[c e f]
      return Ar_ex
 end
-function _expand_Ar(Al::MPSTensor{4}, Al_ex::MPSTensor{4}, Ar::MPSTensor{4})
+function _expand_Ar(Al::MPSTensor{4}, Al_ex::MPSTensor{4}, Ar::MPSTensor{4})::MPSTensor{4}
      @tensor Ar_ex[e f; g h] := (Al.A[a b c d] * Al_ex.A'[c e a b]) * Ar.A[d f g h]
      return Ar_ex
 end
 
-function _expand_Al(Ar::MPSTensor{3}, Ar_ex::MPSTensor{3}, Al::MPSTensor{3})
+function _expand_Al(Ar::MPSTensor{3}, Ar_ex::MPSTensor{3}, Al::MPSTensor{3})::MPSTensor{3}
      @tensor Al_ex[a b; h] := (Ar_ex.A'[g h e] * Ar.A[d e f]) * Al.A[a b d]
      return Al_ex
 end    
 
-function _expand_Al(Ar::MPSTensor{4}, Ar_ex::MPSTensor{4}, Al::MPSTensor{4})
+function _expand_Al(Ar::MPSTensor{4}, Ar_ex::MPSTensor{4}, Al::MPSTensor{4})::MPSTensor{4}
      @tensor Al_ex[a b; c h] := (Ar_ex.A'[f g h e] * Ar.A[d e f g]) * Al.A[a b c d]
      return Al_ex
 end    
+
+function _isometry_Al(Al::MPSTensor{3})::MPSTensor{3}
+     fullspace = fuse(codomain(Al)[1], codomain(Al)[2])
+     return isometry(codomain(Al)[1] ⊗ codomain(Al)[2], fullspace)
+end
+
+function _isometry_Al(Al::MPSTensor{4})::MPSTensor{4}
+     fullspace = fuse(codomain(Al)[1] ⊗ codomain(Al)[2], domain(Al)[1]')
+     return isometry(codomain(Al)[1] ⊗ codomain(Al)[2] ⊗ domain(Al)[1]', fullspace)
+end
+
+function _isometry_Ar(Ar::MPSTensor{3})::MPSTensor{3}
+     fullspace = fuse(codomain(Ar)[2]', domain(Ar)[1])
+     return isometry(fullspace, codomain(Ar)[2]' ⊗ domain(Ar)[1])
+end
+
+function _isometry_Ar(Ar::MPSTensor{4})::MPSTensor{4}
+     fullspace = fuse(codomain(Ar)[2]', domain(Ar)[1] ⊗ domain(Ar)[2])
+     return isometry(fullspace, codomain(Ar)[2]' ⊗ domain(Ar)[1] ⊗ domain(Ar)[2])
+end

@@ -15,6 +15,7 @@ Wrap `TDVPSweep1!` with a symmetric integrator, i.e., sweeping from left to righ
      GCsweep::Bool = false
      verbose::Int64 = 0
      LanczosOpt::NameTuple (Pack options of Lanczos algorithm, details please see `KrylovKit.jl`)
+     CBEAlg::CBEAlgorithm = NoCBE()
 """
 function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::SweepL2R; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,DenseMPS}}
 
@@ -22,21 +23,28 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
      verbose::Int64 = get(kwargs, :verbose, 0)
+     CBEAlg::CBEAlgorithm{SweepL2R} = get(kwargs, :CBEAlg, NoCBE())
 
      TimerSweep = TimerOutput()
      info_forward = Vector{TDVPInfo{1}}(undef, L)
      info_backward = Vector{TDVPInfo{0}}(undef, L - 1)
 
      Ψ = Env[3]
+     canonicalize!(Ψ, 1)
+     canonicalize!(Env, 1)
      # shift energy
      E₀::Float64 = scalar!(Env; normalize=true)
-
-     canonicalize!(Ψ, 1)
      Al::MPSTensor = Ψ[1]
      @timeit TimerSweep "TDVPSweep1>>" for si in 1:L
           TimerStep = TimerOutput()
-          @timeit TimerStep "pushEnv" canonicalize!(Env, si)
 
+          # CBE
+          @timeit TimerStep "CBE" if !isa(CBEAlg, NoCBE) && si < L
+               canonicalize!(Env, si, si + 1)
+               Al, Ψ[si+1], cbeinfo = CBE(ProjHam(Env, si, si + 1; E₀=E₀), Al, Ψ[si+1], CBEAlg)
+          end
+
+          @timeit TimerStep "pushEnv" canonicalize!(Env, si)
           @timeit TimerStep "TDVPUpdate1" x1, Norm, info_Lanczos = _TDVPUpdate1(ProjHam(Env, si; E₀=E₀), Al, dt; kwargs...)
           rmul!(Ψ, Norm * exp(real(dt) * E₀))
 
@@ -44,7 +52,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
                @timeit TimerStep "svd" Ψ[si], S::MPSTensor, info_svd = leftorth(x1; trunc=trunc)
                # note svd may change the norm of S
                normalize!(S)
-               info_forward[si] = TDVPInfo{1}(dt, info_Lanczos, info_svd)
+               info_forward[si] = TDVPInfo{1}(dt, info_Lanczos,  BondInfo(x1, :R))
 
                # backward evolution
                @timeit TimerStep "pushEnv" canonicalize!(Env, si + 1, si)
@@ -56,10 +64,10 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
                # remember to change Center of Ψ manually
                Center(Ψ)[:] = [si + 1, si + 1]
 
-               info_backward[si] = TDVPInfo{0}(-dt, info_Lanczos, BondInfo(Al, :L))
+               info_backward[si] = TDVPInfo{0}(-dt, info_Lanczos, info_svd)
 
                # update E₀, note Norm ~ exp(-dt * (⟨H⟩ - E₀))
-               E₀ -= log(Norm) / real(dt)
+               # E₀ -= log(Norm) / real(dt)
           else
                Ψ[si] = x1
                info_forward[si] = TDVPInfo{1}(dt, info_Lanczos, BondInfo(x1, :R))
@@ -101,21 +109,28 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
      verbose::Int64 = get(kwargs, :verbose, 0)
+     CBEAlg::CBEAlgorithm{SweepR2L} = get(kwargs, :CBEAlg, NoCBE())
 
      TimerSweep = TimerOutput()
      info_forward = Vector{TDVPInfo{1}}(undef, L)
      info_backward = Vector{TDVPInfo{0}}(undef, L - 1)
 
      Ψ = Env[3]
+     canonicalize!(Ψ, L)
+     canonicalize!(Env, L)
      # shift energy
      E₀::Float64 = scalar!(Env; normalize=true)
-
-     canonicalize!(Ψ, L)
      Ar::MPSTensor = Ψ[L]
      @timeit TimerSweep "TDVPSweep1<<" for si = reverse(1:L)
           TimerStep = TimerOutput()
-          @timeit TimerStep "pushEnv" canonicalize!(Env, si)
 
+          # CBE
+          @timeit TimerStep "CBE" if !isa(CBEAlg, NoCBE) && si > 1
+               canonicalize!(Env, si - 1, si)
+               Ψ[si-1], Ar, cbeinfo = CBE(ProjHam(Env, si - 1, si; E₀=E₀), Ψ[si-1], Ar, CBEAlg)
+          end
+
+          @timeit TimerStep "pushEnv" canonicalize!(Env, si)
           @timeit TimerStep "TDVPUpdate1" x1, Norm, info_Lanczos = _TDVPUpdate1(ProjHam(Env, si; E₀=E₀), Ar, dt; kwargs...)
           rmul!(Ψ, Norm * exp(real(dt) * E₀))
 
@@ -123,7 +138,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
                @timeit TimerStep "svd" S::MPSTensor, Ψ[si], info_svd = rightorth(x1; trunc=trunc)
                # note svd may change the norm of S
                normalize!(S)
-               info_forward[si] = TDVPInfo{1}(dt, info_Lanczos, info_svd)
+               info_forward[si] = TDVPInfo{1}(dt, info_Lanczos, BondInfo(x1, :L))
 
                # backward evolution
                @timeit TimerStep "pushEnv" canonicalize!(Env, si, si - 1)
@@ -135,10 +150,10 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
                # remember to change Center of Ψ manually
                Center(Ψ)[:] = [si - 1, si - 1]
 
-               info_backward[si-1] = TDVPInfo{0}(-dt, info_Lanczos, BondInfo(Ar, :R))
+               info_backward[si-1] = TDVPInfo{0}(-dt, info_Lanczos, info_svd)
 
                # update E₀, note Norm ~ exp(-dt * (⟨H⟩ - E₀))
-               E₀ -= log(Norm) / real(dt)
+               # E₀ -= log(Norm) / real(dt)
 
           else
                Ψ[si] = x1

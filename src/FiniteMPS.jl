@@ -17,7 +17,7 @@ include("Globals.jl")
 include("Defaults.jl")
 
 # Utils
-export trivial, istrivial, data, UniformDistribution, GaussianDistribution, NormalDistribution, randStiefel, randisometry, randisometry!, cleanup!, oplusEmbed, SweepDirection, SweepL2R, SweepR2L
+export trivial, istrivial, data, UniformDistribution, GaussianDistribution, NormalDistribution, randStiefel, randisometry, randisometry!, cleanup!, oplusEmbed, SweepDirection, SweepL2R, SweepR2L, AnyDirection
 include("utils/trivial.jl")
 include("utils/TensorMap.jl")
 include("utils/Random.jl")
@@ -76,7 +76,7 @@ include("Algebra/mul.jl")
 include("Algebra/axpby.jl")
 
 # Algorithm
-export LanczosInfo, BondInfo, DMRGInfo, DMRGSweep2!, DMRGSweep1!, SETTN, TDVPSweep2!, TDVPSweep1!, TDVPIntegrator, SymmetricIntegrator
+export LanczosInfo, BondInfo, DMRGInfo, TDVPInfo, DMRGSweep2!, DMRGSweep1!, SETTN, TDVPSweep2!, TDVPSweep1!, TDVPIntegrator, SymmetricIntegrator, CBEAlgorithm, NoCBE, FullCBE, StandardCBE, CBE
 include("Algorithm/Info.jl")
 include("Algorithm/DMRG.jl")
 include("Algorithm/SETTN.jl")
@@ -84,6 +84,11 @@ include("Algorithm/TDVP/TDVPUpdate.jl")
 include("Algorithm/TDVP/TDVP2.jl")
 include("Algorithm/TDVP/TDVP1.jl")
 include("Algorithm/TDVP/Integrator.jl")
+include("Algorithm/CBE/utils.jl")
+include("Algorithm/CBE/SparseSVD.jl")
+include("Algorithm/CBE/CBEAlgorithm.jl")
+include("Algorithm/CBE/CBE.jl")
+
 
 
 # Interaction tree for generating Hamiltonian MPO and calculate observables
