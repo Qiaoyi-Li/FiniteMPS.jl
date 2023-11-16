@@ -305,6 +305,7 @@ function _pushright(El::LocalLeftTensor{5}, A::AdjointMPSTensor{3}, H::IdentityO
 end
 
 # ========================= MPO ===========================
+# TODO test performance
 function _pushright(El::LocalLeftTensor{2}, A::AdjointMPSTensor{4}, B::MPSTensor{4}; kwargs...)
      @tensor tmp[f; e] := (El.A[a b] * A.A[d f a c]) * B.A[b c d e]
      return LocalLeftTensor(tmp, El.tag)

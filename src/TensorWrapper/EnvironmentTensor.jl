@@ -154,4 +154,36 @@ function *(A::MPSTensor{R₁}, Er::LocalRightTensor{R₂}) where {R₁, R₂}
      return permute(A.A, Tuple(1:R₁-1), (R₁,)) * permute(Er.A, (1,), Tuple(2:R₂))
 end
 
+"""
+     fuse(El::SimpleLeftTensor) -> iso::AbstractTensorMap
+     
+Return the isometry to fuse the top 2 legs.
 
+     fuse(lsEl::SparseLeftTensor) -> Vector{AbstractTensorMap} 
+
+Additionally embed the isometry to the direct sum space of all channels. 
+"""
+function fuse(lsEl::SparseLeftTensor)
+
+     lsIso = map(fuse, lsEl)
+     lsV = map(lsIso) do iso
+          domain(iso)[1]
+     end
+     lsembed = oplusEmbed(lsV; reverse = true)
+     return map(lsIso, lsembed) do iso, embed
+          iso * embed
+     end
+end
+function fuse(El::LocalLeftTensor{2})
+     return isometry(domain(El)[end], domain(El)[end])
+end
+function fuse(El::LocalLeftTensor{3})
+     if rank(El, 1) == 1
+          aspace = fuse(domain(El)[1], domain(El)[2])
+          return isometry(domain(El)[1] ⊗ domain(El)[2], aspace)
+     else
+          aspace = fuse(codomain(El)[2]', domain(El)[1])
+          return isometry(codomain(El)[2]' ⊗ domain(El)[1], aspace)
+     end
+end
+fuse(::Nothing) = nothing

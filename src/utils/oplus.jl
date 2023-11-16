@@ -1,12 +1,44 @@
 """
+     oplusEmbed(lsV::Vector{<:GradedSpace};
+          reverse::Bool=false) -> lsEmbed::Vector{<:AbstractTensorMap}
+
+Return the embedding maps from vectors in `lsV` to their direct sum space, with the same order as `lsV`. If `reverse == true`, return the submersions from the direct sum space to the vectors instead.
+
      oplusEmbed(A::AbstractTensorMap,
           B::AbstractTensorMap,
           idx::Int64) -> EmbA::TensorMap, EmbB::TensorMap
 
 Return the 2 embedding maps (from `A` and `B`) to the direct sum space (or their adjoint) corresponding to `idx`.
 """
+function oplusEmbed(lsV::Vector{<:GradedSpace}; reverse::Bool=false)
+
+     V_oplus = ⊕(lsV...)
+     dims_count = TensorKit.SectorDict{sectortype(V_oplus),Int64}()
+     for c in sectors(V_oplus)
+          dims_count[c] = 0
+     end
+     lsEmbed = map(lsV) do V
+          reverse ? TensorMap(zeros, V, V_oplus) : TensorMap(zeros, V_oplus, V)
+     end
+
+     for (V, Embed) in zip(lsV, lsEmbed)
+          for c in sectors(V)
+               d = dim(V, c)
+               if reverse
+                    data(Embed)[c][:, dims_count[c]+1:dims_count[c]+d] = Matrix(I, d, d)
+               else
+                    data(Embed)[c][dims_count[c]+1:dims_count[c]+d, :] = Matrix(I, d, d)
+               end
+               dims_count[c] += d
+          end
+     end
+
+     return lsEmbed
+end
+oplusEmbed(lsV::GradedSpace...; kwargs...) = oplusEmbed([lsV...,]; kwargs...)
+
 function oplusEmbed(A::AbstractTensorMap{F}, B::AbstractTensorMap{F}, idx::Int64) where {F<:GradedSpace}
-     
+
      @assert rank(A) == rank(B)
 
      rA = rank(A, 1)

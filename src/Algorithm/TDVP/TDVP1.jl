@@ -28,6 +28,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
      TimerSweep = TimerOutput()
      info_forward = Vector{TDVPInfo{1}}(undef, L)
      info_backward = Vector{TDVPInfo{0}}(undef, L - 1)
+     info_cbe = Vector{Union{Nothing, CBEInfo}}(nothing, L - 1)
 
      Ψ = Env[3]
      canonicalize!(Ψ, 1)
@@ -39,9 +40,10 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
           TimerStep = TimerOutput()
 
           # CBE
-          @timeit TimerStep "CBE" if !isa(CBEAlg, NoCBE) && si < L
+          if !isa(CBEAlg, NoCBE) && si < L
                canonicalize!(Env, si, si + 1)
-               Al, Ψ[si+1], cbeinfo = CBE(ProjHam(Env, si, si + 1; E₀=E₀), Al, Ψ[si+1], CBEAlg)
+               @timeit TimerStep "CBE" Al, Ψ[si+1], info_cbe[si] = CBE(ProjHam(Env, si, si + 1; E₀=E₀), Al, Ψ[si+1], CBEAlg)
+               merge!(TimerStep, get_timer("CBE"); tree_point=["CBE"])
           end
 
           @timeit TimerStep "pushEnv" canonicalize!(Env, si)
@@ -67,7 +69,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
                info_backward[si] = TDVPInfo{0}(-dt, info_Lanczos, info_svd)
 
                # update E₀, note Norm ~ exp(-dt * (⟨H⟩ - E₀))
-               # E₀ -= log(Norm) / real(dt)
+               E₀ -= log(Norm) / real(dt)
           else
                Ψ[si] = x1
                info_forward[si] = TDVPInfo{1}(dt, info_Lanczos, BondInfo(x1, :R))
@@ -98,7 +100,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
      # GC manually
      GCsweep && manualGC()
 
-     return (forward=info_forward, backward=info_backward), TimerSweep
+     return (forward=info_forward, backward=info_backward, cbe=info_cbe), TimerSweep
 
 end
 
@@ -114,6 +116,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
      TimerSweep = TimerOutput()
      info_forward = Vector{TDVPInfo{1}}(undef, L)
      info_backward = Vector{TDVPInfo{0}}(undef, L - 1)
+     info_cbe = Vector{Union{Nothing, CBEInfo}}(nothing, L - 1)
 
      Ψ = Env[3]
      canonicalize!(Ψ, L)
@@ -125,9 +128,10 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
           TimerStep = TimerOutput()
 
           # CBE
-          @timeit TimerStep "CBE" if !isa(CBEAlg, NoCBE) && si > 1
+          if !isa(CBEAlg, NoCBE) && si > 1
                canonicalize!(Env, si - 1, si)
-               Ψ[si-1], Ar, cbeinfo = CBE(ProjHam(Env, si - 1, si; E₀=E₀), Ψ[si-1], Ar, CBEAlg)
+               @timeit TimerStep "CBE" Ψ[si-1], Ar, info_cbe[si - 1] = CBE(ProjHam(Env, si - 1, si; E₀=E₀), Ψ[si-1], Ar, CBEAlg)
+               merge!(TimerStep, get_timer("CBE"); tree_point=["CBE"])
           end
 
           @timeit TimerStep "pushEnv" canonicalize!(Env, si)
@@ -153,7 +157,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
                info_backward[si-1] = TDVPInfo{0}(-dt, info_Lanczos, info_svd)
 
                # update E₀, note Norm ~ exp(-dt * (⟨H⟩ - E₀))
-               # E₀ -= log(Norm) / real(dt)
+               E₀ -= log(Norm) / real(dt)
 
           else
                Ψ[si] = x1
@@ -184,7 +188,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
      # GC manually
      GCsweep && manualGC()
 
-     return (forward=info_forward, backward=info_backward), TimerSweep
+     return (forward=info_forward, backward=info_backward, cbe=info_cbe), TimerSweep
 
 end
 

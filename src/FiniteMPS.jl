@@ -7,7 +7,7 @@ using Base.Threads, FLoops, FoldsThreads, Distributed, SharedArrays
 @reexport import SerializedElementArrays: SerializedElementArray,  SerializedElementVector
 @reexport using TensorKit, KrylovKit, TensorKit.TensorOperations
 @reexport import Base: +, -, *, /, ==, promote_rule, convert, length, show, getindex, setindex!, lastindex, keys, similar, merge, iterate
-@reexport import TensorKit: ×, one, zero, dim, inner, scalar, domain, codomain, eltype, scalartype, leftorth, rightorth, leftnull, rightnull, tsvd, adjoint, normalize!, norm, axpy!, axpby!, dot, mul!, rmul!
+@reexport import TensorKit: ×, one, zero, dim, inner, scalar, domain, codomain, eltype, scalartype, leftorth, rightorth, leftnull, rightnull, tsvd, adjoint, normalize!, norm, axpy!, axpby!, dot, mul!, rmul!, NoTruncation, fuse
 @reexport import LinearAlgebra: BLAS, rank, qr, diag, I, diagm
 @reexport import AbstractTrees: parent, isroot
 
@@ -76,7 +76,7 @@ include("Algebra/mul.jl")
 include("Algebra/axpby.jl")
 
 # Algorithm
-export LanczosInfo, BondInfo, DMRGInfo, TDVPInfo, DMRGSweep2!, DMRGSweep1!, SETTN, TDVPSweep2!, TDVPSweep1!, TDVPIntegrator, SymmetricIntegrator, CBEAlgorithm, NoCBE, FullCBE, StandardCBE, CBE
+export LanczosInfo, BondInfo, DMRGInfo, TDVPInfo, DMRGSweep2!, DMRGSweep1!, SETTN, TDVPSweep2!, TDVPSweep1!, TDVPIntegrator, SymmetricIntegrator, CBEAlgorithm, NoCBE, FullCBE, StandardCBE, CBE, LeftOrthComplement, RightOrthComplement
 include("Algorithm/Info.jl")
 include("Algorithm/DMRG.jl")
 include("Algorithm/SETTN.jl")
@@ -85,6 +85,8 @@ include("Algorithm/TDVP/TDVP2.jl")
 include("Algorithm/TDVP/TDVP1.jl")
 include("Algorithm/TDVP/Integrator.jl")
 include("Algorithm/CBE/utils.jl")
+include("Algorithm/CBE/OrthComplement.jl")
+include("Algorithm/CBE/preselect.jl")
 include("Algorithm/CBE/SparseSVD.jl")
 include("Algorithm/CBE/CBEAlgorithm.jl")
 include("Algorithm/CBE/CBE.jl")

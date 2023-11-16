@@ -54,3 +54,21 @@ end
 function convert(::Type{CBEAlgorithm{T}}, Alg::StandardCBE{AnyDirection}) where T <: Union{SweepL2R, SweepR2L}
      return StandardCBE(Alg.D, Alg.tol, T())
 end
+
+"""
+     struct CBEInfo{N}
+          Alg::CBEAlgorithm
+          info::NTuple{N, BondInfo}
+          ϵ::Float64
+     end
+
+Information of CBE. `Alg` is the algorithm used. `info` contain the truncation info of `N` times svd. `ϵ = |Al*Ar - Al_ex*Ar_ex|` if calculated (otherwise `NaN`).
+"""
+struct CBEInfo{N}
+     Alg::CBEAlgorithm
+     info::NTuple{N, BondInfo}
+     ϵ::Float64
+     function CBEInfo(Alg::CBEAlgorithm, info::NTuple{N, BondInfo}, ϵ::Float64 = NaN) where N
+          return new{N}(Alg, info, ϵ)
+     end
+end

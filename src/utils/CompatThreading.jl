@@ -76,7 +76,7 @@ function TensorKit.tsvd!(t::TensorMap;
     Udata = TensorKit.SectorDict{I,A}()
     Σmdata = TensorKit.SectorDict{I,Ar}() # this will contain the singular values as matrix
     Vdata = TensorKit.SectorDict{I,A}()
-    dims = TensorKit.SectorDict{sectortype(t),Int}()
+    dims = TensorKit.SectorDict{I,Int}()
     if isempty(blocksectors(t))
         W = S(dims)
         truncerr = zero(real(scalartype(t)))
