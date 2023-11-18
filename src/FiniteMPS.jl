@@ -2,7 +2,7 @@ module FiniteMPS
 
 using TimerOutputs
 using Reexport
-using AbstractTrees, SerializedElementArrays
+using AbstractTrees, SerializedElementArrays, JLD2
 using Base.Threads, FLoops, FoldsThreads, Distributed, SharedArrays
 @reexport import SerializedElementArrays: SerializedElementArray,  SerializedElementVector
 @reexport using TensorKit, KrylovKit, TensorKit.TensorOperations
@@ -21,6 +21,7 @@ export trivial, istrivial, data, UniformDistribution, GaussianDistribution, Norm
 include("utils/trivial.jl")
 include("utils/TensorMap.jl")
 include("utils/Random.jl")
+include("utils/tsvd.jl")
 include("utils/CompatThreading.jl")
 include("utils/SerializedElementArrays.jl")
 include("utils/manualGC.jl")
@@ -87,6 +88,7 @@ include("Algorithm/TDVP/Integrator.jl")
 include("Algorithm/CBE/utils.jl")
 include("Algorithm/CBE/OrthComplement.jl")
 include("Algorithm/CBE/preselect.jl")
+include("Algorithm/CBE/finalselect.jl")
 include("Algorithm/CBE/SparseSVD.jl")
 include("Algorithm/CBE/CBEAlgorithm.jl")
 include("Algorithm/CBE/CBE.jl")

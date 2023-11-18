@@ -1,38 +1,38 @@
-_CBE_leftnull(Al::MPSTensor{3})::MPSTensor{3} = leftnull(Al, (1, 2), (3,))
-_CBE_leftnull(Al::MPSTensor{4})::MPSTensor{4} = leftnull(Al, (1, 2, 3), (4,))
-_CBE_rightnull(Ar::MPSTensor{3})::MPSTensor{3} = rightnull(Ar, (1,), (2, 3))
-_CBE_rightnull(Ar::MPSTensor{4})::MPSTensor{4} = rightnull(Ar, (1,), (2, 3, 4))
-
-function _final_contract(lsEl::SparseLeftTensor, lsEr::SparseRightTensor)
-     # final contract, b is summed over manually
-     #    --c    c--
-     #   |          |
-     #  El--b    b--Er
-     #   |          |
-     #    --a    d-- 
-     function _final_contract_single(El::LocalLeftTensor{2}, Er::LocalRightTensor{2})
-          return El.A * Er.A
-     end
-     function _final_contract_single(El::LocalLeftTensor{3}, Er::LocalRightTensor{3})
-          @tensor tmp[a; d] := El.A[a b c] * Er.A[c b d]
-     end
-     _final_contract_single(::Nothing, ::LocalRightTensor) = nothing
-     _final_contract_single(::LocalLeftTensor, ::Nothing) = nothing
-
-     if get_num_workers() > 1 # multi-processing
-     # TODO
-
-     else # multi-threading
-          @floop GlobalThreadsExecutor for (El, Er) in zip(lsEl, lsEr)
-               tmp = _final_contract_single(El, Er)
-               @reduce() do (M = nothing; tmp)
-                    M = axpy!(true, tmp, M)
-               end
-          end
-     end
-
-     return M
+function _leftProj(A::MPSTensor{4}, Al::MPSTensor{4})
+     @tensor tmp[g h; i e] := (A.A[a b c e] * Al.A'[c f a b]) * Al.A[g h i f]
+     return tmp
 end
+function _leftProj(A::MPSTensor{5}, Al::MPSTensor{4})
+     @tensor tmp[g h; i d e] := (A.A[a b c d e] * Al.A'[c f a b]) * Al.A[g h i f]
+     return tmp
+end
+function _leftProj(El::LocalLeftTensor{2}, Al::MPSTensor{4})
+     @tensor tmp[d e; f c] := El.A[a c] * Al.A[d e f a]
+     return tmp
+end
+function _leftProj(El::LocalLeftTensor{3}, Al::MPSTensor{4})
+     @tensor tmp[d e; f b c] := El.A[a b c] * Al.A[d e f a]
+     return tmp
+end
+_leftProj(::Nothing, ::MPSTensor) = nothing
+
+function _rightProj(A::MPSTensor{4}, Ar::MPSTensor{4})
+     @tensor tmp[a g; h i] := (A.A[a b c e] * Ar.A'[c e f b]) * Ar.A[f g h i]
+     return tmp
+end
+function _rightProj(A::MPSTensor{5}, Ar::MPSTensor{4})
+     @tensor tmp[a g; h d i] := (A.A[a b c d e] * Ar.A'[c e f b]) * Ar.A[f g h i]
+     return tmp
+end
+function _rightProj(Er::LocalRightTensor{2}, Ar::MPSTensor{4})
+     @tensor tmp[a d; e f] := Er.A[a c] * Ar.A[c d e f]
+     return tmp
+end
+function _rightProj(Er::LocalRightTensor{3}, Ar::MPSTensor{4})
+     @tensor tmp[a d; e b f] := Er.A[a b c] * Ar.A[c d e f]
+     return tmp
+end
+_rightProj(::Nothing, ::MPSTensor) = nothing
 
 function _directsum_Al(Al::MPSTensor{R}, Al_f::MPSTensor{R}) where {R}
      # Al ⊕ Al_f

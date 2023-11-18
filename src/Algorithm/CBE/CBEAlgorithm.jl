@@ -59,16 +59,24 @@ end
      struct CBEInfo{N}
           Alg::CBEAlgorithm
           info::NTuple{N, BondInfo}
+          D₀::NTuple{2, Int64}
+          D::NTuple{2, Int64}
           ϵ::Float64
      end
 
-Information of CBE. `Alg` is the algorithm used. `info` contain the truncation info of `N` times svd. `ϵ = |Al*Ar - Al_ex*Ar_ex|` if calculated (otherwise `NaN`).
+Information of CBE. `Alg` is the algorithm used. `info` contain the truncation info of `N` times svd. `D₀` and `D` are the initial and final bond dimension, respectively. `ϵ = |Al*Ar - Al_ex*Ar_ex|` if calculated (otherwise `NaN`).
 """
 struct CBEInfo{N}
      Alg::CBEAlgorithm
      info::NTuple{N, BondInfo}
+     D₀::NTuple{2, Int64}
+     D::NTuple{2, Int64}
      ϵ::Float64
-     function CBEInfo(Alg::CBEAlgorithm, info::NTuple{N, BondInfo}, ϵ::Float64 = NaN) where N
-          return new{N}(Alg, info, ϵ)
+     function CBEInfo(Alg::CBEAlgorithm,
+          info::NTuple{N, BondInfo},
+          D₀::NTuple{2, Int64},
+          D::NTuple{2, Int64},
+          ϵ::Float64 = NaN) where N
+          return new{N}(Alg, info, D₀, D, ϵ)
      end
 end

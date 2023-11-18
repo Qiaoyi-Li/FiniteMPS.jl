@@ -124,62 +124,75 @@ function _CBE_rightorth_L(LO::LeftOrthComplement{N};
      return LeftOrthComplement(US_El, US_Al, LO.Al_c), info
 end
 
-function _CBE_MdM2SVd(lsEl::SparseLeftTensor;
+function _CBE_leftorth_R(LO::LeftOrthComplement{N};
      trunc::TruncationScheme=TensorKit.NoTruncation(),
-     normalize::Bool=false)
+     normalize::Bool=false) where {N}
      # M = USV' => M'M = V S^2 V', return S*V', svdinfo
+     # note M'M = Al'*Al - El'*El
      # contract a index and manually sum over b index
      #    --c
      #   |
      #  El--b  --> c'--El'*El--c
      #   |
-     #    --a   
-     function _CBE_MM(El::LocalLeftTensor{2})
+     #    --a
+     function f(El::LocalLeftTensor{2})
           return El.A' * El.A
      end
-     function _CBE_MM(El::LocalLeftTensor{3})
-          @tensor tmp[d; c] := El.A'[b d a] * El.A[a b c]
+     function f(El::LocalLeftTensor{3})
+          if rank(El, 1) == 1
+               @tensor tmp[d; c] := El.A'[b d a] * El.A[a b c]
+          else
+               @tensor tmp[d; c] := El.A'[d a b] * El.A[a b c]
+          end
           return tmp
      end
-     _CBE_MM(::Nothing) = nothing
-
-     if get_num_workers() > 1 # multi-processing
-     # TODO
-
-     else # multi-threading
-          @floop GlobalThreadsExecutor for El in lsEl
-               tmp = _CBE_MM(El)
-               @reduce() do (MdM = nothing; tmp)
-                    MdM = axpy!(true, tmp, MdM)
-               end
-          end
+     #       c
+     #       |
+     #    a--Al--e -->  e'--Al'*Al-e
+     #       | \
+     #       b  d
+     function f(Al::MPSTensor{4})
+          @tensor tmp[f; e] := Al.A'[c f a b] * Al.A[a b c e]
+          return tmp
      end
+     function f(Al::MPSTensor{5})
+          @tensor tmp[f; e] := Al.A'[c d f a b] * Al.A[a b c d e]
+          return tmp
+     end
+     f(::Nothing) = nothing
+
+     MM = _CBE_MM(f, LO.Al, LO.El)
 
      # M = USV' => M'M = V S^2 V'
-     S2, V = eigh(MdM)
+     S2, V = eigh(MM)
      # norm(S) = norm(M) = sqrt(tr(MM'))
-     normalize && rmul!(S2, 1 / tr(MdM))
-     V, S, info = _truncS(x -> sqrt(x), V, S2, trunc)
+     Norm2 = tr(MM)
+     V, S, info = _truncS(x -> sqrt(x), V, rmul!(S2, 1 / Norm2), trunc)
 
+     if normalize
+          normalize!(S)
+     else
+          rmul!(S, sqrt(Norm2)) # give back the norm
+     end
      return S * V', info
-
 end
 
-function _CBE_MMd2SVd(lsEr::SparseRightTensor;
-     trunc::TruncationScheme=TensorKit.NoTruncation(),
-     normalize::Bool=false)
+function _CBE_leftorth_R(RO::RightOrthComplement{N};
+     BondTensor::Union{Nothing,MPSTensor}=nothing,
+     trunc::TruncationScheme=TensorKit.NoTruncation()) where {N}
      # M = USV' => MM' = U S^2 U', return S*V' = U'*M, svdinfo
-     # note U'*M is a sparse environment tensor
+     # note U'*M is a length-N vector of MPSTensor
+     # MM' = Ar*Ar' - Er*Er'
      # contract c index and manually sum over b index
-     #    a-- 
-     #       |
-     #    b--Er --> a--Er*Er'--a'
-     #       |
-     #    c--
-     function _CBE_MM(Er::LocalRightTensor{2})
+     #   a--
+     #      |
+     #   b--Er  --> a--Er*Er'--a'
+     #      |
+     #   c--
+     function f(Er::LocalRightTensor{2})
           return Er.A * Er.A'
      end
-     function _CBE_MM(Er::LocalRightTensor{3})
+     function f(Er::LocalRightTensor{3})
           if rank(Er, 1) == 1
                @tensor tmp[a; d] := Er.A[a b c] * Er.A'[b c d]
           else
@@ -187,83 +200,53 @@ function _CBE_MMd2SVd(lsEr::SparseRightTensor;
           end
           return tmp
      end
-     _CBE_MM(::Nothing) = nothing
+     #       c
+     #       |
+     #    a--Ar--e -->  a--Ar*Ar'--a'
+     #     / |
+     #    d  b
+     function f(Ar::MPSTensor{4})
+          @tensor tmp[a; f] := Ar.A[a b c e] * Ar.A'[c e f b]
+          return tmp
+     end
+     function f(Ar::MPSTensor{5})
+          @tensor tmp[a; f] := Ar.A[a b c d e] * Ar.A'[c d e f b]
+          return tmp
+     end
+     f(::Nothing) = nothing
 
-     if get_num_workers() > 1 # multi-processing
-     # TODO
+     MM = _CBE_MM(f, RO.Ar, RO.Er)
 
-     else # multi-threading
-          @floop GlobalThreadsExecutor for Er in lsEr
-               tmp = _CBE_MM(Er)
-               @reduce() do (MMd = nothing; tmp)
-                    MMd = axpy!(true, tmp, MMd)
-               end
-          end
+     if !isnothing(BondTensor)
+          C = BondTensor.A
+          # MM' -> CMM'C'
+          MM = C * MM * C'
      end
 
      # M = USV' => MM' = U S^2 U'
-     S2, U = eigh(MMd)
+     S2, U = eigh(MM)
      # norm(S) = norm(M) = sqrt(tr(MM'))
-     normalize && rmul!(S2, 1 / tr(MMd))
-     U, ~, info = _truncS(x -> sqrt(x), U, S2, trunc)
+     Norm2 = tr(MM)
+     U, ~, info = _truncS(x -> sqrt(x), U, rmul!(S2, 1 / Norm2), trunc)
+     # CM = USV' => SV' = U'CM = (C'U)'M, U -> C'U if C is given
+     if !isnothing(BondTensor)
+          U = C' * U
+     end
 
-     # U'*M
-     SVd = SparseRightTensor(undef, length(lsEr))
+     SVd_Ar = Vector{MPSTensor}(undef, N)
+     SVd_Er = SparseRightTensor(undef, N)
      if get_num_workers() > 1 # multi-processing
      # TODO
      else
-          @floop GlobalThreadsExecutor for (i, Er) in enumerate(lsEr)
-               SVd[i] = convert(MPSTensor, U') * Er
-          end
-     end
-
-     return SVd, info
-
-end
-
-function _CBE_MdM2Vd(lsEr::SparseRightTensor;
-     trunc::TruncationScheme=TensorKit.NoTruncation(),
-     normalize::Bool=false)
-     # M = USV' => M'M = V S^2 V', return V', svdinfo
-     # contract a index and manually sum over b index
-     #    a--  
-     #       |
-     #    b--Er --> c'--Er'*Er--c
-     #       |
-     #    c--
-     function _CBE_MM(Er::LocalRightTensor{2})
-          return Er.A' * Er.A
-     end
-     function _CBE_MM(Er::LocalRightTensor{3})
-          if rank(Er, 1) == 1
-               @tensor tmp[d; c] := Er.A'[b d a] * Er.A[a b c]
-          else
-               @tensor tmp[d; c] := Er.A'[d a b] * Er.A[a b c]
-          end
-          return tmp
-     end
-     _CBE_MM(::Nothing) = nothing
-
-     if get_num_workers() > 1 # multi-processing
-     # TODO
-
-     else # multi-threading
-          @floop GlobalThreadsExecutor for Er in lsEr
-               tmp = _CBE_MM(Er)
-               @reduce() do (MdM = nothing; tmp)
-                    MdM = axpy!(true, tmp, MdM)
+          let U_wrap::MPSTensor = U'
+               @floop GlobalThreadsExecutor for i in 1:N
+                    SVd_Ar[i] = U_wrap * RO.Ar[i]
+                    SVd_Er[i] = U_wrap * RO.Er[i]
                end
           end
      end
 
-     # M = USV' => M'M = V S^2 V'
-     S2, V = eigh(MdM)
-     # norm(S) = norm(M) = sqrt(tr(MM'))
-     normalize && rmul!(S2, 1 / tr(MdM))
-     V, ~, info = _truncS(x -> sqrt(x), V, S2, trunc)
-
-     return V', info
-
+     return RightOrthComplement(SVd_Er, SVd_Ar, RO.Ar_c), info
 end
 
 function _CBE_MM(f, lsA::Vector{MPSTensor}, lsE::Union{SparseLeftTensor,SparseRightTensor})

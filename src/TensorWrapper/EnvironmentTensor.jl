@@ -156,10 +156,12 @@ end
 
 """
      fuse(El::SimpleLeftTensor) -> iso::AbstractTensorMap
+     fuse(El::SimpleRightTensor) -> iso::AbstractTensorMap
      
 Return the isometry to fuse the top 2 legs.
 
      fuse(lsEl::SparseLeftTensor) -> Vector{AbstractTensorMap} 
+     fuse(lsEl::SparseRightTensor) -> Vector{AbstractTensorMap}
 
 Additionally embed the isometry to the direct sum space of all channels. 
 """
@@ -174,6 +176,17 @@ function fuse(lsEl::SparseLeftTensor)
           iso * embed
      end
 end
+function fuse(lsEr::SparseRightTensor)
+
+     lsIso = map(fuse, lsEr)
+     lsV = map(lsIso) do iso
+          codomain(iso)[1]
+     end
+     lsembed = oplusEmbed(lsV)
+     return map(lsIso, lsembed) do iso, embed
+          embed * iso
+     end
+end
 function fuse(El::LocalLeftTensor{2})
      return isometry(domain(El)[end], domain(El)[end])
 end
@@ -184,6 +197,18 @@ function fuse(El::LocalLeftTensor{3})
      else
           aspace = fuse(codomain(El)[2]', domain(El)[1])
           return isometry(codomain(El)[2]' ⊗ domain(El)[1], aspace)
+     end
+end
+function fuse(Er::LocalRightTensor{2})
+     return isometry(codomain(Er)[1], codomain(Er)[1])
+end
+function fuse(Er::LocalRightTensor{3})
+     if rank(Er, 1) == 1
+          aspace = fuse(codomain(Er)[1], domain(Er)[1]')
+          return isometry(aspace, codomain(Er)[1] ⊗ domain(Er)[1]')
+     else
+          aspace = fuse(codomain(Er)[1], codomain(Er)[2])
+          return isometry(aspace, codomain(Er)[1] ⊗ codomain(Er)[2])
      end
 end
 fuse(::Nothing) = nothing
