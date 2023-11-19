@@ -38,8 +38,7 @@ function CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar::MPSTen
           Dl = mapreduce(idx -> dim(Al, idx)[2], *, 1:R₁-1)
           Dr = mapreduce(idx -> dim(Ar, idx)[2], *, 2:R₂)
           Dc = dim(Ar, 1)[2]
-          # if Dl ≤ Dc || Dr ≤ Dc # already full
-          if Dl ≤ Dc || Dr ≤ Dc || T <: SweepL2R # only test R2L 
+          if Dl ≤ Dc || Dr ≤ Dc # already full
                Alg = NoCBE(T())
                Al_ex, Ar_ex, info, to = _CBE(Al, Ar, Alg; kwargs...)
           elseif Dl ≤ Alg.D || Dr ≤ Alg.D # full cbe is not expensive
@@ -108,7 +107,7 @@ function _CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar_rc::MP
      @timeit LocalTimer "ConstructRO" RO = RightOrthComplement(PH.Er, Ar_rc, PH.H[2])
 
      # 3-rd svd, D -> D/w, weighted by the updated bond tensor C
-     @show w = mapreduce(x -> rank(x) == 2 ? 1 : dim(x, 2)[2], +, RO.Er)
+     w = mapreduce(x -> rank(x) == 2 ? 1 : dim(x, 2)[2], +, RO.Er)
      @timeit LocalTimer "svd3" RO_trunc, info3 = _CBE_leftorth_R(RO;
           BondTensor=C,
           trunc=truncbelow(Alg.tol) & truncdim(div(Alg.D, w)))
@@ -125,16 +124,23 @@ function _CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar_rc::MP
      @timeit LocalTimer "finalselect" begin
           Er_trunc = _initialize_Er(RO.Ar, Ar_pre)
           Al_final::MPSTensor = _finalselect(LO, Er_trunc)
+          # @show norm(permute(Al_final.A, (1, 2, 3), (4,))' * permute(LO.Al_c.A, (1, 2, 3), (4,)))
      end
 
+     # 5-th svd, directly use svd
+     D₀ = dim(Ar_rc, 1)[2] # original bond dimension
+     @timeit LocalTimer "svd5" begin
+          ~, ~, Vd::MPSTensor, info5 = tsvd(Al_final, Tuple(1:R₁-1), (R₁,); trunc=truncbelow(Alg.tol) & truncdim(Alg.D - D₀))
+     end   
+     Ar_final::MPSTensor = Vd * Ar_pre
 
-     # # direct sum
-     # @timeit LocalTimer "expand" begin
-     #      Ar_ex::MPSTensor = _directsum_Ar(Ar, Ar_final)
-     #      Al_ex::MPSTensor = _expand_Al(Ar, Ar_ex, Al)
-     # end
+     # direct sum
+     @timeit LocalTimer "expand" begin
+          Ar_ex::MPSTensor = _directsum_Ar(Ar_rc, Ar_final)
+          Al_ex::MPSTensor = _expand_Al(Ar_rc, Ar_ex, Al)
+     end
 
-     # return Al_ex, Ar_ex, (info1, info2, info3, info4, info5), LocalTimer
+     return Al_ex, Ar_ex, (info1, info2, info3, info4, info5), LocalTimer
 end
 
 function _CBE(PH::SparseProjectiveHamiltonian{2}, Al_lc::MPSTensor{R₁}, Ar::MPSTensor{R₂}, Alg::StandardCBE{SweepR2L}; kwargs...) where {R₁,R₂}
@@ -169,6 +175,7 @@ function _CBE(PH::SparseProjectiveHamiltonian{2}, Al_lc::MPSTensor{R₁}, Ar::MP
      @timeit LocalTimer "finalselect" begin
           El_trunc = _initialize_El(LO.Al, Al_pre)
           Ar_final::MPSTensor = _finalselect(El_trunc, RO)
+          # @show norm(permute(Ar_final.A, (1,), (2, 3, 4)) * permute(RO.Ar_c.A, (1,), (2, 3, 4))')
      end
      # 5-th svd, directly use svd 
      D₀ = dim(Al_lc, R₁)[2] # original bond dimension

@@ -66,23 +66,3 @@ function _expand_Al(Ar::MPSTensor{4}, Ar_ex::MPSTensor{4}, Al::MPSTensor{4})::MP
      @tensor Al_ex[a b; c h] := (Ar_ex.A'[f g h e] * Ar.A[d e f g]) * Al.A[a b c d]
      return Al_ex
 end    
-
-function _isometry_Al(Al::MPSTensor{3})::MPSTensor{3}
-     fullspace = fuse(codomain(Al)[1], codomain(Al)[2])
-     return isometry(codomain(Al)[1] ⊗ codomain(Al)[2], fullspace)
-end
-
-function _isometry_Al(Al::MPSTensor{4})::MPSTensor{4}
-     fullspace = fuse(codomain(Al)[1] ⊗ codomain(Al)[2], domain(Al)[1]')
-     return isometry(codomain(Al)[1] ⊗ codomain(Al)[2] ⊗ domain(Al)[1]', fullspace)
-end
-
-function _isometry_Ar(Ar::MPSTensor{3})::MPSTensor{3}
-     fullspace = fuse(codomain(Ar)[2]', domain(Ar)[1])
-     return isometry(fullspace, codomain(Ar)[2]' ⊗ domain(Ar)[1])
-end
-
-function _isometry_Ar(Ar::MPSTensor{4})::MPSTensor{4}
-     fullspace = fuse(codomain(Ar)[2]', domain(Ar)[1] ⊗ domain(Ar)[2])
-     return isometry(fullspace, codomain(Ar)[2]' ⊗ domain(Ar)[1] ⊗ domain(Ar)[2])
-end
