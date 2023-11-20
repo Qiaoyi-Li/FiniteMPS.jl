@@ -51,6 +51,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
           rmul!(Ψ, Norm * exp(real(dt) * E₀))
 
           if si < L
+               # TODO, test truncation after backward evolution
                @timeit TimerStep "svd" Ψ[si], S::MPSTensor, info_svd = leftorth(x1; trunc=trunc)
                # note svd may change the norm of S
                normalize!(S)

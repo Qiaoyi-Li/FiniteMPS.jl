@@ -1,8 +1,24 @@
-function _initializeEnv!(obj::AbstractEnvironment{L}; kwargs...) where {L}
-     # initialize boundary El and Er
+"""
+     initialize!(obj::AbstractEnvironment; kwargs...)
+
+Initialize the boundary environment tensors, i.e. `El[1]` and `Er[L]`. 
+
+# Kwargs
+     El::Union{SimpleLeftTensor, SparseLeftTensor}
+     Er::Union{SimpleLeftTensor, SparseLeftTensor}
+
+Directly give `El` or `Er`, otherwise, use `_defaultEl` or `_defaultEr` to generate one.
+
+     free::Bool = false
+If `true`, call `free!(obj)` to free the local environment tensors which are no longer required. Details see `free!`.
+"""
+function initialize!(obj::AbstractEnvironment{L}; kwargs...) where {L}
      obj.El[1] = get(kwargs, :El, _defaultEl(obj))
      obj.Er[end] = get(kwargs, :Er, _defaultEr(obj))
      obj.Center[:] = [1, L]
+     if get(kwargs, :free, false)
+          free!(obj)
+     end
      return obj
 end
 

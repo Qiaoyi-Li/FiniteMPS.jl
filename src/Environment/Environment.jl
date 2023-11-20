@@ -114,7 +114,7 @@ function Environment(M::AbstractMPS{L}...; kwargs...) where L
           obj = SimpleEnvironment(layer, El, Er, Center; disk = get(kwargs, :disk, false))
      end
 
-     _initializeEnv!(obj; kwargs...)
+     initialize!(obj; kwargs...)
      return obj
 end
 

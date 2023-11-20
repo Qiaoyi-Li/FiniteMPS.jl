@@ -56,7 +56,7 @@ export SparseMPO, issparse
 include("SparseMPO/SparseMPO.jl")
 
 # Environment
-export AbstractEnvironment, SimpleEnvironment, SparseEnvironment, Environment, pushleft!, pushright!, canonicalize!, free!, scalar!
+export AbstractEnvironment, SimpleEnvironment, SparseEnvironment, Environment, initialize!, pushleft!, pushright!, canonicalize!, free!, scalar!
 include("Environment/Environment.jl")
 include("Environment/initialize.jl")
 include("Environment/pushleft.jl")
@@ -113,7 +113,7 @@ include("Observables/convert.jl")
 
 
 # predefined local spaces
-export U₁SU₂Fermion, U1SU2Fermion
+export U₁SU₂Fermion, U1SU2Fermion, U₁SpinlessFermion, U1SpinlessFermion
 include("LocalSpace/Fermion.jl")
 
 

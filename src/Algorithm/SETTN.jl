@@ -4,11 +4,14 @@
 Use series-expansion thermal tensor network (SETTN)`[https://doi.org/10.1103/PhysRevB.95.161104]` method to initialize a high-temperature MPO `ρ = e^(-βH/2)`. Note `ρ` is unnormalized. The list of free energy `F = -lnTr[ρρ^†]/β` with different expansion orders is also returned.
 
 # Kwargs
+     trunc::TruncationScheme = truncbelow(D) (this keyword argument is necessary!) 
      disk::Bool = false
      maxorder::Int64 = 4
+     tol::Float64 = 1e-8
      bspace::VectorSpace (details please see identityMPO)
+     compress::Float64 = MPSDefault.tol (finally compress ρ with `tol = compress`)
 
-Note we use `mul!` and `axpby!` to implement `H^n -> H^(n+1)` and `ρ -> ρ + (-βH/2)^n / n!`, respectively. All kwargs of these two functions are valid and will be propagated to them appropriately.
+Note we use `mul!` and `axpby!` to implement `H^n -> H^(n+1)` and `ρ -> ρ + (-βH/2)^n / n!`, respectively. All kwargs of these two functions are valid and will be propagated to them appropriately. We find that it is unstable if truncating the bond dimension with `tol`, thus the input keyword argument `trunc` must be a `TruncationDimension` object (`NoTruncation` is also unallowed to avoid infinitely growing bond dimension).
 """
 function SETTN(H::SparseMPO{L}, β::Number; kwargs...) where {L}
      @assert β ≥ 0
@@ -16,7 +19,9 @@ function SETTN(H::SparseMPO{L}, β::Number; kwargs...) where {L}
      maxorder::Int64 = get(kwargs, :maxorder, 4)
      verbose::Int64 = get(kwargs, :verbose, 0)
      tol::Float64 = get(kwargs, :tol, 1e-8)
-
+     compress::Float64 = get(kwargs, :compress, MPSDefault.tol)
+     trunc::TruncationScheme = get(kwargs, :trunc, notrunc())
+     @assert isa(trunc, TensorKit.TruncationDimension)
 
      # deduce pspace 
      lspspace = map(H) do M
@@ -47,10 +52,16 @@ function SETTN(H::SparseMPO{L}, β::Number; kwargs...) where {L}
           if n > 1 && abs(δF) < tol
                println("SETTN converged at order = $(n), δF/|F| = $(δF) (tol = $(tol))!")
                flush(stdout)
-               return ρ, lsF[1:n]
+               return _finishSETTN!(ρ, compress), lsF[1:n]
           end
      end
 
-     return ρ, lsF
+     return _finishSETTN!(ρ, compress), lsF
 
+end
+
+function _finishSETTN!(ρ::MPO, compress::Float64)
+     canonicalize!(ρ, length(ρ); trunc = truncbelow(compress))
+     canonicalize!(ρ, 1; trunc = truncbelow(compress))
+     return ρ
 end
