@@ -50,7 +50,7 @@ Default `Dist = UniformDistribution{Float64}`.
 function randStiefel(Dist::UniformDistribution{F}, n::Int64, k::Int64=n) where {F}
      n < k && return hcat(randStiefel(Dist, n), zeros(F, n, k-n))
 
-     q::Matrix, ~ = qr(randn(F, n, k))
+     q::Matrix, _ = qr(randn(F, n, k))
      # we find qr will choose a fixed orientation in some cases
      q[:, 1] = view(q, :, 1) * _rand_base(F)
      return q

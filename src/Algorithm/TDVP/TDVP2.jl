@@ -157,27 +157,3 @@ function TDVPSweep2!(Env::SparseEnvironment{L,3,T}, dt::Number, ::SweepR2L; kwar
 
      return (forward=info_forward, backward=info_backward), TimerSweep
 end
-
-function TDVPSweep2!(Env::SparseEnvironment{L,3,T}, dt::Number; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,DenseMPS}}
-     # sweep left to right and then right to left symmetrically
-     verbose::Int64 = get(kwargs, :verbose, 0)
-     info = map((SweepL2R(), SweepR2L())) do direction
-          info, TimerSweep = TDVPSweep2!(Env, dt / 2, direction; kwargs...)
-          if verbose ≥ 1
-               str = isa(direction, SweepL2R) ? ">>" : "<<"
-               show(TimerSweep; title="TDVP sweep $(str)")
-               let K = maximum(x -> x.Lanczos.numops, info.forward)
-                    bondinfo_merge = merge(map(x -> x.Bond, info.forward))
-                    println("\nForward: K = $(K), $(bondinfo_merge)")
-               end
-               let K = maximum(x -> x.Lanczos.numops, info.backward)
-                    bondinfo_merge = merge(map(x -> x.Bond, info.backward))
-                    println("Backward: K = $(K), $(bondinfo_merge)")
-               end
-               flush(stdout)
-          end
-          info
-     end
-     return info
-end
-

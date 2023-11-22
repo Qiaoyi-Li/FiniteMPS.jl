@@ -97,7 +97,7 @@ function _CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar_rc::MP
 
      # 1-st svd, bond-canonicalize Al
      @timeit LocalTimer "svd1" begin
-          Al_lc::MPSTensor, ~, info1 = leftorth(Al; trunc=truncbelow(Alg.tol))
+          Al_lc::MPSTensor, _, info1 = leftorth(Al; trunc=truncbelow(Alg.tol))
      end
      # left orthogonal complement, note the bond tensor is in it
      @timeit LocalTimer "ConstructLO" LO = LeftOrthComplement(PH.El, Al_lc, PH.H[1], Al)
@@ -117,7 +117,7 @@ function _CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar_rc::MP
 
      # directly apply svd
      @timeit LocalTimer "svd4" begin
-          ~, Ar_pre::MPSTensor, info4 = rightorth(Ar_fuse;
+          _, Ar_pre::MPSTensor, info4 = rightorth(Ar_fuse;
                trunc=truncbelow(Alg.tol) & truncdim(Alg.D))
      end
      # final select
@@ -130,7 +130,7 @@ function _CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar_rc::MP
      # 5-th svd, directly use svd
      D₀ = dim(Ar_rc, 1)[2] # original bond dimension
      @timeit LocalTimer "svd5" begin
-          ~, ~, Vd::MPSTensor, info5 = tsvd(Al_final, Tuple(1:R₁-1), (R₁,); trunc=truncbelow(Alg.tol) & truncdim(Alg.D - D₀))
+          _, _, Vd::MPSTensor, info5 = tsvd(Al_final, Tuple(1:R₁-1), (R₁,); trunc=truncbelow(Alg.tol) & truncdim(Alg.D - D₀))
      end   
      Ar_final::MPSTensor = Vd * Ar_pre
 
@@ -149,7 +149,7 @@ function _CBE(PH::SparseProjectiveHamiltonian{2}, Al_lc::MPSTensor{R₁}, Ar::MP
 
      # 1-st svd, bond-canonicalize Ar
      @timeit LocalTimer "svd1" begin
-          ~, Ar_rc::MPSTensor, info1 = rightorth(Ar; trunc=truncbelow(Alg.tol))
+          _, Ar_rc::MPSTensor, info1 = rightorth(Ar; trunc=truncbelow(Alg.tol))
      end
      # right orthogonal complement, note the bond tensor is in it
      @timeit LocalTimer "ConstructRO" RO = RightOrthComplement(PH.Er, Ar_rc, PH.H[2], Ar)
@@ -168,7 +168,7 @@ function _CBE(PH::SparseProjectiveHamiltonian{2}, Al_lc::MPSTensor{R₁}, Ar::MP
      @timeit LocalTimer "preselect" Al_fuse::MPSTensor = _preselect(LO_trunc)
      # directly apply svd
      @timeit LocalTimer "svd4" begin
-          Al_pre::MPSTensor, ~, info4 = leftorth(Al_fuse;
+          Al_pre::MPSTensor, _, info4 = leftorth(Al_fuse;
                trunc=truncbelow(Alg.tol) & truncdim(Alg.D))
      end
      # final select
@@ -180,7 +180,7 @@ function _CBE(PH::SparseProjectiveHamiltonian{2}, Al_lc::MPSTensor{R₁}, Ar::MP
      # 5-th svd, directly use svd 
      D₀ = dim(Al_lc, R₁)[2] # original bond dimension
      @timeit LocalTimer "svd5" begin
-          U::MPSTensor, ~, ~, info5 = tsvd(Ar_final, (1,), Tuple(2:R₂); trunc=truncbelow(Alg.tol) & truncdim(Alg.D - D₀))
+          U::MPSTensor, _, _, info5 = tsvd(Ar_final, (1,), Tuple(2:R₂); trunc=truncbelow(Alg.tol) & truncdim(Alg.D - D₀))
      end
      Al_final::MPSTensor = Al_pre * U
 

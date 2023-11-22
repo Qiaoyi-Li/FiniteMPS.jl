@@ -102,7 +102,7 @@ function _CBE_rightorth_L(LO::LeftOrthComplement{N};
 
      # norm(S) = norm(M) = sqrt(tr(MM'))
      Norm2 = tr(MM)
-     V, ~, info = _truncS(x -> sqrt(x), V, rmul!(S2, 1 / Norm2), trunc)
+     V, _, info = _truncS(x -> sqrt(x), V, rmul!(S2, 1 / Norm2), trunc)
      # MC = USV' => US = MCV, V -> CV if C is given
      if !isnothing(BondTensor)
           V = C * V
@@ -227,7 +227,7 @@ function _CBE_leftorth_R(RO::RightOrthComplement{N};
      S2, U = eigh(MM)
      # norm(S) = norm(M) = sqrt(tr(MM'))
      Norm2 = tr(MM)
-     U, ~, info = _truncS(x -> sqrt(x), U, rmul!(S2, 1 / Norm2), trunc)
+     U, _, info = _truncS(x -> sqrt(x), U, rmul!(S2, 1 / Norm2), trunc)
      # CM = USV' => SV' = U'CM = (C'U)'M, U -> C'U if C is given
      if !isnothing(BondTensor)
           U = C' * U

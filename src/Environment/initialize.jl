@@ -5,7 +5,7 @@ Initialize the boundary environment tensors, i.e. `El[1]` and `Er[L]`.
 
 # Kwargs
      El::Union{SimpleLeftTensor, SparseLeftTensor}
-     Er::Union{SimpleLeftTensor, SparseLeftTensor}
+     Er::Union{SimpleRightTensor, SparseRightTensor}
 
 Directly give `El` or `Er`, otherwise, use `_defaultEl` or `_defaultEr` to generate one.
 
