@@ -52,7 +52,7 @@ function ExactSolution(Latt::AbstractLattice, lsβ::Vector{Float64}; t::Number=1
           T[i, i] = μ
      end
 
-     ϵ, _ = eigen(T)
+     ϵ, _ = eigen(-T)
      lsF = similar(lsβ)
      lsE = similar(lsβ)
      for (i, β) in enumerate(lsβ)

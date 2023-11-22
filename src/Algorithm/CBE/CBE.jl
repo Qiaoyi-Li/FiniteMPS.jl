@@ -31,38 +31,33 @@ end
 
 function CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar::MPSTensor{R₂}, Alg::StandardCBE{T}; kwargs...) where {R₁,R₂,T<:Union{SweepL2R,SweepR2L}}
 
-     try
+     LocalTimer = reset_timer!(get_timer("CBE"))
 
-          LocalTimer = reset_timer!(get_timer("CBE"))
-
-          Dl = mapreduce(idx -> dim(Al, idx)[2], *, 1:R₁-1)
-          Dr = mapreduce(idx -> dim(Ar, idx)[2], *, 2:R₂)
-          Dc = dim(Ar, 1)[2]
-          if Dl ≤ Dc || Dr ≤ Dc # already full
-               Alg = NoCBE(T())
-               Al_ex, Ar_ex, info, to = _CBE(Al, Ar, Alg; kwargs...)
-          elseif Dl ≤ Alg.D || Dr ≤ Alg.D # full cbe is not expensive
-               Alg = FullCBE(T())
-               @timeit LocalTimer "FullCBE" Al_ex, Ar_ex, info, to = _CBE(Al, Ar, Alg; kwargs...)
-               merge!(LocalTimer, to; tree_point=["FullCBE"])
-          else
-               @timeit LocalTimer "StandardCBE" Al_ex, Ar_ex, info, to = _CBE(PH, Al, Ar, Alg; kwargs...)
-               merge!(LocalTimer, to; tree_point=["StandardCBE"])
-          end
-
-          if get(kwargs, :check, false)
-               @timeit LocalTimer "check" ϵ = norm(Al * Ar - Al_ex * Ar_ex)
-          else
-               ϵ = NaN
-          end
-
-          D₀ = dim(Ar, 1)
-          D = dim(Ar_ex, 1)
-          return Al_ex, Ar_ex, CBEInfo(Alg, info, D₀, D, ϵ)
-
-     catch
-          jldsave("CBEerr_$(time_ns()).jld2"; PH, Al, Ar, Alg)
+     Dl = mapreduce(idx -> dim(Al, idx)[2], *, 1:R₁-1)
+     Dr = mapreduce(idx -> dim(Ar, idx)[2], *, 2:R₂)
+     Dc = dim(Ar, 1)[2]
+     if Dl ≤ Dc || Dr ≤ Dc # already full
+          Alg = NoCBE(T())
+          Al_ex, Ar_ex, info, to = _CBE(Al, Ar, Alg; kwargs...)
+     elseif Dl ≤ Alg.D || Dr ≤ Alg.D # full cbe is not expensive
+          Alg = FullCBE(T())
+          @timeit LocalTimer "FullCBE" Al_ex, Ar_ex, info, to = _CBE(Al, Ar, Alg; kwargs...)
+          merge!(LocalTimer, to; tree_point=["FullCBE"])
+     else
+          @timeit LocalTimer "StandardCBE" Al_ex, Ar_ex, info, to = _CBE(PH, Al, Ar, Alg; kwargs...)
+          merge!(LocalTimer, to; tree_point=["StandardCBE"])
      end
+
+     if get(kwargs, :check, false)
+          @timeit LocalTimer "check" ϵ = norm(Al * Ar - Al_ex * Ar_ex)
+     else
+          ϵ = NaN
+     end
+
+     D₀ = dim(Ar, 1)
+     D = dim(Ar_ex, 1)
+     return Al_ex, Ar_ex, CBEInfo(Alg, info, D₀, D, ϵ)
+
 end
 
 # ================== implementation ==================
@@ -131,7 +126,7 @@ function _CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar_rc::MP
      D₀ = dim(Ar_rc, 1)[2] # original bond dimension
      @timeit LocalTimer "svd5" begin
           _, _, Vd::MPSTensor, info5 = tsvd(Al_final, Tuple(1:R₁-1), (R₁,); trunc=truncbelow(Alg.tol) & truncdim(Alg.D - D₀))
-     end   
+     end
      Ar_final::MPSTensor = Vd * Ar_pre
 
      # direct sum

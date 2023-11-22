@@ -1,7 +1,7 @@
 name = "FiniteMPS"
 uuid = "6b572690-f317-4dad-a5fe-5fe73a0b7d42"
 authors = ["qyli <liqiaoyi@itp.ac.cn>"]
-version = "0.2.5"
+version = "0.3.0"
 
 [deps]
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"

@@ -16,14 +16,12 @@ flush(stdout)
 verbose = 1
 GCstep = false
 Latt = SquaLatt(8, 4; BCY=:PBC)
-Para = (t=1, t′=0, μ=0)
 D = 512
-μ = 0
+Para = (t=1, t′=0, μ=-1)
 
 lsβ = vcat(2.0 .^ (-15:2:-1), 1:16)
 lsF = zeros(length(lsβ))
 lsE = zeros(length(lsβ))
-
 
 let
      lsF_ex, lsE_ex = ExactSolution(Latt, lsβ; Para...)
