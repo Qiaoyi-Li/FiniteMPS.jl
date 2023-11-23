@@ -4,7 +4,7 @@ This package provides some MPS-based algorithms. Compared with the well-known [M
 - Density matrix normalization group (DMRG) to search ground states. 
 - Time-dependent variational principle ([TDVP](https://doi.org/10.1103/PhysRevB.94.165116)) for time evolution.
 - Series-expansion thermal tensor network ([SETTN](https://doi.org/10.1103/PhysRevB.95.161104)) and tangent space tensor renormalization group ([tanTRG](https://doi.org/10.1103/PhysRevLett.130.226502)) for purification-based finite-temperature simulations.
-- Non-abelian symmetries can be equiped thanks to [`TensorKit.jl`](https://github.com/Jutho/TensorKit.jl).
+- Non-abelian symmetries can be equiped thanks to [TensorKit.jl](https://github.com/Jutho/TensorKit.jl).
 - Controlled bond expansion ([CBE](https://doi.org/10.1103/PhysRevLett.130.246402)) technique to improve the 1-TDVP. Note some key methods for MPS version are not yet implemented, to be added in the future.
 
 
@@ -26,7 +26,7 @@ pkg> instantiate
 ```
 `Note:` Some methods in TensorKit.jl are replaced in order to be  compatible with parallel computing, thus it will throw some warnings when compiling. Just ignore them. 
 
-1. run script "HubbardDMRG_threads.jl".
+3. run script "HubbardDMRG_threads.jl".
 ```julia
 include("HubbardDMRG_threads.jl")
 ```

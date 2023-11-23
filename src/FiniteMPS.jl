@@ -112,7 +112,7 @@ include("Observables/convert.jl")
 
 
 # predefined local spaces
-export U₁SU₂Fermion, U1SU2Fermion, U₁SpinlessFermion, U1SpinlessFermion
+export U₁SU₂Fermion, U1SU2Fermion, ℤ₂SU₂Fermion, Z2SU2Fermion, U₁SpinlessFermion, U1SpinlessFermion
 include("LocalSpace/Fermion.jl")
 include("LocalSpace/SpinlessFermion.jl")
 
