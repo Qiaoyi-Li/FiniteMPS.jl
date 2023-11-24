@@ -16,10 +16,19 @@ end
 function _TDVPUpdate1(H::SparseProjectiveHamiltonian{1}, A::MPSTensor, dt::Number; kwargs...)
 
      reset_timer!(get_timer("action1"))
-     expx, info = _LanczosExp(x -> action1(H, x; kwargs...),
-          dt,
-          A,
-          _getLanczos(; kwargs...))
+
+     if get(kwargs, :prefuse, false)
+          PH = prefuse(H)
+          expx, info = _LanczosExp(x -> action1(PH, x; kwargs...),
+               dt,
+               A,
+               _getLanczos(; kwargs...))
+     else
+          expx, info = _LanczosExp(x -> action1(H, x; kwargs...),
+               dt,
+               A,
+               _getLanczos(; kwargs...))
+     end
 
      # normalize
      Norm = norm(expx)

@@ -37,6 +37,37 @@ function action1(obj::SparseProjectiveHamiltonian{1}, x::AbstractTensorMap; kwar
      return action1(obj, MPSTensor(x); kwargs...)
 end
 
+function action1(obj::PreFuseProjectiveHamiltonian{1}, x::MPSTensor; kwargs...)
+
+     Timer_action1 = get_timer("action1")
+     @timeit Timer_action1 "action1" begin
+          if get_num_workers() > 1 # multi-processing
+
+               f = (x, y) -> axpy!(true, x, y)
+               Hx = @distributed (f) for j in 1:length(obj.El)
+                    _action1(x, obj.El[j], obj.Er[j]; kwargs...)
+               end
+
+          else # multi-threading
+
+               @floop GlobalThreadsExecutor for j in 1:length(obj.El)
+                    tmp, to = _action1(x, obj.El[j], obj.Er[j], true; kwargs...)
+                    @reduce() do (Hx = nothing; tmp), (Timer_acc = TimerOutput(); to)
+                         Hx = axpy!(true, tmp, Hx)
+                         Timer_acc = merge!(Timer_acc, to)
+                    end
+               end
+          end
+     end
+
+     merge!(Timer_action1, Timer_acc; tree_point=["action1"])
+
+     # x -> (H - E₀)x
+     !iszero(obj.E₀) && axpy!(-obj.E₀, x.A, Hx)
+
+     return MPSTensor(Hx)
+end
+
 # ====================== wrap _action1 to test performance ==================
 function _action1(x::MPSTensor, El::LocalLeftTensor{N₁}, H::LocalOperator{N₂,N₃}, Er::LocalRightTensor{N₄},
      timeit::Bool; kwargs...) where {N₁,N₂,N₃,N₄}
@@ -62,6 +93,17 @@ function _action1(x::MPSTensor, El::LocalLeftTensor{N₁}, H::IdentityOperator, 
      return Hx, LocalTimer
 end
 
+function _action1(x::MPSTensor, El::LeftPreFuseTensor{N₁}, Er::LocalRightTensor{N₂},
+     timeit::Bool; kwargs...) where {N₁,N₂}
+
+     !timeit && return _action1(x, El, Er; kwargs...), TimerOutput()
+
+     LocalTimer = TimerOutput()
+     name = "_action1_$(N₁)_$(N₂)"
+     @timeit LocalTimer name Hx = _action1(x, El, Er; kwargs...)
+
+     return Hx, LocalTimer
+end
 
 # ========================= rank-3 MPS tensor ========================
 #   --c(D)-- --h(D)--
@@ -147,4 +189,15 @@ end
 function _action1(x::MPSTensor{4}, El::LocalLeftTensor{3}, H::LocalOperator{2,2}, Er::LocalRightTensor{3}; kwargs...)
      @tensor Hx[a d; i f] := El.A[a b c] * x.A[c e i h] * H.A[b d e g] * Er.A[h g f]
      return rmul!(Hx, H.strength)
+end
+
+
+# ================== prefuse version ===================
+function _action1(x::MPSTensor{4}, El::LeftPreFuseTensor{4}, Er::LocalRightTensor{2}; kwargs...)
+     @tensor Hx[a b; f h] := El.A[a b d e] * x.A[d e f g] * Er.A[g h]
+     return Hx
+end
+function _action1(x::MPSTensor{4}, El::LeftPreFuseTensor{5}, Er::LocalRightTensor{3}; kwargs...)
+     @tensor Hx[a b; f h] := El.A[a b c d e] * x.A[d e f g] * Er.A[g c h]
+     return Hx
 end

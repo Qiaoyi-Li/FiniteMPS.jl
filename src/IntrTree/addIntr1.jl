@@ -27,9 +27,10 @@ addIntr1!(Tree::InteractionTree, args...) = addIntr1!(Tree.Root.children[1], arg
 function addIntr1!(Root::InteractionTreeNode, O::LocalOperator, strength::Number)
      current_node = Root
      si = 1
+     pspace = getPhysSpace(O)
      while si < O.si
 
-          Op_i = IdentityOperator(si)
+          Op_i = IdentityOperator(pspace, si)
 
           idx = findfirst(x -> x.Op == Op_i, current_node.children)
           if isnothing(idx)

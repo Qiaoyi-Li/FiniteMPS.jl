@@ -48,7 +48,9 @@ function AutomataMPO(Tree::InteractionTree)
 
      # remember the identity to propagate accumulation
      for si = 2:L
-          H[si][1,1] = IdentityOperator(si, 1)
+          idx = findfirst(!isnothing, H[si])
+          pspace = getPhysSpace(H[si][idx])
+          H[si][1,1] = IdentityOperator(pspace, si, 1)
      end
 
      return SparseMPO(H)

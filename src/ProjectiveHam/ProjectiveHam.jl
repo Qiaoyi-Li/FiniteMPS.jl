@@ -72,7 +72,7 @@ end
 """
      ProjHam(Env::SparseEnvironment, siL::Int64 [, siR::Int64 = siL]; E₀::Number = 0.0)
 
-Generic constructor for N-site projective Hamiltonian, where `N = siL - siR + 1`.
+Generic constructor for N-site projective Hamiltonian, where `N = siR - siL + 1`.
 
      ProjHam(Env::SimpleEnvironment, siL::Int64 [, siR::Int64 = siL])
 

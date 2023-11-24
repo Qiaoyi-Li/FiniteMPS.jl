@@ -29,7 +29,7 @@ include("utils/oplus.jl")
 include("utils/Direction.jl")
 
 # Wrapper types for classifying tensors
-export AbstractTensorWrapper, AbstractMPSTensor, MPSTensor, CompositeMPSTensor, AdjointMPSTensor, AbstractEnvironmentTensor, LocalLeftTensor, LocalRightTensor, SimpleLeftTensor, SimpleRightTensor, SparseLeftTensor, SparseRightTensor, AbstractLocalOperator, hastag, getOpName, IdentityOperator, tag2Tuple, LocalOperator, SparseMPOTensor, AbstractStoreType, StoreMemory, StoreDisk
+export AbstractTensorWrapper, AbstractMPSTensor, MPSTensor, CompositeMPSTensor, AdjointMPSTensor, AbstractEnvironmentTensor, LocalLeftTensor, LocalRightTensor, SimpleLeftTensor, SimpleRightTensor, SparseLeftTensor, SparseRightTensor, AbstractLocalOperator, hastag, getPhysSpace, getOpName, IdentityOperator, tag2Tuple, LocalOperator, SparseMPOTensor, AbstractStoreType, StoreMemory, StoreDisk, LeftPreFuseTensor, SparseLeftPreFuseTensor
 include("TensorWrapper/TensorWrapper.jl")
 include("TensorWrapper/MPSTensor.jl")
 include("TensorWrapper/CompositeMPSTensor.jl")
@@ -38,6 +38,7 @@ include("TensorWrapper/EnvironmentTensor.jl")
 include("TensorWrapper/LocalOperator.jl")
 include("TensorWrapper/SparseMPOTensor.jl")
 include("TensorWrapper/StoreType.jl")
+include("TensorWrapper/PreFuseTensor.jl")
 
 # Dense MPS
 export AbstractMPS, DenseMPS, AdjointMPS, coef, Center, MPS, randMPS, canonicalize!
@@ -64,11 +65,13 @@ include("Environment/canonicalize.jl")
 include("Environment/scalar.jl")
 
 # Projective Hamiltonian
-export AbstractProjectiveHamiltonian, IdentityProjectiveHamiltonian, SparseProjectiveHamiltonian, ProjHam, action2, action1, action0
+export AbstractProjectiveHamiltonian, IdentityProjectiveHamiltonian, SparseProjectiveHamiltonian, ProjHam, action2, action1, action0, PreFuseProjectiveHamiltonian, prefuse
 include("ProjectiveHam/ProjectiveHam.jl")
+include("ProjectiveHam/prefuse.jl")
 include("ProjectiveHam/action2.jl")
 include("ProjectiveHam/action1.jl")
 include("ProjectiveHam/action0.jl")
+
 
 # Algebra operations
 include("Algebra/inner.jl")

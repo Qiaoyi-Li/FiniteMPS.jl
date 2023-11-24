@@ -7,6 +7,7 @@ end
 function CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar::MPSTensor{R₂}, Alg::FullCBE{T}; kwargs...) where {R₁,R₂,T<:Union{SweepL2R,SweepR2L}}
 
      LocalTimer = reset_timer!(get_timer("CBE"))
+     cbecheck::Bool = Alg.check
      Dl = mapreduce(idx -> dim(Al, idx)[2], *, 1:R₁-1)
      Dr = mapreduce(idx -> dim(Ar, idx)[2], *, 2:R₂)
      Dc = dim(Ar, 1)[2]
@@ -18,7 +19,7 @@ function CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar::MPSTen
           merge!(LocalTimer, to; tree_point=["FullCBE"])
      end
 
-     if get(kwargs, :check, false)
+     if cbecheck
           @timeit LocalTimer "check" ϵ = norm(Al * Ar - Al_ex * Ar_ex)
      else
           ϵ = NaN
@@ -32,7 +33,7 @@ end
 function CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar::MPSTensor{R₂}, Alg::StandardCBE{T}; kwargs...) where {R₁,R₂,T<:Union{SweepL2R,SweepR2L}}
 
      LocalTimer = reset_timer!(get_timer("CBE"))
-
+     cbecheck::Bool = Alg.check
      Dl = mapreduce(idx -> dim(Al, idx)[2], *, 1:R₁-1)
      Dr = mapreduce(idx -> dim(Ar, idx)[2], *, 2:R₂)
      Dc = dim(Ar, 1)[2]
@@ -48,7 +49,7 @@ function CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar::MPSTen
           merge!(LocalTimer, to; tree_point=["StandardCBE"])
      end
 
-     if get(kwargs, :check, false)
+     if cbecheck
           @timeit LocalTimer "check" ϵ = norm(Al * Ar - Al_ex * Ar_ex)
      else
           ϵ = NaN
@@ -165,12 +166,15 @@ function _CBE(PH::SparseProjectiveHamiltonian{2}, Al_lc::MPSTensor{R₁}, Ar::MP
      @timeit LocalTimer "svd4" begin
           Al_pre::MPSTensor, _, info4 = leftorth(Al_fuse;
                trunc=truncbelow(Alg.tol) & truncdim(Alg.D))
+          println("$(PH.si): ")
+          @show norm(permute(Al_fuse.A, (1, 2, 3), (4,))' * permute(Al_lc.A, (1, 2, 3), (4,)))
+          @show norm(permute(Al_pre.A, (1, 2, 3), (4,))' * permute(Al_lc.A, (1, 2, 3), (4,)))
      end
      # final select
      @timeit LocalTimer "finalselect" begin
           El_trunc = _initialize_El(LO.Al, Al_pre)
           Ar_final::MPSTensor = _finalselect(El_trunc, RO)
-          # @show norm(permute(Ar_final.A, (1,), (2, 3, 4)) * permute(RO.Ar_c.A, (1,), (2, 3, 4))')
+          @show norm(permute(Ar_final.A, (1,), (2, 3, 4)) * permute(RO.Ar_c.A, (1,), (2, 3, 4))')
      end
      # 5-th svd, directly use svd 
      D₀ = dim(Al_lc, R₁)[2] # original bond dimension

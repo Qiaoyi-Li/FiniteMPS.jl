@@ -56,6 +56,7 @@ function addIntr2!(Root::InteractionTreeNode, OL::LocalOperator, OR::LocalOperat
 
      current_node = Root
      si = 1
+     pspace = getPhysSpace(OL)
      while si < OR.si
 
           if si == OL.si
@@ -63,7 +64,7 @@ function addIntr2!(Root::InteractionTreeNode, OL::LocalOperator, OR::LocalOperat
           elseif !isnothing(Z) && OL.si < si < OR.si
                Op_i = LocalOperator(Z, :Z, si)
           else
-               Op_i = IdentityOperator(si)
+               Op_i = IdentityOperator(pspace, si)
           end
 
           idx = findfirst(x -> x.Op == Op_i, current_node.children)

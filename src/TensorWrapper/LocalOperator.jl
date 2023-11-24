@@ -14,6 +14,7 @@ hastag(::AbstractLocalOperator) = false
 
 """
      mutable struct IdentityOperator <: AbstractLocalOperator
+          pspace::Union{Nothing, VectorSpace}
           si::Int64
           strength::Number 
      end
@@ -21,13 +22,20 @@ hastag(::AbstractLocalOperator) = false
 Lazy type of identity operator, used for skipping some tensor contractions.
 
 # Constructors
-     IdentityOperator(si::Int64, strength::Number = NaN)
+     IdentityOperator([pspace::VectorSpace,] si::Int64, strength::Number = NaN)
 """
 mutable struct IdentityOperator <: AbstractLocalOperator
+     pspace::Union{Nothing, VectorSpace}
      si::Int64
      strength::Number 
      function IdentityOperator(si::Int64, strength::Number = NaN)
-          return new(si, strength)
+          return new(nothing, si, strength)
+     end
+     function IdentityOperator(::Nothing, si::Int64, strength::Number = NaN)
+          return new(nothing, si, strength)
+     end
+     function IdentityOperator(pspace::VectorSpace, si::Int64, strength::Number = NaN)
+          return new(pspace, si, strength)
      end
 end
 
@@ -44,6 +52,13 @@ function Base.show(io::IO, obj::IdentityOperator)
           print(io, "($(obj.strength))")
      end
 end
+
+"""
+     getPhysSpace(O::AbstractLocalOperator) -> ::VectorSpace
+
+Interface of `AbstractLocalOperator`, return the local physical space.
+"""
+getPhysSpace(O::IdentityOperator) = O.pspace
 
 """
      const tag2Tuple{R₁,R₂} = Tuple{NTuple{R₁,String}, NTuple{R₂,String}}
@@ -123,6 +138,9 @@ end
 
 hastag(::LocalOperator) = true
 getOpName(O::LocalOperator) = O.name
+function getPhysSpace(O::LocalOperator)
+     return domain(O)[1]
+end
 
 function Base.show(io::IO, obj::LocalOperator{R₁, R₂}) where {R₁, R₂}
      print(io, "$(obj.name)$(String(collect("$(obj.si)") .+ 8272)){$R₁,$R₂}")
