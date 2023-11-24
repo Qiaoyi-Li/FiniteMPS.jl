@@ -129,6 +129,10 @@ function _CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar_rc::MP
           _, _, Vd::MPSTensor, info5 = tsvd(Al_final, Tuple(1:R₁-1), (R₁,); trunc=truncbelow(Alg.tol) & truncdim(Alg.D - D₀))
      end
      Ar_final::MPSTensor = Vd * Ar_pre
+     # orthogonalize again
+     @timeit LocalTimer "reortho" begin
+          axpy!(-1, _rightProj(Ar_final, Ar_rc), Ar_final.A)
+     end
 
      # direct sum
      @timeit LocalTimer "expand" begin
@@ -136,7 +140,12 @@ function _CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar_rc::MP
           Al_ex::MPSTensor = _expand_Al(Ar_rc, Ar_ex, Al)
      end
 
-     return Al_ex, Ar_ex, (info1, info2, info3, info4, info5), LocalTimer
+     @timeit LocalTimer "svd6" begin
+          S::MPSTensor, Ar_ex, info6 = rightorth(Ar_ex; trunc=notrunc())
+          Al_ex = Al_ex * S
+     end
+
+     return Al_ex, Ar_ex, (info1, info2, info3, info4, info5, info6), LocalTimer
 end
 
 function _CBE(PH::SparseProjectiveHamiltonian{2}, Al_lc::MPSTensor{R₁}, Ar::MPSTensor{R₂}, Alg::StandardCBE{SweepR2L}; kwargs...) where {R₁,R₂}
@@ -166,15 +175,13 @@ function _CBE(PH::SparseProjectiveHamiltonian{2}, Al_lc::MPSTensor{R₁}, Ar::MP
      @timeit LocalTimer "svd4" begin
           Al_pre::MPSTensor, _, info4 = leftorth(Al_fuse;
                trunc=truncbelow(Alg.tol) & truncdim(Alg.D))
-          println("$(PH.si): ")
-          @show norm(permute(Al_fuse.A, (1, 2, 3), (4,))' * permute(Al_lc.A, (1, 2, 3), (4,)))
-          @show norm(permute(Al_pre.A, (1, 2, 3), (4,))' * permute(Al_lc.A, (1, 2, 3), (4,)))
+          # @show norm(permute(Al_pre.A, (1, 2, 3), (4,))' * permute(Al_lc.A, (1, 2, 3), (4,)))
      end
      # final select
      @timeit LocalTimer "finalselect" begin
           El_trunc = _initialize_El(LO.Al, Al_pre)
           Ar_final::MPSTensor = _finalselect(El_trunc, RO)
-          @show norm(permute(Ar_final.A, (1,), (2, 3, 4)) * permute(RO.Ar_c.A, (1,), (2, 3, 4))')
+          # @show norm(permute(Ar_final.A, (1,), (2, 3, 4)) * permute(RO.Ar_c.A, (1,), (2, 3, 4))')
      end
      # 5-th svd, directly use svd 
      D₀ = dim(Al_lc, R₁)[2] # original bond dimension
@@ -182,6 +189,11 @@ function _CBE(PH::SparseProjectiveHamiltonian{2}, Al_lc::MPSTensor{R₁}, Ar::MP
           U::MPSTensor, _, _, info5 = tsvd(Ar_final, (1,), Tuple(2:R₂); trunc=truncbelow(Alg.tol) & truncdim(Alg.D - D₀))
      end
      Al_final::MPSTensor = Al_pre * U
+     # orthogonalize again
+     @timeit LocalTimer "reortho" begin
+          axpy!(-1, _leftProj(Al_final, Al_lc), Al_final.A)
+     end
+     # @show norm(permute(Al_final.A, (1, 2, 3), (4,))' * permute(Al_lc.A, (1, 2, 3), (4,)))
 
      # direct sum
      @timeit LocalTimer "expand" begin
@@ -189,6 +201,11 @@ function _CBE(PH::SparseProjectiveHamiltonian{2}, Al_lc::MPSTensor{R₁}, Ar::MP
           Ar_ex::MPSTensor = _expand_Ar(Al_lc, Al_ex, Ar)
      end
 
-     return Al_ex, Ar_ex, (info1, info2, info3, info4, info5), LocalTimer
+     @timeit LocalTimer "svd6" begin
+          Al_ex, S::MPSTensor, info6 = leftorth(Al_ex; trunc=notrunc())
+          Ar_ex = S * Ar_ex 
+     end
+
+     return Al_ex, Ar_ex, (info1, info2, info3, info4, info5, info6), LocalTimer
 end
 
