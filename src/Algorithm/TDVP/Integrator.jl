@@ -57,7 +57,7 @@ for func in (:TDVPSweep1!, :TDVPSweep2!)
      @eval begin
           function $func(Env::SparseEnvironment{L,3,T},
                dt::Number,
-               integrator::TDVPIntegrator{N} = SymmetricIntegrator(3);
+               integrator::TDVPIntegrator{N} = SymmetricIntegrator(2);
                kwargs...) where {L,N,T<:Tuple{AdjointMPS,SparseMPO,DenseMPS}}
 
                verbose::Int64 = get(kwargs, :verbose, 0)

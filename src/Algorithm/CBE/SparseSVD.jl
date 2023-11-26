@@ -108,16 +108,24 @@ function _CBE_rightorth_L(LO::LeftOrthComplement{N};
           V = C * V
      end
 
-     US_Al = Vector{MPSTensor}(undef, N)
-     US_El = SparseLeftTensor(undef, N)
-     if get_num_workers() > 1 # multi-processing
-     # TODO
-     else
+
+     US_Al::Vector{MPSTensor}, US_El::SparseLeftTensor = if get_num_workers() > 1 # multi-processing
           let V_wrap::MPSTensor = V
+               US_Al = pmap(LO.Al) do Al
+                    Al * V_wrap
+               end
+               US_El = pmap(LO.El) do El
+                    El * V_wrap
+               end
+               US_Al, US_El
+          end
+     else
+          let V_wrap::MPSTensor = V, US_Al = Vector{MPSTensor}(undef, N), US_El = SparseLeftTensor(undef, N)
                @floop GlobalThreadsExecutor for i in 1:N
                     US_Al[i] = LO.Al[i] * V_wrap
                     US_El[i] = LO.El[i] * V_wrap
                end
+               US_Al, US_El
           end
      end
 
@@ -233,16 +241,23 @@ function _CBE_leftorth_R(RO::RightOrthComplement{N};
           U = C' * U
      end
 
-     SVd_Ar = Vector{MPSTensor}(undef, N)
-     SVd_Er = SparseRightTensor(undef, N)
-     if get_num_workers() > 1 # multi-processing
-     # TODO
-     else
+     SVd_Ar::Vector{MPSTensor}, SVd_Er::SparseRightTensor = if get_num_workers() > 1 # multi-processing
           let U_wrap::MPSTensor = U'
+               SVd_Ar = pmap(RO.Ar) do Ar
+                    U_wrap * Ar
+               end
+               SVd_Er = pmap(RO.Er) do Er
+                    U_wrap * Er
+               end
+               SVd_Ar, SVd_Er
+          end
+     else
+          let U_wrap::MPSTensor = U', SVd_Ar = Vector{MPSTensor}(undef, N), SVd_Er = SparseRightTensor(undef, N)
                @floop GlobalThreadsExecutor for i in 1:N
                     SVd_Ar[i] = U_wrap * RO.Ar[i]
                     SVd_Er[i] = U_wrap * RO.Er[i]
                end
+               SVd_Ar, SVd_Er
           end
      end
 
@@ -252,7 +267,9 @@ end
 function _CBE_MM(f, lsA::Vector{MPSTensor}, lsE::Union{SparseLeftTensor,SparseRightTensor})
 
      if get_num_workers() > 1 # multi-processing
-     # TODO
+          MM = @distributed (add!) for i in 1:length(lsA)
+               f(lsA[i]) - f(lsE[i])
+          end
 
      else
           @floop GlobalThreadsExecutor for (A, E) in zip(lsA, lsE)

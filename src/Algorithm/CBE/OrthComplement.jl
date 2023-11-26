@@ -1,4 +1,4 @@
-mutable struct LeftOrthComplement{N}  
+mutable struct LeftOrthComplement{N}
      El::SparseLeftTensor
      Al::Vector{MPSTensor}
      const Al_c::MPSTensor
@@ -7,7 +7,7 @@ mutable struct LeftOrthComplement{N}
           N = length(El)
           return new{N}(El, Al, Al_c)
      end
-     function LeftOrthComplement(El_i::SparseLeftTensor, Al_c::MPSTensor, Hl::SparseMPOTensor, Al_i::MPSTensor = Al_c)
+     function LeftOrthComplement(El_i::SparseLeftTensor, Al_c::MPSTensor, Hl::SparseMPOTensor, Al_i::MPSTensor=Al_c)
           # initialize Al
           Al = _initialize_Al(El_i, Al_i, Hl)
           # initialize El
@@ -26,7 +26,7 @@ mutable struct RightOrthComplement{N}
           N = length(Er)
           return new{N}(Er, Ar, Ar_c)
      end
-     function RightOrthComplement(Er_i::SparseRightTensor, Ar_c::MPSTensor, Hr::SparseMPOTensor, Ar_i::MPSTensor = Ar_c)
+     function RightOrthComplement(Er_i::SparseRightTensor, Ar_c::MPSTensor, Hr::SparseMPOTensor, Ar_i::MPSTensor=Ar_c)
           # initialize Ar
           Ar = _initialize_Ar(Er_i, Ar_i, Hr)
           # initialize Er
@@ -36,32 +36,36 @@ mutable struct RightOrthComplement{N}
      end
 end
 
-length(::LeftOrthComplement{N}) where N = N
-length(::RightOrthComplement{N}) where N = N
+length(::LeftOrthComplement{N}) where {N} = N
+length(::RightOrthComplement{N}) where {N} = N
 
 function _initialize_Al(El_i::SparseLeftTensor, Al_i::MPSTensor, Hl::SparseMPOTensor)
-     
+
      sz = size(Hl)
      Al = Vector{MPSTensor}(undef, sz[2])
 
-     validIdx = filter!(x -> !isnothing(El_i[x[1]]) && !isnothing(Hl[x[1], x[2]]),  [(i, j) for i in 1:sz[1] for j in 1:sz[2]])
-     
+     validIdx = filter!(x -> !isnothing(El_i[x[1]]) && !isnothing(Hl[x[1], x[2]]), [(i, j) for i in 1:sz[1] for j in 1:sz[2]])
+
      if get_num_workers() > 1
-          # TODO
-     else
-          lsAl = Vector{MPSTensor}(undef, length(validIdx))
-          @floop GlobalThreadsExecutor for idx in 1:length(validIdx)
-               i, j = validIdx[idx]
-               Al_single = _initialize_Al_single(El_i[i], Al_i, Hl[i, j])
-               lsAl[idx] = Al_single
+          lsAl = pmap(validIdx) do (i, j)
+               _initialize_Al_single(El_i[i], Al_i, Hl[i, j])
           end
-          # sum over i
-          for (idx, (i, j)) in enumerate(validIdx)
-               if !isassigned(Al, j)
-                    Al[j] = lsAl[idx]
-               else
-                    axpy!(true, lsAl[idx], Al[j])
+     else
+          lsAl = let lsAl = Vector{MPSTensor}(undef, length(validIdx))
+               @floop GlobalThreadsExecutor for idx in 1:length(validIdx)
+                    i, j = validIdx[idx]
+                    lsAl[idx] = _initialize_Al_single(El_i[i], Al_i, Hl[i, j])
                end
+               lsAl
+          end
+     end
+
+     # sum over i
+     for (idx, (_, j)) in enumerate(validIdx)
+          if !isassigned(Al, j)
+               Al[j] = lsAl[idx]
+          else
+               axpy!(true, lsAl[idx], Al[j])
           end
      end
 
@@ -69,62 +73,72 @@ function _initialize_Al(El_i::SparseLeftTensor, Al_i::MPSTensor, Hl::SparseMPOTe
 end
 
 function _initialize_Ar(Er_i::SparseRightTensor, Ar_i::MPSTensor, Hr::SparseMPOTensor)
-     
+
      sz = size(Hr)
      Ar = Vector{MPSTensor}(undef, sz[1])
 
-     validIdx = filter!(x -> !isnothing(Er_i[x[2]]) && !isnothing(Hr[x[1], x[2]]),  [(i, j) for i in 1:sz[1] for j in 1:sz[2]])
-     
+     validIdx = filter!(x -> !isnothing(Er_i[x[2]]) && !isnothing(Hr[x[1], x[2]]), [(i, j) for i in 1:sz[1] for j in 1:sz[2]])
+
      if get_num_workers() > 1
-          # TODO
-     else
-          lsAr = Vector{MPSTensor}(undef, length(validIdx))
-          @floop GlobalThreadsExecutor for idx in 1:length(validIdx)
-               i, j = validIdx[idx]
-               Ar_single = _initialize_Ar_single(Er_i[j], Ar_i, Hr[i, j])
-               lsAr[idx] = Ar_single
+          lsAr = pmap(validIdx) do (i, j)
+               _initialize_Ar_single(Er_i[j], Ar_i, Hr[i, j])
           end
-          # sum over j
-          for (idx, (i, j)) in enumerate(validIdx)
-               if !isassigned(Ar, i)
-                    Ar[i] = lsAr[idx]
-               else
-                    axpy!(true, lsAr[idx], Ar[i])
+
+     else
+          lsAr = let lsAr = Vector{MPSTensor}(undef, length(validIdx))
+               @floop GlobalThreadsExecutor for idx in 1:length(validIdx)
+                    i, j = validIdx[idx]
+                    lsAr[idx] = _initialize_Ar_single(Er_i[j], Ar_i, Hr[i, j])
                end
+               lsAr
+          end
+     end
+     # sum over j
+     for (idx, (i, j)) in enumerate(validIdx)
+          if !isassigned(Ar, i)
+               Ar[i] = lsAr[idx]
+          else
+               axpy!(true, lsAr[idx], Ar[i])
           end
      end
 
      return Ar
 end
 
-function _initialize_El(Al::Vector{MPSTensor}, Al_i::MPSTensor)
+function _initialize_El(Al::Vector{MPSTensor}, Al_i::MPSTensor)::SparseLeftTensor
 
-     sz = length(Al) 
-     El = SparseLeftTensor(undef, sz)
+     sz = length(Al)
+
      if get_num_workers() > 1
-          
+          return pmap(Al) do Al
+               _initialize_El_single(Al, Al_i)
+          end
      else
+          El = SparseLeftTensor(undef, sz)
           @floop GlobalThreadsExecutor for i in 1:sz
                El[i] = _initialize_El_single(Al[i], Al_i)
           end
+          return El
      end
 
-     return El
+
 end
 
-function _initialize_Er(Ar::Vector{MPSTensor}, Ar_i::MPSTensor)
+function _initialize_Er(Ar::Vector{MPSTensor}, Ar_i::MPSTensor)::SparseRightTensor
 
-     sz = length(Ar) 
-     Er = SparseRightTensor(undef, sz)
+     sz = length(Ar)
+
      if get_num_workers() > 1
-          
+          return pmap(Ar) do Ar
+               _initialize_Er_single(Ar, Ar_i)
+          end
      else
+          Er = SparseRightTensor(undef, sz)
           @floop GlobalThreadsExecutor for i in 1:sz
                Er[i] = _initialize_Er_single(Ar[i], Ar_i)
           end
+          return Er
      end
-
-     return Er
 end
 
 # =================== contract El, Al and Hl ====================
@@ -140,29 +154,29 @@ end
 #   |
 #    --- a(1)
 function _initialize_Al_single(El::LocalLeftTensor{2}, Al::MPSTensor, Hl::IdentityOperator)::MPSTensor
-     return rmul!(El * Al, Hl.strength)    
+     return rmul!(El * Al, Hl.strength)
 end
-function _initialize_Al_single(El::LocalLeftTensor{2}, Al::MPSTensor{4}, Hl::LocalOperator{1, 1})::MPSTensor
+function _initialize_Al_single(El::LocalLeftTensor{2}, Al::MPSTensor{4}, Hl::LocalOperator{1,1})::MPSTensor
      @tensor tmp[a g; e f] := Hl.strength * El.A[a c] * (Hl.A[g d] * Al.A[c d e f])
      return tmp
 end
-function _initialize_Al_single(El::LocalLeftTensor{2}, Al::MPSTensor{4}, Hl::LocalOperator{1, 2})::MPSTensor
+function _initialize_Al_single(El::LocalLeftTensor{2}, Al::MPSTensor{4}, Hl::LocalOperator{1,2})::MPSTensor
      @tensor tmp[a g; e h f] := Hl.strength * (El.A[a c] * Al.A[c d e f]) * Hl.A[g d h]
      return tmp
 end
 function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{4}, Hl::IdentityOperator)::MPSTensor
      @tensor tmp[a d; e b f] := Hl.strength * El.A[a b c] * Al.A[c d e f]
-     return tmp   
+     return tmp
 end
-function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{4}, Hl::LocalOperator{2, 1})::MPSTensor
+function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{4}, Hl::LocalOperator{2,1})::MPSTensor
      @tensor tmp[a g; e f] := Hl.strength * (El.A[a b c] * Al.A[c d e f]) * Hl.A[b g d]
      return tmp
 end
-function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{4}, Hl::LocalOperator{1, 1})::MPSTensor
+function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{4}, Hl::LocalOperator{1,1})::MPSTensor
      @tensor tmp[a g e b f] := Hl.strength * El.A[a b c] * (Hl.A[g d] * Al.A[c d e f])
      return tmp
 end
-function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{4}, Hl::LocalOperator{2, 2})::MPSTensor
+function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{4}, Hl::LocalOperator{2,2})::MPSTensor
      @tensor tmp[a g; e h f] := Hl.strength * (El.A[a b c] * Al.A[c d e f]) * Hl.A[b g d h]
      return tmp
 end
@@ -181,30 +195,30 @@ end
 #                      |
 #              h(5) ---
 function _initialize_Ar_single(Er::LocalRightTensor{2}, Ar::MPSTensor, Hr::IdentityOperator)::MPSTensor
-     return rmul!(Ar * Er, Hr.strength)    
+     return rmul!(Ar * Er, Hr.strength)
 end
 function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor, Hr::IdentityOperator)::MPSTensor
      @tensor tmp[a b; c g h] := Hr.strength * Ar.A[a b c d] * Er.A[d g h]
      return tmp
 end
-function _initialize_Ar_single(Er::LocalRightTensor{2}, Ar::MPSTensor{4}, Hr::LocalOperator{1, 1})::MPSTensor
+function _initialize_Ar_single(Er::LocalRightTensor{2}, Ar::MPSTensor{4}, Hr::LocalOperator{1,1})::MPSTensor
      @tensor tmp[a f; c h] := Hr.strength * (Ar.A[a b c d] * Er.A[d h]) * Hr.A[f b]
      return tmp
 end
-function _initialize_Ar_single(Er::LocalRightTensor{2}, Ar::MPSTensor{4}, Hr::LocalOperator{2, 1})::MPSTensor
+function _initialize_Ar_single(Er::LocalRightTensor{2}, Ar::MPSTensor{4}, Hr::LocalOperator{2,1})::MPSTensor
      @tensor tmp[a f; c e h] := Hr.strength * (Ar.A[a b c d] * Er.A[d h]) * Hr.A[e f b]
      return tmp
 end
-function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{4}, Hr::LocalOperator{1, 1})::MPSTensor
+function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{4}, Hr::LocalOperator{1,1})::MPSTensor
      @tensor tmp[a f; c g h] := Hr.strength * (Hr.A[f b] * Ar.A[a b c d]) * Er.A[d g h]
      return tmp
 end
-function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{4}, Hr::LocalOperator{1, 2})::MPSTensor
+function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{4}, Hr::LocalOperator{1,2})::MPSTensor
      @tensor tmp[a f; c h] := Hr.strength * (Hr.A[f b g] * Ar.A[a b c d]) * Er.A[d g h]
      return tmp
 end
-function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{4}, Hr::LocalOperator{2, 2})::MPSTensor
-     @tensor tmp[a f; c e h] := Hr.strength * (Ar.A[a b c d] * Er.A[d g h]) * Hr.A[e f b g] 
+function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{4}, Hr::LocalOperator{2,2})::MPSTensor
+     @tensor tmp[a f; c e h] := Hr.strength * (Ar.A[a b c d] * Er.A[d g h]) * Hr.A[e f b g]
      return tmp
 end
 

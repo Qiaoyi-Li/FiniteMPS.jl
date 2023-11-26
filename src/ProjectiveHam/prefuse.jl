@@ -23,7 +23,7 @@ struct PreFuseProjectiveHamiltonian{N,Tl,Tr} <: AbstractProjectiveHamiltonian
      end
 end
 
-function prefuse(PH::SparseProjectiveHamiltonian{1})
+function _prefuse(PH::SparseProjectiveHamiltonian{1})
      El = _prefuse(PH.El, PH.H[1], PH.validIdx)
      idx = findall(x -> isassigned(El, x), eachindex(El))
      return PreFuseProjectiveHamiltonian(El[idx], PH.Er[idx], PH.si, PH.E₀)

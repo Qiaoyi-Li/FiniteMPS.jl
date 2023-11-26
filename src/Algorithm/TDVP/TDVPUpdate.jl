@@ -18,7 +18,7 @@ function _TDVPUpdate1(H::SparseProjectiveHamiltonian{1}, A::MPSTensor, dt::Numbe
      reset_timer!(get_timer("action1"))
 
      if get(kwargs, :prefuse, false)
-          PH = prefuse(H)
+          PH = _prefuse(H)
           expx, info = _LanczosExp(x -> action1(PH, x; kwargs...),
                dt,
                A,

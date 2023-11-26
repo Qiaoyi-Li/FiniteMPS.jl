@@ -19,7 +19,10 @@ function _preselect(LO::LeftOrthComplement{N}) where {N}
      lsIso = fuse(LO.El)
 
      if get_num_workers() > 1 # multi-processing
-     #TODO
+          Al_oc = @distributed (add!) for i in 1:N
+               f(LO.Al[i] - MPSTensor(_leftProj(LO.El[i], LO.Al_c)), lsIso[i])
+          end
+          normalize!(Al_oc)
      else
           Al_oc = let f = f
                @floop GlobalThreadsExecutor for i in 1:N
@@ -57,7 +60,10 @@ function _preselect(RO::RightOrthComplement{N}) where {N}
      lsIso = fuse(RO.Er)
 
      if get_num_workers() > 1 # multi-processing
-     #TODO
+          Ar_oc = @distributed (add!) for i in 1:N
+               f(RO.Ar[i] - MPSTensor(_rightProj(RO.Er[i], RO.Ar_c)), lsIso[i])
+          end
+          normalize!(Ar_oc)
      else
           Ar_oc = let f = f
                @floop GlobalThreadsExecutor for i in 1:N

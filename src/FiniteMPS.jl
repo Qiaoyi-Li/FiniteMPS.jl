@@ -6,7 +6,7 @@ using Base.Threads, FLoops, FoldsThreads, Distributed, SharedArrays
 @reexport import SerializedElementArrays: SerializedElementArray,  SerializedElementVector
 @reexport using TensorKit, KrylovKit, TensorKit.TensorOperations, TimerOutputs
 @reexport import Base: +, -, *, /, ==, promote_rule, convert, length, show, getindex, setindex!, lastindex, keys, similar, merge, iterate
-@reexport import TensorKit: ×, one, zero, dim, inner, scalar, domain, codomain, eltype, scalartype, leftorth, rightorth, leftnull, rightnull, tsvd, adjoint, normalize!, norm, axpy!, axpby!, dot, mul!, rmul!, NoTruncation, fuse
+@reexport import TensorKit: ×, one, zero, dim, inner, scalar, domain, codomain, eltype, scalartype, leftorth, rightorth, leftnull, rightnull, tsvd, adjoint, normalize!, norm, axpy!, axpby!, add!, dot, mul!, rmul!, NoTruncation, fuse
 @reexport import LinearAlgebra: BLAS, rank, qr, diag, I, diagm
 @reexport import AbstractTrees: parent, isroot
 
@@ -65,7 +65,7 @@ include("Environment/canonicalize.jl")
 include("Environment/scalar.jl")
 
 # Projective Hamiltonian
-export AbstractProjectiveHamiltonian, IdentityProjectiveHamiltonian, SparseProjectiveHamiltonian, ProjHam, action2, action1, action0, PreFuseProjectiveHamiltonian, prefuse
+export AbstractProjectiveHamiltonian, IdentityProjectiveHamiltonian, SparseProjectiveHamiltonian, ProjHam, action2, action1, action0, PreFuseProjectiveHamiltonian
 include("ProjectiveHam/ProjectiveHam.jl")
 include("ProjectiveHam/prefuse.jl")
 include("ProjectiveHam/action2.jl")
