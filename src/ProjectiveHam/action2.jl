@@ -12,19 +12,21 @@ function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}
      @timeit Timer_action2 "action2" begin
           if get_num_workers() > 1  # multi-processing
 
-               f = (x, y) -> axpy!(true, x, y)
-               Hx = @distributed (f) for (i, j, k) in obj.validIdx
-                    _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k]; kwargs...)
+               f = (x, y) -> (add!(x[1], y[1]), merge!(x[2], y[2]))
+               Hx, Timer_acc = @distributed (f) for (i, j, k) in obj.validIdx
+                    _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k], true; kwargs...)
                end
 
           else # multi-threading
-
-               @floop GlobalThreadsExecutor for (i, j, k) in obj.validIdx
-                    tmp, to = _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k], true; kwargs...)
-                    @reduce() do (Hx = nothing; tmp), (Timer_acc = TimerOutput(); to)
-                         Hx = axpy!(true, tmp, Hx)
-                         Timer_acc = merge!(Timer_acc, to)
+               Hx, Timer_acc = let
+                    @floop GlobalThreadsExecutor for (i, j, k) in obj.validIdx
+                         tmp, to = _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k], true; kwargs...)
+                         @reduce() do (Hx = nothing; tmp), (Timer_acc = TimerOutput(); to)
+                              Hx = axpy!(true, tmp, Hx)
+                              Timer_acc = merge!(Timer_acc, to)
+                         end
                     end
+                    Hx, Timer_acc
                end
           end
      end

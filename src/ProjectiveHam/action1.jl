@@ -8,10 +8,9 @@ function action1(obj::SparseProjectiveHamiltonian{1}, x::MPSTensor; kwargs...)
      Timer_action1 = get_timer("action1")
      @timeit Timer_action1 "action1" begin
           if get_num_workers() > 1 # multi-processing
-
-               f = (x, y) -> axpy!(true, x, y)
-               Hx = @distributed (f) for (i, j) in obj.validIdx
-                    _action1(x, obj.El[i], obj.H[1][i, j], obj.Er[j]; kwargs...)
+               f = (x, y) -> (add!(x[1], y[1]), merge!(x[2], y[2]))
+               Hx, Timer_acc = @distributed (f) for (i, j) in obj.validIdx
+                    _action1(x, obj.El[i], obj.H[1][i, j], obj.Er[j], true; kwargs...)
                end
 
           else # multi-threading

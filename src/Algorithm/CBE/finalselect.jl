@@ -20,11 +20,11 @@ function _finalselect(lsEl::SparseLeftTensor, RO::RightOrthComplement{N}) where 
      f(::Nothing, ::MPSTensor) = nothing
 
      if get_num_workers() > 1 # multi-processing
-          Er = @distributed (add!) for i in 1:N
-               f(lsEl[i], RO.Er[i])
-          end
-          Ar = @distributed (add!) for i in 1:N
-               f(lsEl[i], RO.Ar[i])
+          _add = (x, y) -> (add!(x[1], y[1]), add!(x[2], y[2]))
+          Er, Ar = let f = f
+               @distributed (_add) for i in 1:N
+                    f(lsEl[i], RO.Er[i]), f(lsEl[i], RO.Ar[i])
+               end
           end
 
      else # multi-threading
@@ -67,13 +67,12 @@ function _finalselect(LO::LeftOrthComplement{N}, lsEr::SparseRightTensor) where 
      f(::MPSTensor, ::Nothing) = nothing
 
      if get_num_workers() > 1 # multi-processing
-          El = @distributed (add!) for i in 1:N
-               f(LO.El[i], lsEr[i])
+          _add = (x, y) -> (add!(x[1], y[1]), add!(x[2], y[2]))
+          El, Al = let f = f
+               @distributed (_add) for i in 1:N
+                    f(LO.El[i], lsEr[i]), f(LO.Al[i], lsEr[i])
+               end
           end
-          Al = @distributed (add!) for i in 1:N
-               f(LO.Al[i], lsEr[i])
-          end
-
      else # multi-threading
           El::LocalLeftTensor, Al = let f = f
                @floop GlobalThreadsExecutor for i in 1:N

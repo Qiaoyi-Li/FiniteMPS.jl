@@ -8,9 +8,9 @@ function action0(obj::SparseProjectiveHamiltonian{0}, x::MPSTensor{2}; kwargs...
      Timer_action0 = get_timer("action0")
      @timeit Timer_action0 "action0" begin
           if get_num_workers() > 1
-               f = (x, y) -> axpy!(true, x, y)
-               Hx = @distributed (f) for (i,) in obj.validIdx
-                    _action0(x, obj.El[i], obj.Er[i]; kwargs...)
+               f = (x, y) -> (add!(x[1], y[1]), merge!(x[2], y[2]))
+               Hx, Timer_acc = @distributed (f) for (i,) in obj.validIdx
+                    _action0(x, obj.El[i], obj.Er[i], true; kwargs...)
                end
 
           else
