@@ -70,7 +70,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
                info_backward[si] = TDVPInfo{0}(-dt, info_Lanczos, info_svd)
 
                # update E₀, note Norm ~ exp(-dt * (⟨H⟩ - E₀))
-               E₀ -= log(Norm) / real(dt)
+               # E₀ -= log(Norm) / real(dt)
           else
                Ψ[si] = x1
                info_forward[si] = TDVPInfo{1}(dt, info_Lanczos, BondInfo(x1, :R))
@@ -158,7 +158,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
                info_backward[si-1] = TDVPInfo{0}(-dt, info_Lanczos, info_svd)
 
                # update E₀, note Norm ~ exp(-dt * (⟨H⟩ - E₀))
-               E₀ -= log(Norm) / real(dt)
+               # E₀ -= log(Norm) / real(dt)
 
           else
                Ψ[si] = x1
