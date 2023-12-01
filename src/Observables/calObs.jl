@@ -25,17 +25,31 @@ end
 function _calObs_threading!(Tree::ObservableTree, Ψ::AbstractMPS{L}, ::StoreMemory; kwargs...) where {L}
 
      ntasks::Int64 = get(kwargs, :ntasks, get_num_threads_julia() - 1)
+     @assert ntasks ≤ get_num_threads_julia() - 1 # avoid conflict
      GCspacing::Int64 = get(kwargs, :GCspacing, 100)
      verbose::Int64 = get(kwargs, :verbose, 0)
      showtimes::Int64 = get(kwargs, :showtimes, 100)
+     cachesize::Int64 = get(kwargs, :cachesize, 4 * ntasks)
 
-     Ch = Channel{Tuple{InteractionTreeNode,LocalLeftTensor}}(Inf)
+     # Ch = Channel{Tuple{InteractionTreeNode,LocalLeftTensor}}(Inf)
+     Ch = Channel{Tuple{InteractionTreeNode,LocalLeftTensor}}(cachesize)
+     Ch_swap = Channel{Tuple{InteractionTreeNode,LocalLeftTensor}}(Inf)
      Ch_Timer = Channel{TimerOutput}(Inf)
 
+     # control swap
+     task_swap = Threads.@spawn while isopen(Ch)
+          sz = Base.n_avail(Ch)
+          if sz < div(cachesize, 2) && isready(Ch_swap)
+               put!(Ch, take!(Ch_swap))
+          else
+               sleep(0.01)
+          end
+     end
+
      # workers
-     map(1:ntasks) do _
+     task_c = map(1:ntasks) do _
           Threads.@spawn while isopen(Ch)
-               to = _calObs_worker!(Ch, Ψ)
+               to = _calObs_worker!(Ch, Ch_swap, Ψ)
                put!(Ch_Timer, to)
           end
      end
@@ -67,6 +81,11 @@ function _calObs_threading!(Tree::ObservableTree, Ψ::AbstractMPS{L}, ::StoreMem
                flush(stdout)
           end
      end
+
+     # kill tasks
+     close(Ch)
+     close(Ch_swap)
+     close(Ch_Timer)
 
      return Timer_acc
 end
@@ -145,7 +164,7 @@ end
 
 # end
 
-function _calObs_worker!(Ch::Channel, Ψ::AbstractMPS{L}) where {L}
+function _calObs_worker!(Ch::Channel, Ch_swap::Channel, Ψ::AbstractMPS{L}) where {L}
      LocalTimer = TimerOutput()
 
      @timeit LocalTimer "take" (node_parent, El) = take!(Ch)
@@ -154,7 +173,7 @@ function _calObs_worker!(Ch::Channel, Ψ::AbstractMPS{L}) where {L}
      si == L + 1 && return LocalTimer
 
      let A = Ψ[si]', B = Ψ[si]
-          for node in node_parent.children
+          for (i, node) in enumerate(node_parent.children)
                if isnan(node.Op.strength)
                     # propagate
                     node.Op.strength = 1
@@ -168,8 +187,11 @@ function _calObs_worker!(Ch::Channel, Ψ::AbstractMPS{L}) where {L}
                     @timeit LocalTimer "pushright" El_next = _pushright(El, A, node.Op, B)
                     @timeit LocalTimer "trace" node.Op.strength = fac * tr(El_next.A) # add fac(±1) here
                end
-               # print(node.Op, " ")
-               @timeit LocalTimer "put" put!(Ch, (node, El_next))
+               if i == 1
+                    @timeit LocalTimer "put" put!(Ch, (node, El_next))
+               else
+                    @timeit LocalTimer "put" put!(Ch_swap, (node, El_next))
+               end
           end
      end
      return LocalTimer
