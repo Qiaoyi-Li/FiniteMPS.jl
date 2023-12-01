@@ -199,10 +199,10 @@ uuid = "650210df-7c64-40ac-8e1f-94ea4f378b07"
 version = "0.1.0"
 
 [[deps.FiniteMPS]]
-deps = ["AbstractTrees", "Distributed", "FLoops", "FoldsThreads", "JLD2", "KrylovKit", "LinearAlgebra", "MKL", "Reexport", "SerializedElementArrays", "SharedArrays", "TensorKit", "TimerOutputs"]
+deps = ["AbstractTrees", "Distributed", "FLoops", "FoldsThreads", "JLD2", "KrylovKit", "LinearAlgebra", "MKL", "Reexport", "Serialization", "SerializedElementArrays", "SharedArrays", "TensorKit", "TimerOutputs"]
 path = ".."
 uuid = "6b572690-f317-4dad-a5fe-5fe73a0b7d42"
-version = "0.2.5"
+version = "0.3.0"
 
 [[deps.FoldsThreads]]
 deps = ["Accessors", "FunctionWrappers", "InitialValues", "SplittablesBase", "Transducers"]

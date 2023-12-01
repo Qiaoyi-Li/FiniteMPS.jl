@@ -1,7 +1,7 @@
 module FiniteMPS
 
 using Reexport
-using AbstractTrees, SerializedElementArrays, JLD2
+using AbstractTrees, SerializedElementArrays, JLD2, Serialization
 using Base.Threads, FLoops, FoldsThreads, Distributed, SharedArrays
 @reexport import SerializedElementArrays: SerializedElementArray,  SerializedElementVector
 @reexport using TensorKit, KrylovKit, TensorKit.TensorOperations, TimerOutputs

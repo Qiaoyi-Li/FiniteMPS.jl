@@ -73,34 +73,34 @@ function mainDMRG(Ψ=nothing)
      return Ψ, Env, lsD, lsEn, info
 end
 
-function mainObs(Ψ::MPS)
+# function mainObs(Ψ::MPS)
 
-     Tree = ObservableTree(; disk=disk)
-     for i in 1:length(Latt)
-          addObs!(Tree, U₁SU₂Fermion.n, i, 1; name=:n)
-          addObs!(Tree, U₁SU₂Fermion.nd, i, 1; name=:nd)
-     end
-     for i in 1:length(Latt), j in i+1:length(Latt)
-          addObs!(Tree, U₁SU₂Fermion.SS, (i, j), 1; name=(:S, :S))
-          addObs!(Tree, (U₁SU₂Fermion.n, U₁SU₂Fermion.n), (i, j), 1; name=(:n, :n))
-          addObs!(Tree, U₁SU₂Fermion.FdagF, (i, j), 1; Z=U₁SU₂Fermion.Z, name=(:Fdag, :F))
-     end
-     for (i, j) in neighbor(Latt), (k, l) in neighbor(Latt)
-          !isempty(intersect([i, j], [k, l])) && continue
-          i > j && continue # note ⟨Δᵢⱼ^dag Δₖₗ⟩ = ⟨Δₖₗ^dag Δᵢⱼ⟩
-          addObs!(Tree, U₁SU₂Fermion.ΔₛdagΔₛ, (i, j, k, l), 1; Z=U₁SU₂Fermion.Z, name=(:Fdag, :Fdag, :F, :F))
-     end
+#      Tree = ObservableTree(; disk=disk)
+#      for i in 1:length(Latt)
+#           addObs!(Tree, U₁SU₂Fermion.n, i, 1; name=:n)
+#           addObs!(Tree, U₁SU₂Fermion.nd, i, 1; name=:nd)
+#      end
+#      for i in 1:length(Latt), j in i+1:length(Latt)
+#           addObs!(Tree, U₁SU₂Fermion.SS, (i, j), 1; name=(:S, :S))
+#           addObs!(Tree, (U₁SU₂Fermion.n, U₁SU₂Fermion.n), (i, j), 1; name=(:n, :n))
+#           addObs!(Tree, U₁SU₂Fermion.FdagF, (i, j), 1; Z=U₁SU₂Fermion.Z, name=(:Fdag, :F))
+#      end
+#      for (i, j) in neighbor(Latt), (k, l) in neighbor(Latt)
+#           !isempty(intersect([i, j], [k, l])) && continue
+#           i > j && continue # note ⟨Δᵢⱼ^dag Δₖₗ⟩ = ⟨Δₖₗ^dag Δᵢⱼ⟩
+#           addObs!(Tree, U₁SU₂Fermion.ΔₛdagΔₛ, (i, j, k, l), 1; Z=U₁SU₂Fermion.Z, name=(:Fdag, :Fdag, :F, :F))
+#      end
 
-     @time calObs!(Tree, Ψ; GCstep = true, verbose = verbose)
+#      @time calObs!(Tree, Ψ; GCstep = true, verbose = verbose)
 
-     Obs = convert(Dict, Tree, [(:n,), (:nd,), (:S, :S), (:n, :n), (:Fdag, :F), (:Fdag, :Fdag, :F, :F)])
-     GC.gc()
+#      Obs = convert(Dict, Tree, [(:n,), (:nd,), (:S, :S), (:n, :n), (:Fdag, :F), (:Fdag, :Fdag, :F, :F)])
+#      GC.gc()
 
-     return Obs
+#      return Obs
 
-end
+# end
 
 Ψ, Env, lsD, lsEn, info = mainDMRG(Ψ);
-Obs = mainObs(Ψ)
+# Obs = mainObs(Ψ)
 
 rmprocs(workers())

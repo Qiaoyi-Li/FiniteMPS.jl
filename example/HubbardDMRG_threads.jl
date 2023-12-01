@@ -70,7 +70,7 @@ end
 
 function mainObs(Ψ::MPS)
 
-     Tree = ObservableTree(; disk=disk)
+     Tree = ObservableTree()
      for i in 1:length(Latt)
           addObs!(Tree, U₁SU₂Fermion.n, i, 1; name=:n)
           addObs!(Tree, U₁SU₂Fermion.nd, i, 1; name=:nd)
@@ -86,7 +86,7 @@ function mainObs(Ψ::MPS)
           addObs!(Tree, U₁SU₂Fermion.ΔₛdagΔₛ, (i, j, k, l), 1; Z=U₁SU₂Fermion.Z, name=(:Fdag, :Fdag, :F, :F))
      end
 
-     @time calObs!(Tree, Ψ; GCstep=true, verbose=verbose)
+     @time calObs!(Tree, Ψ; GCspacing=1000, verbose=verbose, showtimes=20)
 
      Obs = convert(Dict, Tree, [(:n,), (:nd,), (:S, :S), (:n, :n), (:Fdag, :F), (:Fdag, :Fdag, :F, :F)])
      GC.gc()

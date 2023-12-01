@@ -1,30 +1,24 @@
 """
-     struct ObservableTree{N, T<:AbstractVector{LocalLeftTensor}, C<: AbstractStoreType}
+     struct ObservableTree{N}
           Root::InteractionTreeNode{Nothing}
      end
      
-Similar to `InteractionTree` but specially used for calculation of observables. 
-
-Value of each non-root node is a length `1` vector of `LocalLeftTensor`, whose concrete type depends on `C <: AbstractStoreType`.
+Similar to `InteractionTree` but specially used for calculation of observables.
 
 # Constructors
-     ObservableTree{N}(;disk::Bool = false)
+     ObservableTree{N}()
 Initialize an empty object.
 """
-struct ObservableTree{N, T<:AbstractVector{LocalLeftTensor}, C<: AbstractStoreType}
+struct ObservableTree{N}
      Root::InteractionTreeNode{Nothing}
-     function ObservableTree{N}(;disk::Bool = false) where N
+     function ObservableTree{N}() where N
           Root = InteractionTreeNode(nothing, nothing)
           for i = 1:N
-               value = Vector{LocalLeftTensor}(undef, 1)
-               disk && (value = SerializedElementArrays.disk(value))
-               addchild!(Root, InteractionTreeNode(IdentityOperator(0), value))
+               addchild!(Root, InteractionTreeNode(IdentityOperator(0), nothing))
           end
-          T = typeof(Root.children[1].value)
-          C = disk ? StoreDisk : StoreMemory
-          return new{N, T, C}(Root)     
+          return new{N}(Root)     
      end
-     ObservableTree(;kwargs...) = ObservableTree{1}(;kwargs...)
+     ObservableTree() = ObservableTree{1}()
 end
 
 """
