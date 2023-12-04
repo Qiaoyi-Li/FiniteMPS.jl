@@ -48,11 +48,12 @@ function mainDMRG(Ψ=nothing)
      Env = Environment(Ψ', H, Ψ; disk=disk)
 
      for (i, D) in enumerate(lsD)
-          lsinfo[i], lsTimer[i] = DMRGSweep2!(Env;
+          lsinfo[i], lsTimer[i] = DMRGSweep1!(Env;
+               CBEAlg=StandardCBE(D + div(D, 8), 1e-6),
                GCstep=true, GCsweep=true, verbose=verbose,
                trunc=truncdim(D) & truncbelow(1e-6),
                LanczosOpt=(krylovdim=5, maxiter=1, tol=1e-4, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
-          lsEn[i] = lsinfo[i][2][1].Eg
+          lsEn[i] = lsinfo[i][2].dmrg[1].Eg
      end
 
      for i in 1:Nsweep_DMRG1

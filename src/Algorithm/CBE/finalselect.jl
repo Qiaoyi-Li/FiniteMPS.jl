@@ -8,8 +8,16 @@ function _finalselect(lsEl::SparseLeftTensor, RO::RightOrthComplement{N}) where 
           @tensor tmp[a; d] := El.A[a b c] * Er.A[c b d]
           return tmp
      end
+     function f(El::LocalLeftTensor{2}, Ar::MPSTensor{3})
+          @tensor tmp[a c; e] := El.A[a b] * Ar.A[b c e]
+          return tmp
+     end
      function f(El::LocalLeftTensor{2}, Ar::MPSTensor{4})
           @tensor tmp[a c; d e] := El.A[a b] * Ar.A[b c d e]
+          return tmp
+     end
+     function f(El::LocalLeftTensor{3}, Ar::MPSTensor{4})
+          @tensor tmp[a d; f] := El.A[a b c] * Ar.A[c d b f]
           return tmp
      end
      function f(El::LocalLeftTensor{3}, Ar::MPSTensor{5})
@@ -55,8 +63,16 @@ function _finalselect(LO::LeftOrthComplement{N}, lsEr::SparseRightTensor) where 
           @tensor tmp[a; d] := El.A[a b c] * Er.A[c b d]
           return tmp
      end
+     function f(Al::MPSTensor{3}, Er::LocalRightTensor{2})
+          @tensor tmp[a b; f] := Al.A[a b e] * Er.A[e f]
+          return tmp
+     end
      function f(Al::MPSTensor{4}, Er::LocalRightTensor{2})
           @tensor tmp[a b; c f] := Al.A[a b c e] * Er.A[e f]
+          return tmp
+     end
+     function f(Al::MPSTensor{4}, Er::LocalRightTensor{3})
+          @tensor tmp[a b; f] := Al.A[a b d e] * Er.A[e d f]
           return tmp
      end
      function f(Al::MPSTensor{5}, Er::LocalRightTensor{3})

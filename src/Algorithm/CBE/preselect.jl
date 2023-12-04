@@ -1,5 +1,9 @@
 function _preselect(LO::LeftOrthComplement{N}) where {N}
 
+     function f(Al::MPSTensor{3}, iso::AbstractTensorMap)
+          @tensor tmp[a b; f] := Al.A[a b e] * iso[e f]
+          return tmp
+     end
      function f(Al::MPSTensor{4}, iso::AbstractTensorMap)
           if rank(iso) == 2
                @tensor tmp[a b; c f] := Al.A[a b c e] * iso[e f]
@@ -41,12 +45,16 @@ end
 
 function _preselect(RO::RightOrthComplement{N}) where {N}
 
+     function f(Ar::MPSTensor{3}, iso::AbstractTensorMap)
+          @tensor tmp[a d; f] := iso[a b] * Ar.A[b d f]
+          return tmp
+     end
      function f(Ar::MPSTensor{4}, iso::AbstractTensorMap)
           if rank(iso) == 2
                @tensor tmp[a d; e f] := iso[a b] * Ar.A[b d e f]
           else
                # MPS tensor with an additional bond
-               @tensor tmp[a d; e c f] := iso[a b c] * Ar.A[b d e f]
+               @tensor tmp[a d; f] := iso[a b c] * Ar.A[b d c f]
           end
           return tmp
      end

@@ -160,24 +160,48 @@ function _initialize_Al_single(El::LocalLeftTensor{2}, Al::MPSTensor{4}, Hl::Loc
      @tensor tmp[a g; e f] := Hl.strength * El.A[a c] * (Hl.A[g d] * Al.A[c d e f])
      return tmp
 end
+function _initialize_Al_single(El::LocalLeftTensor{2}, Al::MPSTensor{3}, Hl::LocalOperator{1,1})::MPSTensor
+     @tensor tmp[a g; f] := Hl.strength * El.A[a c] * (Hl.A[g d] * Al.A[c d f])
+     return tmp
+end
 function _initialize_Al_single(El::LocalLeftTensor{2}, Al::MPSTensor{4}, Hl::LocalOperator{1,2})::MPSTensor
      @tensor tmp[a g; e h f] := Hl.strength * (El.A[a c] * Al.A[c d e f]) * Hl.A[g d h]
+     return tmp
+end
+function _initialize_Al_single(El::LocalLeftTensor{2}, Al::MPSTensor{3}, Hl::LocalOperator{1,2})::MPSTensor
+     @tensor tmp[a g; h f] := Hl.strength * (El.A[a c] * Al.A[c d f]) * Hl.A[g d h]
      return tmp
 end
 function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{4}, Hl::IdentityOperator)::MPSTensor
      @tensor tmp[a d; e b f] := Hl.strength * El.A[a b c] * Al.A[c d e f]
      return tmp
 end
+function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{3}, Hl::IdentityOperator)::MPSTensor
+     @tensor tmp[a d; b f] := Hl.strength * El.A[a b c] * Al.A[c d f]
+     return tmp
+end
 function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{4}, Hl::LocalOperator{2,1})::MPSTensor
      @tensor tmp[a g; e f] := Hl.strength * (El.A[a b c] * Al.A[c d e f]) * Hl.A[b g d]
      return tmp
 end
+function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{3}, Hl::LocalOperator{2,1})::MPSTensor
+     @tensor tmp[a g; f] := Hl.strength * (El.A[a b c] * Al.A[c d f]) * Hl.A[b g d]
+     return tmp
+end
 function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{4}, Hl::LocalOperator{1,1})::MPSTensor
-     @tensor tmp[a g e b f] := Hl.strength * El.A[a b c] * (Hl.A[g d] * Al.A[c d e f])
+     @tensor tmp[a g; e b f] := Hl.strength * El.A[a b c] * (Hl.A[g d] * Al.A[c d e f])
+     return tmp
+end
+function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{3}, Hl::LocalOperator{1,1})::MPSTensor
+     @tensor tmp[a g; b f] := Hl.strength * El.A[a b c] * (Hl.A[g d] * Al.A[c d f])
      return tmp
 end
 function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{4}, Hl::LocalOperator{2,2})::MPSTensor
      @tensor tmp[a g; e h f] := Hl.strength * (El.A[a b c] * Al.A[c d e f]) * Hl.A[b g d h]
+     return tmp
+end
+function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{3}, Hl::LocalOperator{2,2})::MPSTensor
+     @tensor tmp[a g; h f] := Hl.strength * (El.A[a b c] * Al.A[c d f]) * Hl.A[b g d h]
      return tmp
 end
 # ------------------------------------------------------
@@ -197,31 +221,54 @@ end
 function _initialize_Ar_single(Er::LocalRightTensor{2}, Ar::MPSTensor, Hr::IdentityOperator)::MPSTensor
      return rmul!(Ar * Er, Hr.strength)
 end
-function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor, Hr::IdentityOperator)::MPSTensor
+function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{4}, Hr::IdentityOperator)::MPSTensor
      @tensor tmp[a b; c g h] := Hr.strength * Ar.A[a b c d] * Er.A[d g h]
+     return tmp
+end
+function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{3}, Hr::IdentityOperator)::MPSTensor
+     @tensor tmp[a b; g h] := Hr.strength * Ar.A[a b d] * Er.A[d g h]
      return tmp
 end
 function _initialize_Ar_single(Er::LocalRightTensor{2}, Ar::MPSTensor{4}, Hr::LocalOperator{1,1})::MPSTensor
      @tensor tmp[a f; c h] := Hr.strength * (Ar.A[a b c d] * Er.A[d h]) * Hr.A[f b]
      return tmp
 end
+function _initialize_Ar_single(Er::LocalRightTensor{2}, Ar::MPSTensor{3}, Hr::LocalOperator{1,1})::MPSTensor
+     @tensor tmp[a f; h] := Hr.strength * (Ar.A[a b d] * Er.A[d h]) * Hr.A[f b]
+     return tmp
+end
 function _initialize_Ar_single(Er::LocalRightTensor{2}, Ar::MPSTensor{4}, Hr::LocalOperator{2,1})::MPSTensor
      @tensor tmp[a f; c e h] := Hr.strength * (Ar.A[a b c d] * Er.A[d h]) * Hr.A[e f b]
+     return tmp
+end
+function _initialize_Ar_single(Er::LocalRightTensor{2}, Ar::MPSTensor{3}, Hr::LocalOperator{2,1})::MPSTensor
+     @tensor tmp[a f; e h] := Hr.strength * (Ar.A[a b d] * Er.A[d h]) * Hr.A[e f b]
      return tmp
 end
 function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{4}, Hr::LocalOperator{1,1})::MPSTensor
      @tensor tmp[a f; c g h] := Hr.strength * (Hr.A[f b] * Ar.A[a b c d]) * Er.A[d g h]
      return tmp
 end
+function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{3}, Hr::LocalOperator{1,1})::MPSTensor
+     @tensor tmp[a f; g h] := Hr.strength * (Hr.A[f b] * Ar.A[a b d]) * Er.A[d g h]
+     return tmp
+end
 function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{4}, Hr::LocalOperator{1,2})::MPSTensor
      @tensor tmp[a f; c h] := Hr.strength * (Hr.A[f b g] * Ar.A[a b c d]) * Er.A[d g h]
+     return tmp
+end
+function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{3}, Hr::LocalOperator{1,2})::MPSTensor
+     @tensor tmp[a f; h] := Hr.strength * (Hr.A[f b g] * Ar.A[a b d]) * Er.A[d g h]
      return tmp
 end
 function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{4}, Hr::LocalOperator{2,2})::MPSTensor
      @tensor tmp[a f; c e h] := Hr.strength * (Ar.A[a b c d] * Er.A[d g h]) * Hr.A[e f b g]
      return tmp
 end
-
+function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{3}, Hr::LocalOperator{2,2})::MPSTensor
+     @tensor tmp[a f; e h] := Hr.strength * (Ar.A[a b d] * Er.A[d g h]) * Hr.A[e f b g]
+     return tmp
+end
 # =================== contract Al and Al_i ====================
 #      c
 #      | 
@@ -236,8 +283,16 @@ function _initialize_El_single(Al::MPSTensor{4}, Al_i::MPSTensor{4})::LocalLeftT
      @tensor tmp[f; e] := Al.A[a b c e] * Al_i.A'[c f a b]
      return tmp
 end
+function _initialize_El_single(Al::MPSTensor{3}, Al_i::MPSTensor{3})::LocalLeftTensor
+     @tensor tmp[f; e] := Al.A[a b e] * Al_i.A'[f a b]
+     return tmp
+end
 function _initialize_El_single(Al::MPSTensor{5}, Al_i::MPSTensor{4})::LocalLeftTensor
      @tensor tmp[f d; e] := Al.A[a b c d e] * Al_i.A'[c f a b]
+     return tmp
+end
+function _initialize_El_single(Al::MPSTensor{4}, Al_i::MPSTensor{3})::LocalLeftTensor
+     @tensor tmp[f d; e] := Al.A[a b d e] * Al_i.A'[f a b]
      return tmp
 end
 # --------------------------------------------------------------
@@ -256,8 +311,16 @@ function _initialize_Er_single(Ar::MPSTensor{4}, Ar_i::MPSTensor{4})::LocalRight
      @tensor tmp[a; f] := Ar.A[a b c e] * Ar_i.A'[c e f b]
      return tmp
 end
+function _initialize_Er_single(Ar::MPSTensor{3}, Ar_i::MPSTensor{3})::LocalRightTensor
+     @tensor tmp[a; f] := Ar.A[a b e] * Ar_i.A'[e f b]
+     return tmp
+end
 function _initialize_Er_single(Ar::MPSTensor{5}, Ar_i::MPSTensor{4})::LocalRightTensor
      @tensor tmp[a; d f] := Ar.A[a b c d e] * Ar_i.A'[c e f b]
+     return tmp
+end
+function _initialize_Er_single(Ar::MPSTensor{4}, Ar_i::MPSTensor{3})::LocalRightTensor
+     @tensor tmp[a; d f] := Ar.A[a b d e] * Ar_i.A'[e f b]
      return tmp
 end
 # --------------------------------------------------------------

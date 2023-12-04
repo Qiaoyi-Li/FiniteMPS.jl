@@ -290,6 +290,11 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
 end
 
+function _action2(x::CompositeMPSTensor{2, T}, El::LocalLeftTensor{2}, Hl::LocalOperator{1,1}, Hr::LocalOperator{1,1}, Er::LocalRightTensor{2}; kwargs...) where {T<:NTuple{2,MPSTensor{4}}}
+     @tensor Hx[a d l; g m i] := (((El.A[a c] * x.A[c e l h m k]) * Hl.A[d e]) * Hr.A[g h]) * Er.A[k i]
+     return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
+end
+
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      Hl::LocalOperator{1,1}, Hr::LocalOperator{1,1},
      Er::LocalRightTensor{3}; kwargs...) where {T<:NTuple{2,MPSTensor{4}}}

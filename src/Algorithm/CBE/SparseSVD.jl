@@ -25,6 +25,10 @@ function _CBE_rightorth_L(RO::RightOrthComplement{N};
      #    a--Ar--e -->  a--Ar*Ar'--a'  
      #     / |
      #    d  b  
+     function f(Ar::MPSTensor{3})
+          @tensor tmp[a; f] := Ar.A[a b e] * Ar.A'[e f b]
+          return tmp
+     end
      function f(Ar::MPSTensor{4})
           @tensor tmp[a; f] := Ar.A[a b c e] * Ar.A'[c e f b]
           return tmp
@@ -79,6 +83,10 @@ function _CBE_rightorth_L(LO::LeftOrthComplement{N};
      #    a--Al--e -->  e'--Al'*Al-e  
      #       | \
      #       b  d 
+     function f(Al::MPSTensor{3})
+          @tensor tmp[f; e] := Al.A'[f a b] * Al.A[a b e]
+          return tmp
+     end
      function f(Al::MPSTensor{4})
           @tensor tmp[f; e] := Al.A'[c f a b] * Al.A[a b c e]
           return tmp
@@ -159,6 +167,10 @@ function _CBE_leftorth_R(LO::LeftOrthComplement{N};
      #    a--Al--e -->  e'--Al'*Al-e
      #       | \
      #       b  d
+     function f(Al::MPSTensor{3})
+          @tensor tmp[f; e] := Al.A'[f a b] * Al.A[a b e]
+          return tmp
+     end
      function f(Al::MPSTensor{4})
           @tensor tmp[f; e] := Al.A'[c f a b] * Al.A[a b c e]
           return tmp
@@ -213,6 +225,10 @@ function _CBE_leftorth_R(RO::RightOrthComplement{N};
      #    a--Ar--e -->  a--Ar*Ar'--a'
      #     / |
      #    d  b
+     function f(Ar::MPSTensor{3})
+          @tensor tmp[a; f] := Ar.A[a b e] * Ar.A'[e f b]
+          return tmp
+     end
      function f(Ar::MPSTensor{4})
           @tensor tmp[a; f] := Ar.A[a b c e] * Ar.A'[c e f b]
           return tmp
