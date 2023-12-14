@@ -1,7 +1,7 @@
 """
      calObs!(Tree::ObservableTree, Ψ::AbstractMPS{L}; kwargs...) -> Tree::InteractionTree
 
-Calculate observables respect to state `Ψ`, the info to tell which observables to calculate is stored in `Tree`. The results are stored in each leave node of `Tree`. 
+Calculate observables respect to state `Ψ`, the info to tell which observables to calculate is stored in `Tree`. The results are stored in each leaf node of `Tree`. 
 
 Note only multi-threading backend is supported now.
 """
@@ -34,7 +34,7 @@ function _calObs_threading!(Tree::ObservableTree, Ψ::AbstractMPS{L}, ::StoreMem
      # Ch = Channel{Tuple{InteractionTreeNode,LocalLeftTensor}}(Inf)
      Ch = Channel{Tuple{InteractionTreeNode,LocalLeftTensor}}(cachesize)
      Ch_swap = Channel{Tuple{InteractionTreeNode,LocalLeftTensor}}(Inf)
-     Ch_Timer = Channel{TimerOutput}(Inf)
+     Ch_Timer = Channel{Tuple{Int64, TimerOutput}}(Inf) # (num_count, TimerOutput)
 
      # control swap
      task_swap = Threads.@spawn while isopen(Ch)
@@ -62,21 +62,27 @@ function _calObs_threading!(Tree::ObservableTree, Ψ::AbstractMPS{L}, ::StoreMem
 
      # main thread
      Timer_acc = TimerOutput()
-     num_tot = 0
-     for _ in PreOrderDFS(Tree.Root)
-          num_tot += 1
+     num_leaves = 0
+     for _ in Leaves(Tree.Root)
+          num_leaves += 1
      end
      num_count = 0
-     showspacing::Int64 = cld(num_tot, showtimes)
-     while num_count < num_tot - 1
-          to = take!(Ch_Timer)
+     showspacing::Int64 = cld(num_leaves, showtimes)
+     GC_count = 0
+     num_left = num_leaves
+     while num_count < num_left
+          (num, to) = take!(Ch_Timer)
           merge!(Timer_acc, to)
-          num_count += 1
-          if num_count % GCspacing == 0
+          num_count += num
+          GC_count += 1
+          if GC_count == GCspacing
+               GC_count = 0
                manualGC(Timer_acc)
           end
-          if verbose > 0 && num_count % showspacing == 0
-               show(Timer_acc; title="$(num_count) / $(num_tot)")
+          if verbose > 0 && num_count ≥ showspacing 
+               num_left -= num_count
+               num_count = 0
+               show(Timer_acc; title="$(num_leaves - num_left) / $(num_leaves)")
                println()
                flush(stdout)
           end
@@ -167,32 +173,48 @@ end
 function _calObs_worker!(Ch::Channel, Ch_swap::Channel, Ψ::AbstractMPS{L}) where {L}
      LocalTimer = TimerOutput()
 
-     @timeit LocalTimer "take" (node_parent, El) = take!(Ch)
+     worklist = Vector{Tuple{InteractionTreeNode,LocalLeftTensor}}(undef, 0)
+     leaves_count = 0
+     @timeit LocalTimer "take" push!(worklist, take!(Ch))
+     while !isempty(worklist)
+          (node_parent, El) = pop!(worklist)
+          si = node_parent.Op.si + 1
+          si > L && return LocalTimer
 
-     si = node_parent.Op.si + 1
-     si == L + 1 && return LocalTimer
+          let A = Ψ[si]', B = Ψ[si]
+               for node in node_parent.children
+                    El_child = _update_node!(node.Op, El, A, B, LocalTimer)
+                    if isempty(node.children) # leaf node
+                         leaves_count += 1
+                         continue 
+                    end
 
-     let A = Ψ[si]', B = Ψ[si]
-          for (i, node) in enumerate(node_parent.children)
-               if isnan(node.Op.strength)
-                    # propagate
-                    node.Op.strength = 1
-                    @timeit LocalTimer "pushright" El_next = _pushright(El, A, node.Op, B)
-                    node.Op.strength = NaN
-
-               else
-                    fac = node.Op.strength
-                    @assert abs(fac) == 1 # just convention, -1 for some fermionic cases
-                    node.Op.strength = 1 # we do not want to propagate -El !!
-                    @timeit LocalTimer "pushright" El_next = _pushright(El, A, node.Op, B)
-                    @timeit LocalTimer "trace" node.Op.strength = fac * tr(El_next.A) # add fac(±1) here
-               end
-               if i == 1
-                    @timeit LocalTimer "put" put!(Ch, (node, El_next))
-               else
-                    @timeit LocalTimer "put" put!(Ch_swap, (node, El_next))
+                    if length(worklist) < 1 # choose as next parent
+                         push!(worklist, (node, El_child))
+                    else # put to swap
+                         @timeit LocalTimer "put" put!(Ch_swap, (node, El_child))
+                    end                   
                end
           end
+
      end
-     return LocalTimer
+     return leaves_count, LocalTimer
 end
+
+function _update_node!(Op::AbstractLocalOperator, El::LocalLeftTensor, A::AdjointMPSTensor, B::MPSTensor, LocalTimer::TimerOutput)
+     
+     if isnan(Op.strength)
+          # propagate
+          Op.strength = 1
+          @timeit LocalTimer "pushright" El_next = _pushright(El, A, Op, B)
+          Op.strength = NaN
+     else
+          fac = Op.strength
+          @assert abs(fac) == 1 # just convention, -1 for some fermionic cases
+          Op.strength = 1 # we do not want to propagate -El !!
+          @timeit LocalTimer "pushright" El_next = _pushright(El, A, Op, B)
+          @timeit LocalTimer "trace" Op.strength = fac * tr(El_next.A) # add fac(±1) here
+     end
+     return El_next
+end
+

@@ -139,8 +139,9 @@ function _action1(x::MPSTensor{3}, El::LocalLeftTensor{2}, H::LocalOperator{1,1}
 end
 
 function _action1(x::MPSTensor{3}, El::LocalLeftTensor{2}, H::LocalOperator{1,2}, Er::LocalRightTensor{3}; kwargs...)
-     @tensor Hx[a d; f] := El.A[a c] * x.A[c e h] * H.A[d e g] * Er.A[h g f]
-     return H.strength * Hx
+     # @tensor Hx[a d; f] := El.A[a c] * x.A[c e h] * H.A[d e g] * Er.A[h g f]
+     @tensor Hx[a d; f] := H.strength * El.A[a c] * x.A[c e h] * Er.A[h g f] * H.A[d e g] 
+     return Hx
 end
 
 # ========================= rank-4 MPO tensor ========================
