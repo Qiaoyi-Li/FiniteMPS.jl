@@ -120,6 +120,11 @@ function _action1(x::MPSTensor{3}, El::LocalLeftTensor{2}, H::IdentityOperator, 
      return Hx
 end
 
+function _action1(x::MPSTensor{3}, El::LocalLeftTensor{3}, H::IdentityOperator, Er::LocalRightTensor{3}; kwargs...)
+     @tensor Hx[a e; f] := H.strength * (El.A[a b c] * x.A[c e h]) * Er.A[h b f]
+     return Hx
+end
+
 function _action1(x::MPSTensor{3}, El::LocalLeftTensor{3}, H::LocalOperator{2,1}, Er::LocalRightTensor{2}; kwargs...)
      # @tensor Hx[a d; f] := (El.A[a b c] * (x.A[c e h] * Er.A[h f])) *  H.A[b d e]
      @tensor Hx[a d; f] := H.strength * El.A[a b c] * (x.A[c e h] * Er.A[h f]) * H.A[b d e]

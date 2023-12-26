@@ -6,16 +6,16 @@ function U₁SU₂Hubbard(Latt::AbstractLattice; t::Number=1, t′::Number=0, U:
           # NN hopping
           for pairs in neighbor(Latt; ordered=true)
                addIntr2!(Root, LocalSpace.FdagF, pairs,
-                    -t; Z=U₁SU₂Fermion.Z, name=(:Fdag, :F))
+                    -t; Z=LocalSpace.Z, name=(:Fdag, :F))
           end
           # NNN hopping
           for pairs in neighbor(Latt; r=(1, 1), ordered=true)
                addIntr2!(Root, LocalSpace.FdagF, pairs,
-                    -t′; Z=U₁SU₂Fermion.Z, name=(:Fdag, :F))
+                    -t′; Z=LocalSpace.Z, name=(:Fdag, :F))
           end
           # nn interaction
           for pairs in neighbor(Latt)
-               addIntr2!(Root, (U₁SU₂Fermion.n, LocalSpace.n), pairs,
+               addIntr2!(Root, (LocalSpace.n, LocalSpace.n), pairs,
                     V; name=(:n, :n))
           end
 

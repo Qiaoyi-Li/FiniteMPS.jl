@@ -123,6 +123,21 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
+     Hl::IdentityOperator, Hr::IdentityOperator,
+     Er::LocalRightTensor{3}; kwargs...) where {T<:NTuple{2,MPSTensor{3}}}
+     @tensor Hx[a e; h i] := Hl.strength * Hr.strength * (El.A[a b c] * x.A[c e h k]) * Er.A[k b i]
+     return _permute2(Hx, x.A)
+end
+
+function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
+     Hl::IdentityOperator, Hr::LocalOperator{2, 1},
+     Er::LocalRightTensor{2}; kwargs...) where {T<:NTuple{2,MPSTensor{3}}}
+
+     @tensor Hx[a e; g i] := Hl.strength * Hr.strength * (El.A[a b c] * (x.A[c e h k] * Er.A[k i])) * Hr.A[b g h]
+     return _permute2(Hx, x.A)
+end
+
+function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      Hl::LocalOperator{2,1}, Hr::IdentityOperator,
      Er::LocalRightTensor{2}; kwargs...) where {T<:NTuple{2,MPSTensor{3}}}
      # @tensor Hx[a d; h i] := (El.A[a b c] * Hl.A[b d e]) * x.A[c e h k] * Er.A[k i] #2.6s/10(D=8192)
@@ -174,6 +189,13 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
      @tensor Hx[a d; g i] := (((El.A[a c] * x.A[c e h k]) * Hl.A[d e]) * Hr.A[g h]) * Er.A[k i]
 
      return Hl.strength * Hr.strength * _permute2(Hx, x.A)
+end
+
+function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
+     Hl::LocalOperator{1,2}, Hr::IdentityOperator,
+     Er::LocalRightTensor{3}; kwargs...) where {T<:NTuple{2,MPSTensor{3}}}
+     @tensor Hx[a d; h i] := Hl.strength * Hr.strength * ((El.A[a c] * x.A[c e h k]) * Hl.A[d e f]) * Er.A[k f i] 
+     return _permute2(Hx, x.A)
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
