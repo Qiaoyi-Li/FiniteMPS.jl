@@ -125,7 +125,9 @@ end
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      Hl::IdentityOperator, Hr::IdentityOperator,
      Er::LocalRightTensor{3}; kwargs...) where {T<:NTuple{2,MPSTensor{3}}}
-     @tensor Hx[a e; h i] := Hl.strength * Hr.strength * (El.A[a b c] * x.A[c e h k]) * Er.A[k b i]
+     
+     coef = Hl.strength * Hr.strength
+     @tensor Hx[a e; h i] := coef * (El.A[a b c] * x.A[c e h k]) * Er.A[k b i]
      return _permute2(Hx, x.A)
 end
 
@@ -133,7 +135,8 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      Hl::IdentityOperator, Hr::LocalOperator{2, 1},
      Er::LocalRightTensor{2}; kwargs...) where {T<:NTuple{2,MPSTensor{3}}}
 
-     @tensor Hx[a e; g i] := Hl.strength * Hr.strength * (El.A[a b c] * (x.A[c e h k] * Er.A[k i])) * Hr.A[b g h]
+     coef = Hl.strength * Hr.strength
+     @tensor Hx[a e; g i] :=  coef * (El.A[a b c] * (x.A[c e h k] * Er.A[k i])) * Hr.A[b g h]
      return _permute2(Hx, x.A)
 end
 
@@ -194,7 +197,8 @@ end
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
      Hl::LocalOperator{1,2}, Hr::IdentityOperator,
      Er::LocalRightTensor{3}; kwargs...) where {T<:NTuple{2,MPSTensor{3}}}
-     @tensor Hx[a d; h i] := Hl.strength * Hr.strength * ((El.A[a c] * x.A[c e h k]) * Hl.A[d e f]) * Er.A[k f i] 
+     coef = Hl.strength * Hr.strength
+     @tensor Hx[a d; h i] := coef * ((El.A[a c] * x.A[c e h k]) * Hl.A[d e f]) * Er.A[k f i] 
      return _permute2(Hx, x.A)
 end
 

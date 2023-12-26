@@ -36,6 +36,7 @@ function rank(A::AbstractTensorMap, idx::Int64)
      idx == 2 && return typeof(domain(A)).parameters[2]
 end
 rank(A::AbstractTensorMap) = rank(A, 1) + rank(A, 2) 
+rank(::Nothing, args...) = 0
 
 # implement usage A.dom[end] ...
 Base.lastindex(V::ProductSpace) = typeof(V).parameters[2]
@@ -56,5 +57,7 @@ data(A::TensorKit.AdjointTensorMap) = data(A.parent)
 axpy!(α::Number, ::Nothing, ::Nothing) = nothing
 axpy!(α::Number, ::Nothing, A::AbstractTensorMap) = A
 axpy!(α::Number, A::AbstractTensorMap, B::Nothing) = α * A
+
+dim(::Nothing, ::Int64) = (0, 0)
 
 

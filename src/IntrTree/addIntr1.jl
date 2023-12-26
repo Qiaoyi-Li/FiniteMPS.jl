@@ -22,7 +22,7 @@ function addIntr1!(Root::InteractionTreeNode, Op::AbstractTensorMap, si::Int64, 
      return addIntr1!(Root, O, strength)
 
 end
-addIntr1!(Tree::InteractionTree, args...) = addIntr1!(Tree.Root.children[1], args...)
+addIntr1!(Tree::InteractionTree, args...; kwargs...) = addIntr1!(Tree.Root.children[1], args...; kwargs...)
 
 function addIntr1!(Root::InteractionTreeNode, O::LocalOperator, strength::Number)
      current_node = Root

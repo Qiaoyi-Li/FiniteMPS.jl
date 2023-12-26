@@ -96,10 +96,12 @@ function show(io::IO, obj::SparseProjectiveHamiltonian)
 end
 
 function _showDinfo(io::IO, obj::SparseProjectiveHamiltonian{N}) where {N}
-     D, DD = dim(obj.El[1], rank(obj.El[1]))
-     println(io, "State[L]: $(domain(obj.El[1])[end]), dim = $(D) -> $(DD)")
+ 
+     idx = findfirst(i -> !isnothing(obj.El[i]), 1:length(obj.El))
+     D, DD = dim(obj.El[idx], rank(obj.El[idx]))
+     println(io, "State[L]: $(domain(obj.El[idx])[end]), dim = $(D) -> $(DD)")
      D, DD = dim(obj.Er[1], 1)
-     println(io, "State[R]: $(domain(obj.Er[1])[end]), dim = $(D) -> $(DD)")
+     println(io, "State[R]: $(domain(obj.Er[idx])[end]), dim = $(D) -> $(DD)")
      for i in 1:N
           DL, DDL = dim(obj.H[i], 1)
           DR, DDR = dim(obj.H[i], 2)
