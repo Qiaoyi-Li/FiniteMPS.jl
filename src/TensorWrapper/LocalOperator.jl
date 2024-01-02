@@ -12,6 +12,12 @@ Check if this `LocalOperator` has field `tag` or not.
 """
 hastag(::AbstractLocalOperator) = false
 
+function rmul!(O::AbstractLocalOperator, α::Number)
+     # change strength instead of the tensor
+     O.strength *= α
+     return O
+end
+
 """
      mutable struct IdentityOperator <: AbstractLocalOperator
           pspace::Union{Nothing, VectorSpace}

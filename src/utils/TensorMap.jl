@@ -57,6 +57,7 @@ data(A::TensorKit.AdjointTensorMap) = data(A.parent)
 axpy!(α::Number, ::Nothing, ::Nothing) = nothing
 axpy!(α::Number, ::Nothing, A::AbstractTensorMap) = A
 axpy!(α::Number, A::AbstractTensorMap, B::Nothing) = α * A
+rmul!(::Nothing, ::Number) = nothing
 
 dim(::Nothing, ::Int64) = (0, 0)
 
