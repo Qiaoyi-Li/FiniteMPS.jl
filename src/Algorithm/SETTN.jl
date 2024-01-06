@@ -10,6 +10,7 @@ Use series-expansion thermal tensor network (SETTN)`[https://doi.org/10.1103/Phy
      tol::Float64 = 1e-8
      bspace::VectorSpace (details please see identityMPO)
      compress::Float64 = MPSDefault.tol (finally compress ρ with `tol = compress`)
+     ρ₀::MPO (initial MPO, default = Id)
 
 Note we use `mul!` and `axpby!` to implement `H^n -> H^(n+1)` and `ρ -> ρ + (-βH/2)^n / n!`, respectively. All kwargs of these two functions are valid and will be propagated to them appropriately. We find that it is unstable if truncating the bond dimension with `tol`, thus the input keyword argument `trunc` must be a `TruncationDimension` object (`NoTruncation` is also unallowed to avoid infinitely growing bond dimension).
 """
@@ -29,8 +30,9 @@ function SETTN(H::SparseMPO{L}, β::Number; kwargs...) where {L}
           domain(M[idx])[1]
      end
 
-     Hn = identityMPO(L, lspspace; kwargs...) # H0 = Id
-     ρ = identityMPO(L, lspspace; kwargs...)
+     ρ = get(kwargs, :ρ₀, identityMPO(L, lspspace; kwargs...))
+     Hn = deepcopy(ρ) # H0 = Id*ρ
+   
 
      lsF = zeros(Float64, maxorder)
      for n = 1:maxorder
