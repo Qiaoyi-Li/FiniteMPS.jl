@@ -28,7 +28,7 @@ function TensorKit.tsvd!(t::TensorMap;
          lsV = Vector{A}(undef, length(lsc))
  
          @floop GlobalThreadsExecutor for i in 1:length(lsc)
-             U, Σ, V = TensorKit.svd!(blocks(t)[lsc[i]]; alg = alg)
+             U, Σ, V = TensorKit.MatrixAlgebra.svd!(blocks(t)[lsc[i]], alg)
              lsU[i] = U
              lsΣ[i] = Σ
              lsV[i] = V
@@ -48,7 +48,7 @@ function TensorKit.tsvd!(t::TensorMap;
  
      else
          for (c, b) in blocks(t)
-             U, Σ, V = TensorKit.svd!(b; alg = alg)
+             U, Σ, V = TensorKit.MatrixAlgebra.svd!(b, alg)
              Udata[c] = U
              Vdata[c] = V
              if @isdefined Σdata # cannot easily infer the type of Σ, so use this construction
