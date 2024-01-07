@@ -36,28 +36,40 @@ function canonicalize!(obj::AbstractEnvironment, si::Vector{Int64}; kwargs...)
 end
 
 """
-     free!(obj::AbstractEnvironment) -> nothing
+     free!(obj::AbstractEnvironment; 
+          siL::AbstractVector{Int64} = obj.Center[1] + 1 : L,
+          siR::AbstractVector{Int64} = 1 : obj.Center[2] - 1     
+     ) -> nothing
 
-Free the local tensors in `El[Center[1] + : end]` and `Er[1 : Center[2] - 1]`.
+Free the local tensors in `El[siL]` and `Er[siR]`.
 """
-function free!(obj::SimpleEnvironment)
-     obj.El[obj.Center[1]+1:end] .= nothing
-     obj.Er[1:obj.Center[2]-1] .= nothing
+function free!(obj::SimpleEnvironment{L};
+     siL::AbstractVector{Int64} = obj.Center[1] + 1 : L,
+     siR::AbstractVector{Int64} = 1 : obj.Center[2] - 1
+     ) where L
+     obj.El[siL] .= nothing
+     obj.Er[siR] .= nothing
      return nothing
 end
-function free!(obj::SparseEnvironment{L,N,T,StoreMemory}) where {L,N,T}
-     for i in filter(i -> isassigned(obj.El, i), obj.Center[1]+1:L)
+function free!(obj::SparseEnvironment{L,N,T,StoreMemory};
+     siL::AbstractVector{Int64} = obj.Center[1] + 1 : L,
+     siR::AbstractVector{Int64} = 1 : obj.Center[2] - 1
+     ) where {L,N,T}
+     for i in filter(i -> isassigned(obj.El, i), siL)
           obj.El[i] .= nothing
      end
-     for i in filter(i -> isassigned(obj.Er, i), 1:obj.Center[2]-1)
+     for i in filter(i -> isassigned(obj.Er, i), siR)
           obj.Er[i] .= nothing
      end
      return nothing
 end
-function free!(obj::SparseEnvironment{L,N,T,StoreDisk}) where {L,N,T}
+function free!(obj::SparseEnvironment{L,N,T,StoreDisk};
+     siL::AbstractVector{Int64} = obj.Center[1] + 1 : L,
+     siR::AbstractVector{Int64} = 1 : obj.Center[2] - 1
+     ) where {L,N,T}
      # clear the files in disk
-     cleanup!(obj.El, obj.Center[1]+1:L)
-     cleanup!(obj.Er, 1:obj.Center[2]-1)
+     cleanup!(obj.El, siL)
+     cleanup!(obj.Er, siR)
      return nothing
 end
 

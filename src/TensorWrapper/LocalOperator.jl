@@ -182,6 +182,30 @@ function +(A::LocalOperator{R₁,R₂}, B::LocalOperator{R₁,R₂}) where {R₁
      return LocalOperator(Op, name, A.si, 1)
 end
 
+"""
+     *(O::LocalOperator{R₁,R₂}, A::MPSTensor{R₃}) -> ::MPSTensor{R₁ + R₂ +R₃ - 2}
+
+Apply a local operator on a MPS tensor.
+
+Convention:
+       R₁+2  R₁+3 ...
+          | /
+      1---A-- end
+          |
+      2---O --- ...
+        / |
+     ...  R₁+1      
+i.e., merge the domain and codomain, legs of `A` first.
+"""
+function *(O::LocalOperator{R₁,R₂}, A::MPSTensor{R₃}) where {R₁,R₂,R₃}
+     pO = (Tuple(setdiff(1:R₁+R₂, R₁+1)), (R₁+1,))
+     pA = ((2,), Tuple(setdiff(1:R₃, 2)))
+     pOA = ((R₁+R₂, 1:R₁...), (R₁+R₂+1:R₁+R₂+R₃-3..., R₁+1:R₁+R₂-1..., R₁+R₂+R₃-2))
+
+     OA = TensorOperations.tensorcontract(pOA, O.A, pO, :N, A.A, pA, :N, O.strength)
+     return MPSTensor(OA)
+end
+
 # node we only apply * in addIntr..., hence we assert A.strength == B.strength == NaN 
 """
      *(A::LocalOperator{R₁, R₂}, B::LocalOperator{R₃,R₄}) -> ::LocalOperator{R₁ + R₃ - 1, R₂ + R₄ - 1}
