@@ -27,7 +27,7 @@ function mainDMRG(Ψ=nothing)
      Ndop = 0 # number of hole doping, negative value means elec doping
 
      lsD = let
-          lsD = broadcast(Int64 ∘ round, 2 .^ vcat(6:13))
+          lsD = broadcast(Int64 ∘ round, 2 .^ vcat(6:12))
           Nsweep = 2
           repeat(lsD, inner=Nsweep)
      end
@@ -49,7 +49,7 @@ function mainDMRG(Ψ=nothing)
 
      for (i, D) in enumerate(lsD)
           lsinfo[i], lsTimer[i] = DMRGSweep2!(Env;
-               GCstep=true, GCsweep=true, verbose=verbose,
+               GCstep=false, GCsweep=true, verbose=verbose,
                trunc=truncdim(D) & truncbelow(1e-6),
                LanczosOpt=(krylovdim=5, maxiter=1, tol=1e-4, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
           lsEn[i] = lsinfo[i][2][1].Eg
@@ -57,7 +57,7 @@ function mainDMRG(Ψ=nothing)
 
      for i in 1:Nsweep_DMRG1
           info_DMRG1, Timer_DMRG1 = DMRGSweep1!(Env;
-               GCstep=true, GCsweep=true, verbose=verbose,
+               GCstep=false, GCsweep=true, verbose=verbose,
                LanczosOpt=(krylovdim=8, maxiter=1, tol=1e-4, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
           push!(lsEn, info_DMRG1[2].dmrg[1].Eg)
           push!(lsinfo, info_DMRG1)

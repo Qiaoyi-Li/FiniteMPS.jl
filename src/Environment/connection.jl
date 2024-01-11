@@ -56,6 +56,9 @@ function connection!(obj::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple
                # remember to update the last local tensor
                Ψ[si] = A
                Center(Ψ)[:] = [si, si]
+
+               # note previous El and Er are no longer correct
+               Center(obj)[:] = [1, L]
           end
 
      end
