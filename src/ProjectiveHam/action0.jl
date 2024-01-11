@@ -15,13 +15,45 @@ function action0(obj::SparseProjectiveHamiltonian{0}, x::MPSTensor{2}; kwargs...
 
           else
 
-               @floop GlobalThreadsExecutor for (i,) in obj.validIdx
-                    tmp, to = _action0(x, obj.El[i], obj.Er[i], true; kwargs...)
-                    @reduce() do (Hx = nothing; tmp), (Timer_acc = TimerOutput(); to)
-                         Hx = axpy!(true, tmp, Hx)
-                         Timer_acc = merge!(Timer_acc, to)
+               numthreads = Threads.nthreads()
+               # producer
+               taskref = Ref{Task}()
+               ch = Channel{Tuple{Int64}}(; taskref = taskref, spawn = true) do ch
+                    for idx in vcat(obj.validIdx, fill((0,), numthreads))
+                         put!(ch, idx)
                     end
                end
+
+               Hx = scale!(similar(x.A), 0.0)
+               Timer_acc = TimerOutput()
+
+               # consumers
+               Lock = Threads.SpinLock()
+               tasks = map(1:numthreads) do _
+                    task = Threads.@spawn while true
+                         (i,) = take!(ch)
+                         i == 0 && break
+
+                         tmp, to = _action0(x, obj.El[i], obj.Er[i], true; kwargs...)
+
+                         lock(Lock)
+                         axpy!(true, tmp, Hx)
+                         merge!(Timer_acc, to)
+                         unlock(Lock)
+                    end
+               end
+
+               wait.(tasks)
+               wait(taskref[])
+
+
+               # @floop GlobalThreadsExecutor for (i,) in obj.validIdx
+               #      tmp, to = _action0(x, obj.El[i], obj.Er[i], true; kwargs...)
+               #      @reduce() do (Hx = nothing; tmp), (Timer_acc = TimerOutput(); to)
+               #           Hx = axpy!(true, tmp, Hx)
+               #           Timer_acc = merge!(Timer_acc, to)
+               #      end
+               # end
           end
      end
 

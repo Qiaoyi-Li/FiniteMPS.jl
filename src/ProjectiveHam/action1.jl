@@ -15,13 +15,47 @@ function action1(obj::SparseProjectiveHamiltonian{1}, x::MPSTensor; kwargs...)
 
           else # multi-threading
 
-               @floop GlobalThreadsExecutor for (i, j) in obj.validIdx
-                    tmp, to = _action1(x, obj.El[i], obj.H[1][i, j], obj.Er[j], true; kwargs...)
-                    @reduce() do (Hx = nothing; tmp), (Timer_acc = TimerOutput(); to)
-                         Hx = axpy!(true, tmp, Hx)
-                         Timer_acc = merge!(Timer_acc, to)
+               numthreads = Threads.nthreads()
+               # producer
+               taskref = Ref{Task}()
+               ch = Channel{Tuple{Int64, Int64}}(; taskref=taskref, spawn=true) do ch
+                    for idx in vcat(obj.validIdx, fill((0,0), numthreads))
+                         put!(ch, idx)
                     end
                end
+
+               Hx = scale!(similar(x.A), 0.0)
+               Timer_acc = TimerOutput()
+
+               # consumers
+               Lock = Threads.SpinLock()
+               tasks = map(1:numthreads) do _
+                    task = Threads.@spawn while true
+                         (i, j) = take!(ch)
+                         i == 0 && break
+
+                         tmp, to = _action1(x, obj.El[i], obj.H[1][i, j], obj.Er[j], true; kwargs...)
+
+
+                         lock(Lock)
+                         axpy!(true, tmp, Hx)
+                         merge!(Timer_acc, to)
+                         unlock(Lock)
+                    end
+                    errormonitor(task)
+               end
+
+               wait.(tasks)
+               wait(taskref[])
+
+
+               # @floop GlobalThreadsExecutor for (i, j) in obj.validIdx
+               #      tmp, to = _action1(x, obj.El[i], obj.H[1][i, j], obj.Er[j], true; kwargs...)
+               #      @reduce() do (Hx = nothing; tmp), (Timer_acc = TimerOutput(); to)
+               #           Hx = axpy!(true, tmp, Hx)
+               #           Timer_acc = merge!(Timer_acc, to)
+               #      end
+               # end
           end
      end
 
@@ -145,7 +179,7 @@ end
 
 function _action1(x::MPSTensor{3}, El::LocalLeftTensor{2}, H::LocalOperator{1,2}, Er::LocalRightTensor{3}; kwargs...)
      # @tensor Hx[a d; f] := El.A[a c] * x.A[c e h] * H.A[d e g] * Er.A[h g f]
-     @tensor Hx[a d; f] := H.strength * El.A[a c] * x.A[c e h] * Er.A[h g f] * H.A[d e g] 
+     @tensor Hx[a d; f] := H.strength * El.A[a c] * x.A[c e h] * Er.A[h g f] * H.A[d e g]
      return Hx
 end
 

@@ -18,16 +18,49 @@ function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}
                end
 
           else # multi-threading
-               Hx, Timer_acc = let
-                    @floop GlobalThreadsExecutor for (i, j, k) in obj.validIdx
-                         tmp, to = _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k], true; kwargs...)
-                         @reduce() do (Hx = nothing; tmp), (Timer_acc = TimerOutput(); to)
-                              Hx = axpy!(true, tmp, Hx)
-                              Timer_acc = merge!(Timer_acc, to)
-                         end
+
+               numthreads = Threads.nthreads()
+               # producer
+               taskref = Ref{Task}()
+               ch = Channel{Tuple{Int64, Int64, Int64}}(; taskref=taskref, spawn=true) do ch
+                    for idx in vcat(obj.validIdx, fill((0,0,0), numthreads))
+                         put!(ch, idx)
                     end
-                    Hx, Timer_acc
                end
+
+               Hx = scale!(similar(x.A), 0.0)
+               Timer_acc = TimerOutput()
+
+               # consumers
+               Lock = Threads.SpinLock()
+               tasks = map(1:numthreads) do _
+                    task = Threads.@spawn while true
+                         (i, j, k) = take!(ch)
+                         i == 0 && break
+
+                         tmp, to = _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k], true; kwargs...)
+
+                         lock(Lock)
+                         axpy!(true, tmp, Hx)
+                         merge!(Timer_acc, to)
+                         unlock(Lock)
+                    end
+                    errormonitor(task)
+               end
+
+               wait.(tasks)
+               wait(taskref[])
+
+               # Hx, Timer_acc = let
+               #      @floop GlobalThreadsExecutor for (i, j, k) in obj.validIdx
+               #           tmp, to = _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k], true; kwargs...)
+               #           @reduce() do (Hx = nothing; tmp), (Timer_acc = TimerOutput(); to)
+               #                Hx = axpy!(true, tmp, Hx)
+               #                Timer_acc = merge!(Timer_acc, to)
+               #           end
+               #      end
+               #      Hx, Timer_acc
+               # end
           end
      end
 
