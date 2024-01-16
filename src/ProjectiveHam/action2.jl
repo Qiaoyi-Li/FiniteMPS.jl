@@ -408,6 +408,23 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
 end
 
+function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
+     Hl::LocalOperator{1,2}, Hr::IdentityOperator,
+     Er::LocalRightTensor{3}; kwargs...) where {T<:NTuple{2,MPSTensor{4}}}
+     coef = Hl.strength * Hr.strength
+     @tensor Hx[a d l ; h m i] := coef * ((El.A[a c] * x.A[c e l h m k]) * Hl.A[d e f]) * Er.A[k f i]
+     return _permute2(Hx, x.A)
+end
+
+function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
+     Hl::IdentityOperator, Hr::LocalOperator{2,1},
+     Er::LocalRightTensor{2}; kwargs...) where {T<:NTuple{2,MPSTensor{4}}}
+
+     coef = Hl.strength * Hr.strength
+     @tensor Hx[a e l; g m i] := coef * (El.A[a b c] * (x.A[c e l h m k] * Er.A[k i])) * Hr.A[b g h]
+     return _permute2(Hx, x.A)
+end
+
 # -----------------------------------------------------------------------
 
 function _permute2(A::AbstractTensorMap, B::AbstractTensorMap)
