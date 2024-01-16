@@ -24,7 +24,7 @@ function action0(obj::SparseProjectiveHamiltonian{0}, x::MPSTensor{2}; kwargs...
                     end
                end
 
-               Hx = scale!(similar(x.A), 0.0)
+               Hx = nothing
                Timer_acc = TimerOutput()
 
                # consumers
@@ -37,14 +37,20 @@ function action0(obj::SparseProjectiveHamiltonian{0}, x::MPSTensor{2}; kwargs...
                          tmp, to = _action0(x, obj.El[i], obj.Er[i], true; kwargs...)
 
                          lock(Lock)
-                         axpy!(true, tmp, Hx)
+                         try
+                         Hx = axpy!(true, tmp, Hx)
                          merge!(Timer_acc, to)
+                         catch
+                              unlock(Lock)
+                              rethrow()
+                         end
                          unlock(Lock)
                     end
+                    errormonitor(task)
                end
 
-               wait.(tasks)
-               wait(taskref[])
+               fetch.(tasks)
+               fetch(taskref[])
 
 
                # @floop GlobalThreadsExecutor for (i,) in obj.validIdx

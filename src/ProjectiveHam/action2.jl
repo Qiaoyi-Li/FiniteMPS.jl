@@ -22,13 +22,13 @@ function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}
                numthreads = Threads.nthreads()
                # producer
                taskref = Ref{Task}()
-               ch = Channel{Tuple{Int64, Int64, Int64}}(; taskref=taskref, spawn=true) do ch
-                    for idx in vcat(obj.validIdx, fill((0,0,0), numthreads))
+               ch = Channel{Tuple{Int64,Int64,Int64}}(; taskref=taskref, spawn=true) do ch
+                    for idx in vcat(obj.validIdx, fill((0, 0, 0), numthreads))
                          put!(ch, idx)
                     end
                end
 
-               Hx = scale!(similar(x.A), 0.0)
+               Hx = nothing
                Timer_acc = TimerOutput()
 
                # consumers
@@ -41,15 +41,20 @@ function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}
                          tmp, to = _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k], true; kwargs...)
 
                          lock(Lock)
-                         axpy!(true, tmp, Hx)
-                         merge!(Timer_acc, to)
+                         try
+                              Hx = axpy!(true, tmp, Hx)
+                              merge!(Timer_acc, to)
+                         catch 
+                              unlock(Lock)
+                              rethrow()
+                         end
                          unlock(Lock)
                     end
                     errormonitor(task)
                end
 
-               wait.(tasks)
-               wait(taskref[])
+               fetch.(tasks)
+               fetch(taskref[])
 
                # Hx, Timer_acc = let
                #      @floop GlobalThreadsExecutor for (i, j, k) in obj.validIdx
@@ -158,18 +163,18 @@ end
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      Hl::IdentityOperator, Hr::IdentityOperator,
      Er::LocalRightTensor{3}; kwargs...) where {T<:NTuple{2,MPSTensor{3}}}
-     
+
      coef = Hl.strength * Hr.strength
      @tensor Hx[a e; h i] := coef * (El.A[a b c] * x.A[c e h k]) * Er.A[k b i]
      return _permute2(Hx, x.A)
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
-     Hl::IdentityOperator, Hr::LocalOperator{2, 1},
+     Hl::IdentityOperator, Hr::LocalOperator{2,1},
      Er::LocalRightTensor{2}; kwargs...) where {T<:NTuple{2,MPSTensor{3}}}
 
      coef = Hl.strength * Hr.strength
-     @tensor Hx[a e; g i] :=  coef * (El.A[a b c] * (x.A[c e h k] * Er.A[k i])) * Hr.A[b g h]
+     @tensor Hx[a e; g i] := coef * (El.A[a b c] * (x.A[c e h k] * Er.A[k i])) * Hr.A[b g h]
      return _permute2(Hx, x.A)
 end
 
@@ -231,7 +236,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
      Hl::LocalOperator{1,2}, Hr::IdentityOperator,
      Er::LocalRightTensor{3}; kwargs...) where {T<:NTuple{2,MPSTensor{3}}}
      coef = Hl.strength * Hr.strength
-     @tensor Hx[a d; h i] := coef * ((El.A[a c] * x.A[c e h k]) * Hl.A[d e f]) * Er.A[k f i] 
+     @tensor Hx[a d; h i] := coef * ((El.A[a c] * x.A[c e h k]) * Hl.A[d e f]) * Er.A[k f i]
      return _permute2(Hx, x.A)
 end
 
@@ -349,7 +354,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
 end
 
-function _action2(x::CompositeMPSTensor{2, T}, El::LocalLeftTensor{2}, Hl::LocalOperator{1,1}, Hr::LocalOperator{1,1}, Er::LocalRightTensor{2}; kwargs...) where {T<:NTuple{2,MPSTensor{4}}}
+function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2}, Hl::LocalOperator{1,1}, Hr::LocalOperator{1,1}, Er::LocalRightTensor{2}; kwargs...) where {T<:NTuple{2,MPSTensor{4}}}
      @tensor Hx[a d l; g m i] := (((El.A[a c] * x.A[c e l h m k]) * Hl.A[d e]) * Hr.A[g h]) * Er.A[k i]
      return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
 end

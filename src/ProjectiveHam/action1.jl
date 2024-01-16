@@ -18,13 +18,13 @@ function action1(obj::SparseProjectiveHamiltonian{1}, x::MPSTensor; kwargs...)
                numthreads = Threads.nthreads()
                # producer
                taskref = Ref{Task}()
-               ch = Channel{Tuple{Int64, Int64}}(; taskref=taskref, spawn=true) do ch
-                    for idx in vcat(obj.validIdx, fill((0,0), numthreads))
+               ch = Channel{Tuple{Int64,Int64}}(; taskref=taskref, spawn=true) do ch
+                    for idx in vcat(obj.validIdx, fill((0, 0), numthreads))
                          put!(ch, idx)
                     end
                end
 
-               Hx = scale!(similar(x.A), 0.0)
+               Hx = nothing
                Timer_acc = TimerOutput()
 
                # consumers
@@ -38,15 +38,20 @@ function action1(obj::SparseProjectiveHamiltonian{1}, x::MPSTensor; kwargs...)
 
 
                          lock(Lock)
-                         axpy!(true, tmp, Hx)
-                         merge!(Timer_acc, to)
+                         try
+                              Hx = axpy!(true, tmp, Hx)
+                              merge!(Timer_acc, to)
+                         catch
+                              unlock(Lock)
+                              rethrow()
+                         end
                          unlock(Lock)
                     end
                     errormonitor(task)
                end
 
-               wait.(tasks)
-               wait(taskref[])
+               fetch.(tasks)
+               fetch(taskref[])
 
 
                # @floop GlobalThreadsExecutor for (i, j) in obj.validIdx

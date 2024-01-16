@@ -39,15 +39,50 @@ function _pushright(El::SparseLeftTensor, A::AdjointMPSTensor, H::SparseMPOTenso
 
      else # multi-threading
 
-          @threads for j in 1:sz[2]
-               @floop GlobalThreadsExecutor for i in filter(x -> !isnothing(H[x, j]) && !isnothing(El[x]), 1:sz[1])
-                    El_i = _pushright(El[i], A, H[i, j], B; sparse=true)
-                    @reduce() do (El_cum = nothing; El_i)
-                         El_cum = axpy!(true, El_i, El_cum)
-                    end
+          numthreads = Threads.nthreads()
+          validIdx = [(i, j) for j in 1:sz[2] for i in filter(x -> !isnothing(H[x, j]) && !isnothing(El[x]), 1:sz[1])]
+          # producer
+          taskref = Ref{Task}()
+          ch = Channel{Tuple{Int64,Int64}}(; taskref=taskref, spawn=true) do ch
+               for idx in vcat(validIdx, fill((0, 0), numthreads))
+                    put!(ch, idx)
                end
-               El_next[j] = El_cum
           end
+
+          # consumer
+          Lock = Threads.SpinLock()
+          tasks = map(1:numthreads) do _
+               task = Threads.@spawn while true
+                    (i, j) = take!(ch)
+                    i == 0 && break
+
+                    El_i = _pushright(El[i], A, H[i, j], B; sparse=true)
+                    
+                    lock(Lock)
+                    try
+                         El_next[j] = axpy!(true, El_i, El_next[j])
+                    catch
+                         unlock(Lock)
+                         rethrow()
+                    end
+                    unlock(Lock)
+               end
+               errormonitor(task)
+          end
+
+          fetch.(tasks)
+          fetch(taskref[]) 
+
+
+          # @threads for j in 1:sz[2]
+          #      @floop GlobalThreadsExecutor for i in filter(x -> !isnothing(H[x, j]) && !isnothing(El[x]), 1:sz[1])
+          #           El_i = _pushright(El[i], A, H[i, j], B; sparse=true)
+          #           @reduce() do (El_cum = nothing; El_i)
+          #                El_cum = axpy!(true, El_i, El_cum)
+          #           end
+          #      end
+          #      El_next[j] = El_cum
+          # end
 
      end
 

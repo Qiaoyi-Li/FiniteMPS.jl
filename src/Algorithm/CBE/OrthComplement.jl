@@ -50,24 +50,74 @@ function _initialize_Al(El_i::SparseLeftTensor, Al_i::MPSTensor, Hl::SparseMPOTe
           lsAl = pmap(validIdx) do (i, j)
                _initialize_Al_single(El_i[i], Al_i, Hl[i, j])
           end
-     else
-          lsAl = let lsAl = Vector{MPSTensor}(undef, length(validIdx))
-               @floop GlobalThreadsExecutor for idx in 1:length(validIdx)
-                    i, j = validIdx[idx]
-                    lsAl[idx] = _initialize_Al_single(El_i[i], Al_i, Hl[i, j])
+
+          # sum over i
+          for (idx, (_, j)) in enumerate(validIdx)
+               if !isassigned(Al, j)
+                    Al[j] = lsAl[idx]
+               else
+                    axpy!(true, lsAl[idx], Al[j])
                end
-               lsAl
           end
+
+     else
+
+          numthreads = Threads.nthreads()
+          # producer
+          taskref = Ref{Task}()
+          ch = Channel{Tuple{Int64,Int64}}(; taskref=taskref, spawn=true) do ch
+               for idx in vcat(validIdx, fill((0, 0), numthreads))
+                    put!(ch, idx)
+               end
+          end
+
+          # consumer
+          Lock = Threads.SpinLock()
+          tasks = map(1:numthreads) do _
+               task = Threads.@spawn while true
+                    (i, j) = take!(ch)
+                    i == 0 && break
+                    
+                    tmp = _initialize_Al_single(El_i[i], Al_i, Hl[i, j])
+
+                    lock(Lock)
+                    try 
+                         if !isassigned(Al, j)
+                              Al[j] = tmp
+                         else
+                              axpy!(true, tmp, Al[j])
+                         end
+                    catch
+                         unlock(Lock)
+                         rethrow()
+                    end
+                    unlock(Lock)
+
+               end
+               errormonitor(task)
+          end
+
+          wait.(tasks)
+          wait(taskref[])
+
+          # lsAl = let lsAl = Vector{MPSTensor}(undef, length(validIdx))
+          #      @floop GlobalThreadsExecutor for idx in 1:length(validIdx)
+          #           i, j = validIdx[idx]
+          #           lsAl[idx] = _initialize_Al_single(El_i[i], Al_i, Hl[i, j])
+          #      end
+          #      lsAl
+          # end
+
+          # # sum over i
+          # for (idx, (_, j)) in enumerate(validIdx)
+          #      if !isassigned(Al, j)
+          #           Al[j] = lsAl[idx]
+          #      else
+          #           axpy!(true, lsAl[idx], Al[j])
+          #      end
+          # end
      end
 
-     # sum over i
-     for (idx, (_, j)) in enumerate(validIdx)
-          if !isassigned(Al, j)
-               Al[j] = lsAl[idx]
-          else
-               axpy!(true, lsAl[idx], Al[j])
-          end
-     end
 
      return Al
 end
@@ -115,9 +165,33 @@ function _initialize_El(Al::Vector{MPSTensor}, Al_i::MPSTensor)::SparseLeftTenso
           end
      else
           El = SparseLeftTensor(undef, sz)
-          @floop GlobalThreadsExecutor for i in 1:sz
-               El[i] = _initialize_El_single(Al[i], Al_i)
+
+          numthreads = Threads.nthreads()
+          # producer
+          taskref = Ref{Task}()
+          ch = Channel{Int64}(; taskref=taskref, spawn=true) do ch
+               for idx in vcat(1:sz, fill(0, numthreads))
+                    put!(ch, idx)
+               end
           end
+
+          # consumer
+          tasks = map(1:numthreads) do _
+               task = Threads.@spawn while true
+                    i = take!(ch)
+                    i == 0 && break
+                    El[i] = _initialize_El_single(Al[i], Al_i)
+               end
+               errormonitor(task)
+          end
+
+          wait.(tasks)
+          wait(taskref[])
+
+          # @floop GlobalThreadsExecutor for i in 1:sz
+          #      El[i] = _initialize_El_single(Al[i], Al_i)
+          # end
+
           return El
      end
 
