@@ -204,3 +204,131 @@ end
      const Z2SU2Fermion = ℤ₂SU₂Fermion
 """
 const Z2SU2Fermion = ℤ₂SU₂Fermion
+
+"""
+     module U₁U₁Fermion
+
+Prepare the local space of `d = 4` spin-1/2 fermions with `U₁` charge and `U₁` spin symmetry.
+
+# Fields
+     pspace::VectorSpace
+Local `d = 4` Hilbert space.
+
+     Z::TensorMap
+Rank-`2` fermion parity operator `Z = (-1)^n`.
+
+     n₊::TensorMap
+     n₋::TensorMap
+     n::TensorMap
+Rank-`2` particle number operators. `₊` and `₋` denote spin up and down as `↑` and `↓` cannot be used in variable names.
+
+     nd::TensorMap
+Rank-`2` double occupancy operator `nd = n↑n↓`.
+
+     Sz::TensorMap
+Rank-`2` spin-z operator `Sz = (n↑ - n↓)/2`.
+
+     S₊₋::NTuple{2, TensorMap}
+     S₋₊::NTuple{2, TensorMap}
+Two rank-`3` operators of `S₊₋` and `S₋₊` interaction. Note Heisenberg `S⋅S = SzSz + (S₊₋ + S₋₊)/2`.
+
+     FdagF₊::NTuple{2, TensorMap}
+     FdagF₋::NTuple{2, TensorMap}
+Two rank-`3` operators of hopping `c↑^dag c↑` and `c↓^dag c↓`.
+
+     FFdag₊::NTuple{2, TensorMap}
+     FFdag₋::NTuple{2, TensorMap}
+Two rank-`3` operators of hopping `c↑ c↑^dag` and `c↓ c↓^dag`.
+"""
+module U₁U₁Fermion
+
+using TensorKit
+
+const pspace = Rep[U₁×U₁]((-1, 0) => 1, (0, -1 // 2) => 1, (0, 1 // 2) => 1, (1, 0) => 1)
+
+const Z = let
+     Z = TensorMap(ones, pspace, pspace)
+     block(Z, Irrep[U₁×U₁](0, 1 // 2)) .= -1
+     block(Z, Irrep[U₁×U₁](0, -1 // 2)) .= -1
+     Z
+end
+
+const n₊ = let
+     n₊ = TensorMap(zeros, pspace, pspace)
+     block(n₊, Irrep[U₁×U₁](1, 0)) .= 1
+     block(n₊, Irrep[U₁×U₁](0, 1 / 2)) .= 1
+     n₊
+end
+
+const n₋ = let
+     n₋ = TensorMap(zeros, pspace, pspace)
+     block(n₋, Irrep[U₁×U₁](1, 0)) .= 1
+     block(n₋, Irrep[U₁×U₁](0, -1 / 2)) .= 1
+     n₋
+end
+
+
+const n = n₊ + n₋
+
+const nd = n₊ * n₋
+
+const Sz = (n₊ - n₋) / 2
+
+# S+ S- interaction
+# convention: S⋅S = SzSz + (S₊₋ + S₋₊)/2
+const S₊₋ = let
+     aspace = Rep[U₁×U₁]((0, 1) => 1)
+     S₊ = TensorMap(ones, pspace, pspace ⊗ aspace)
+     S₋ = TensorMap(ones, aspace ⊗ pspace, pspace)
+     S₊, S₋
+end
+
+const S₋₊ = let
+     aspace = Rep[U₁×U₁]((0, 1) => 1)
+     iso = isometry(aspace, flip(aspace))
+     @tensor S₋[a; c d] := S₊₋[1]'[a, b, c] * iso'[d, b]
+     @tensor S₊[d a; c] := S₊₋[2]'[a, b, c] * iso[b, d]
+     S₋, S₊
+end
+
+# hopping term, FdagF₊ = c↑^dag c↑
+const FdagF₊ = let
+     aspace = Rep[U₁×U₁]((1, 1 // 2) => 1)
+     Fdag₊ = TensorMap(ones, pspace, pspace ⊗ aspace)
+     F₊ = TensorMap(ones, aspace ⊗ pspace, pspace)
+     Fdag₊, F₊
+end
+const FdagF₋ = let
+     # note c↓^dag|↑⟩ = -|↑↓⟩, c↓|↑↓⟩ = -|↑⟩  
+     aspace = Rep[U₁×U₁]((1, -1 // 2) => 1)
+     Fdag₋ = TensorMap(ones, pspace, pspace ⊗ aspace)
+     block(Fdag₋, Irrep[U₁×U₁](1, 0)) .= -1
+     F₋ = TensorMap(ones, aspace ⊗ pspace, pspace)
+     block(F₋, Irrep[U₁×U₁](1, 0)) .= -1
+     Fdag₋, F₋
+end
+const FFdag₊ = let
+     aspace = Rep[U₁×U₁]((1, 1 // 2) => 1)
+     iso = isometry(aspace, flip(aspace))
+     @tensor F₊[a; c d] := FdagF₊[1]'[a, b, c] * iso'[d, b]
+     @tensor Fdag₊[d a; c] := FdagF₊[2]'[a, b, c] * iso[b, d]
+     F₊, Fdag₊
+end
+const FFdag₋ = let
+     aspace = Rep[U₁×U₁]((1, -1 // 2) => 1)
+     iso = isometry(aspace, flip(aspace))
+     @tensor F₋[a; c d] := FdagF₋[1]'[a, b, c] * iso'[d, b]
+     @tensor Fdag₋[d a; c] := FdagF₋[2]'[a, b, c] * iso[b, d]
+     F₋, Fdag₋
+end
+
+# TODO pairing Δ↑↓^dag, ...
+
+
+end
+
+"""
+     const U1U1Fermion = U₁U₁Fermion
+"""
+const U1U1Fermion = U₁U₁Fermion
+
