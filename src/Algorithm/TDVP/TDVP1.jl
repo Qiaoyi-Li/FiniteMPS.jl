@@ -34,7 +34,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
      canonicalize!(Ψ, 1)
      canonicalize!(Env, 1)
      # shift energy
-     E₀::Float64 = scalar!(Env; normalize=true)
+     E₀::Float64 = scalar!(Env; normalize=true) |> real
      Al::MPSTensor = Ψ[1]
      @timeit TimerSweep "TDVPSweep1>>" for si in 1:L
           TimerStep = TimerOutput()
@@ -123,7 +123,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
      canonicalize!(Ψ, L)
      canonicalize!(Env, L)
      # shift energy
-     E₀::Float64 = scalar!(Env; normalize=true)
+     E₀::Float64 = scalar!(Env; normalize=true) |> real
      Ar::MPSTensor = Ψ[L]
      @timeit TimerSweep "TDVPSweep1<<" for si = reverse(1:L)
           TimerStep = TimerOutput()

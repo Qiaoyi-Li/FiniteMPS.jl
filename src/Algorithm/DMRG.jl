@@ -32,7 +32,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
      canonicalize!(Ψ, 1, 2)
      Al::MPSTensor = Ψ[1]
      # shift energy
-     E₀::Float64 = scalar!(Env; normalize=true)
+     E₀::Float64 = scalar!(Env; normalize=true) |> real
      @timeit TimerSweep "DMRGSweep2>>" for si = 1:L-1
           TimerStep = TimerOutput()
           @timeit TimerStep "pushEnv" canonicalize!(Env, si, si + 1)
@@ -84,7 +84,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
 
      Ψ = Env[3]
      canonicalize!(Ψ, L - 1, L)
-     E₀::Float64 = scalar!(Env; normalize=true)
+     E₀::Float64 = scalar!(Env; normalize=true) |> real
      Ar::MPSTensor = Ψ[L]
      @timeit TimerSweep "DMRGSweep2<<" for si = reverse(2:L)
           TimerStep = TimerOutput()
@@ -162,7 +162,7 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
      canonicalize!(Ψ, 1)
      canonicalize!(Env, 1)
      # shift energy
-     E₀::Float64 = scalar!(Env; normalize=true)
+     E₀::Float64 = scalar!(Env; normalize=true) |> real
      Al::MPSTensor = Ψ[1]
      @timeit TimerSweep "DMRGSweep1>>" for si = 1:L
           TimerStep = TimerOutput()
@@ -227,7 +227,7 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
      canonicalize!(Ψ, L)
      canonicalize!(Env, L)
      # shift energy
-     E₀::Float64 = scalar!(Env; normalize=true)
+     E₀::Float64 = scalar!(Env; normalize=true) |> real
      Ar::MPSTensor = Ψ[L]
      @timeit TimerSweep "DMRGSweep1<<" for si = reverse(1:L)
           TimerStep = TimerOutput()

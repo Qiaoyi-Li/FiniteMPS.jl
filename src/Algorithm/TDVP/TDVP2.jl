@@ -29,7 +29,7 @@ function TDVPSweep2!(Env::SparseEnvironment{L,3,T}, dt::Number, ::SweepL2R; kwar
 
      Ψ = Env[3]
      # shift energy
-     E₀::Float64 = scalar!(Env; normalize=true)
+     E₀::Float64 = scalar!(Env; normalize=true) |> real
 
      canonicalize!(Ψ, 1, 2)
      Al::MPSTensor = Ψ[1]
@@ -102,7 +102,7 @@ function TDVPSweep2!(Env::SparseEnvironment{L,3,T}, dt::Number, ::SweepR2L; kwar
 
      Ψ = Env[3]
      # shift energy
-     E₀::Float64 = scalar!(Env; normalize=true)
+     E₀::Float64 = scalar!(Env; normalize=true) |> real
 
      canonicalize!(Ψ, L - 1, L)
      Ar::MPSTensor = Ψ[L]
