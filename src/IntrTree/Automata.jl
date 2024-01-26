@@ -35,7 +35,7 @@ function AutomataMPO(Tree::InteractionTree)
 
           # merge this channel to accumulation
           if !isnan(node.Op.strength)
-               H[si][c[si], 1] += _convertStrength(node.Op)
+               H[si][c[si], 1] += deepcopy(node.Op)
           end
 
           # propagate
@@ -58,6 +58,6 @@ end
 
 function _convertStrength(A::AbstractLocalOperator)
      B = deepcopy(A)
-     isnan(B.strength) && (B.strength = 1)
+     B.strength = 1
      return B
 end

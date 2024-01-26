@@ -18,7 +18,7 @@ flush(stdout)
 
 @show Latt = SquaLatt(8, 4; BCY=:PBC)
 disk = false # store local tensors in disk or memory
-GCstep = false
+GCstep = true
 Ψ = nothing
 
 function mainDMRG(Ψ=nothing)
@@ -41,7 +41,7 @@ function mainDMRG(Ψ=nothing)
 
     # initial state
     if isnothing(Ψ)
-        aspace = vcat(Rep[U₁×SU₂]((Ndop, 0) => 1), repeat([Rep[U₁×SU₂]((i, j) => 2 for i in -(abs(Ndop) + 1):(abs(Ndop)+1) for j in 0:1//2:1),], length(Latt) - 1))
+        aspace = vcat(Rep[U₁×SU₂]((Ndop, 0) => 1), repeat([Rep[U₁×SU₂]((i, j) => 2 for i in 0:(abs(Ndop)+2) for j in 0:1//2:1),], length(Latt) - 1))
         Ψ = randMPS(U₁SU₂tJFermion.pspace, aspace)
     end
 
