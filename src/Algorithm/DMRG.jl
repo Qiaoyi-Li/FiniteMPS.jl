@@ -16,6 +16,9 @@ Control the truncation in svd after each 2-site update. Details see `tsvd`.
 
      verbose::Int64 = 0
 Print the `TimerOutput` after each sweep or each local update if `verbose = 1` or `2`, respectively.
+
+     noise::Real = 0
+Add noise to the 2-site local tensor after each update. 
 """
 function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,MPS}}
      @assert Center(Env[3])[2] ≤ 2
@@ -24,6 +27,8 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
      verbose::Int64 = get(kwargs, :verbose, 0)
+     noise::Float64 = get(kwargs, :noise, 0)
+     @assert noise ≥ 0
 
      TimerSweep = TimerOutput()
      info = Vector{DMRGInfo}(undef, L - 1)
@@ -39,6 +44,8 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
           Ar = Ψ[si+1]
 
           @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = _DMRGUpdate2(ProjHam(Env, si, si + 1; E₀=E₀), Al, Ar; kwargs...)
+          # apply noise
+          noise > 0 && noise!(xg, noise)
           eg += E₀
           @timeit TimerStep "svd" Ψ[si], s, vd, info_svd = tsvd(xg; trunc=trunc)
           # next Al
@@ -78,6 +85,8 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
      verbose::Int64 = get(kwargs, :verbose, 0)
+     noise::Float64 = get(kwargs, :noise, 0)
+     @assert noise ≥ 0
 
      TimerSweep = TimerOutput()
      info = Vector{DMRGInfo}(undef, L - 1)
@@ -93,6 +102,8 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
 
           @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = _DMRGUpdate2(ProjHam(Env, si - 1, si; E₀=E₀), Al, Ar; kwargs...)
           eg += E₀
+          # apply noise
+          noise > 0 && noise!(xg, noise)
           @timeit TimerStep "svd" u, s, Ψ[si], info_svd = tsvd(xg; trunc=trunc)
           # next Ar
           Ar = u * s
@@ -185,7 +196,7 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
                Center(Ψ)[:] = [si + 1, si + 1]
           else
                Ψ[si] = xg
-               info_svd =  BondInfo(xg, :R)
+               info_svd = BondInfo(xg, :R)
           end
           info_dmrg[si] = DMRGInfo(eg, info_Lanczos, info_svd)
 

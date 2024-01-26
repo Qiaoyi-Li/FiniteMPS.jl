@@ -74,9 +74,26 @@ function tsvd(A::CompositeMPSTensor{2,Tuple{MPSTensor{R₁},MPSTensor{R₂}}}; k
      trunc = get(kwargs, :trunc, notrunc())
      alg = get(kwargs, :alg, nothing)
      if isnothing(alg)
-          u,s,v,ϵ = tsvd(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)); trunc=trunc)
+          u, s, v, ϵ = tsvd(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)); trunc=trunc)
      else
-          u,s,v,ϵ = tsvd(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)); trunc=trunc, alg=alg)
+          u, s, v, ϵ = tsvd(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)); trunc=trunc, alg=alg)
      end
      return u, s, v, BondInfo(s, ϵ)
 end
+
+
+"""
+     noise!(A::CompositeMPSTensor{2}, σ::Real)
+
+Apply noise to a given 2-site local tensor by contract a `d×d` random isometry to it. 
+"""
+function noise!(A::CompositeMPSTensor{2,Tuple{MPSTensor{R₁},MPSTensor{R₂}}}, σ::Real) where {R₁,R₂}
+     perms = vcat(2, R₁, setdiff(1:R₁+R₂-2, [2, R₁]))
+     iperms = invperm(perms)
+     RA = permute(A.A, (Tuple(perms[1:2]), Tuple(perms[3:end])))
+
+     Iso = randisometry(eltype(RA), codomain(RA); σ=σ)
+     permute!(A.A, Iso * RA, (Tuple(iperms[1:R₁-1]), Tuple(iperms[R₁:end])))
+     return A
+end
+

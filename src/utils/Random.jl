@@ -79,12 +79,12 @@ end
 
 
 """  
-     randisometry([::Type{T},] codom::VectorSpace, dom::VectorSpace; kwargs...)
+     randisometry([::Type{T},] codom::VectorSpace, dom::VectorSpace = codom; kwargs...)
      randisometry([::Type{T},] A::AbstractTensorMap; kwargs...)
 
 Generate random tensors based on `randStiefel`. Valid kwargs please see the mutating version `randisometry!`.
 """
-function randisometry(::Type{T}, codom::VectorSpace, dom::VectorSpace; kwargs...) where {T<:Union{Float64,ComplexF64}}
+function randisometry(::Type{T}, codom::VectorSpace, dom::VectorSpace = codom; kwargs...) where {T<:Union{Float64,ComplexF64}}
      A = TensorMap(zeros, T, codom, dom)
      return randisometry!(A; kwargs...)
 end
