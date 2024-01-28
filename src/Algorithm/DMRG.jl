@@ -72,7 +72,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
      Ψ[L] = Al
 
      # GC manually
-     GCsweep && manualGC()
+     GCsweep && manualGC(TimerSweep)
 
      return info, TimerSweep
 
@@ -103,6 +103,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
           @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = _DMRGUpdate2(ProjHam(Env, si - 1, si; E₀=E₀), Al, Ar; kwargs...)
           eg += E₀
           # apply noise
+          # TODO: try to mix phys and bond idx
           noise > 0 && noise!(xg, noise)
           @timeit TimerStep "svd" u, s, Ψ[si], info_svd = tsvd(xg; trunc=trunc)
           # next Ar
@@ -129,7 +130,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
      Ψ[1] = Ar
 
      # GC manually
-     GCsweep && manualGC()
+     GCsweep && manualGC(TimerSweep)
 
      return info, TimerSweep
 
@@ -216,7 +217,7 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
      end
 
      # GC manually
-     GCsweep && manualGC()
+     GCsweep && manualGC(TimerSweep)
 
      return (dmrg=info_dmrg, cbe=info_cbe), TimerSweep
 
@@ -282,7 +283,7 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
      end
 
      # GC manually
-     GCsweep && manualGC()
+     GCsweep && manualGC(TimerSweep)
 
      return (dmrg=info_dmrg, cbe=info_cbe), TimerSweep
 

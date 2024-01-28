@@ -68,6 +68,22 @@ Interface of `DenseMPS`, return the info of canonical center. `[a, b]` means lef
 """
 Center(obj::DenseMPS) = obj.Center
 
+"""
+     complex(obj::DenseMPS{L}) -> ::DenseMPS{L, ComplexF64}
+
+Return a copy of given MPS but with `ComplexF64` as basic field.
+"""
+function complex(obj::DenseMPS{L, Float64}) where L
+     obj_c = similar(ComplexF64, obj)
+     obj_c.c = obj.c
+     obj_c.Center[:] = obj.Center[:]
+     for i = 1:L
+          obj_c[i] = obj[i]
+     end
+     return obj_c
+end
+complex(obj::DenseMPS{L, ComplexF64}) where L = deepcopy(obj)
+
 function Base.show(io::IO, obj::DenseMPS{L}) where L
      any(i -> !isassigned(obj.A, i), 1:L) && return println(io, "$(typeof(obj)): L = $L, to be initialized !")
 

@@ -44,18 +44,18 @@ function TDVPSweep2!(Env::SparseEnvironment{L,3,T}, dt::Number, ::SweepL2R; kwar
           normalize!(Al)
           # remember to change Center of Ψ manually
           Center(Ψ)[:] = [si + 1, si + 1]
-          rmul!(Ψ, Norm * exp(real(dt) * E₀))
+          rmul!(Ψ, Norm * exp(dt * E₀))
           info_forward[si] = TDVPInfo{2}(dt, info_Lanczos, info_svd)
 
           # backward evolution
           if si < L - 1
                @timeit TimerStep "pushEnv" canonicalize!(Env, si + 1, si + 1)
                @timeit TimerStep "TDVPUpdate1" Al, Norm, info_Lanczos = _TDVPUpdate1(ProjHam(Env, si + 1, si + 1; E₀=E₀), Al, -dt; kwargs...)
-               rmul!(Ψ, Norm * exp(-real(dt) * E₀))
+               rmul!(Ψ, Norm * exp(-dt * E₀))
                info_backward[si] = TDVPInfo{1}(-dt, info_Lanczos, BondInfo(Al, :R))
 
                # update E₀, note Norm ~ exp(-dt * (⟨H⟩ - E₀))
-               # E₀ -= log(Norm) / real(dt)
+               # E₀ -= log(Norm) / dt
           end
 
           # GC manually
@@ -82,7 +82,7 @@ function TDVPSweep2!(Env::SparseEnvironment{L,3,T}, dt::Number, ::SweepL2R; kwar
      Ψ[L] = Al
 
      # GC manually
-     GCsweep && manualGC()
+     GCsweep && manualGC(TimerSweep)
 
      return (forward=info_forward, backward=info_backward), TimerSweep
 
@@ -116,18 +116,18 @@ function TDVPSweep2!(Env::SparseEnvironment{L,3,T}, dt::Number, ::SweepR2L; kwar
           normalize!(Ar)
           # remember to change Center of Ψ manually
           Center(Ψ)[:] = [si - 1, si - 1]
-          rmul!(Ψ, Norm * exp(real(dt) * E₀))
+          rmul!(Ψ, Norm * exp(dt * E₀))
           info_forward[si-1] = TDVPInfo{2}(dt, info_Lanczos, info_svd)
 
           # backward evolution
           if si > 2
                @timeit TimerStep "pushEnv" canonicalize!(Env, si - 1, si - 1)
                @timeit TimerStep "TDVPUpdate1" Ar, Norm, info_Lanczos = _TDVPUpdate1(ProjHam(Env, si - 1, si - 1; E₀=E₀), Ar, -dt; kwargs...)
-               rmul!(Ψ, Norm * exp(-real(dt) * E₀))
+               rmul!(Ψ, Norm * exp(-dt * E₀))
                info_backward[si-2] = TDVPInfo{1}(-dt, info_Lanczos, BondInfo(Ar, :L))
 
                # update E₀, note Norm ~ exp(-dt * (⟨H⟩ - E₀))
-               # E₀ -= log(Norm) / real(dt)
+               # E₀ -= log(Norm) / dt
           end
 
           # GC manually
@@ -153,7 +153,7 @@ function TDVPSweep2!(Env::SparseEnvironment{L,3,T}, dt::Number, ::SweepR2L; kwar
      Ψ[1] = Ar
 
      # GC manually
-     GCsweep && manualGC()
+     GCsweep && manualGC(TimerSweep)
 
      return (forward=info_forward, backward=info_backward), TimerSweep
 end

@@ -48,7 +48,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
 
           @timeit TimerStep "pushEnv" canonicalize!(Env, si)
           @timeit TimerStep "TDVPUpdate1" x1, Norm, info_Lanczos = _TDVPUpdate1(ProjHam(Env, si; E₀=E₀), Al, dt; kwargs...)
-          rmul!(Ψ, Norm * exp(real(dt) * E₀))
+          rmul!(Ψ, Norm * exp(dt * E₀))
 
           if si < L
                # TODO, test truncation after backward evolution
@@ -60,7 +60,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
                # backward evolution
                @timeit TimerStep "pushEnv" canonicalize!(Env, si + 1, si)
                @timeit TimerStep "TDVPUpdate0" S, Norm, info_Lanczos = _TDVPUpdate0(ProjHam(Env, si + 1, si; E₀=E₀), S, -dt; kwargs...)
-               rmul!(Ψ, Norm * exp(-real(dt) * E₀))
+               rmul!(Ψ, Norm * exp(-dt * E₀))
 
                # next Al
                Al = S * Ψ[si+1]
@@ -70,7 +70,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
                info_backward[si] = TDVPInfo{0}(-dt, info_Lanczos, info_svd)
 
                # update E₀, note Norm ~ exp(-dt * (⟨H⟩ - E₀))
-               # E₀ -= log(Norm) / real(dt)
+               # E₀ -= log(Norm) / dt
           else
                Ψ[si] = x1
                info_forward[si] = TDVPInfo{1}(dt, info_Lanczos, BondInfo(x1, :R))
@@ -99,7 +99,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
      end
 
      # GC manually
-     GCsweep && manualGC()
+     GCsweep && manualGC(TimerSweep)
 
      return (forward=info_forward, backward=info_backward, cbe=info_cbe), TimerSweep
 
@@ -137,7 +137,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
 
           @timeit TimerStep "pushEnv" canonicalize!(Env, si)
           @timeit TimerStep "TDVPUpdate1" x1, Norm, info_Lanczos = _TDVPUpdate1(ProjHam(Env, si; E₀=E₀), Ar, dt; kwargs...)
-          rmul!(Ψ, Norm * exp(real(dt) * E₀))
+          rmul!(Ψ, Norm * exp(dt * E₀))
 
           if si > 1
                @timeit TimerStep "svd" S::MPSTensor, Ψ[si], info_svd = rightorth(x1; trunc=trunc)
@@ -148,7 +148,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
                # backward evolution
                @timeit TimerStep "pushEnv" canonicalize!(Env, si, si - 1)
                @timeit TimerStep "TDVPUpdate0" S, Norm, info_Lanczos = _TDVPUpdate0(ProjHam(Env, si, si - 1; E₀=E₀), S, -dt; kwargs...)
-               rmul!(Ψ, Norm * exp(-real(dt) * E₀))
+               rmul!(Ψ, Norm * exp(-dt * E₀))
 
                # next Ar
                Ar = Ψ[si-1] * S
@@ -158,7 +158,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
                info_backward[si-1] = TDVPInfo{0}(-dt, info_Lanczos, info_svd)
 
                # update E₀, note Norm ~ exp(-dt * (⟨H⟩ - E₀))
-               # E₀ -= log(Norm) / real(dt)
+               # E₀ -= log(Norm) / dt
 
           else
                Ψ[si] = x1
@@ -187,7 +187,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
      end
 
      # GC manually
-     GCsweep && manualGC()
+     GCsweep && manualGC(TimerSweep)
 
      return (forward=info_forward, backward=info_backward, cbe=info_cbe), TimerSweep
 
