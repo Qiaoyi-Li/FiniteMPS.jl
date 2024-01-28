@@ -1,12 +1,11 @@
 """
-     AutomataMPO(Tree::InteractionTree) -> ::SparseMPO
+     AutomataMPO(Tree::InteractionTree, L::Int64) -> ::SparseMPO
 
 Convert an interaction tree to a sparse MPO.
 """
-function AutomataMPO(Tree::InteractionTree)
+function AutomataMPO(Tree::InteractionTree, L::Int64 = treeheight(Tree.Root) - 1)
      # convert an interaction tree to a sparse MPO
      Root = Tree.Root
-     L = treeheight(Root) - 1
 
      # count_size
      D = zeros(Int64, L + 1) # D[i] denotes the bond dimension from i-1 to i
@@ -49,7 +48,7 @@ function AutomataMPO(Tree::InteractionTree)
      # remember the identity to propagate accumulation
      for si = 2:L
           idx = findfirst(!isnothing, H[si])
-          pspace = getPhysSpace(H[si][idx])
+          pspace = isnothing(idx) ? nothing : getPhysSpace(H[si][idx])
           H[si][1,1] = IdentityOperator(pspace, si, 1)
      end
 

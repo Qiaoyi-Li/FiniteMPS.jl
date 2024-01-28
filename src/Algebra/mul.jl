@@ -15,6 +15,7 @@ Compute `C = A*B` by letting `α = 1` and `β = 0`.
      disk::Bool = false
      tol::Float64 = 1e-8
      verbose::Int64 = 0
+     lsnoise::AbstractVector{Float64} = Float64[]
 """
 function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Number; kwargs...) where L
      @assert α != 0 || β != 0
@@ -26,6 +27,7 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
      maxiter::Int64 = get(kwargs, :maxiter, 8)
      tol::Float64 = get(kwargs, :tol, 1e-8)
      verbose::Int64 = get(kwargs, :verbose, 0)
+     lsnoise::Vector{Float64} = get(kwargs, :lsnoise, Float64[])
 
      if α != 0
           Env_mul = Environment(C', A, B; kwargs...)
@@ -73,6 +75,9 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
                norm_x = norm(x)
                rmul!(x, 1 / norm_x)
                C.c *= norm_x
+
+               # apply noise
+               iter ≤ length(lsnoise) && noise!(x, lsnoise[iter])
 
                # svd
                if direction == :L2R
