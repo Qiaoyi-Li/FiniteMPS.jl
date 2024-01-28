@@ -519,7 +519,7 @@ version = "1.10.0"
 
 [[deps.TensorKit]]
 deps = ["HalfIntegers", "LRUCache", "LinearAlgebra", "PackageExtensionCompat", "Strided", "TensorOperations", "TupleTools", "VectorInterface", "WignerSymbols"]
-git-tree-sha1 = "734158d51d1fded3306d2842e2cfdc336d48c5d8"
+git-tree-sha1 = "09feb0fc96b629fe4f36a40fca12e8195348ec10"
 repo-rev = "master"
 repo-url = "https://github.com/Qiaoyi-Li/TensorKit.jl.git"
 uuid = "07d1fe3e-3e46-537d-9eac-e9e13d0d4cec"

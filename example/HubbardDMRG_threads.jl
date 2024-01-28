@@ -14,6 +14,8 @@ include("Models/Hubbard.jl")
 BLAS.set_num_threads(1)
 @show BLAS.get_num_threads()
 
+@show TensorKit.NTHREADS_SVD=Threads.nthreads()
+
 flush(stdout)
 
 @show Latt = SquaLatt(8, 4; BCY=:PBC)
@@ -27,7 +29,7 @@ function mainDMRG(Ψ=nothing)
      Ndop = 0 # number of hole doping, negative value means elec doping
 
      lsD = let
-          lsD = broadcast(Int64 ∘ round, 2 .^ vcat(6:12))
+          lsD = broadcast(Int64 ∘ round, 2 .^ vcat(6:13))
           Nsweep = 2
           repeat(lsD, inner=Nsweep)
      end
@@ -101,5 +103,5 @@ function mainObs(Ψ::MPS)
 end
 
 Ψ, Env, lsD, lsEn, lsinfo, lsTimer = mainDMRG(Ψ);
-# Obs = mainObs(Ψ)
+Obs = mainObs(Ψ)
 lsEn
