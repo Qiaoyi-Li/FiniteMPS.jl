@@ -72,7 +72,7 @@ function _initialize_Al(El_i::SparseLeftTensor, Al_i::MPSTensor, Hl::SparseMPOTe
           end
 
           # consumer
-          Lock = Threads.SpinLock()
+          Lock = Threads.ReentrantLock()
           tasks = map(1:numthreads) do _
                task = Threads.@spawn while true
                     (i, j) = take!(ch)

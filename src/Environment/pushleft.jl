@@ -39,50 +39,29 @@ function _pushleft(Er::SparseRightTensor, A::AdjointMPSTensor, H::SparseMPOTenso
 
      else
 
-          numthreads = Threads.nthreads()
           validIdx = [(j, i) for j in 1:sz[1] for i in filter(x -> !isnothing(H[j, x]) && !isnothing(Er[x]), 1:sz[2])]
-          # producer
-          taskref = Ref{Task}()
-          ch = Channel{Tuple{Int64,Int64}}(; taskref=taskref, spawn=true) do ch
-               for idx in vcat(validIdx, fill((0, 0), numthreads))
-                    put!(ch, idx)
-               end
-          end
 
-          # consumer
-          Lock = Threads.SpinLock()
-          tasks = map(1:numthreads) do _
-               task = Threads.@spawn while true
-                    (j, i) = take!(ch)
-                    i == 0 && break
+          Lock = Threads.ReentrantLock()
+          idx = Threads.Atomic{Int64}(1)
+          Threads.@sync for t in 1:Threads.nthreads()
+               Threads.@spawn while true
+                    idx_t = Threads.atomic_add!(idx, 1)
+                    idx_t > length(validIdx) && break
 
+                    (j, i) = validIdx[idx_t]
                     Er_i = _pushleft(Er[i], A, H[j, i], B)
 
                     lock(Lock)
                     try
                          Er_next[j] = axpy!(true, Er_i, Er_next[j])
                     catch
-                         unlock(Lock)
                          rethrow()
+                    finally
+                         unlock(Lock)
                     end
-                    unlock(Lock)
                end
-               errormonitor(task)
           end
-
-          fetch.(tasks)
-          fetch(taskref[])
-
-          # @threads for j in 1:sz[1]
-          #      @floop GlobalThreadsExecutor for i in filter(x -> !isnothing(H[j, x]) && !isnothing(Er[x]), 1:sz[2])
-
-          #           Er_i = _pushleft(Er[i], A, H[j, i], B)
-          #           @reduce() do (Er_cum = nothing; Er_i)
-          #                Er_cum = axpy!(true, Er_i, Er_cum)
-          #           end
-          #      end
-          #      Er_next[j] = Er_cum
-          # end
+          
      end
 
      return Er_next

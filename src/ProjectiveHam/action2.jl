@@ -19,42 +19,44 @@ function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}
 
           else # multi-threading
 
-               numthreads = Threads.nthreads()
-               # producer
-               taskref = Ref{Task}()
-               ch = Channel{Tuple{Int64,Int64,Int64}}(; taskref=taskref, spawn=true) do ch
-                    for idx in vcat(obj.validIdx, fill((0, 0, 0), numthreads))
-                         put!(ch, idx)
-                    end
-               end
+               # numthreads = Threads.nthreads()
+               # # producer
+               # taskref = Ref{Task}()
+               # ch = Channel{Tuple{Int64,Int64,Int64}}(; taskref=taskref, spawn=true) do ch
+               #      for idx in vcat(obj.validIdx, fill((0, 0, 0), numthreads))
+               #           put!(ch, idx)
+               #      end
+               # end
 
-               Hx = nothing
-               Timer_acc = TimerOutput()
+               # Hx = nothing
+               # Timer_acc = TimerOutput()
 
-               # consumers
-               Lock = Threads.SpinLock()
-               tasks = map(1:numthreads) do _
-                    task = Threads.@spawn while true
-                         (i, j, k) = take!(ch)
-                         i == 0 && break
+               # # consumers
+               # Lock = Threads.SpinLock()
+               # tasks = map(1:numthreads) do _
+               #      task = Threads.@spawn while true
+               #           (i, j, k) = take!(ch)
+               #           i == 0 && break
 
-                         tmp, to = _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k], true; kwargs...)
+               #           tmp, to = _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k], true; kwargs...)
 
-                         lock(Lock)
-                         try
-                              Hx = axpy!(true, tmp, Hx)
-                              merge!(Timer_acc, to)
-                         catch 
-                              unlock(Lock)
-                              rethrow()
-                         end
-                         unlock(Lock)
-                    end
-                    errormonitor(task)
-               end
+               #           lock(Lock)
+               #           try
+               #                Hx = axpy!(true, tmp, Hx)
+               #                merge!(Timer_acc, to)
+               #           catch 
+               #                unlock(Lock)
+               #                rethrow()
+               #           end
+               #           unlock(Lock)
+               #      end
+               #      errormonitor(task)
+               # end
 
-               fetch.(tasks)
-               fetch(taskref[])
+               # fetch.(tasks)
+               # fetch(taskref[])
+
+
 
                # Hx, Timer_acc = let
                #      @floop GlobalThreadsExecutor for (i, j, k) in obj.validIdx
@@ -66,6 +68,31 @@ function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}
                #      end
                #      Hx, Timer_acc
                # end
+
+               Hx = nothing
+               Timer_acc = TimerOutput()
+               Lock = Threads.ReentrantLock()
+               idx = Threads.Atomic{Int64}(1)
+               Threads.@sync for t in 1:Threads.nthreads()
+                    Threads.@spawn while true
+                         idx_t = Threads.atomic_add!(idx, 1)
+                         idx_t > length(obj.validIdx) && break
+
+                         (i, j, k) = obj.validIdx[idx_t]
+                         tmp, to = _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k], true; kwargs...)
+
+                         lock(Lock)
+                         try
+                              Hx = axpy!(true, tmp, Hx)
+                              merge!(Timer_acc, to)
+                         catch
+                              rethrow()
+                         finally
+                              unlock(Lock)
+                         end
+                    end
+               end
+
           end
      end
 
@@ -412,7 +439,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
      Hl::LocalOperator{1,2}, Hr::IdentityOperator,
      Er::LocalRightTensor{3}; kwargs...) where {T<:NTuple{2,MPSTensor{4}}}
      coef = Hl.strength * Hr.strength
-     @tensor Hx[a d l ; h m i] := coef * ((El.A[a c] * x.A[c e l h m k]) * Hl.A[d e f]) * Er.A[k f i]
+     @tensor Hx[a d l; h m i] := coef * ((El.A[a c] * x.A[c e l h m k]) * Hl.A[d e f]) * Er.A[k f i]
      return _permute2(Hx, x.A)
 end
 

@@ -15,52 +15,31 @@ function action1(obj::SparseProjectiveHamiltonian{1}, x::MPSTensor; kwargs...)
 
           else # multi-threading
 
-               numthreads = Threads.nthreads()
-               # producer
-               taskref = Ref{Task}()
-               ch = Channel{Tuple{Int64,Int64}}(; taskref=taskref, spawn=true) do ch
-                    for idx in vcat(obj.validIdx, fill((0, 0), numthreads))
-                         put!(ch, idx)
-                    end
-               end
-
                Hx = nothing
                Timer_acc = TimerOutput()
 
-               # consumers
-               Lock = Threads.SpinLock()
-               tasks = map(1:numthreads) do _
-                    task = Threads.@spawn while true
-                         (i, j) = take!(ch)
-                         i == 0 && break
+               Lock = Threads.ReentrantLock()
+               idx = Threads.Atomic{Int64}(1)
+               Threads.@sync for t in 1:Threads.nthreads()
+                    Threads.@spawn while true
+                         idx_t = Threads.atomic_add!(idx, 1)
+                         idx_t > length(obj.validIdx) && break
 
+                         (i, j) = obj.validIdx[idx_t]
                          tmp, to = _action1(x, obj.El[i], obj.H[1][i, j], obj.Er[j], true; kwargs...)
-
 
                          lock(Lock)
                          try
                               Hx = axpy!(true, tmp, Hx)
                               merge!(Timer_acc, to)
                          catch
-                              unlock(Lock)
                               rethrow()
+                         finally
+                              unlock(Lock)
                          end
-                         unlock(Lock)
                     end
-                    errormonitor(task)
                end
 
-               fetch.(tasks)
-               fetch(taskref[])
-
-
-               # @floop GlobalThreadsExecutor for (i, j) in obj.validIdx
-               #      tmp, to = _action1(x, obj.El[i], obj.H[1][i, j], obj.Er[j], true; kwargs...)
-               #      @reduce() do (Hx = nothing; tmp), (Timer_acc = TimerOutput(); to)
-               #           Hx = axpy!(true, tmp, Hx)
-               #           Timer_acc = merge!(Timer_acc, to)
-               #      end
-               # end
           end
      end
 

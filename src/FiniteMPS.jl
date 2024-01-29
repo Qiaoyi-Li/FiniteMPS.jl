@@ -2,7 +2,7 @@ module FiniteMPS
 
 using Reexport
 using AbstractTrees, SerializedElementArrays, JLD2, Serialization
-using Base.Threads, FLoops, FoldsThreads, Distributed, SharedArrays
+using Base.Threads, FLoops, FoldsThreads, Distributed
 @reexport import SerializedElementArrays: SerializedElementArray,  SerializedElementVector
 @reexport using TensorKit, KrylovKit, TensorKit.TensorOperations, TimerOutputs
 @reexport import Base: +, -, *, /, ==, promote_rule, convert, length, show, getindex, setindex!, lastindex, keys, similar, merge, iterate, complex

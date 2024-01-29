@@ -1,30 +1,30 @@
-# replace some TensorKit functions to avoid conflict of multi-threading
-function TensorKit._add_general_kernel!(tdst, tsrc, p, fusiontreetransform, α, β, backend...)
-    if iszero(β)
-        zerovector!(tdst)
-    elseif β != 1
-        scale!(tdst, β)
-    end
+# # replace some TensorKit functions to avoid conflict of multi-threading
+# function TensorKit._add_general_kernel!(tdst, tsrc, p, fusiontreetransform, α, β, backend...)
+#     if iszero(β)
+#         zerovector!(tdst)
+#     elseif β != 1
+#         scale!(tdst, β)
+#     end
 
-    for (f₁, f₂) in fusiontrees(tsrc)
-        for ((f₁′, f₂′), coeff) in fusiontreetransform(f₁, f₂)
-            TensorOperations.tensoradd!(tdst[f₁′, f₂′], p, tsrc[f₁, f₂], :N, α * coeff, true,
-                backend...)
-        end
-    end
+#     for (f₁, f₂) in fusiontrees(tsrc)
+#         for ((f₁′, f₂′), coeff) in fusiontreetransform(f₁, f₂)
+#             TensorOperations.tensoradd!(tdst[f₁′, f₂′], p, tsrc[f₁, f₂], :N, α * coeff, true,
+#                 backend...)
+#         end
+#     end
 
-    return nothing
-end
+#     return nothing
+# end
 
 
-function TensorKit._add_abelian_kernel!(tdst, tsrc, p, fusiontreetransform, α, β, backend...)
+# function TensorKit._add_abelian_kernel!(tdst, tsrc, p, fusiontreetransform, α, β, backend...)
 
-    for (f₁, f₂) in fusiontrees(tsrc)
-        TensorKit._add_abelian_block!(tdst, tsrc, p, fusiontreetransform, f₁, f₂, α, β, backend...)
-    end
+#     for (f₁, f₂) in fusiontrees(tsrc)
+#         TensorKit._add_abelian_block!(tdst, tsrc, p, fusiontreetransform, f₁, f₂, α, β, backend...)
+#     end
 
-    return tdst
-end
+#     return tdst
+# end
 
 # function TensorKit.mul!(tC::AbstractTensorMap,
 #     tA::AbstractTensorMap,

@@ -39,50 +39,29 @@ function _pushright(El::SparseLeftTensor, A::AdjointMPSTensor, H::SparseMPOTenso
 
      else # multi-threading
 
-          numthreads = Threads.nthreads()
+
           validIdx = [(i, j) for j in 1:sz[2] for i in filter(x -> !isnothing(H[x, j]) && !isnothing(El[x]), 1:sz[1])]
-          # producer
-          taskref = Ref{Task}()
-          ch = Channel{Tuple{Int64,Int64}}(; taskref=taskref, spawn=true) do ch
-               for idx in vcat(validIdx, fill((0, 0), numthreads))
-                    put!(ch, idx)
-               end
-          end
 
-          # consumer
-          Lock = Threads.SpinLock()
-          tasks = map(1:numthreads) do _
-               task = Threads.@spawn while true
-                    (i, j) = take!(ch)
-                    i == 0 && break
+          Lock = Threads.ReentrantLock()
+          idx = Threads.Atomic{Int64}(1)
+          Threads.@sync for t in 1:Threads.nthreads()
+               Threads.@spawn while true
+                    idx_t = Threads.atomic_add!(idx, 1)
+                    idx_t > length(validIdx) && break
 
+                    (i, j) = validIdx[idx_t]
                     El_i = _pushright(El[i], A, H[i, j], B; sparse=true)
-                    
+
                     lock(Lock)
                     try
                          El_next[j] = axpy!(true, El_i, El_next[j])
                     catch
-                         unlock(Lock)
                          rethrow()
+                    finally
+                         unlock(Lock)
                     end
-                    unlock(Lock)
                end
-               errormonitor(task)
           end
-
-          fetch.(tasks)
-          fetch(taskref[]) 
-
-
-          # @threads for j in 1:sz[2]
-          #      @floop GlobalThreadsExecutor for i in filter(x -> !isnothing(H[x, j]) && !isnothing(El[x]), 1:sz[1])
-          #           El_i = _pushright(El[i], A, H[i, j], B; sparse=true)
-          #           @reduce() do (El_cum = nothing; El_i)
-          #                El_cum = axpy!(true, El_i, El_cum)
-          #           end
-          #      end
-          #      El_next[j] = El_cum
-          # end
 
      end
 

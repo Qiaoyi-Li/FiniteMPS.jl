@@ -95,22 +95,22 @@
 #  end
  
  # SDD may lead to some errors in some cases 
- function TensorKit.tsvd(t::AbstractTensorMap; trunc::TruncationScheme=NoTruncation(),
-     p::Real=2, alg::Union{SVD,SDD}=SDD())
-     try 
-         return tsvd!(copy(t); trunc=trunc, p=p, alg=alg)
-     catch 
-         @warn "SDD() failed, use SVD() instead."
-         return tsvd!(copy(t); trunc=trunc, p=p, alg=SVD())
-     end
- end
- function TensorKit.tsvd(t::AbstractTensorMap, (p₁, p₂)::Index2Tuple; kwargs...)
-     try   
-         return tsvd!(permute(t, (p₁, p₂); copy=true); kwargs...)
-     catch
-         @warn "SDD() failed, use SVD() instead."
-         trunc = get(kwargs, :trunc, TensorKit.NoTruncation())
-         p = get(kwargs, :p, 2)
-         return tsvd!(permute(t, (p₁, p₂); copy=true); trunc=trunc, p=p, alg=SVD())
-     end
- end
+#  function TensorKit.tsvd(t::AbstractTensorMap; trunc::TruncationScheme=NoTruncation(),
+#      p::Real=2, alg::Union{SVD,SDD}=SDD())
+#      try 
+#          return tsvd!(copy(t); trunc=trunc, p=p, alg=alg)
+#      catch 
+#          @warn "SDD() failed, use SVD() instead."
+#          return tsvd!(copy(t); trunc=trunc, p=p, alg=SVD())
+#      end
+#  end
+#  function TensorKit.tsvd(t::AbstractTensorMap, (p₁, p₂)::Index2Tuple; kwargs...)
+#      try   
+#          return tsvd!(permute(t, (p₁, p₂); copy=true); kwargs...)
+#      catch
+#          @warn "SDD() failed, use SVD() instead."
+#          trunc = get(kwargs, :trunc, TensorKit.NoTruncation())
+#          p = get(kwargs, :p, 2)
+#          return tsvd!(permute(t, (p₁, p₂); copy=true); trunc=trunc, p=p, alg=SVD())
+#      end
+#  end
