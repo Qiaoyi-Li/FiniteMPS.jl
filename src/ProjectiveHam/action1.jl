@@ -13,7 +13,7 @@ function action1(obj::SparseProjectiveHamiltonian{1}, x::MPSTensor; kwargs...)
                     _action1(x, obj.El[i], obj.H[1][i, j], obj.Er[j], true; kwargs...)
                end
 
-          else # multi-threading
+          elseif get_num_threads_action() > 1
 
                Hx = nothing
                Timer_acc = TimerOutput()
@@ -40,6 +40,14 @@ function action1(obj::SparseProjectiveHamiltonian{1}, x::MPSTensor; kwargs...)
                     end
                end
 
+          else
+               Hx = nothing
+               Timer_acc = TimerOutput()
+               for (i, j) in obj.validIdx
+                    tmp, to = _action1(x, obj.El[i], obj.H[1][i, j], obj.Er[j], true; kwargs...)
+                    Hx = axpy!(true, tmp, Hx)
+                    merge!(Timer_acc, to)
+               end
           end
      end
 

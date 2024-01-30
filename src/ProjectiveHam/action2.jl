@@ -17,7 +17,7 @@ function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}
                     _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k], true; kwargs...)
                end
 
-          else # multi-threading
+          elseif get_num_threads_action() > 1
 
                # numthreads = Threads.nthreads()
                # # producer
@@ -92,8 +92,17 @@ function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}
                          end
                     end
                end
+          else
+               Hx = nothing
+               Timer_acc = TimerOutput()
+               for (i, j, k) in obj.validIdx
+                    tmp, to = _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k], true; kwargs...)
+                    Hx = axpy!(true, tmp, Hx)
+                    merge!(Timer_acc, to)
+               end
 
           end
+
      end
 
      merge!(Timer_action2, Timer_acc; tree_point=["action2"])
