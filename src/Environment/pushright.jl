@@ -39,12 +39,11 @@ function _pushright(El::SparseLeftTensor, A::AdjointMPSTensor, H::SparseMPOTenso
 
      else # multi-threading
 
-
           validIdx = [(i, j) for j in 1:sz[2] for i in filter(x -> !isnothing(H[x, j]) && !isnothing(El[x]), 1:sz[1])]
 
           Lock = Threads.ReentrantLock()
           idx = Threads.Atomic{Int64}(1)
-          Threads.@sync for t in 1:Threads.nthreads()
+          Threads.@sync for _ in 1:Threads.nthreads()
                Threads.@spawn while true
                     idx_t = Threads.atomic_add!(idx, 1)
                     idx_t > length(validIdx) && break

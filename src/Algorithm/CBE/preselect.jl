@@ -26,21 +26,42 @@ function _preselect(LO::LeftOrthComplement{N}) where {N}
           Al_oc = @distributed (add!) for i in 1:N
                f(LO.Al[i] - MPSTensor(_leftProj(LO.El[i], LO.Al_c)), lsIso[i])
           end
-          normalize!(Al_oc)
      else
-          Al_oc = let f = f
-               @floop GlobalThreadsExecutor for i in 1:N
+          # Al_oc = let f = f
+          #      @floop GlobalThreadsExecutor for i in 1:N
+          #           axpy!(-1, _leftProj(LO.El[i], LO.Al_c), LO.Al[i].A) # project to orthogonal complement
+          #           Al_i = f(LO.Al[i], lsIso[i])
+          #           @reduce() do (Al = nothing; Al_i)
+          #                Al = axpy!(true, Al_i, Al)
+          #           end
+          #      end
+          #      normalize!(Al)
+          # end
+
+          Al_oc = nothing
+          Lock = Threads.ReentrantLock()
+          idx = Threads.Atomic{Int64}(1)
+          Threads.@sync for _ in 1:Threads.nthreads()
+               Threads.@spawn while true
+                    i = Threads.atomic_add!(idx, 1)
+                    i > N && break
+
                     axpy!(-1, _leftProj(LO.El[i], LO.Al_c), LO.Al[i].A) # project to orthogonal complement
                     Al_i = f(LO.Al[i], lsIso[i])
-                    @reduce() do (Al = nothing; Al_i)
-                         Al = axpy!(true, Al_i, Al)
+
+                    lock(Lock)
+                    try
+                         Al_oc = axpy!(true, Al_i, Al_oc)
+                    catch
+                         rethrow()
+                    finally
+                         unlock(Lock)
                     end
                end
-               normalize!(Al)
           end
      end
 
-     return Al_oc
+     return normalize!(Al_oc)
 end
 
 function _preselect(RO::RightOrthComplement{N}) where {N}
@@ -71,19 +92,41 @@ function _preselect(RO::RightOrthComplement{N}) where {N}
           Ar_oc = @distributed (add!) for i in 1:N
                f(RO.Ar[i] - MPSTensor(_rightProj(RO.Er[i], RO.Ar_c)), lsIso[i])
           end
-          normalize!(Ar_oc)
+         
      else
-          Ar_oc = let f = f
-               @floop GlobalThreadsExecutor for i in 1:N
+          # Ar_oc = let f = f
+          #      @floop GlobalThreadsExecutor for i in 1:N
+          #           axpy!(-1, _rightProj(RO.Er[i], RO.Ar_c), RO.Ar[i].A) # project to orthogonal complement
+          #           Ar_i = f(RO.Ar[i], lsIso[i])
+          #           @reduce() do (Ar = nothing; Ar_i)
+          #                Ar = axpy!(true, Ar_i, Ar)
+          #           end
+          #      end
+          #      normalize!(Ar)
+          # end
+
+          Ar_oc = nothing
+          Lock = Threads.ReentrantLock()
+          idx = Threads.Atomic{Int64}(1)
+          Threads.@sync for _ in 1:Threads.nthreads()
+               Threads.@spawn while true
+                    i = Threads.atomic_add!(idx, 1)
+                    i > N && break
+
                     axpy!(-1, _rightProj(RO.Er[i], RO.Ar_c), RO.Ar[i].A) # project to orthogonal complement
                     Ar_i = f(RO.Ar[i], lsIso[i])
-                    @reduce() do (Ar = nothing; Ar_i)
-                         Ar = axpy!(true, Ar_i, Ar)
+
+                    lock(Lock)
+                    try
+                         Ar_oc = axpy!(true, Ar_i, Ar_oc)
+                    catch
+                         rethrow()
+                    finally
+                         unlock(Lock)
                     end
                end
-               normalize!(Ar)
           end
      end
 
-     return Ar_oc
+     return  normalize!(Ar_oc)
 end

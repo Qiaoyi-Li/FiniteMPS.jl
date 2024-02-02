@@ -36,21 +36,46 @@ function _finalselect(lsEl::SparseLeftTensor, RO::RightOrthComplement{N}) where 
           end
 
      else # multi-threading
-          Er::LocalRightTensor, Ar = let f = f
-               @floop GlobalThreadsExecutor for i in 1:N
-                    Er_i = f(lsEl[i], RO.Er[i])
-                    Ar_i = f(lsEl[i], RO.Ar[i])
-                    @reduce() do (Er = nothing; Er_i), (Ar = nothing; Ar_i)
+          # Er::LocalRightTensor, Ar = let f = f
+          #      @floop GlobalThreadsExecutor for i in 1:N
+          #           Er_i = f(lsEl[i], RO.Er[i])
+          #           Ar_i = f(lsEl[i], RO.Ar[i])
+          #           @reduce() do (Er = nothing; Er_i), (Ar = nothing; Ar_i)
+          #                Er = axpy!(true, Er_i, Er)
+          #                Ar = axpy!(true, Ar_i, Ar)
+          #           end
+          #      end
+          #      Er, Ar
+          # end
+          
+          Er = nothing
+          Ar = nothing
+          Lock = Threads.ReentrantLock()
+          idx = Threads.Atomic{Int64}(1)
+          Threads.@sync for _ in 1:Threads.nthreads()
+               Threads.@spawn while true
+                    idx_t = Threads.atomic_add!(idx, 1)
+                    idx_t > N && break
+
+                    Er_i = f(lsEl[idx_t], RO.Er[idx_t])
+                    Ar_i = f(lsEl[idx_t], RO.Ar[idx_t])
+
+                    lock(Lock)
+                    try
                          Er = axpy!(true, Er_i, Er)
                          Ar = axpy!(true, Ar_i, Ar)
+                    catch
+                         rethrow()
+                    finally
+                         unlock(Lock)
                     end
                end
-               Er, Ar
-          end
+          end  
+
      end
 
      # orthogonal projection, Ar - Er*Ar_c
-     return normalize!(axpy!(-1, _rightProj(Er, RO.Ar_c), Ar))
+     return normalize!(axpy!(-1, _rightProj(LocalRightTensor(Er), RO.Ar_c), Ar))
 end
 
 function _finalselect(LO::LeftOrthComplement{N}, lsEr::SparseRightTensor) where {N}
@@ -90,19 +115,44 @@ function _finalselect(LO::LeftOrthComplement{N}, lsEr::SparseRightTensor) where 
                end
           end
      else # multi-threading
-          El::LocalLeftTensor, Al = let f = f
-               @floop GlobalThreadsExecutor for i in 1:N
-                    El_i = f(LO.El[i], lsEr[i])
-                    Al_i = f(LO.Al[i], lsEr[i])
-                    @reduce() do (El = nothing; El_i), (Al = nothing; Al_i)
+          # El::LocalLeftTensor, Al = let f = f
+          #      @floop GlobalThreadsExecutor for i in 1:N
+          #           El_i = f(LO.El[i], lsEr[i])
+          #           Al_i = f(LO.Al[i], lsEr[i])
+          #           @reduce() do (El = nothing; El_i), (Al = nothing; Al_i)
+          #                El = axpy!(true, El_i, El)
+          #                Al = axpy!(true, Al_i, Al)
+          #           end
+          #      end
+          #      El, Al
+          # end
+
+          El = nothing
+          Al = nothing
+          Lock = Threads.ReentrantLock()
+          idx = Threads.Atomic{Int64}(1)
+          Threads.@sync for _ in 1:Threads.nthreads()
+               Threads.@spawn while true
+                    idx_t = Threads.atomic_add!(idx, 1)
+                    idx_t > N && break
+
+                    El_i = f(LO.El[idx_t], lsEr[idx_t])
+                    Al_i = f(LO.Al[idx_t], lsEr[idx_t])
+
+                    lock(Lock)
+                    try
                          El = axpy!(true, El_i, El)
                          Al = axpy!(true, Al_i, Al)
+                    catch
+                         rethrow()
+                    finally
+                         unlock(Lock)
                     end
                end
-               El, Al
           end
+
      end
 
      # orthogonal projection, Al - El*Al_c
-     return normalize!(axpy!(-1, _leftProj(El, LO.Al_c), Al))
+     return normalize!(axpy!(-1, _leftProj(LocalLeftTensor(El), LO.Al_c), Al))
 end

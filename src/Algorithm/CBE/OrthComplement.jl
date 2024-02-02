@@ -77,21 +77,21 @@ function _initialize_Al(El_i::SparseLeftTensor, Al_i::MPSTensor, Hl::SparseMPOTe
                task = Threads.@spawn while true
                     (i, j) = take!(ch)
                     i == 0 && break
-                    
+
                     tmp = _initialize_Al_single(El_i[i], Al_i, Hl[i, j])
 
                     lock(Lock)
-                    try 
+                    try
                          if !isassigned(Al, j)
                               Al[j] = tmp
                          else
                               axpy!(true, tmp, Al[j])
                          end
                     catch
-                         unlock(Lock)
                          rethrow()
+                    finally
+                         unlock(Lock)
                     end
-                    unlock(Lock)
 
                end
                errormonitor(task)
@@ -99,23 +99,6 @@ function _initialize_Al(El_i::SparseLeftTensor, Al_i::MPSTensor, Hl::SparseMPOTe
 
           wait.(tasks)
           wait(taskref[])
-
-          # lsAl = let lsAl = Vector{MPSTensor}(undef, length(validIdx))
-          #      @floop GlobalThreadsExecutor for idx in 1:length(validIdx)
-          #           i, j = validIdx[idx]
-          #           lsAl[idx] = _initialize_Al_single(El_i[i], Al_i, Hl[i, j])
-          #      end
-          #      lsAl
-          # end
-
-          # # sum over i
-          # for (idx, (_, j)) in enumerate(validIdx)
-          #      if !isassigned(Al, j)
-          #           Al[j] = lsAl[idx]
-          #      else
-          #           axpy!(true, lsAl[idx], Al[j])
-          #      end
-          # end
      end
 
 
@@ -133,22 +116,40 @@ function _initialize_Ar(Er_i::SparseRightTensor, Ar_i::MPSTensor, Hr::SparseMPOT
           lsAr = pmap(validIdx) do (i, j)
                _initialize_Ar_single(Er_i[j], Ar_i, Hr[i, j])
           end
+          # sum over j
+          for (idx, (i, j)) in enumerate(validIdx)
+               if !isassigned(Ar, i)
+                    Ar[i] = lsAr[idx]
+               else
+                    axpy!(true, lsAr[idx], Ar[i])
+               end
+          end
 
      else
-          lsAr = let lsAr = Vector{MPSTensor}(undef, length(validIdx))
-               @floop GlobalThreadsExecutor for idx in 1:length(validIdx)
-                    i, j = validIdx[idx]
-                    lsAr[idx] = _initialize_Ar_single(Er_i[j], Ar_i, Hr[i, j])
+
+          Lock = Threads.ReentrantLock()
+          idx = Threads.Atomic{Int64}(1)
+          Threads.@sync for _ in 1:Threads.nthreads()
+               Threads.@spawn while true
+                    idx_t = Threads.atomic_add!(idx, 1)
+                    idx_t > length(validIdx) && break
+
+                    (i, j) = validIdx[idx_t]
+                    tmp = _initialize_Ar_single(Er_i[j], Ar_i, Hr[i, j])
+
+                    lock(Lock)
+                    try
+                         if !isassigned(Ar, i)
+                              Ar[i] = tmp
+                         else
+                              axpy!(true, tmp, Ar[i])
+                         end
+                    catch
+                         rethrow()
+                    finally
+                         unlock(Lock)
+                    end
                end
-               lsAr
-          end
-     end
-     # sum over j
-     for (idx, (i, j)) in enumerate(validIdx)
-          if !isassigned(Ar, i)
-               Ar[i] = lsAr[idx]
-          else
-               axpy!(true, lsAr[idx], Ar[i])
           end
      end
 
@@ -208,9 +209,19 @@ function _initialize_Er(Ar::Vector{MPSTensor}, Ar_i::MPSTensor)::SparseRightTens
           end
      else
           Er = SparseRightTensor(undef, sz)
-          @floop GlobalThreadsExecutor for i in 1:sz
-               Er[i] = _initialize_Er_single(Ar[i], Ar_i)
+          # @floop GlobalThreadsExecutor for i in 1:sz
+          #      Er[i] = _initialize_Er_single(Ar[i], Ar_i)
+          # end
+
+          idx = Threads.Atomic{Int64}(1)
+          @sync for _ in 1:Threads.nthreads()
+               Threads.@spawn while true
+                    i = Threads.atomic_add!(idx, 1)
+                    i > sz && break
+                    Er[i] = _initialize_Er_single(Ar[i], Ar_i)
+               end
           end
+
           return Er
      end
 end

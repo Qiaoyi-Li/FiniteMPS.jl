@@ -56,24 +56,11 @@ function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}
                # fetch.(tasks)
                # fetch(taskref[])
 
-
-
-               # Hx, Timer_acc = let
-               #      @floop GlobalThreadsExecutor for (i, j, k) in obj.validIdx
-               #           tmp, to = _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k], true; kwargs...)
-               #           @reduce() do (Hx = nothing; tmp), (Timer_acc = TimerOutput(); to)
-               #                Hx = axpy!(true, tmp, Hx)
-               #                Timer_acc = merge!(Timer_acc, to)
-               #           end
-               #      end
-               #      Hx, Timer_acc
-               # end
-
                Hx = nothing
                Timer_acc = TimerOutput()
                Lock = Threads.ReentrantLock()
                idx = Threads.Atomic{Int64}(1)
-               Threads.@sync for t in 1:Threads.nthreads()
+               Threads.@sync for _ in 1:Threads.nthreads()
                     Threads.@spawn while true
                          idx_t = Threads.atomic_add!(idx, 1)
                          idx_t > length(obj.validIdx) && break

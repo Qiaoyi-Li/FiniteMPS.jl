@@ -116,9 +116,8 @@ function _CBE_rightorth_L(LO::LeftOrthComplement{N};
           V = C * V
      end
 
-
-     US_Al::Vector{MPSTensor}, US_El::SparseLeftTensor = if get_num_workers() > 1 # multi-processing
-          let V_wrap::MPSTensor = V
+     if get_num_workers() > 1 # multi-processing
+          US_Al::Vector{MPSTensor}, US_El::SparseLeftTensor = let V_wrap::MPSTensor = V
                US_Al = pmap(LO.Al) do Al
                     Al * V_wrap
                end
@@ -128,13 +127,32 @@ function _CBE_rightorth_L(LO::LeftOrthComplement{N};
                US_Al, US_El
           end
      else
-          let V_wrap::MPSTensor = V, US_Al = Vector{MPSTensor}(undef, N), US_El = SparseLeftTensor(undef, N)
-               @floop GlobalThreadsExecutor for i in 1:N
-                    US_Al[i] = LO.Al[i] * V_wrap
-                    US_El[i] = LO.El[i] * V_wrap
+          # US_Al::Vector{MPSTensor}, US_El::SparseLeftTensor = let V_wrap::MPSTensor = V, US_Al = Vector{MPSTensor}(undef, N), US_El = SparseLeftTensor(undef, N)
+          #      @floop GlobalThreadsExecutor for i in 1:N
+          #           US_Al[i] = LO.Al[i] * V_wrap
+          #           US_El[i] = LO.El[i] * V_wrap
+          #      end
+          #      US_Al, US_El
+          # end
+
+          US_Al = Vector{MPSTensor}(undef, N)
+          US_El = SparseLeftTensor(undef, N)
+          V_wrap::MPSTensor = V
+          idx = Threads.Atomic{Int64}(1)
+          Threads.@sync for _ in 1:Threads.nthreads()
+               Threads.@spawn while true
+                    idx_t = Threads.atomic_add!(idx, 1)
+
+                    if idx_t <= N
+                         US_Al[idx_t] = LO.Al[idx_t] * V_wrap
+                    elseif idx_t <= 2*N
+                         US_El[idx_t - N] = LO.El[idx_t - N] * V_wrap
+                    else
+                         break
+                    end
                end
-               US_Al, US_El
           end
+
      end
 
      return LeftOrthComplement(US_El, US_Al, LO.Al_c), info
@@ -257,8 +275,8 @@ function _CBE_leftorth_R(RO::RightOrthComplement{N};
           U = C' * U
      end
 
-     SVd_Ar::Vector{MPSTensor}, SVd_Er::SparseRightTensor = if get_num_workers() > 1 # multi-processing
-          let U_wrap::MPSTensor = U'
+     if get_num_workers() > 1 # multi-processing
+          SVd_Ar::Vector{MPSTensor}, SVd_Er::SparseRightTensor = let U_wrap::MPSTensor = U'
                SVd_Ar = pmap(RO.Ar) do Ar
                     U_wrap * Ar
                end
@@ -268,13 +286,34 @@ function _CBE_leftorth_R(RO::RightOrthComplement{N};
                SVd_Ar, SVd_Er
           end
      else
-          let U_wrap::MPSTensor = U', SVd_Ar = Vector{MPSTensor}(undef, N), SVd_Er = SparseRightTensor(undef, N)
-               @floop GlobalThreadsExecutor for i in 1:N
-                    SVd_Ar[i] = U_wrap * RO.Ar[i]
-                    SVd_Er[i] = U_wrap * RO.Er[i]
+
+          # SVd_Ar::Vector{MPSTensor}, SVd_Er::SparseRightTensor = let U_wrap::MPSTensor = U', SVd_Ar = Vector{MPSTensor}(undef, N), SVd_Er = SparseRightTensor(undef, N)
+          #      @floop GlobalThreadsExecutor for i in 1:N
+          #           SVd_Ar[i] = U_wrap * RO.Ar[i]
+          #           SVd_Er[i] = U_wrap * RO.Er[i]
+          #      end
+          #      SVd_Ar, SVd_Er
+          # end
+
+          SVd_Ar = Vector{MPSTensor}(undef, N)
+          SVd_Er = SparseRightTensor(undef, N)
+          U_wrap::MPSTensor = U'
+          idx = Threads.Atomic{Int64}(1)
+          Threads.@sync for _ in 1:Threads.nthreads()
+               Threads.@spawn while true
+                    idx_t = Threads.atomic_add!(idx, 1)
+
+                    if idx_t <= N
+                         SVd_Ar[idx_t] = U_wrap * RO.Ar[idx_t]
+                    elseif idx_t <= 2*N
+                         SVd_Er[idx_t - N] = U_wrap * RO.Er[idx_t - N]
+                    else
+                         break
+                    end
                end
-               SVd_Ar, SVd_Er
           end
+
+
      end
 
      return RightOrthComplement(SVd_Er, SVd_Ar, RO.Ar_c), info
@@ -288,10 +327,32 @@ function _CBE_MM(f, lsA::Vector{MPSTensor}, lsE::Union{SparseLeftTensor,SparseRi
           end
 
      else
-          @floop GlobalThreadsExecutor for (A, E) in zip(lsA, lsE)
-               tmp = f(A) - f(E)
-               @reduce() do (MM = nothing; tmp)
-                    MM = axpy!(true, tmp, MM)
+          # @floop GlobalThreadsExecutor for (A, E) in zip(lsA, lsE)
+          #      tmp = f(A) - f(E)
+          #      @reduce() do (MM = nothing; tmp)
+          #           MM = axpy!(true, tmp, MM)
+          #      end
+          # end
+
+          MM = nothing
+          Lock = Threads.ReentrantLock()
+          idx = Threads.Atomic{Int64}(1)
+          N = length(lsA)
+          Threads.@sync for _ in 1:Threads.nthreads()
+               Threads.@spawn while true
+                    idx_t = Threads.atomic_add!(idx, 1)
+                    idx_t > N && break
+
+                    tmp = f(lsA[idx_t]) - f(lsE[idx_t])
+
+                    lock(Lock)
+                    try
+                         MM = axpy!(true, tmp, MM)
+                    catch
+                         rethrow()
+                    finally
+                         unlock(Lock)
+                    end
                end
           end
      end

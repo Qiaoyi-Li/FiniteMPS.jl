@@ -10,9 +10,12 @@ include("Models/Hubbard.jl")
 @assert Threads.nthreads() > 1
 
 @show TensorKit.Strided.set_num_threads(1)
+@show TensorKit.NTHREADS_SVD = Threads.nthreads()
+@show TensorKit.NTHREADS_EIG = Threads.nthreads()
 # set MKL nthreads
 BLAS.set_num_threads(1)
 @show BLAS.get_num_threads()
+@show FiniteMPS.get_num_threads_action()
 
 flush(stdout)
 
@@ -28,7 +31,7 @@ function mainDMRG(Ψ=nothing)
 
      lsD = let
           lsD = broadcast(Int64 ∘ round, 2 .^ vcat(6:13))
-          Nsweep = 2
+          Nsweep = 1
           repeat(lsD, inner=Nsweep)
      end
      # finish with 1-DMRG 
