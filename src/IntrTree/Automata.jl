@@ -1,5 +1,7 @@
 """
-     AutomataMPO(Tree::InteractionTree, L::Int64) -> ::SparseMPO
+     AutomataMPO(Tree::InteractionTree,
+          L::Int64 = treeheight(Tree.Root) - 1)
+          -> ::SparseMPO
 
 Convert an interaction tree to a sparse MPO.
 """
@@ -54,6 +56,7 @@ function AutomataMPO(Tree::InteractionTree, L::Int64 = treeheight(Tree.Root) - 1
 
      return SparseMPO(H)
 end
+AutomataMPO(Root::InteractionTreeNode, args...; kwargs...) = AutomataMPO(InteractionTree(Root), args...; kwargs...)
 
 function _convertStrength(A::AbstractLocalOperator)
      B = deepcopy(A)
