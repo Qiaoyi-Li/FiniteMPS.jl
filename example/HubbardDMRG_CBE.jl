@@ -30,12 +30,12 @@ function mainDMRG(Ψ=nothing)
      Ndop = 0 # number of hole doping, negative value means elec doping
 
      lsD = let
-          lsD = broadcast(Int64 ∘ round, 2 .^ vcat(6:13))
-          Nsweep = 1
+          lsD = broadcast(Int64 ∘ round, 2 .^ vcat(10:13))
+          Nsweep = 2
           repeat(lsD, inner=Nsweep)
      end
      # finish with 1-DMRG 
-     Nsweep_DMRG1 = 2
+     Nsweep_DMRG1 = 0
 
      lsEn = zeros(length(lsD))
      lsinfo = Vector{Any}(undef, length(lsD))

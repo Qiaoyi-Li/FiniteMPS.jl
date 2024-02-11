@@ -5,6 +5,9 @@
 2-site DMRG sweep from left to right or sweep back from right to left.  
 
 # Kwargs
+     krylovalg::KrylovKit.KrylovAlgorithm = DMRGDefaultLanczos
+Krylov algorithm used in DMRG update.
+
      trunc::TruncationScheme = notrunc()
 Control the truncation in svd after each 2-site update. Details see `tsvd`. 
 
@@ -23,6 +26,7 @@ Add noise to the 2-site local tensor after each update.
 function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,MPS}}
      @assert Center(Env[3])[2] ≤ 2
 
+     krylovalg = get(kwargs, :krylovalg, DMRGDefaultLanczos)
      trunc = get(kwargs, :trunc, notrunc())
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
@@ -43,7 +47,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
           @timeit TimerStep "pushEnv" canonicalize!(Env, si, si + 1)
           Ar = Ψ[si+1]
 
-          @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = _DMRGUpdate2(ProjHam(Env, si, si + 1; E₀=E₀), Al, Ar; kwargs...)
+          @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = _DMRGUpdate2(ProjHam(Env, si, si + 1; E₀=E₀), Al, Ar, krylovalg; kwargs...)
           # apply noise
           noise > 0 && noise!(xg, noise)
           eg += E₀
@@ -81,6 +85,7 @@ end
 function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,MPS}}
      @assert Center(Env[3])[1] ≥ L - 1
 
+     krylovalg = get(kwargs, :krylovalg, DMRGDefaultLanczos)
      trunc = get(kwargs, :trunc, notrunc())
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
@@ -100,7 +105,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
           @timeit TimerStep "pushEnv" canonicalize!(Env, si - 1, si)
           Al = Ψ[si-1]
 
-          @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = _DMRGUpdate2(ProjHam(Env, si - 1, si; E₀=E₀), Al, Ar; kwargs...)
+          @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = _DMRGUpdate2(ProjHam(Env, si - 1, si; E₀=E₀), Al, Ar, krylovalg; kwargs...)
           eg += E₀
           # apply noise
           # TODO: try to mix phys and bond idx
@@ -143,6 +148,9 @@ end
 1-site DMRG sweep from left to right or sweep back from right to left.  
 
 # Kwargs
+     krylovalg::KrylovKit.KrylovAlgorithm = DMRGDefaultLanczos
+Krylov algorithm used in DMRG update.
+
      GCstep::Bool = false
 `GC.gc()` manually after each step if `true`.
 
@@ -160,6 +168,7 @@ Control the truncation after each update, only used together with CBE. Details s
 """
 function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,MPS}}
 
+     krylovalg = get(kwargs, :krylovalg, DMRGDefaultLanczos)
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
      verbose::Int64 = get(kwargs, :verbose, 0)
@@ -187,7 +196,7 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
           end
 
           @timeit TimerStep "pushEnv" canonicalize!(Env, si)
-          @timeit TimerStep "DMRGUpdate1" eg, xg, info_Lanczos = _DMRGUpdate1(ProjHam(Env, si; E₀=E₀), Al; kwargs...)
+          @timeit TimerStep "DMRGUpdate1" eg, xg, info_Lanczos = _DMRGUpdate1(ProjHam(Env, si; E₀=E₀), Al, krylovalg; kwargs...)
           eg += E₀
           if si < L
                @timeit TimerStep "svd" Ψ[si], S::MPSTensor, info_svd = leftorth(xg; trunc=trunc)
@@ -225,6 +234,7 @@ end
 
 function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,MPS}}
 
+     krylovalg = get(kwargs, :krylovalg, DMRGDefaultLanczos)
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
      verbose::Int64 = get(kwargs, :verbose, 0)
@@ -252,7 +262,7 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
           end
 
           @timeit TimerStep "pushEnv" canonicalize!(Env, si)
-          @timeit TimerStep "DMRGUpdate1" eg, xg, info_Lanczos = _DMRGUpdate1(ProjHam(Env, si; E₀=E₀), Ar; kwargs...)
+          @timeit TimerStep "DMRGUpdate1" eg, xg, info_Lanczos = _DMRGUpdate1(ProjHam(Env, si; E₀=E₀), Ar, krylovalg; kwargs...)
           eg += E₀
           if si > 1
                @timeit TimerStep "svd" S::MPSTensor, Ψ[si], info_svd = rightorth(xg; trunc=trunc)
@@ -321,19 +331,26 @@ end
 
 
 
-function _DMRGUpdate2(H::SparseProjectiveHamiltonian{2}, Al::MPSTensor, Ar::MPSTensor; kwargs...)
+function _DMRGUpdate2(H::SparseProjectiveHamiltonian{2},
+     Al::MPSTensor,
+     Ar::MPSTensor,
+     alg::KrylovKit.KrylovAlgorithm;
+     kwargs...)
 
      reset_timer!(get_timer("action2"))
-     eg, xg, info = eigsolve(x -> action2(H, x; kwargs...), CompositeMPSTensor(Al, Ar), 1, :SR, _getLanczos(; kwargs...))
+     eg, xg, info = eigsolve(x -> action2(H, x; kwargs...), CompositeMPSTensor(Al, Ar), 1, :SR, alg)
 
      return eg[1], xg[1], info
 
 end
 
-function _DMRGUpdate1(H::SparseProjectiveHamiltonian{1}, A::MPSTensor; kwargs...)
+function _DMRGUpdate1(H::SparseProjectiveHamiltonian{1},
+     A::MPSTensor,
+     alg::KrylovKit.KrylovAlgorithm;
+     kwargs...)
 
      reset_timer!(get_timer("action1"))
-     eg, xg, info = eigsolve(x -> action1(H, x; kwargs...), A, 1, :SR, _getLanczos(; kwargs...))
+     eg, xg, info = eigsolve(x -> action1(H, x; kwargs...), A, 1, :SR, alg)
      return eg[1], xg[1], info
 
 end

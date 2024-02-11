@@ -85,7 +85,7 @@ end
 """
      noise!(A::CompositeMPSTensor{2}, σ::Real)
 
-Apply noise to a given 2-site local tensor by contract a `d×d` random isometry to it. 
+Apply noise to a given 2-site local tensor by contracting a `d×d` random isometry to it. 
 """
 function noise!(A::CompositeMPSTensor{2,Tuple{MPSTensor{R₁},MPSTensor{R₂}}}, σ::Real) where {R₁,R₂}
      perms = vcat(2, R₁, setdiff(1:R₁+R₂-2, [2, R₁]))

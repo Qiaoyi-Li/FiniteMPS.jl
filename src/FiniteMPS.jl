@@ -3,7 +3,7 @@ module FiniteMPS
 using Reexport
 using AbstractTrees, SerializedElementArrays, JLD2, Serialization
 using Base.Threads, FLoops, FoldsThreads, Distributed
-@reexport import SerializedElementArrays: SerializedElementArray,  SerializedElementVector
+@reexport import SerializedElementArrays: SerializedElementArray, SerializedElementVector
 @reexport using TensorKit, KrylovKit, TensorKit.TensorOperations, TimerOutputs
 @reexport import Base: +, -, *, /, ==, promote_rule, convert, length, show, getindex, setindex!, lastindex, keys, similar, merge, iterate, complex
 @reexport import TensorKit: ×, one, zero, dim, inner, scalar, domain, codomain, eltype, scalartype, leftorth, rightorth, leftnull, rightnull, tsvd, adjoint, normalize!, norm, axpy!, axpby!, add!, dot, mul!, rmul!, NoTruncation, fuse
@@ -122,5 +122,8 @@ include("LocalSpace/Fermion.jl")
 include("LocalSpace/tJFermion.jl")
 include("LocalSpace/SpinlessFermion.jl")
 
+
+# __init__
+include("init.jl")
 
 end # module FiniteMPS

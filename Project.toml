@@ -1,7 +1,7 @@
 name = "FiniteMPS"
 uuid = "6b572690-f317-4dad-a5fe-5fe73a0b7d42"
 authors = ["qyli <liqiaoyi@itp.ac.cn>"]
-version = "0.3.15"
+version = "1.0.0"
 
 [deps]
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
@@ -11,7 +11,6 @@ FoldsThreads = "9c68100b-dfe1-47cf-94c8-95104e173443"
 JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
 KrylovKit = "0b1a1467-8014-51b9-945f-bf0ae24f4b77"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-MKL = "33e6dc65-8f57-5167-99aa-e5a354878fb2"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 Serialization = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 SerializedElementArrays = "d3ce8812-9567-47e9-a7b5-65a6d70a3065"

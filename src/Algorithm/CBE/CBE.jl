@@ -1,5 +1,13 @@
+"""
+     CBE(PH::SparseProjectiveHamiltonian{2},
+          Al::MPSTensor, Ar::MPSTensor,
+          Alg::CBEAlgorithm;
+          kwargs...) -> Al_ex::MPSTensor, Ar_ex::MPSTensor, info::CBEInfo
+
+Return the two local tensors `Al_ex` and `Ar_ex` after CBE.
+"""
 function CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor, Ar::MPSTensor, Alg::NoCBE; kwargs...)
-     Al_ex, Ar_ex, info, to = _CBE(Al, Ar, Alg; kwargs...)
+     Al_ex, Ar_ex, info, _ = _CBE(Al, Ar, Alg; kwargs...)
      D₀ = D = dim(Ar_ex, 1)
      return Al_ex, Ar_ex, CBEInfo(Alg, info, D₀, D, 0)
 end
@@ -135,10 +143,8 @@ function _CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar_rc::MP
      end
 
      # direct sum
-     @timeit LocalTimer "expand" begin
-          Ar_ex::MPSTensor = _directsum_Ar(Ar_rc, Ar_final)
-          Al_ex::MPSTensor = _expand_Al(Ar_rc, Ar_ex, Al)
-     end
+     @timeit LocalTimer "oplus" Ar_ex::MPSTensor = _directsum_Ar(Ar_rc, Ar_final)
+     @timeit LocalTimer "expand" Al_ex::MPSTensor = _expand_Al(Ar_rc, Ar_ex, Al)
 
      @timeit LocalTimer "svd6" begin
           S::MPSTensor, Ar_ex, info6 = rightorth(Ar_ex; trunc=notrunc())
@@ -196,14 +202,13 @@ function _CBE(PH::SparseProjectiveHamiltonian{2}, Al_lc::MPSTensor{R₁}, Ar::MP
      # @show norm(permute(Al_final.A, (1, 2, 3), (4,))' * permute(Al_lc.A, (1, 2, 3), (4,)))
 
      # direct sum
-     @timeit LocalTimer "expand" begin
-          Al_ex::MPSTensor = _directsum_Al(Al_lc, Al_final)
-          Ar_ex::MPSTensor = _expand_Ar(Al_lc, Al_ex, Ar)
-     end
+     @timeit LocalTimer "oplus" Al_ex::MPSTensor = _directsum_Al(Al_lc, Al_final)
+     @timeit LocalTimer "expand" Ar_ex::MPSTensor = _expand_Ar(Al_lc, Al_ex, Ar)
+
 
      @timeit LocalTimer "svd6" begin
           Al_ex, S::MPSTensor, info6 = leftorth(Al_ex; trunc=notrunc())
-          Ar_ex = S * Ar_ex 
+          Ar_ex = S * Ar_ex
      end
 
      return Al_ex, Ar_ex, (info1, info2, info3, info4, info5, info6), LocalTimer

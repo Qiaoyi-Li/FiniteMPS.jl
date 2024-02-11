@@ -1,4 +1,5 @@
 .vscode*
 *.DS_Store
 *.jld2
-test/*
+test
+docs/build

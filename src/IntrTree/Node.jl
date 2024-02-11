@@ -30,6 +30,7 @@ mutable struct InteractionTreeNode{T}
           children::Vector{InteractionTreeNode} = InteractionTreeNode[]) where T
           return InteractionTreeNode(Op, value, nothing, children)
      end
+     InteractionTreeNode() = InteractionTreeNode(IdentityOperator(0), nothing)
 end
 
 function Base.show(io::IO, Root::InteractionTreeNode)

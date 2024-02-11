@@ -145,8 +145,8 @@ function _CBE_rightorth_L(LO::LeftOrthComplement{N};
 
                     if idx_t <= N
                          US_Al[idx_t] = LO.Al[idx_t] * V_wrap
-                    elseif idx_t <= 2*N
-                         US_El[idx_t - N] = LO.El[idx_t - N] * V_wrap
+                    elseif idx_t <= 2 * N
+                         US_El[idx_t-N] = LO.El[idx_t-N] * V_wrap
                     else
                          break
                     end
@@ -305,8 +305,8 @@ function _CBE_leftorth_R(RO::RightOrthComplement{N};
 
                     if idx_t <= N
                          SVd_Ar[idx_t] = U_wrap * RO.Ar[idx_t]
-                    elseif idx_t <= 2*N
-                         SVd_Er[idx_t - N] = U_wrap * RO.Er[idx_t - N]
+                    elseif idx_t <= 2 * N
+                         SVd_Er[idx_t-N] = U_wrap * RO.Er[idx_t-N]
                     else
                          break
                     end
@@ -338,12 +338,22 @@ function _CBE_MM(f, lsA::Vector{MPSTensor}, lsE::Union{SparseLeftTensor,SparseRi
           Lock = Threads.ReentrantLock()
           idx = Threads.Atomic{Int64}(1)
           N = length(lsA)
+          # TODO, use channels to avoid lock
           Threads.@sync for _ in 1:Threads.nthreads()
                Threads.@spawn while true
-                    idx_t = Threads.atomic_add!(idx, 1)
-                    idx_t > N && break
+                    # idx_t = Threads.atomic_add!(idx, 1)
+                    # idx_t > N && break
 
-                    tmp = f(lsA[idx_t]) - f(lsE[idx_t])
+                    # tmp = f(lsA[idx_t]) - f(lsE[idx_t])
+
+                    idx_t = Threads.atomic_add!(idx, 1)
+                    if idx_t <= N
+                         tmp = f(lsA[idx_t])
+                    elseif idx_t <= 2 * N
+                         tmp = rmul!(f(lsE[idx_t-N]), -1)
+                    else
+                         break
+                    end
 
                     lock(Lock)
                     try
