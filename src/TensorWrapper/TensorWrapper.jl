@@ -84,16 +84,40 @@ Wrap TensorKit.tsvd, return `BondInfo` struct instead of truncation error `ϵ`.
 """
 function tsvd(A::AbstractTensorWrapper, p₁::NTuple{N₁,Int64}, p₂::NTuple{N₂,Int64}; kwargs...) where {N₁,N₂}
      trunc = get(kwargs, :trunc, notrunc())
-     alg = get(kwargs, :alg, nothing)
-     if isnothing(alg)
-          u,s,v,ϵ = tsvd(A.A, p₁, p₂; trunc=trunc)
-     else
-          u,s,v,ϵ = tsvd(A.A, p₁, p₂; trunc=trunc, alg=alg)
-     end
+     alg = get(kwargs, :alg, SDD())
+     p = get(kwargs, :p, 2)
+
+     u,s,v,ϵ = _tsvd_try(A.A, (p₁, p₂); p = p, trunc=trunc, alg=alg)
+
      return u, s, v, BondInfo(s, ϵ)
 end
 tsvd(A::AbstractTensorWrapper, p::Index2Tuple; kwargs...) = tsvd(A, p[1], p[2]; kwargs...)
 
+# use try to avoid errors in tsvd by SDD()
+function _tsvd_try(t::AbstractTensorMap;
+     trunc::TruncationScheme=NoTruncation(),
+     p::Real=2, alg::Union{SVD,SDD}=SDD())
+
+     try
+          return tsvd!(copy(t); trunc=trunc, p=p, alg=alg)
+     catch
+          @assert alg = SDD()
+          @warn "SDD() failed, use SVD() instead."
+          return tsvd!(copy(t); trunc=trunc, p=p, alg=SVD())
+     end
+end
+function _tsvd_try(t::AbstractTensorMap,
+     (p₁, p₂)::Index2Tuple; kwargs...)
+     try
+         return tsvd!(permute(t, (p₁, p₂); copy=true); kwargs...)
+     catch
+         @assert get(kwargs, :alg, SDD()) == SDD()
+         @warn "SDD() failed, use SVD() instead."
+         trunc = get(kwargs, :trunc, TensorKit.NoTruncation())
+         p = get(kwargs, :p, 2)
+         return tsvd!(permute(t, (p₁, p₂); copy=true); trunc=trunc, p=p, alg=SVD())
+     end
+ end
 
 
 

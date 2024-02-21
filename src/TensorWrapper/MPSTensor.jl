@@ -70,13 +70,14 @@ function leftorth(A::MPSTensor{R₁}; trunc=notrunc(), kwargs...) where {R₁}
           Q, R = leftorth(A.A, Tuple(1:R₁-1), (R₁,); kwargs...)
           return Q, R, BondInfo(Q, :R)
      else
-          alg = get(kwargs, :alg, nothing)
-          if isnothing(alg)
-               u, s, vd, ϵ = tsvd(A.A, Tuple(1:R₁-1), (R₁,); trunc=trunc)
-          else
-               u, s, vd, ϵ = tsvd(A.A, Tuple(1:R₁-1), (R₁,); trunc=trunc, alg=alg)
-          end
-          return u, s * vd, BondInfo(s, ϵ)
+          return tsvd(A, Tuple(1:R₁-1), (R₁,); trunc=trunc, kwargs...)
+          # alg = get(kwargs, :alg, nothing)
+          # if isnothing(alg)
+          #      u, s, vd, ϵ = tsvd(A.A, Tuple(1:R₁-1), (R₁,); trunc=trunc)
+          # else
+          #      u, s, vd, ϵ = tsvd(A.A, Tuple(1:R₁-1), (R₁,); trunc=trunc, alg=alg)
+          # end
+          # return u, s * vd, BondInfo(s, ϵ)
      end
 
 end
@@ -95,13 +96,14 @@ function rightorth(A::MPSTensor{R₂}; trunc=notrunc(), kwargs...) where {R₂}
           L, Q = rightorth(A.A, (1,), Tuple(2:R₂); kwargs...)
           return L, Q, BondInfo(Q, :L)
      else
-          alg = get(kwargs, :alg, nothing)
-          if isnothing(alg)
-               u, s, vd, ϵ = tsvd(A.A, (1,), Tuple(2:R₂); trunc=trunc)
-          else
-               u, s, vd, ϵ = tsvd(A.A, (1,), Tuple(2:R₂); trunc=trunc, alg=alg)
-          end
-          return u * s, vd, BondInfo(s, ϵ)
+          return tsvd(A, (1,), Tuple(2:R₂); trunc=trunc, kwargs...)
+          # alg = get(kwargs, :alg, nothing)
+          # if isnothing(alg)
+          #      u, s, vd, ϵ = tsvd(A.A, (1,), Tuple(2:R₂); trunc=trunc)
+          # else
+          #      u, s, vd, ϵ = tsvd(A.A, (1,), Tuple(2:R₂); trunc=trunc, alg=alg)
+          # end
+          # return u * s, vd, BondInfo(s, ϵ)
      end
 end
 

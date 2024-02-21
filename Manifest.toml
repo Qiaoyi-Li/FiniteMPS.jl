@@ -487,11 +487,9 @@ version = "1.10.0"
 
 [[deps.TensorKit]]
 deps = ["HalfIntegers", "LRUCache", "LinearAlgebra", "PackageExtensionCompat", "Strided", "TensorOperations", "TupleTools", "VectorInterface", "WignerSymbols"]
-git-tree-sha1 = "d87d3447bce40fcf096f4e1aded2360775e52be7"
-repo-rev = "master"
-repo-url = "https://github.com/Qiaoyi-Li/TensorKit.jl.git"
+git-tree-sha1 = "b060923b0d2414452857c33545b6d67266dad590"
 uuid = "07d1fe3e-3e46-537d-9eac-e9e13d0d4cec"
-version = "0.12.1"
+version = "0.12.2"
 weakdeps = ["ChainRulesCore"]
 
     [deps.TensorKit.extensions]
@@ -552,9 +550,9 @@ version = "0.4.80"
     Referenceables = "42d2dcc6-99eb-4e98-b66c-637b7d73030e"
 
 [[deps.TupleTools]]
-git-tree-sha1 = "155515ed4c4236db30049ac1495e2969cc06be9d"
+git-tree-sha1 = "41d61b1c545b06279871ef1a4b5fcb2cac2191cd"
 uuid = "9d95972d-f1c8-5527-a6e0-b4b365fa01f6"
-version = "1.4.3"
+version = "1.5.0"
 
 [[deps.UUIDs]]
 deps = ["Random", "SHA"]
@@ -565,9 +563,9 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [[deps.VectorInterface]]
 deps = ["LinearAlgebra"]
-git-tree-sha1 = "ecc747f33d2cb2c7ae73e1346e1b24e338f96012"
+git-tree-sha1 = "ed8f91274e744e5030c349e76fa98bf68236766f"
 uuid = "409d34a3-91d5-4945-b6ec-7529ddf182d8"
-version = "0.4.2"
+version = "0.4.4"
 
 [[deps.WignerSymbols]]
 deps = ["HalfIntegers", "LRUCache", "Primes", "RationalRoots"]

@@ -5,16 +5,7 @@ verbose = 1
 
 include("Models/Hubbard.jl")
 
-# show julia nthreads (set by -t)
-@show Threads.nthreads()
-@assert Threads.nthreads() > 1
-
-@show TensorKit.Strided.set_num_threads(1)
-# set MKL nthreads
-BLAS.set_num_threads(1)
 @show BLAS.get_num_threads()
-
-@show TensorKit.NTHREADS_SVD=Threads.nthreads()
 
 flush(stdout)
 
@@ -22,7 +13,6 @@ flush(stdout)
 disk = false # store local tensors in disk or memory
 
 Ψ = nothing
-
 function mainDMRG(Ψ=nothing)
 
      Para = (t=1, t′=-0.2, U=8)
@@ -33,7 +23,7 @@ function mainDMRG(Ψ=nothing)
           Nsweep = 2
           repeat(lsD, inner=Nsweep)
      end
-     lsnoise = [2.0 ^(-i) for i in 10:2:20]
+     lsnoise = [2.0^(-i) for i in 10:2:20]
      append!(lsnoise, zeros(length(lsD) - length(lsnoise)))
 
      # finish with 1-DMRG 
@@ -54,17 +44,27 @@ function mainDMRG(Ψ=nothing)
 
      for (i, D) in enumerate(lsD)
           lsinfo[i], lsTimer[i] = DMRGSweep2!(Env;
-               noise = lsnoise[i],
+               noise=lsnoise[i],
                GCstep=true, GCsweep=true, verbose=verbose,
                trunc=truncdim(D) & truncbelow(1e-6),
-               LanczosOpt=(krylovdim=5, maxiter=1, tol=1e-4, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
+               krylovalg=Lanczos(; krylovdim=5,
+                    maxiter=1,
+                    tol=1e-4,
+                    orth=ModifiedGramSchmidt(),
+                    eager=true,
+                    verbosity=0))
           lsEn[i] = lsinfo[i][2][1].Eg
      end
 
      for i in 1:Nsweep_DMRG1
           info_DMRG1, Timer_DMRG1 = DMRGSweep1!(Env;
                GCstep=false, GCsweep=true, verbose=verbose,
-               LanczosOpt=(krylovdim=8, maxiter=1, tol=1e-4, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
+               krylovalg=Lanczos(; krylovdim=5,
+                    maxiter=1,
+                    tol=1e-8,
+                    orth=ModifiedGramSchmidt(),
+                    eager=true,
+                    verbosity=0))
           push!(lsEn, info_DMRG1[2].dmrg[1].Eg)
           push!(lsinfo, info_DMRG1)
           push!(lsTimer, Timer_DMRG1)
@@ -103,5 +103,5 @@ function mainObs(Ψ::MPS)
 end
 
 Ψ, Env, lsD, lsEn, lsinfo, lsTimer = mainDMRG(Ψ);
-Obs = mainObs(Ψ)
+# Obs = mainObs(Ψ)
 lsEn

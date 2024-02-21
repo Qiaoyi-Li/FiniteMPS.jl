@@ -10,7 +10,6 @@ end
 
 function _init_multithreading()
 
-
      # if MKL is not used, set num_threads of BLAS to 1 to avoid the confliction to the high-level multi-threading implementations
      if !any(x -> startswith(x, "libmkl_rt"),
           basename(lib.libname) for lib in BLAS.get_config().loaded_libs)
@@ -22,12 +21,19 @@ function _init_multithreading()
 
      # initialize global variables
      global GlobalNumThreads_action = Threads.nthreads()
+     global GlobalNumThreads_mul = 1
+     global GlobalNumThreads_svd = Threads.nthreads()
+     global GlobalNumThreads_eig = Threads.nthreads()
+
 
      # print
      println("Multi-threading Info:")
      println(" Julia: $(Threads.nthreads())")
      println(" BLAS: $(BLAS.get_num_threads())")
      println(" action: $(get_num_threads_action())")
+     println(" mul: $(get_num_threads_mul())")
+     println(" svd: $(get_num_threads_svd())")
+     println(" eig: $(get_num_threads_eig())")
 
      println("BLAS Info:")
      println(" $(BLAS.get_config())")

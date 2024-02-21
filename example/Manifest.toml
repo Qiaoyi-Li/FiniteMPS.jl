@@ -2,12 +2,12 @@
 
 julia_version = "1.9.1"
 manifest_format = "2.0"
-project_hash = "7d8b38e146f71a8e2ca76d21e5785e1ce1b244f2"
+project_hash = "b24452c8df6144e1d689ff8a2a003597fb671686"
 
 [[deps.AbstractTrees]]
-git-tree-sha1 = "faa260e4cb5aba097a73fab382dd4b5819d8ec8c"
+git-tree-sha1 = "2d9c9a55f9c93e8887ad391fbae72f8ef55e1177"
 uuid = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
-version = "0.4.4"
+version = "0.4.5"
 
 [[deps.Accessors]]
 deps = ["CompositionsBase", "ConstructionBase", "Dates", "InverseFunctions", "LinearAlgebra", "MacroTools", "Test"]
@@ -82,9 +82,9 @@ version = "0.1.1"
 
 [[deps.ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra"]
-git-tree-sha1 = "1287e3872d646eed95198457873249bd9f0caed2"
+git-tree-sha1 = "892b245fdec1c511906671b6a5e1bafa38a727c1"
 uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-version = "1.20.1"
+version = "1.22.0"
 
     [deps.ChainRulesCore.extensions]
     ChainRulesCoreSparseArraysExt = "SparseArrays"
@@ -94,9 +94,9 @@ version = "1.20.1"
 
 [[deps.Compat]]
 deps = ["TOML", "UUIDs"]
-git-tree-sha1 = "75bd5b6fc5089df449b5d35fa501c846c9b6549b"
+git-tree-sha1 = "d2c021fbdde94f6cdaa799639adfeeaa17fd67f5"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "4.12.0"
+version = "4.13.0"
 weakdeps = ["Dates", "LinearAlgebra"]
 
     [deps.Compat.extensions]
@@ -199,10 +199,10 @@ uuid = "650210df-7c64-40ac-8e1f-94ea4f378b07"
 version = "0.1.0"
 
 [[deps.FiniteMPS]]
-deps = ["AbstractTrees", "Distributed", "FLoops", "FoldsThreads", "JLD2", "KrylovKit", "LinearAlgebra", "MKL", "Reexport", "Serialization", "SerializedElementArrays", "TensorKit", "TimerOutputs"]
+deps = ["AbstractTrees", "Distributed", "FLoops", "FoldsThreads", "JLD2", "KrylovKit", "LinearAlgebra", "Reexport", "Serialization", "SerializedElementArrays", "TensorKit", "TimerOutputs"]
 path = ".."
 uuid = "6b572690-f317-4dad-a5fe-5fe73a0b7d42"
-version = "0.3.15"
+version = "1.0.0"
 
 [[deps.FoldsThreads]]
 deps = ["Accessors", "FunctionWrappers", "InitialValues", "SplittablesBase", "Transducers"]
@@ -281,9 +281,9 @@ version = "0.2.4"
 
 [[deps.KrylovKit]]
 deps = ["ChainRulesCore", "GPUArraysCore", "LinearAlgebra", "Printf"]
-git-tree-sha1 = "1a5e1d9941c783b0119897d29f2eb665d876ecf3"
+git-tree-sha1 = "5cebb47f472f086f7dd31fb8e738a8db728f1f84"
 uuid = "0b1a1467-8014-51b9-945f-bf0ae24f4b77"
-version = "0.6.0"
+version = "0.6.1"
 
 [[deps.LRUCache]]
 git-tree-sha1 = "b3cc6698599b10e652832c2f23db3cab99d51b59"
@@ -529,9 +529,9 @@ version = "1.10.0"
 
 [[deps.TensorKit]]
 deps = ["HalfIntegers", "LRUCache", "LinearAlgebra", "PackageExtensionCompat", "Strided", "TensorOperations", "TupleTools", "VectorInterface", "WignerSymbols"]
-path = "/Users/qyli/Packages/TensorKit.jl"
+git-tree-sha1 = "b060923b0d2414452857c33545b6d67266dad590"
 uuid = "07d1fe3e-3e46-537d-9eac-e9e13d0d4cec"
-version = "0.12.1"
+version = "0.12.2"
 weakdeps = ["ChainRulesCore"]
 
     [deps.TensorKit.extensions]
@@ -592,9 +592,9 @@ version = "0.4.80"
     Referenceables = "42d2dcc6-99eb-4e98-b66c-637b7d73030e"
 
 [[deps.TupleTools]]
-git-tree-sha1 = "155515ed4c4236db30049ac1495e2969cc06be9d"
+git-tree-sha1 = "41d61b1c545b06279871ef1a4b5fcb2cac2191cd"
 uuid = "9d95972d-f1c8-5527-a6e0-b4b365fa01f6"
-version = "1.4.3"
+version = "1.5.0"
 
 [[deps.UUIDs]]
 deps = ["Random", "SHA"]
@@ -605,9 +605,9 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [[deps.VectorInterface]]
 deps = ["LinearAlgebra"]
-git-tree-sha1 = "ecc747f33d2cb2c7ae73e1346e1b24e338f96012"
+git-tree-sha1 = "ed8f91274e744e5030c349e76fa98bf68236766f"
 uuid = "409d34a3-91d5-4945-b6ec-7529ddf182d8"
-version = "0.4.2"
+version = "0.4.4"
 
 [[deps.WignerSymbols]]
 deps = ["HalfIntegers", "LRUCache", "Primes", "RationalRoots"]

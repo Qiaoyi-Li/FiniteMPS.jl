@@ -48,9 +48,11 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
           Ar = Ψ[si+1]
 
           @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = _DMRGUpdate2(ProjHam(Env, si, si + 1; E₀=E₀), Al, Ar, krylovalg; kwargs...)
-          # apply noise
-          noise > 0 && noise!(xg, noise)
           eg += E₀
+          # apply noise
+          if noise > 0 && si < L-1
+               noise!(xg, noise)
+          end
           @timeit TimerStep "svd" Ψ[si], s, vd, info_svd = tsvd(xg; trunc=trunc)
           # next Al
           Al = s * vd
@@ -109,7 +111,9 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
           eg += E₀
           # apply noise
           # TODO: try to mix phys and bond idx
-          noise > 0 && noise!(xg, noise)
+          if noise > 0 && si > 2
+               noise!(xg, noise)
+          end
           @timeit TimerStep "svd" u, s, Ψ[si], info_svd = tsvd(xg; trunc=trunc)
           # next Ar
           Ar = u * s
@@ -328,8 +332,6 @@ for func in (:DMRGSweep1!, :DMRGSweep2!)
 
      end
 end
-
-
 
 function _DMRGUpdate2(H::SparseProjectiveHamiltonian{2},
      Al::MPSTensor,

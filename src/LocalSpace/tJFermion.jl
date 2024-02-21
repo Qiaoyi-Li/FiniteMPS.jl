@@ -27,7 +27,7 @@ const SS = let
      aspace = Rep[U₁×SU₂]((0, 1) => 1)
      SL = TensorMap(ones, Float64, pspace, pspace ⊗ aspace) * sqrt(3) / 2
 
-     SR = permute(SL', (2, 1), (3,))
+     SR = permute(SL', ((2, 1), (3,)))
      SL, SR
 end
 
@@ -59,8 +59,8 @@ const ΔₛdagΔₛ = let
      aspace2 = Rep[U₁×SU₂]((2, 0) => 1)
      iso = isometry(aspace ⊗ aspace, aspace2)
      @tensor B[d a; b e] := A[a b c] * iso[c d e]
-     C = permute(B', (2, 1), (4, 3))
-     D = permute(A', (2, 1), (3,))
+     C = permute(B', ((2, 1), (4, 3)))
+     D = permute(A', ((2, 1), (3,)))
      A, B, C, D
 end
 
@@ -68,10 +68,10 @@ end
 const Δₛ = (ΔₛdagΔₛ[3], ΔₛdagΔₛ[4])
 
 const Δₛdag = let (A, B) = Δₛ
-     Adag = permute(A', (3, 1), (4, 2))
+     Adag = permute(A', ((3, 1), (4, 2)))
      iso = isometry(flip(codomain(Adag)[1]), codomain(Adag)[1])
      @tensor Adag[a c; d e] := iso[a b] * Adag[b c; d e]
-     Bdag = permute(B', (2, 1), (3,))
+     Bdag = permute(B', ((2, 1), (3,)))
      Adag, -Bdag
 end
 

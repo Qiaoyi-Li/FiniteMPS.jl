@@ -20,7 +20,7 @@ const SS = let
      aspace = Rep[SU₂](1 => 1)
      SL = TensorMap(ones, Float64, pspace, pspace ⊗ aspace) * sqrt(3) / 2
 
-     SR = permute(SL', (2, 1), (3,))
+     SR = permute(SL', ((2, 1), (3,)))
      SL, SR
 end
 

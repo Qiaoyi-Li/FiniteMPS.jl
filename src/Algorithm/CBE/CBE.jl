@@ -69,6 +69,37 @@ function CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar::MPSTen
 
 end
 
+function CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar::MPSTensor{R₂}, Alg::CheapCBE{T}; kwargs...) where {R₁,R₂,T<:Union{SweepL2R,SweepR2L}}
+
+     LocalTimer = reset_timer!(get_timer("CBE"))
+     cbecheck::Bool = Alg.check
+     Dl = mapreduce(idx -> dim(Al, idx)[2], *, 1:R₁-1)
+     Dr = mapreduce(idx -> dim(Ar, idx)[2], *, 2:R₂)
+     Dc = dim(Ar, 1)[2]
+     if Dl ≤ Dc || Dr ≤ Dc # already full
+          Alg = NoCBE(T())
+          Al_ex, Ar_ex, info, to = _CBE(Al, Ar, Alg; kwargs...)
+     elseif Dl ≤ Alg.D || Dr ≤ Alg.D # full cbe is not expensive
+          Alg = FullCBE(T())
+          @timeit LocalTimer "FullCBE" Al_ex, Ar_ex, info, to = _CBE(Al, Ar, Alg; kwargs...)
+          merge!(LocalTimer, to; tree_point=["FullCBE"])
+     else
+          @timeit LocalTimer "CheapCBE" Al_ex, Ar_ex, info, to = _CBE(PH, Al, Ar, Alg; kwargs...)
+          merge!(LocalTimer, to; tree_point=["CheapCBE"])
+     end
+
+     if cbecheck
+          @timeit LocalTimer "check" ϵ = norm(Al * Ar - Al_ex * Ar_ex)
+     else
+          ϵ = NaN
+     end
+
+     D₀ = dim(Ar, 1)
+     D = dim(Ar_ex, 1)
+     return Al_ex, Ar_ex, CBEInfo(Alg, info, D₀, D, ϵ)
+
+end
+
 # ================== implementation ==================
 # return Al, Ar, info, LocalTimer
 function _CBE(Al::MPSTensor, Ar::MPSTensor, Alg::NoCBE; kwargs...)
@@ -209,6 +240,65 @@ function _CBE(PH::SparseProjectiveHamiltonian{2}, Al_lc::MPSTensor{R₁}, Ar::MP
      @timeit LocalTimer "svd6" begin
           Al_ex, S::MPSTensor, info6 = leftorth(Al_ex; trunc=notrunc())
           Ar_ex = S * Ar_ex
+     end
+
+     return Al_ex, Ar_ex, (info1, info2, info3, info4, info5, info6), LocalTimer
+end
+
+function _CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar_rc::MPSTensor{R₂}, Alg::CheapCBE{SweepL2R}; kwargs...) where {R₁,R₂}
+
+     LocalTimer = TimerOutput()
+
+     # 1-st svd, bond-canonicalize Al
+     @timeit LocalTimer "svd1" begin
+          Al_lc::MPSTensor, _, info1 = leftorth(Al; trunc=truncbelow(Alg.tol))
+     end
+     # left orthogonal complement, note the bond tensor is in it
+     @timeit LocalTimer "ConstructLO" LO = LeftOrthComplement(PH.El, Al_lc, PH.H[1], Al)
+     # 2-nd svd, implemented by eig
+     @timeit LocalTimer "svd2" C::MPSTensor, info2 = _CBE_leftorth_R(LO; trunc=truncbelow(Alg.tol), normalize=true)
+     # right orthogonal complement
+     @timeit LocalTimer "ConstructRO" RO = RightOrthComplement(PH.Er, Ar_rc, PH.H[2])
+
+     # 3-rd svd, D -> D/w, weighted by the updated bond tensor C
+     w = mapreduce(x -> rank(x) == 2 ? 1 : dim(x, 2)[2], +, RO.Er)
+     @timeit LocalTimer "svd3" RO_trunc, info3 = _CBE_leftorth_R(RO;
+          BondTensor=C,
+          trunc=truncbelow(Alg.tol) & truncdim(div(Alg.D, w)))
+
+     # 4-th svd, preselect
+     @timeit LocalTimer "preselect" Ar_fuse::MPSTensor = _preselect(RO_trunc)
+
+     # directly apply svd
+     @timeit LocalTimer "svd4" begin
+          _, Ar_pre::MPSTensor, info4 = rightorth(Ar_fuse;
+               trunc=truncbelow(Alg.tol) & truncdim(Alg.D))
+     end
+     # final select
+     @timeit LocalTimer "finalselect" begin
+          Er_trunc = _initialize_Er(RO.Ar, Ar_pre)
+          Al_final::MPSTensor = _finalselect(LO, Er_trunc)
+          # @show norm(permute(Al_final.A, (1, 2, 3), (4,))' * permute(LO.Al_c.A, (1, 2, 3), (4,)))
+     end
+
+     # 5-th svd, directly use svd
+     D₀ = dim(Ar_rc, 1)[2] # original bond dimension
+     @timeit LocalTimer "svd5" begin
+          _, _, Vd::MPSTensor, info5 = tsvd(Al_final, Tuple(1:R₁-1), (R₁,); trunc=truncbelow(Alg.tol) & truncdim(Alg.D - D₀))
+     end
+     Ar_final::MPSTensor = Vd * Ar_pre
+     # orthogonalize again
+     @timeit LocalTimer "reortho" begin
+          axpy!(-1, _rightProj(Ar_final, Ar_rc), Ar_final.A)
+     end
+
+     # direct sum
+     @timeit LocalTimer "oplus" Ar_ex::MPSTensor = _directsum_Ar(Ar_rc, Ar_final)
+     @timeit LocalTimer "expand" Al_ex::MPSTensor = _expand_Al(Ar_rc, Ar_ex, Al)
+
+     @timeit LocalTimer "svd6" begin
+          S::MPSTensor, Ar_ex, info6 = rightorth(Ar_ex; trunc=notrunc())
+          Al_ex = Al_ex * S
      end
 
      return Al_ex, Ar_ex, (info1, info2, info3, info4, info5, info6), LocalTimer

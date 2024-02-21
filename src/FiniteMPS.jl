@@ -20,7 +20,6 @@ export trivial, istrivial, data, UniformDistribution, GaussianDistribution, Norm
 include("utils/trivial.jl")
 include("utils/TensorMap.jl")
 include("utils/Random.jl")
-include("utils/tsvd.jl")
 include("utils/CompatThreading.jl")
 include("utils/SerializedElementArrays.jl")
 include("utils/manualGC.jl")
