@@ -10,15 +10,15 @@ Apply 1-site TDVP`[https://doi.org/10.1103/PhysRevB.94.165116]` sweep to perform
 Wrap `TDVPSweep1!` with a symmetric integrator, i.e., sweeping from left to right and then from right to left with the same step length `dt / 2`.
 
 # Kwargs
+     krylovalg::KrylovKit.KrylovAlgorithm = TDVPDefaultLanczos
      trunc::TruncationType = notrunc()
      GCstep::Bool = false
      GCsweep::Bool = false
      verbose::Int64 = 0
-     LanczosOpt::NameTuple (Pack options of Lanczos algorithm, details please see `KrylovKit.jl`)
      CBEAlg::CBEAlgorithm = NoCBE()
 """
 function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::SweepL2R; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,DenseMPS}}
-
+     krylovalg = get(kwargs, :krylovalg, TDVPDefaultLanczos)
      trunc = get(kwargs, :trunc, notrunc())
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
@@ -47,7 +47,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
           end
 
           @timeit TimerStep "pushEnv" canonicalize!(Env, si)
-          @timeit TimerStep "TDVPUpdate1" x1, Norm, info_Lanczos = _TDVPUpdate1(ProjHam(Env, si; E₀=E₀), Al, dt; kwargs...)
+          @timeit TimerStep "TDVPUpdate1" x1, Norm, info_Lanczos = _TDVPUpdate1(ProjHam(Env, si; E₀=E₀), Al, dt, krylovalg; kwargs...)
           rmul!(Ψ, Norm * exp(dt * E₀))
 
           if si < L
@@ -59,7 +59,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
 
                # backward evolution
                @timeit TimerStep "pushEnv" canonicalize!(Env, si + 1, si)
-               @timeit TimerStep "TDVPUpdate0" S, Norm, info_Lanczos = _TDVPUpdate0(ProjHam(Env, si + 1, si; E₀=E₀), S, -dt; kwargs...)
+               @timeit TimerStep "TDVPUpdate0" S, Norm, info_Lanczos = _TDVPUpdate0(ProjHam(Env, si + 1, si; E₀=E₀), S, -dt, krylovalg; kwargs...)
                rmul!(Ψ, Norm * exp(-dt * E₀))
 
                # next Al
@@ -107,7 +107,7 @@ end
 
 function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::SweepR2L; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,DenseMPS}}
      # right to left sweep
-
+     krylovalg = get(kwargs, :krylovalg, TDVPDefaultLanczos)
      trunc = get(kwargs, :trunc, notrunc())
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
@@ -136,7 +136,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
           end
 
           @timeit TimerStep "pushEnv" canonicalize!(Env, si)
-          @timeit TimerStep "TDVPUpdate1" x1, Norm, info_Lanczos = _TDVPUpdate1(ProjHam(Env, si; E₀=E₀), Ar, dt; kwargs...)
+          @timeit TimerStep "TDVPUpdate1" x1, Norm, info_Lanczos = _TDVPUpdate1(ProjHam(Env, si; E₀=E₀), Ar, dt, krylovalg; kwargs...)
           rmul!(Ψ, Norm * exp(dt * E₀))
 
           if si > 1
@@ -147,7 +147,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
 
                # backward evolution
                @timeit TimerStep "pushEnv" canonicalize!(Env, si, si - 1)
-               @timeit TimerStep "TDVPUpdate0" S, Norm, info_Lanczos = _TDVPUpdate0(ProjHam(Env, si, si - 1; E₀=E₀), S, -dt; kwargs...)
+               @timeit TimerStep "TDVPUpdate0" S, Norm, info_Lanczos = _TDVPUpdate0(ProjHam(Env, si, si - 1; E₀=E₀), S, -dt, krylovalg; kwargs...)
                rmul!(Ψ, Norm * exp(-dt * E₀))
 
                # next Ar

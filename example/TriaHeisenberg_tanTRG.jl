@@ -2,15 +2,6 @@ using MKL
 using FiniteMPS, FiniteLattices
 
 include("Models/Heisenberg.jl")
-# show julia nthreads (set by -t)
-@show Threads.nthreads()
-@assert Threads.nthreads() > 1
-
-@show TensorKit.Strided.set_num_threads(1)
-# set MKL nthreads
-BLAS.set_num_threads(1)
-@show BLAS.get_num_threads()
-flush(stdout)
 
 verbose = 1
 GCstep = false
@@ -46,14 +37,12 @@ let
 
           TDVPSweep2!(Env, -dβ / 2;
                GCstep=GCstep, GCsweep=true, verbose=verbose,
-               trunc=truncdim(D) & truncbelow(1e-16),
-               LanczosOpt=(krylovdim=32, maxiter=1, tol=1e-8, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
+               trunc=truncdim(D) & truncbelow(1e-16))
 
           # TDVPSweep1!(Env, -dβ / 2;
           #      CBEAlg = StandardCBE(D + div(D, 8), 1e-8),
           #      GCstep=GCstep, GCsweep=true, verbose=verbose,
-          #      trunc=truncdim(D) & truncbelow(1e-16),
-          #      LanczosOpt=(krylovdim=32, maxiter=1, tol=1e-8, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
+          #      trunc=truncdim(D) & truncbelow(1e-16))
 
 
           lnZ += 2 * log(norm(ρ))

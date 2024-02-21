@@ -5,15 +5,6 @@ verbose = 1
 
 include("Models/tJ.jl")
 
-# show julia nthreads (set by -t)
-@show Threads.nthreads()
-@assert Threads.nthreads() > 1
-
-@show TensorKit.Strided.set_num_threads(1)
-# set MKL nthreads
-BLAS.set_num_threads(1)
-@show BLAS.get_num_threads()
-
 flush(stdout)
 
 @show Latt = SquaLatt(8, 4; BCY=:PBC)
@@ -51,8 +42,7 @@ function mainDMRG(Ψ=nothing)
     for (i, D) in enumerate(lsD)
         lsinfo[i], lsTimer[i] = DMRGSweep2!(Env;
             GCstep=GCstep, GCsweep=true, verbose=verbose,
-            trunc=truncdim(D) & truncbelow(1e-6),
-            LanczosOpt=(krylovdim=5, maxiter=1, tol=1e-4, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
+            trunc=truncdim(D) & truncbelow(1e-6))
         lsEn[i] = lsinfo[i][2][1].Eg
     end
 
@@ -60,8 +50,7 @@ function mainDMRG(Ψ=nothing)
         info_DMRG1, Timer_DMRG1 = DMRGSweep1!(Env;
           CBEAlg=StandardCBE(lsD[end] + div(lsD[end], 10), 1e-6),
           trunc=truncdim(lsD[end]) & truncbelow(1e-6),
-            GCstep=GCstep, GCsweep=true, verbose=verbose,
-            LanczosOpt=(krylovdim=8, maxiter=1, tol=1e-4, orth=ModifiedGramSchmidt(), eager=true, verbosity=0))
+            GCstep=GCstep, GCsweep=true, verbose=verbose)
         push!(lsEn, info_DMRG1[2].dmrg[1].Eg)
         push!(lsinfo, info_DMRG1)
         push!(lsTimer, Timer_DMRG1)

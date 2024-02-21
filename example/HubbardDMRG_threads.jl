@@ -7,8 +7,6 @@ include("Models/Hubbard.jl")
 
 @show BLAS.get_num_threads()
 
-flush(stdout)
-
 @show Latt = SquaLatt(8, 4; BCY=:PBC)
 disk = false # store local tensors in disk or memory
 

@@ -70,7 +70,8 @@ function leftorth(A::MPSTensor{R₁}; trunc=notrunc(), kwargs...) where {R₁}
           Q, R = leftorth(A.A, Tuple(1:R₁-1), (R₁,); kwargs...)
           return Q, R, BondInfo(Q, :R)
      else
-          return tsvd(A, Tuple(1:R₁-1), (R₁,); trunc=trunc, kwargs...)
+          u, s, vd, info =  tsvd(A, Tuple(1:R₁-1), (R₁,); trunc=trunc, kwargs...)
+          return u, s * vd, info
           # alg = get(kwargs, :alg, nothing)
           # if isnothing(alg)
           #      u, s, vd, ϵ = tsvd(A.A, Tuple(1:R₁-1), (R₁,); trunc=trunc)
@@ -96,7 +97,8 @@ function rightorth(A::MPSTensor{R₂}; trunc=notrunc(), kwargs...) where {R₂}
           L, Q = rightorth(A.A, (1,), Tuple(2:R₂); kwargs...)
           return L, Q, BondInfo(Q, :L)
      else
-          return tsvd(A, (1,), Tuple(2:R₂); trunc=trunc, kwargs...)
+          u, s, vd, info = tsvd(A, (1,), Tuple(2:R₂); trunc=trunc, kwargs...)
+          return u * s, vd, info
           # alg = get(kwargs, :alg, nothing)
           # if isnothing(alg)
           #      u, s, vd, ϵ = tsvd(A.A, (1,), Tuple(2:R₂); trunc=trunc)

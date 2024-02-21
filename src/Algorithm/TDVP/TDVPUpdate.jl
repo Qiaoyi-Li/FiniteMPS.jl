@@ -1,10 +1,10 @@
-function _TDVPUpdate2(H::SparseProjectiveHamiltonian{2}, Al::MPSTensor, Ar::MPSTensor, dt::Number; kwargs...)
+function _TDVPUpdate2(H::SparseProjectiveHamiltonian{2}, Al::MPSTensor, Ar::MPSTensor, dt::Number, alg::KrylovKit.KrylovAlgorithm; kwargs...)
 
      reset_timer!(get_timer("action2"))
      expx, info = _LanczosExp(x -> action2(H, x; kwargs...),
           dt,
           CompositeMPSTensor(Al, Ar),
-          _getLanczos(; kwargs...))
+          alg)
 
      # normalize
      Norm = norm(expx)
@@ -13,7 +13,7 @@ function _TDVPUpdate2(H::SparseProjectiveHamiltonian{2}, Al::MPSTensor, Ar::MPST
 
 end
 
-function _TDVPUpdate1(H::SparseProjectiveHamiltonian{1}, A::MPSTensor, dt::Number; kwargs...)
+function _TDVPUpdate1(H::SparseProjectiveHamiltonian{1}, A::MPSTensor, dt::Number, alg::KrylovKit.KrylovAlgorithm; kwargs...)
 
      reset_timer!(get_timer("action1"))
 
@@ -22,12 +22,12 @@ function _TDVPUpdate1(H::SparseProjectiveHamiltonian{1}, A::MPSTensor, dt::Numbe
           expx, info = _LanczosExp(x -> action1(PH, x; kwargs...),
                dt,
                A,
-               _getLanczos(; kwargs...))
+               alg)
      else
           expx, info = _LanczosExp(x -> action1(H, x; kwargs...),
                dt,
                A,
-               _getLanczos(; kwargs...))
+               alg)
      end
 
      # normalize
@@ -37,13 +37,13 @@ function _TDVPUpdate1(H::SparseProjectiveHamiltonian{1}, A::MPSTensor, dt::Numbe
 
 end
 
-function _TDVPUpdate0(H::SparseProjectiveHamiltonian{0}, A::MPSTensor{2}, dt::Number; kwargs...)
+function _TDVPUpdate0(H::SparseProjectiveHamiltonian{0}, A::MPSTensor{2}, dt::Number, alg::KrylovKit.KrylovAlgorithm; kwargs...)
 
      reset_timer!(get_timer("action0"))
      expx, info = _LanczosExp(x -> action0(H, x; kwargs...),
           dt,
           A,
-          _getLanczos(; kwargs...))
+          alg)
 
      # normalize
      Norm = norm(expx)
