@@ -10,7 +10,6 @@ using Base.Threads, FLoops, FoldsThreads, Distributed
 @reexport import LinearAlgebra: BLAS, rank, qr, diag, I, diagm
 @reexport import AbstractTrees: parent, isroot
 
-
 # global settings
 include("Globals.jl")
 include("Defaults.jl")

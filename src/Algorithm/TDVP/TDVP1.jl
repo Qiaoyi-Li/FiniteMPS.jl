@@ -10,7 +10,7 @@ Apply 1-site TDVP`[https://doi.org/10.1103/PhysRevB.94.165116]` sweep to perform
 Wrap `TDVPSweep1!` with a symmetric integrator, i.e., sweeping from left to right and then from right to left with the same step length `dt / 2`.
 
 # Kwargs
-     trunc::TruncationType = truncbelow(MPSDefault.tol)
+     trunc::TruncationType = notrunc()
      GCstep::Bool = false
      GCsweep::Bool = false
      verbose::Int64 = 0
@@ -19,7 +19,7 @@ Wrap `TDVPSweep1!` with a symmetric integrator, i.e., sweeping from left to righ
 """
 function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::SweepL2R; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,DenseMPS}}
 
-     trunc = get(kwargs, :trunc, truncbelow(MPSDefault.tol))
+     trunc = get(kwargs, :trunc, notrunc())
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
      verbose::Int64 = get(kwargs, :verbose, 0)
@@ -108,7 +108,7 @@ end
 function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::SweepR2L; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,DenseMPS}}
      # right to left sweep
 
-     trunc = get(kwargs, :trunc, truncbelow(MPSDefault.tol))
+     trunc = get(kwargs, :trunc, notrunc())
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
      verbose::Int64 = get(kwargs, :verbose, 0)

@@ -8,7 +8,7 @@
      krylovalg::KrylovKit.KrylovAlgorithm = DMRGDefaultLanczos
 Krylov algorithm used in DMRG update.
 
-     trunc::TruncationScheme = notrunc()
+     trunc::TruncationScheme = truncbelow(MPSDefault.tol) & truncdim(MPSDefault.D)
 Control the truncation in svd after each 2-site update. Details see `tsvd`. 
 
      GCstep::Bool = false
@@ -27,7 +27,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
      @assert Center(Env[3])[2] ≤ 2
 
      krylovalg = get(kwargs, :krylovalg, DMRGDefaultLanczos)
-     trunc = get(kwargs, :trunc, notrunc())
+     trunc = get(kwargs, :trunc, truncbelow(MPSDefault.tol) & truncdim(MPSDefault.D))
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
      verbose::Int64 = get(kwargs, :verbose, 0)
@@ -88,7 +88,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
      @assert Center(Env[3])[1] ≥ L - 1
 
      krylovalg = get(kwargs, :krylovalg, DMRGDefaultLanczos)
-     trunc = get(kwargs, :trunc, notrunc())
+     trunc = get(kwargs, :trunc, truncbelow(MPSDefault.tol) & truncdim(MPSDefault.D))
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
      verbose::Int64 = get(kwargs, :verbose, 0)

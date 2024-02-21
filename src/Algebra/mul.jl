@@ -8,7 +8,7 @@ Compute `C = α A*B + β C` variationally via 2-site update, where `A` is a spar
 Compute `C = A*B` by letting `α = 1` and `β = 0`.
 
 # Kwargs
-     trunc::TruncationScheme = truncbelow(MPSDefault.tol)
+     trunc::TruncationScheme = truncbelow(MPSDefault.tol) & truncdim(MPSDefault.D)
      GCstep::Bool = false
      GCsweep::Bool = false
      maxiter::Int64 = 8
@@ -21,7 +21,7 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
      @assert α != 0 || β != 0
      @assert !(B === C)
 
-     trunc::TruncationScheme = get(kwargs, :trunc, truncbelow(MPSDefault.tol))
+     trunc::TruncationScheme = get(kwargs, :trunc, truncbelow(MPSDefault.tol) & truncdim(MPSDefault.D))
      GCstep::Bool = get(kwargs, :GCstep, false)
      GCsweep::Bool = get(kwargs, :GCsweep, false)
      maxiter::Int64 = get(kwargs, :maxiter, 8)

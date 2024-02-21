@@ -4,7 +4,7 @@
 Compute `y = α*x + β*y` variationally via 2-site update, where `x` and `y` are dense MPS/MPO. Note 'x' cannot reference to the same MPS/MPO with `y`.  
 
 # Kwargs
-     trunc::TruncationScheme = truncbelow(MPSDefault.tol)
+     trunc::TruncationScheme = truncbelow(MPSDefault.tol) & truncdim(MPSDefault.D)
      GCstep::Bool = false
      GCsweep::Bool = false
      maxiter::Int64 = 8
@@ -26,7 +26,7 @@ function axpby!(α::Number, x::DenseMPS{L}, β::Number, y::DenseMPS{L}; kwargs..
 
      @assert !(x === y)
 
-     trunc::TruncationScheme = get(kwargs, :trunc, truncbelow(MPSDefault.tol))
+     trunc::TruncationScheme = get(kwargs, :trunc, truncbelow(MPSDefault.tol) & truncdim(MPSDefault.D))
      GCstep::Bool = get(kwargs, :GCstep, false)
      GCsweep::Bool = get(kwargs, :GCsweep, false)
      maxiter::Int64 = get(kwargs, :maxiter, 8)
