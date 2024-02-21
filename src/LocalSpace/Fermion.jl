@@ -33,6 +33,9 @@ Four operators of singlet pairing correlation `Δₛ^dagΔₛ`, where `Δₛ = (
      Δₛ::NTuple{2, TensorMap}
      Δₛdag::NTuple{2, TensorMap}
 Singlet pairing operators `Δₛ` and `Δₛ^dag`. Rank = `(4, 3)`. Note the first operator has nontrivial left bond index.
+
+     CpCm::NTuple{2, TensorMap}
+Two rank-`3` operators of `C+C-` correlation where `C+ = c↑^dag c↓^dag` and `C- = C+^dag = c↓c↑`. Note both operators are bosonic.
 """
 module U₁SU₂Fermion
 
@@ -110,6 +113,16 @@ const Δₛdag = let (A, B) = Δₛ
      @tensor Adag[a c; d e] := iso[a b] * Adag[b c; d e]
      Bdag = permute(B', ((2, 1), (3,)))
      Adag, -Bdag
+end
+
+# C+C- correlation
+const CpCm = let Fdag = FdagF[1]
+     aspace = Rep[U₁×SU₂]((1, 1 / 2) => 1)
+     aspace2 = Rep[U₁×SU₂]((2, 0) => 1)
+     iso = isometry(aspace ⊗ aspace, aspace2)
+     @tensor Cp[a; d f] := Fdag[a b c] * Fdag[b d e] * iso[c e f]
+     Cm = permute(Cp', (2, 1), (3,))
+     Cp, Cm
 end
 
 end
