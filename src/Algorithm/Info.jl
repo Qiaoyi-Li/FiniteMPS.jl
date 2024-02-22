@@ -1,8 +1,8 @@
 """
-     struct LanczosInfo 
+     struct LanczosInfo
           converged::Bool
-          normres::Vector{Float64}    
-          numiter::Int64    
+          normres::Vector{Float64}
+          numiter::Int64
           numops::Int64
      end
 
@@ -41,7 +41,7 @@ Outer constructor via giving the `s` tensor and `ϵ` form `tsvd`.
      BondInfo(A::AbstractTensorMap, direction::Symbol)
      BondInfo(A::MPSTensor, direction::Symbol)
 
-Outer constructor via giving a tensor `A` and `direction = :L` or `:R`. We cannot get truncation error and singular values hence `TrunErr` and `SE` are set to `0.0` and `NaN`, respectively.  
+Outer constructor via giving a tensor `A` and `direction = :L` or `:R`. We cannot get truncation error and singular values hence `TrunErr` and `SE` are set to `0.0` and `NaN`, respectively.
 """
 struct BondInfo
      D::Int64
@@ -51,7 +51,7 @@ struct BondInfo
      BondInfo(D::Int64, DD::Int64, TrunErr::Float64, SE::Float64) = new(D, DD, TrunErr, SE)
 end
 
-function BondInfo(s::AbstractTensorMap, ϵ::Float64=0.0)
+function BondInfo(s::AbstractTensorMap{T}, ϵ::Float64=0.0) where T <: GradedSpace
      D = DD = 0
      Norm2 = SE = 0.0
      for k in keys(data(s))
@@ -63,6 +63,19 @@ function BondInfo(s::AbstractTensorMap, ϵ::Float64=0.0)
      end
      SE = -2SE / Norm2 + log(Norm2)
      return BondInfo(D, DD, ϵ, SE)
+end
+function BondInfo(s::AbstractTensorMap{T}, ϵ::Float64=0.0) where T <: Union{CartesianSpace, ComplexSpace}
+    D = DD = 0
+    Norm2 = SE = 0.0
+
+    λ = diag(data(s)[1])
+    D += length(λ)
+    DD += length(λ)
+    Norm2 += norm(λ)^2
+    SE += mapreduce(x -> x == 0 ? 0 : x^2 * log(x), +, λ)
+
+    SE = -2SE / Norm2 + log(Norm2)
+    return BondInfo(D, DD, ϵ, SE)
 end
 function BondInfo(A::AbstractTensorMap, direction::Symbol)
      @assert direction in (:L, :R)
@@ -76,7 +89,7 @@ function show(io::IO, info::BondInfo)
 end
 
 function merge(info1::BondInfo, info2::BondInfo)
-     
+
      if isnan(info1.SE)
           SE = info2.SE
      elseif isnan(info2.SE)
@@ -96,7 +109,7 @@ merge(v::AbstractVector{BondInfo}) = reduce(merge, v)
 """
      struct DMRGInfo
           Eg::Float64
-          Lanczos::LanczosInfo 
+          Lanczos::LanczosInfo
           Bond::BondInfo
      end
 
