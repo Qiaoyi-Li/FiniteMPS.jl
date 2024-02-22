@@ -249,58 +249,70 @@ function _CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar_rc::MP
 
      LocalTimer = TimerOutput()
 
-     # 1-st svd, bond-canonicalize Al
+     # pre truncate
+     w = mapreduce(x -> rank(x) == 2 ? 1 : dim(x, 2)[2], +, PH.Er)
      @timeit LocalTimer "svd1" begin
-          Al_lc::MPSTensor, _, info1 = leftorth(Al; trunc=truncbelow(Alg.tol))
+          _, C::MPSTensor, info1 = leftorth(Al; trunc=truncbelow(Alg.tol) & truncdim(div(Alg.D,w)))
      end
-     # left orthogonal complement, note the bond tensor is in it
-     @timeit LocalTimer "ConstructLO" LO = LeftOrthComplement(PH.El, Al_lc, PH.H[1], Al)
-     # 2-nd svd, implemented by eig
-     @timeit LocalTimer "svd2" C::MPSTensor, info2 = _CBE_leftorth_R(LO; trunc=truncbelow(Alg.tol), normalize=true)
+     Ar::MPSTensor = C * Ar_rc
+
      # right orthogonal complement
-     @timeit LocalTimer "ConstructRO" RO = RightOrthComplement(PH.Er, Ar_rc, PH.H[2])
+     @timeit LocalTimer "ConstructRO" RO = RightOrthComplement(PH.Er, Ar_rc, PH.H[2], Ar)
 
-     # 3-rd svd, D -> D/w, weighted by the updated bond tensor C
-     w = mapreduce(x -> rank(x) == 2 ? 1 : dim(x, 2)[2], +, RO.Er)
-     @timeit LocalTimer "svd3" RO_trunc, info3 = _CBE_leftorth_R(RO;
-          BondTensor=C,
-          trunc=truncbelow(Alg.tol) & truncdim(div(Alg.D, w)))
+     # orthogonalize
+     @timeit LocalTimer "fuseAbstractBond" Ar_fuse::MPSTensor = _preselect(RO)
 
-     # 4-th svd, preselect
-     @timeit LocalTimer "preselect" Ar_fuse::MPSTensor = _preselect(RO_trunc)
-
-     # directly apply svd
-     @timeit LocalTimer "svd4" begin
-          _, Ar_pre::MPSTensor, info4 = rightorth(Ar_fuse;
-               trunc=truncbelow(Alg.tol) & truncdim(Alg.D))
+     # svd to get the isometry to selected space
+     D₀ = dim(codomain(Ar_rc)[1])
+     @timeit LocalTimer "svd2" begin
+          _, Ar_pre::MPSTensor, info2 = rightorth(Ar_fuse;
+               trunc=truncbelow(Alg.tol) & truncdim(Alg.D - D₀))
      end
-     # final select
-     @timeit LocalTimer "finalselect" begin
-          Er_trunc = _initialize_Er(RO.Ar, Ar_pre)
-          Al_final::MPSTensor = _finalselect(LO, Er_trunc)
-          # @show norm(permute(Al_final.A, (1, 2, 3), (4,))' * permute(LO.Al_c.A, (1, 2, 3), (4,)))
-     end
-
-     # 5-th svd, directly use svd
-     D₀ = dim(Ar_rc, 1)[2] # original bond dimension
-     @timeit LocalTimer "svd5" begin
-          _, _, Vd::MPSTensor, info5 = tsvd(Al_final, Tuple(1:R₁-1), (R₁,); trunc=truncbelow(Alg.tol) & truncdim(Alg.D - D₀))
-     end
-     Ar_final::MPSTensor = Vd * Ar_pre
+ 
      # orthogonalize again
      @timeit LocalTimer "reortho" begin
-          axpy!(-1, _rightProj(Ar_final, Ar_rc), Ar_final.A)
+          axpy!(-1, _rightProj(Ar_pre, Ar_rc), Ar_pre.A)
      end
 
      # direct sum
-     @timeit LocalTimer "oplus" Ar_ex::MPSTensor = _directsum_Ar(Ar_rc, Ar_final)
+     @timeit LocalTimer "oplus" Ar_ex::MPSTensor = _directsum_Ar(Ar_rc, Ar_pre)
      @timeit LocalTimer "expand" Al_ex::MPSTensor = _expand_Al(Ar_rc, Ar_ex, Al)
 
-     @timeit LocalTimer "svd6" begin
-          S::MPSTensor, Ar_ex, info6 = rightorth(Ar_ex; trunc=notrunc())
-          Al_ex = Al_ex * S
-     end
-
-     return Al_ex, Ar_ex, (info1, info2, info3, info4, info5, info6), LocalTimer
+     return Al_ex, Ar_ex, (info1, info2), LocalTimer
 end
 
+function _CBE(PH::SparseProjectiveHamiltonian{2}, Al_lc::MPSTensor{R₁}, Ar::MPSTensor{R₂}, Alg::CheapCBE{SweepR2L}; kwargs...) where {R₁,R₂}
+
+     LocalTimer = TimerOutput()
+
+     # pre truncate
+     w = mapreduce(x -> rank(x) == 2 ? 1 : dim(x, 2)[2], +, PH.El)
+     @timeit LocalTimer "svd1" begin
+          C::MPSTensor, _, info1 = rightorth(Ar; trunc=truncbelow(Alg.tol) & truncdim(div(Alg.D,w)))
+     end
+     Al::MPSTensor = Al_lc * C
+
+     # right orthogonal complement
+     @timeit LocalTimer "ConstructLO" LO = LeftOrthComplement(PH.El, Al_lc, PH.H[1], Al)
+
+     # orthogonalize
+     @timeit LocalTimer "fuseAbstractBond" Al_fuse::MPSTensor = _preselect(LO)
+
+     # svd to get the isometry to selected space
+     D₀ = dim(codomain(Ar)[1])
+     @timeit LocalTimer "svd2" begin
+          Al_pre::MPSTensor, _, info2 = leftorth(Al_fuse;
+               trunc=truncbelow(Alg.tol) & truncdim(Alg.D - D₀))
+     end
+ 
+     # orthogonalize again
+     @timeit LocalTimer "reortho" begin
+          axpy!(-1, _leftProj(Al_pre, Al_lc), Al_pre.A)
+     end
+
+     # direct sum
+     @timeit LocalTimer "oplus" Al_ex::MPSTensor = _directsum_Al(Al_lc, Al_pre)
+     @timeit LocalTimer "expand" Ar_ex::MPSTensor = _expand_Ar(Al_lc, Al_ex, Ar)
+
+     return Al_ex, Ar_ex, (info1, info2), LocalTimer
+end

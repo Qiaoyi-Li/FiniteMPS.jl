@@ -78,7 +78,7 @@ include("Algebra/mul.jl")
 include("Algebra/axpby.jl")
 
 # Algorithm
-export LanczosInfo, BondInfo, DMRGInfo, TDVPInfo, DMRGSweep2!, DMRGSweep1!, SETTN, TDVPSweep2!, TDVPSweep1!, TDVPIntegrator, SymmetricIntegrator, CBEAlgorithm, NoCBE, FullCBE, StandardCBE, CBE, LeftOrthComplement, RightOrthComplement
+export LanczosInfo, BondInfo, DMRGInfo, TDVPInfo, DMRGSweep2!, DMRGSweep1!, SETTN, TDVPSweep2!, TDVPSweep1!, TDVPIntegrator, SymmetricIntegrator, CBEAlgorithm, NoCBE, FullCBE, StandardCBE, CheapCBE, CBE, LeftOrthComplement, RightOrthComplement
 include("Algorithm/Info.jl")
 include("Algorithm/DMRG.jl")
 include("Algorithm/SETTN.jl")

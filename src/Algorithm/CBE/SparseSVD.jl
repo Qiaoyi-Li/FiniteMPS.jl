@@ -287,14 +287,6 @@ function _CBE_leftorth_R(RO::RightOrthComplement{N};
           end
      else
 
-          # SVd_Ar::Vector{MPSTensor}, SVd_Er::SparseRightTensor = let U_wrap::MPSTensor = U', SVd_Ar = Vector{MPSTensor}(undef, N), SVd_Er = SparseRightTensor(undef, N)
-          #      @floop GlobalThreadsExecutor for i in 1:N
-          #           SVd_Ar[i] = U_wrap * RO.Ar[i]
-          #           SVd_Er[i] = U_wrap * RO.Er[i]
-          #      end
-          #      SVd_Ar, SVd_Er
-          # end
-
           SVd_Ar = Vector{MPSTensor}(undef, N)
           SVd_Er = SparseRightTensor(undef, N)
           U_wrap::MPSTensor = U'

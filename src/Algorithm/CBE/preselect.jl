@@ -27,16 +27,6 @@ function _preselect(LO::LeftOrthComplement{N}) where {N}
                f(LO.Al[i] - MPSTensor(_leftProj(LO.El[i], LO.Al_c)), lsIso[i])
           end
      else
-          # Al_oc = let f = f
-          #      @floop GlobalThreadsExecutor for i in 1:N
-          #           axpy!(-1, _leftProj(LO.El[i], LO.Al_c), LO.Al[i].A) # project to orthogonal complement
-          #           Al_i = f(LO.Al[i], lsIso[i])
-          #           @reduce() do (Al = nothing; Al_i)
-          #                Al = axpy!(true, Al_i, Al)
-          #           end
-          #      end
-          #      normalize!(Al)
-          # end
 
           Al_oc = nothing
           Lock = Threads.ReentrantLock()
@@ -94,16 +84,6 @@ function _preselect(RO::RightOrthComplement{N}) where {N}
           end
          
      else
-          # Ar_oc = let f = f
-          #      @floop GlobalThreadsExecutor for i in 1:N
-          #           axpy!(-1, _rightProj(RO.Er[i], RO.Ar_c), RO.Ar[i].A) # project to orthogonal complement
-          #           Ar_i = f(RO.Ar[i], lsIso[i])
-          #           @reduce() do (Ar = nothing; Ar_i)
-          #                Ar = axpy!(true, Ar_i, Ar)
-          #           end
-          #      end
-          #      normalize!(Ar)
-          # end
 
           Ar_oc = nothing
           Lock = Threads.ReentrantLock()

@@ -71,14 +71,6 @@ end
 Use SVD to split a 2-site local tensor, details see TensorKit.tsvd.
 """
 function tsvd(A::CompositeMPSTensor{2,Tuple{MPSTensor{R₁},MPSTensor{R₂}}}; kwargs...) where {R₁,R₂}
-     # trunc = get(kwargs, :trunc, notrunc())
-     # alg = get(kwargs, :alg, nothing)
-     # if isnothing(alg)
-     #      u, s, v, ϵ = tsvd(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)); trunc=trunc)
-     # else
-     #      u, s, v, ϵ = tsvd(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)); trunc=trunc, alg=alg)
-     # end
-     # return u, s, v, BondInfo(s, ϵ)
      return tsvd(A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)); kwargs...)
 end
 
