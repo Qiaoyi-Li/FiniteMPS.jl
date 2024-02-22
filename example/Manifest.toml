@@ -202,7 +202,7 @@ version = "0.1.0"
 deps = ["AbstractTrees", "Distributed", "FLoops", "FoldsThreads", "JLD2", "KrylovKit", "LinearAlgebra", "Reexport", "Serialization", "SerializedElementArrays", "TensorKit", "TimerOutputs"]
 path = ".."
 uuid = "6b572690-f317-4dad-a5fe-5fe73a0b7d42"
-version = "1.0.0"
+version = "1.1.0"
 
 [[deps.FoldsThreads]]
 deps = ["Accessors", "FunctionWrappers", "InitialValues", "SplittablesBase", "Transducers"]
