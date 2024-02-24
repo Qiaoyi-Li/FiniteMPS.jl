@@ -127,13 +127,6 @@ function _CBE_rightorth_L(LO::LeftOrthComplement{N};
                US_Al, US_El
           end
      else
-          # US_Al::Vector{MPSTensor}, US_El::SparseLeftTensor = let V_wrap::MPSTensor = V, US_Al = Vector{MPSTensor}(undef, N), US_El = SparseLeftTensor(undef, N)
-          #      @floop GlobalThreadsExecutor for i in 1:N
-          #           US_Al[i] = LO.Al[i] * V_wrap
-          #           US_El[i] = LO.El[i] * V_wrap
-          #      end
-          #      US_Al, US_El
-          # end
 
           US_Al = Vector{MPSTensor}(undef, N)
           US_El = SparseLeftTensor(undef, N)
@@ -319,24 +312,13 @@ function _CBE_MM(f, lsA::Vector{MPSTensor}, lsE::Union{SparseLeftTensor,SparseRi
           end
 
      else
-          # @floop GlobalThreadsExecutor for (A, E) in zip(lsA, lsE)
-          #      tmp = f(A) - f(E)
-          #      @reduce() do (MM = nothing; tmp)
-          #           MM = axpy!(true, tmp, MM)
-          #      end
-          # end
 
           MM = nothing
           Lock = Threads.ReentrantLock()
           idx = Threads.Atomic{Int64}(1)
           N = length(lsA)
-          # TODO, use channels to avoid lock
           Threads.@sync for _ in 1:Threads.nthreads()
                Threads.@spawn while true
-                    # idx_t = Threads.atomic_add!(idx, 1)
-                    # idx_t > N && break
-
-                    # tmp = f(lsA[idx_t]) - f(lsE[idx_t])
 
                     idx_t = Threads.atomic_add!(idx, 1)
                     if idx_t <= N

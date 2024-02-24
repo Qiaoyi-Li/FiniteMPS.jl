@@ -5,7 +5,9 @@ Action of 1-site projective Hamiltonian on the 1-site local tensors.
 """
 function action1(obj::SparseProjectiveHamiltonian{1}, x::MPSTensor; kwargs...)
 
+
      Timer_action1 = get_timer("action1")
+
      @timeit Timer_action1 "action1" begin
           if get_num_workers() > 1 # multi-processing
                f = (x, y) -> (add!(x[1], y[1]), merge!(x[2], y[2]))
@@ -17,10 +19,9 @@ function action1(obj::SparseProjectiveHamiltonian{1}, x::MPSTensor; kwargs...)
 
                Hx = nothing
                Timer_acc = TimerOutput()
-
                Lock = Threads.ReentrantLock()
                idx = Threads.Atomic{Int64}(1)
-               Threads.@sync for t in 1:Threads.nthreads()
+               Threads.@sync for _ in 1:Threads.nthreads()
                     Threads.@spawn while true
                          idx_t = Threads.atomic_add!(idx, 1)
                          idx_t > length(obj.validIdx) && break
@@ -30,7 +31,11 @@ function action1(obj::SparseProjectiveHamiltonian{1}, x::MPSTensor; kwargs...)
 
                          lock(Lock)
                          try
-                              Hx = axpy!(true, tmp, Hx)
+                              if isnothing(Hx)
+                                   Hx = tmp  
+                              else
+                                   axpy!(true, tmp, Hx)
+                              end
                               merge!(Timer_acc, to)
                          catch
                               rethrow()
@@ -75,13 +80,33 @@ function action1(obj::PreFuseProjectiveHamiltonian{1}, x::MPSTensor; kwargs...)
 
           else # multi-threading
 
-               @floop GlobalThreadsExecutor for j in 1:length(obj.El)
-                    tmp, to = _action1(x, obj.El[j], obj.Er[j], true; kwargs...)
-                    @reduce() do (Hx = nothing; tmp), (Timer_acc = TimerOutput(); to)
-                         Hx = axpy!(true, tmp, Hx)
-                         Timer_acc = merge!(Timer_acc, to)
+               Hx = nothing
+               Timer_acc = TimerOutput()
+               Lock = Threads.ReentrantLock()
+               idx = Threads.Atomic{Int64}(1)
+               Threads.@sync for t in 1:Threads.nthreads()
+                    Threads.@spawn while true
+                         idx_t = Threads.atomic_add!(idx, 1)
+                         idx_t > length(obj.El) && break
+
+                         tmp, to = _action1(x, obj.El[idx_t], obj.Er[idx_t], true; kwargs...)
+
+                         lock(Lock)
+                         try
+                              if isnothing(Hx)
+                                   Hx = tmp  
+                              else
+                                   axpy!(true, tmp, Hx)
+                              end
+                              merge!(Timer_acc, to)
+                         catch
+                              rethrow()
+                         finally
+                              unlock(Lock)
+                         end
                     end
                end
+
           end
      end
 

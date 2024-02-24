@@ -189,10 +189,6 @@ function _initialize_El(Al::Vector{MPSTensor}, Al_i::MPSTensor)::SparseLeftTenso
           wait.(tasks)
           wait(taskref[])
 
-          # @floop GlobalThreadsExecutor for i in 1:sz
-          #      El[i] = _initialize_El_single(Al[i], Al_i)
-          # end
-
           return El
      end
 
@@ -209,10 +205,7 @@ function _initialize_Er(Ar::Vector{MPSTensor}, Ar_i::MPSTensor)::SparseRightTens
           end
      else
           Er = SparseRightTensor(undef, sz)
-          # @floop GlobalThreadsExecutor for i in 1:sz
-          #      Er[i] = _initialize_Er_single(Ar[i], Ar_i)
-          # end
-
+     
           idx = Threads.Atomic{Int64}(1)
           @sync for _ in 1:Threads.nthreads()
                Threads.@spawn while true

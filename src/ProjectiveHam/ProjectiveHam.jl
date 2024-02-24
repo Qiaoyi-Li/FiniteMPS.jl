@@ -113,36 +113,62 @@ end
 
 function _countIntr(obj::SparseProjectiveHamiltonian{2})
      # count the valid interactions
-     idx = Vector{NTuple{3,Int64}}(undef, 0)
+     validIdx = Vector{NTuple{3,Int64}}(undef, 0)
+     lscost = Int64[]
      for i in 1:length(obj.El), j in 1:size(obj.H[1], 2), k in 1:length(obj.Er)
           isnothing(obj.El[i]) && continue
           isnothing(obj.H[1][i, j]) && continue
           isnothing(obj.H[2][j, k]) && continue
           isnothing(obj.Er[k]) && continue
-          push!(idx, (i, j, k))
+          push!(validIdx, (i, j, k))
+
+          cost = rank(obj.El[i]) + rank(obj.Er[k])
+          if !isa(obj.H[1][i, j], IdentityOperator)
+               cost += rank(obj.H[1][i,j]) - 2
+          end
+          if !isa(obj.H[2][j, k], IdentityOperator)
+               cost += rank(obj.H[2][j,k]) - 2
+          end
+          push!(lscost, cost)
      end
-     return idx
+     # sort
+     perms = sortperm(lscost; rev = true)
+     return validIdx[perms]
 end
 
 function _countIntr(obj::SparseProjectiveHamiltonian{1})
-     idx = Vector{NTuple{2,Int64}}(undef, 0)
+     validIdx = Vector{NTuple{2,Int64}}(undef, 0)
+     lscost = Int64[]
      for i in 1:length(obj.El), j in 1:length(obj.Er)
           isnothing(obj.El[i]) && continue
           isnothing(obj.H[1][i, j]) && continue
           isnothing(obj.Er[j]) && continue
-          push!(idx, (i, j))
+          push!(validIdx, (i, j))
+          
+          cost = rank(obj.El[i]) + rank(obj.Er[j])
+          if !isa(obj.H[1][i, j], IdentityOperator)
+               cost += rank(obj.H[1][i,j]) - 2
+          end
+          push!(lscost, cost)
      end
-     return idx
+     # sort
+     perms = sortperm(lscost; rev = true)
+     return validIdx[perms]
 end
 
 function _countIntr(obj::SparseProjectiveHamiltonian{0})
-     idx = Tuple{Int64}[]
+     validIdx = Tuple{Int64}[]
+     lscost = Int64[]
      for i in 1:length(obj.El)
           isnothing(obj.El[i]) && continue
           isnothing(obj.Er[i]) && continue
-          push!(idx, (i,))
+          push!(validIdx, (i,))
+          cost = rank(obj.El[i]) + rank(obj.Er[i])
+          push!(lscost, cost)
      end
-     return idx
+     # sort
+     perms = sortperm(lscost; rev = true)
+     return validIdx[perms]
 end
 
 

@@ -36,7 +36,7 @@ setindex!(obj::AdjointMPS, X, inds...) = setindex!(obj.parent, X', inds...)
 coef(obj::AdjointMPS) = coef(obj.parent)'
 
 # some functions to be directly propagated to the parent
-for func in (:lastindex, :length, :keys,:norm, :normalize!, :Center, :iterate, :canonicalize!)
+for func in (:lastindex, :length, :keys,:norm, :normalize!, :Center, :iterate, :canonicalize!, :scalartype)
      @eval $func(obj::AdjointMPS, args...) = $func(obj.parent, args...)
 end
 

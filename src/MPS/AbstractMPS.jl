@@ -25,6 +25,7 @@ Abstract type of dense MPS/MPO with length `L`.
 abstract type DenseMPS{L, T <:Union{Float64, ComplexF64}} <: AbstractMPS{L} end
 
 # promote local tensors
+scalartype(::DenseMPS{L, T}) where {L, T} = T
 function Base.setindex!(obj::DenseMPS{L, ComplexF64}, A::T, si::Int64) where {L, T <:Union{AbstractTensorMap, AbstractMPSTensor}}
      if scalartype(A) != ComplexF64
           return setindex!(obj.A, A*one(ComplexF64), si)

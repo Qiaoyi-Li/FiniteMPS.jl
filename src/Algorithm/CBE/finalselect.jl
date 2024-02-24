@@ -36,17 +36,6 @@ function _finalselect(lsEl::SparseLeftTensor, RO::RightOrthComplement{N}) where 
           end
 
      else # multi-threading
-          # Er::LocalRightTensor, Ar = let f = f
-          #      @floop GlobalThreadsExecutor for i in 1:N
-          #           Er_i = f(lsEl[i], RO.Er[i])
-          #           Ar_i = f(lsEl[i], RO.Ar[i])
-          #           @reduce() do (Er = nothing; Er_i), (Ar = nothing; Ar_i)
-          #                Er = axpy!(true, Er_i, Er)
-          #                Ar = axpy!(true, Ar_i, Ar)
-          #           end
-          #      end
-          #      Er, Ar
-          # end
           
           Er = nothing
           Ar = nothing
@@ -115,17 +104,6 @@ function _finalselect(LO::LeftOrthComplement{N}, lsEr::SparseRightTensor) where 
                end
           end
      else # multi-threading
-          # El::LocalLeftTensor, Al = let f = f
-          #      @floop GlobalThreadsExecutor for i in 1:N
-          #           El_i = f(LO.El[i], lsEr[i])
-          #           Al_i = f(LO.Al[i], lsEr[i])
-          #           @reduce() do (El = nothing; El_i), (Al = nothing; Al_i)
-          #                El = axpy!(true, El_i, El)
-          #                Al = axpy!(true, Al_i, Al)
-          #           end
-          #      end
-          #      El, Al
-          # end
 
           El = nothing
           Al = nothing

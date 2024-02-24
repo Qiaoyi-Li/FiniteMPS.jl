@@ -2,3 +2,4 @@
 *.DS_Store
 *.jld2
 docs/build
+*/ManiFest.toml
