@@ -121,7 +121,7 @@ const CpCm = let Fdag = FdagF[1]
      aspace2 = Rep[U₁×SU₂]((2, 0) => 1)
      iso = isometry(aspace ⊗ aspace, aspace2)
      @tensor Cp[a; d f] := Fdag[a b c] * Fdag[b d e] * iso[c e f]
-     Cm = permute(Cp', (2, 1), (3,))
+     Cm = permute(Cp', ((2, 1), (3,)))
      Cp, Cm
 end
 
