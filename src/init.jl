@@ -1,5 +1,11 @@
 function __init__()
 
+     println("Julia Version $(VERSION)")
+     # throw a warning for v1.10
+     if VERSION ≥ v"1.10"
+          @warn "It seems the new GC algorithm in Julia v1.10.0 will lead to bad performance of multi-threading parallelism in this package, v1.9 is strongly recommended!"
+     end
+
      println("FiniteMPS Version $(pkgversion(FiniteMPS))")
 
      # default multi-threading initialization
