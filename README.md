@@ -30,7 +30,7 @@ Now this package contains
 - SETTN and tanTRG for finite-temperature simulations. Both thermal quantites and observables can be obtained.
 - Ground state and finite-temperature dynamics can be studied with real-time evolution based on TDVP. Note this is still under development.
 
-## Suggested workflow
+## Tutorial
 
 ### Installation
 To install this package, you can press "]" in REPL and type
@@ -39,68 +39,126 @@ pkg> add "https://github.com/Qiaoyi-Li/FiniteMPS.jl.git"
 ```
 
 ### Multi-threading settings
-- Only multi-threading is stable in current version, please make sure Julia is started with [multiple threads](https://docs.julialang.org/en/v1/manual/multi-threading/#man-multithreading). If this is not satisfied, it will throw an warning to remind you when loading `FiniteMPS`. 
+- Only multi-threading is stable in current version, please make sure Julia is started with [multiple threads](https://docs.julialang.org/en/v1/manual/multi-threading/#man-multithreading). It will throw an warning to remind you when loading `FiniteMPS` with a single thread.
   
   TODO: I will add single-thread mode and try to support multi-processing in the future.
 
 - If the linear algebra backend is `OpenBlas`, nested multi-threading is forbidden (a related discussion [here](https://carstenbauer.github.io/ThreadPinning.jl/stable/explanations/blas/)). So just close the parallelism of BLAS via
   ```julia
-     BLAS.set_num_threads(1)
+  BLAS.set_num_threads(1)
   ```
 
-- If using MKL as the linear algebra backend, you can set the number of blas threads similarly and nested multi-threading can be supported in this case. Note MKL is invalid for some cpus and you should also close the BLAS parallelism in this case. You can follow [MKL.jl](https://github.com/JuliaLinearAlgebra/MKL.jl)) to check if MKL is loaded successfully or not.
+- If using MKL as the linear algebra backend, you can set the number of blas threads similarly and nested multi-threading can be supported in this case. Note MKL is invalid for some cpus and you should also close the BLAS parallelism in such case. You can follow [MKL.jl](https://github.com/JuliaLinearAlgebra/MKL.jl) to check if MKL is loaded successfully or not.
   
-   `Warning`: Please make sure the total threads number 
-   ```julia
-       Threads.nthreads() * BLAS.get_num_threads()
-   ```   
-   is not larger than the cpu cores (physical, without hyper-threading). Otherwise, the performance will become much worse due to confliction.
+   > [!WARNING] Warning: 
+     Please make sure the total threads number is not larger than the cpu cores (physical, without hyper-threading). Otherwise, the performance will become much worse due to confliction. You can estimate the total threads via    
+     ```julia
+     Threads.nthreads() * BLAS.get_num_threads()
+     ```   
 
 
 ### Local space
-Choose a local space, i.e. the local 1-site Hilbert space and some 1-site operators according to the model and symmetry used. We predefine some in folder `LocalSpace` and you can use the documentation to see which operators are provided, e.g 
+The first step is to choose a local space, i.e. the local 1-site Hilbert space and some 1-site operators according to the model and symmetry used. We predefine some in folder `LocalSpace` and you can use the documentation to see which operators are provided in it, e.g 
 ```julia 
 help?> U₁Spin
 ```
-Note: It is impossible to predefine all local spaces so you must write a new one if that you need is not in it. Moreover, some `no method` errors may occur for new defined local spaces due to the multiple-dispatched implementations may not cover all cases. Please feel free to submit an issue if this happens and I will deal with it as soon as possible.
+> [!NOTE] Note:
+It is impossible to predefine all local spaces so you must write a new one if that you need is not in it. Moreover, some `no method` errors may occur when using a new defined one due to the multiple-dispatch-based implementations may not cover all kinds of operators. Please feel free to submit an issue if this happens and I will deal with it as soon as possible.
 
 ### Hamiltonian
-After that, you need to tell the program the interactions in hamiltonian. We use a tree-like struct `InteractionTree` to store them and provide an interface named `addIntr!` to add terms. The following is a demo code to generate the hamiltonian of an AFM Heisenberg chain.
+After that, you need to tell the program the interactions in the hamiltonian. We use a tree-like struct `InteractionTree` to store them and provide an interface named `addIntr!` to add terms. The following is a demo code to generate the hamiltonian of an AFM Heisenberg chain.
 ```julia
-     L = 8
-     Root = InteractionTreeNode()
-     for i in 1:L-1
-          # SzSz
-          addIntr!(Root,
-               (U₁Spin.Sz, U₁Spin.Sz),
-               (i, i+1),
-               1.0;
-               name = (:Sz, :Sz))
-          # (S+S- + h.c.)/2
-          addIntr!(Root, 
-               U₁Spin.S₊₋,
-               (i, i+1),
-               0.5;
-               name = (:Sz, :Sz))
-          addIntr!(Root,
-               U₁Spin.S₋₊,
-               (i, i+1),
-               0.5;
-               name = (:Sz, :Sz))
-     end
-     Ham = AutomataMPO(InteractionTree(Root))
+# generate hamiltonian MPO
+L = 32
+Root = InteractionTreeNode()
+for i in 1:L-1
+     # SzSz
+     addIntr!(Root,
+          (U₁Spin.Sz, U₁Spin.Sz),
+          (i, i+1),
+          1.0;
+          name = (:Sz, :Sz))
+     # (S+S- + h.c.)/2
+     addIntr!(Root, 
+          U₁Spin.S₊₋,
+          (i, i+1),
+          0.5;
+          name = (:Sp, :Sm))
+     addIntr!(Root,
+          U₁Spin.S₋₊,
+          (i, i+1),
+          0.5;
+          name = (:Sm, :Sp))
+end
+Ham = AutomataMPO(Root)
 ```
 
-### Main algorithm
-TODO
+### Main script
+Although the `FiniteMPS` package is written in an object-oriented style, a procedure-oriented script is still required for a concrete question. You can freely design it with the following sweep methods such as 
+- DMRGSweep2!, DMRGSweep1!\
+   The standard 2-site/1-site DMRG sweep.
+- TDVPSweep2!, TDVPSweep1!\
+   The standard 2-site/1-site TDVP sweep.
+
+being the usually used building blocks.
+
+Note a trilayer tensor network (namely environment), e.g. $\langle \Psi|H|\Psi\rangle$ where $\ket{\Psi}$ the MPS and $H$ the hamiltonian MPO, instead of the state $\ket\Psi$, should be passed in. The following code will intialize a random MPS and then generate the environment.
+```julia
+# initialize
+Ψ = randMPS(L, U₁Spin.pspace, Rep[U₁](i => 1 for i in -1:1//2:1))
+Env = Environment(Ψ', Ham, Ψ)
+```
+More detailed usages of the above functions can be found in the documentation.\
+
+> [!NOTE] Note: 
+Symmetries may limit the choice of auxiliary space, e.g. the spin quantum number must be integers or half integers alternately along the sites for spin-1/2 systems as fusing the physical space will exactly shift quantum number by 1/2. If the auxiliary space (`Rep[U₁](i => 1 for i in -1:1//2:1)` here) is not chosen appropriately to be compatible with the symmetry, some errors will occur when generating the MPS or later.
+
+For example, you can use `DMRGSweep2!` to obtain the ground state MPS
+```julia
+# 2-DMRG sweeps
+D = 256
+for i in 1:5
+     t = @elapsed info, timer = DMRGSweep2!(Env; trunc = truncdim(D))
+     println("Sweep $(i), En = $(info[2][1].Eg), wall time = $(t)s")
+end
+```
 
 ### Observables
-TODO
+Then, you can use a similar interface `addObs!` to generate the tree that stores the observables to be calculated.
+```julia
+# calculate observables
+Tree = ObservableTree()
+# all to all spin correlation
+for i in 1:L, j in i + 1:L
+     addObs!(Tree, (U₁Spin.Sz, U₁Spin.Sz), (i, j); name = (:Sz, :Sz))
+end
+# local moment
+for i in 1:L
+     addObs!(Tree, U₁Spin.Sz, i; name = :Sz)
+end
 
-`Warning:` There may exist undiscovered bugs, therefore, please use it at your own risk. Benchmark with exact diagonalization (ED) is recommended before using it to simulate any new models.
+calObs!(Tree, Ψ)
+# collect the results from Tree
+Obs = convert(Dict, Tree, [(:Sz, :Sz), (:Sz,)])
+```
+> [!WARNING] Warning:
+  DO NOT call `calObs!` twice to a `Tree`, which will lead to a dead loop due to the detailed multi-threading implementation. I will fix this in a future version.
+
+Now you can obtain the spin correlation $\langle S_i^z S_j^z\rangle$ via `Obs.SzSz[(i,j)]` and local moment $\langle S_i^z \rangle$ via `Obs.Sz[(i,)]` (should be zero up to a noise due to the $SU_2$ symmetry of the Heisenberg model).
+
+> [!WARNING] Warning:
+  There may exist undiscovered bugs, therefore, please use it at your own risk. Benchmark with exact diagonalization (ED) is strongly recommended before using it to simulate any new models.
 
 ## Contributions
-TODO
+### Authors
+- [Qiaoyi Li](https://github.com/Qiaoyi-Li) build the main architecture and the original version.
+- [Junsen Wang](https://github.com/phyjswang) will maintain the algorithms for spin systems.
+
+### How to contribute
+- If you benefit from this package, please star it.
+- If you find a bug, you can submit an issue or a PR if you have fixed it.
+- Add a new instance to LocalSpace folder and submit a PR. Note you should add some comments and document it so that others can easily use it.
+- If you are familiar with multi-processing parallelism in Julia and want to join us to improve the package, please contact us!  
 
 ## Acknowledgments
 - This package uses [TensorKit.jl](https://github.com/Jutho/TensorKit.jl) to implement basic tensor operations.
