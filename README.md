@@ -35,7 +35,7 @@ Now this package contains
 ### Installation
 To install this package, you can press "]" in REPL and type
 ```julia
-pkg> add "https://github.com/Qiaoyi-Li/FiniteMPS.jl.git"
+pkg> add FiniteMPS
 ```
 
 ### Multi-threading settings

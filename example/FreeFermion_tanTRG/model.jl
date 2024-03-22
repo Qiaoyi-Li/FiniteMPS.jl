@@ -1,11 +1,11 @@
 function SpinlessFreeFermion(Latt::AbstractLattice; t::Number=1, t′::Number=0, μ::Number=0)
 
-     L = length(Latt)
+     L = size(Latt)
      T = zeros(L, L)
      for pairs in neighbor(Latt; ordered = true)
           T[pairs...] = t
      end
-     for pairs in neighbor(Latt; r = (1,1), ordered = true)
+     for pairs in neighbor(Latt; level = 2, ordered = true)
           T[pairs...] = t′
      end
      for i in 1:L
@@ -40,12 +40,12 @@ function SpinlessFreeFermion(T::AbstractMatrix)
 end
 
 function ExactSolution(Latt::AbstractLattice, lsβ::Vector{Float64}; t::Number=1, t′::Number=0, μ::Number=0)
-     L = length(Latt)
+     L = size(Latt)
      T = zeros(L, L)
      for pairs in neighbor(Latt; ordered = true)
           T[pairs...] = t
      end
-     for pairs in neighbor(Latt; r = (1,1), ordered = true)
+     for pairs in neighbor(Latt; level = 2, ordered = true)
           T[pairs...] = t′
      end
      for i in 1:L

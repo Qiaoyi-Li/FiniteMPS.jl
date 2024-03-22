@@ -1,12 +1,11 @@
-# julia -t6 --project=$(pwd) FreeFermion_tanTRG.jl
-using MKL
+# julia -t6 --project=$(pwd) main.jl
 using FiniteMPS, FiniteLattices
 
-include("Models/SpinlessFreeFermion.jl")
+include("model.jl")
 
 verbose = 1
 GCstep = false
-Latt = SquaLatt(8, 4; BCY=:PBC)
+Latt = YCSqua(8, 4) |> Snake!
 D = 512
 Para = (t=1, t′=0, μ=-1)
 
@@ -41,15 +40,9 @@ let
      for i = 2:length(lsβ)
           dβ = lsβ[i] - lsβ[i-1]
 
-          # TDVPSweep2!(Env, -dβ / 2;
-          #      GCstep=GCstep, GCsweep=true, verbose=verbose,
-          #      trunc=truncdim(D) & truncbelow(1e-16))
-
-          TDVPSweep1!(Env, -dβ / 2;
-               CBEAlg = StandardCBE(D + div(D, 8), 1e-8),
+          TDVPSweep2!(Env, -dβ / 2;
                GCstep=GCstep, GCsweep=true, verbose=verbose,
                trunc=truncdim(D) & truncbelow(1e-16))
-
 
           lnZ += 2 * log(norm(ρ))
           normalize!(ρ)
