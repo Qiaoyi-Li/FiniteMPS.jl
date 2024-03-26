@@ -21,16 +21,16 @@ function SETTN(H::SparseMPO{L}, β::Number; kwargs...) where {L}
      verbose::Int64 = get(kwargs, :verbose, 0)
      tol::Float64 = get(kwargs, :tol, 1e-8)
      compress::Float64 = get(kwargs, :compress, 1e-16)
-     trunc::TruncationScheme = get(kwargs, :trunc, notrunc())
+     trunc::TruncationScheme = get(kwargs, :trunc, truncdim(MPSDefault.D))
      @assert isa(trunc, TensorKit.TruncationDimension)
 
      # deduce pspace 
      lspspace = map(H) do M
           idx = findfirst(x -> !isnothing(x) && !isa(x, IdentityOperator), M)
           domain(M[idx])[1]
-     end
+     end     
 
-     ρ = get(kwargs, :ρ₀, identityMPO(L, lspspace; kwargs...))
+     ρ = get(kwargs, :ρ₀, identityMPO(scalartype(H), L, lspspace; kwargs...))
      Hn = deepcopy(ρ) # H0 = Id*ρ
    
 

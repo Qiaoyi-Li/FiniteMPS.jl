@@ -34,5 +34,21 @@ function show(io::IO, obj::SparseMPO{L}) where L
      end
 end
 
+"""
+     scalartype(obj::SparseMPO) -> Float64/ComplexF64
+
+Return the scalar type of given `SparseMPO`. Note return `Float64` iff all local tensors are real. 
+"""
+function scalartype(obj::SparseMPO)
+     for M in obj.A
+          for T in M
+               isnothing(T) && continue
+               isa(T, IdentityOperator) && continue
+               scalartype(T) <: Complex && return ComplexF64
+          end
+     end
+     return Float64
+end
+
 
 # TODO SparseMPO to MPO

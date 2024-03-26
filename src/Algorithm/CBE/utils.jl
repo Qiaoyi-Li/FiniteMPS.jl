@@ -70,14 +70,14 @@ function _directsum_Al(Al::MPSTensor{R}, Al_f::MPSTensor{R}) where {R}
      # Al ⊕ Al_f
 
      EmbA, EmbB = oplusEmbed(Al.A, Al_f.A, R)
-     return permute(Al.A, Tuple(1:R-1), (R,)) * EmbA + permute(Al_f.A, Tuple(1:R-1), (R,)) * EmbB
+     return permute(Al.A, (Tuple(1:R-1), (R,))) * EmbA + permute(Al_f.A, (Tuple(1:R-1), (R,))) * EmbB
 end
 
 function _directsum_Ar(Ar::MPSTensor{R}, Ar_f::MPSTensor{R}) where {R}
      # Ar ⊕ Ar_f
 
      EmbA, EmbB = oplusEmbed(Ar.A, Ar_f.A, 1)
-     return EmbA * permute(Ar.A, (1,), Tuple(2:R)) + EmbB * permute(Ar_f.A, (1,), Tuple(2:R))
+     return EmbA * permute(Ar.A, ((1,), Tuple(2:R))) + EmbB * permute(Ar_f.A, ((1,), Tuple(2:R)))
 end
 
 function _expand_Ar(Al::MPSTensor{3}, Al_ex::MPSTensor{3}, Ar::MPSTensor{3})::MPSTensor{3}

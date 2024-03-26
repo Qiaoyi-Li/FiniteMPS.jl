@@ -106,9 +106,9 @@ function identityMPO(::Type{T}, L::Int64, pspace::AbstractVector; kwargs...) whe
      obj = MPO(L, T; disk = get(kwargs, :disk, false))  
      aspace = trivial(pspace[1])
      bspace = get(kwargs, :bspace, aspace)
-     obj[1] = permute(isometry(bspace, aspace) ⊗ isometry(pspace[1], pspace[1]), (1, 2), (4, 3))
+     obj[1] = permute(isometry(bspace, aspace) ⊗ isometry(pspace[1], pspace[1]), ((1, 2), (4, 3)))
      for si in 2:L
-          obj[si] = permute(isometry(aspace, aspace) ⊗ isometry(pspace[si], pspace[si]), (1, 2), (4, 3))  
+          obj[si] = permute(isometry(aspace, aspace) ⊗ isometry(pspace[si], pspace[si]), ((1, 2), (4, 3)))  
      end
 
      canonicalize!(obj, L)

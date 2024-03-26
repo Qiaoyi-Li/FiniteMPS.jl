@@ -72,7 +72,7 @@ function BondInfo(s::AbstractTensorMap{T}, ϵ::Float64=0.0) where T <: Union{Car
     D += length(λ)
     DD += length(λ)
     Norm2 += norm(λ)^2
-    SE += mapreduce(x -> x == 0 ? 0 : x^2 * log(x), +, λ)
+    SE += mapreduce(x -> x == 0 ? 0 : x^2 * log(x), +, λ; init = 0.0)
 
     SE = -2SE / Norm2 + log(Norm2)
     return BondInfo(D, DD, ϵ, SE)
