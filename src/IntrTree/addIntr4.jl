@@ -163,12 +163,17 @@ function addIntr4!(Root::InteractionTreeNode, A::LocalOperator, B::LocalOperator
                Op_i = IdentityOperator(pspace, si)
           end
 
-          idx = findfirst(x -> x.Op == Op_i, current_node.children)
+          idx = findfirst(current_node.children) do x
+               x.Op ≠ Op_i && return false
+               if hastag(x.Op) && hastag(Op_i)
+                    x.Op.tag ≠ Op_i.tag && return false
+               end 
+               return true
+          end
           if isnothing(idx)
                addchild!(current_node, Op_i)
                current_node = current_node.children[end]
           else
-               
                current_node = current_node.children[idx]
                # replace the tag 
                hastag(current_node.Op) && (current_node.Op.tag = Op_i.tag)

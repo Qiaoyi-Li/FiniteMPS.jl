@@ -1,7 +1,7 @@
 """
      calObs!(Tree::ObservableTree, Ψ::AbstractMPS{L}; kwargs...) -> Tree::InteractionTree
 
-Calculate observables respect to state `Ψ`, the info to tell which observables to calculate is stored in `Tree`. The results are stored in each leaf node of `Tree`. 
+Calculate observables respect to state `Ψ`, the info to tell which observables to calculate is stored in `Tree`. The results are stored in each leaf node of `Tree`. Note the value in each node will be in-place updated, so do not call this function twice with the same `Tree` object.  
 
 Note only multi-threading backend is supported now.
 """
@@ -71,6 +71,10 @@ function _calObs_threading!(Tree::ObservableTree, Ψ::AbstractMPS{L}, ::StoreMem
      GC_count = 0
      num_left = num_leaves
      while num_count < num_left
+          # check and rethrow if any task failed
+          for task in task_c
+               istaskfailed(task) && fetch(task)
+          end
           (num, to) = take!(Ch_Timer)
           merge!(Timer_acc, to)
           num_count += num

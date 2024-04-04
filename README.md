@@ -141,8 +141,6 @@ calObs!(Tree, Ψ)
 # collect the results from Tree
 Obs = convert(Dict, Tree, [(:Sz, :Sz), (:Sz,)])
 ```
-> [!WARNING] Warning:
-  DO NOT call `calObs!` twice to a `Tree`, which will lead to a dead loop due to the detailed multi-threading implementation. I will fix this in a future version.
 
 Now you can obtain the spin correlation $\langle S_i^z S_j^z\rangle$ via `Obs.SzSz[(i,j)]` and local moment $\langle S_i^z \rangle$ via `Obs.Sz[(i,)]` (should be zero up to a noise due to the $SU_2$ symmetry of the Heisenberg model).
 
