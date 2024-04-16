@@ -30,6 +30,9 @@ Two rank-`3` operators of hopping `c↑ c↑^dag + c↓ c↓^dag`.
      ΔₛdagΔₛ::NTuple{4, TensorMap}
 Four operators of singlet pairing correlation `Δₛ^dagΔₛ`, where `Δₛ = (c↓c↑ - c↑c↓)/√2`. Rank = `(3, 4, 4, 3)`.
 
+     ΔₜdagΔₜ::NTuple{4, TensorMap}
+Four operators of triplet pairing correlation `Δₜ^dag⋅Δₜ`, where `Δₜ` is the triplet pairing operator that carries `2` charge and `1` spin quantum numbers. Rank = `(3, 4, 4, 3)`.
+
      Δₛ::NTuple{2, TensorMap}
      Δₛdag::NTuple{2, TensorMap}
 Singlet pairing operators `Δₛ` and `Δₛ^dag`. Rank = `(4, 3)`. Note the first operator has nontrivial left bond index.

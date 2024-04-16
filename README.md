@@ -14,7 +14,7 @@ I write this package aim to study some heavy quantum many-body problems (e.g. hi
 ### Convenience
 
 - The MPS-level operations are separated with the lower tensor-level operations so modifying codes with different symmetries, lattices and models is quite simple.
-- We provide a hamiltonian generator via automata (like `OpSum` in [ITensors.jl](https://github.com/ITensor/ITensors.jl)) so that the interactions can be added in a simple and general way, details please see the workflow section.
+- We provide a hamiltonian generator via automata (like `OpSum` in [ITensors.jl](https://github.com/ITensor/ITensors.jl)) so that the interactions can be added in a simple and general way, details please see the tutorials.
 - We also provide some similar interfaces so that you can measure the  observales and correlations conveniently. Note these computations can also be multi-threaded.
   
 ### MPO supports
