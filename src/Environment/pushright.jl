@@ -308,6 +308,15 @@ function _pushright(El::LocalLeftTensor{4}, A::AdjointMPSTensor{3}, H::LocalOper
      return LocalLeftTensor(tmp * H.strength, El.tag)
 end
 
+function _pushright(El::LocalLeftTensor{4}, A::AdjointMPSTensor{3}, H::IdentityOperator, B::MPSTensor{3}; kwargs...)
+     if rank(A, 1) == 1
+          @tensor tmp[a; d e h] := (A.A[a b c]  * El.A[b d e f]) * B.A[f c h]
+     else
+          @tensor tmp[a; d e h] := (A.A[c a b] * El.A[b d e f]) * B.A[f c h]
+     end
+     return LocalLeftTensor(tmp * H.strength, El.tag)
+end
+
 function _pushright(El::LocalLeftTensor{5}, A::AdjointMPSTensor{3}, H::IdentityOperator, B::MPSTensor{3}; kwargs...)
      if rank(A, 1) == 1
           @tensor tmp[a; d e f h] := (A.A[a b c] * El.A[b d e f g]) * B.A[g c h]
@@ -400,6 +409,11 @@ function _pushright(El::LocalLeftTensor{4}, A::AdjointMPSTensor{4}, H::LocalOper
      @tensor tmp[a; d e h] := ((A.A[j a b c] * H.A[c g]) * El.A[b d e f]) * B.A[f g j h]
 
      return LocalLeftTensor(tmp * H.strength, El.tag)
+end
+
+function _pushright(El::LocalLeftTensor{4}, A::AdjointMPSTensor{4}, H::IdentityOperator, B::MPSTensor{4}; kwargs...)
+     @tensor tmp[a; d e h] := H.strength * (A.A[j a b c]  * El.A[b d e f]) * B.A[f c j h]
+     return LocalLeftTensor(tmp, El.tag)
 end
 
 function _pushright(El::LocalLeftTensor{5}, A::AdjointMPSTensor{4}, H::IdentityOperator, B::MPSTensor{4}; kwargs...)

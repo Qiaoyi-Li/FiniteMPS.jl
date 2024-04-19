@@ -26,9 +26,12 @@ end
           Op::NTuple{N,AbstractTensorMap},
           si::NTuple{N,Int64}
           n::Int64 = 1; 
-          kwargs...)
+          Z::Union{Nothing,AbstractTensorMap} = nothing,
+          name::NTuple{N,Union{Symbol,String}} = (:A, :B, ...))
 
 Add a term to the `n`-th root of `ObservableTree{M}`. Detailed usage see `addIntr!`. 
+
+Warning: a same `name` can be given to two local operators iff they are exactly the same, otherwise, it will confuse the `convert` function when trying to extract the values stored in the tree to a dictionary. For example, you can simply name `SzSz` correlation as `(:S, :S)`. However this name is inappropriate for `S+S-` correlation. 
 """
 function addObs!(Tree::ObservableTree{M},
      Op::NTuple{N,AbstractTensorMap},

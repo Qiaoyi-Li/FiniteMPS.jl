@@ -124,9 +124,12 @@ function randMPS(::Type{T}, pspace::AbstractVector{<:VectorSpace}, aspace::Abstr
      @assert (L = length(pspace)) == length(aspace)
 
      obj = MPS(L, T; kwargs...)
-     push!(aspace, trivial(pspace[1]))
      for si = 1:L
-          obj[si] = randisometry(T, aspace[si]⊗pspace[si], aspace[si+1]; kwargs...)
+          if si == L
+               obj[si] = randisometry(T, aspace[si]⊗pspace[si], trivial(pspace[si]); kwargs...)
+          else
+               obj[si] = randisometry(T, aspace[si]⊗pspace[si], aspace[si+1]; kwargs...)
+          end
      end
      canonicalize!(obj, L)
      canonicalize!(obj, 1)

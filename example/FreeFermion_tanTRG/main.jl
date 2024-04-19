@@ -9,7 +9,7 @@ Latt = YCSqua(8, 4) |> Snake!
 D = 512
 Para = (t=1, t′=0, μ=-1)
 
-lsβ = vcat(2.0 .^ (-15:2:-1), 1:16)
+lsβ = vcat(2.0 .^ (-15:2:-1), 1:8)
 lsF = zeros(length(lsβ))
 lsE = zeros(length(lsβ))
 

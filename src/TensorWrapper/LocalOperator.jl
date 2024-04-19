@@ -165,6 +165,7 @@ Test if two LocalOperator objects are equal. Note we do not consider the field `
 function ==(A::LocalOperator{R₁, R₂}, B::LocalOperator{R₁, R₂}) where {R₁, R₂}
      A.name ≠ B.name && return false
      A.si ≠ B.si && return false
+     A.tag ≠ B.tag && return false
      return A.A == B.A
 end
 

@@ -6,7 +6,7 @@ using Base.Threads, Distributed
 @reexport import SerializedElementArrays: SerializedElementArray, SerializedElementVector
 @reexport using TensorKit, KrylovKit, TensorKit.TensorOperations, TimerOutputs
 @reexport import Base: +, -, *, /, ==, promote_rule, convert, length, show, getindex, setindex!, lastindex, keys, similar, merge, iterate, complex
-@reexport import TensorKit: ×, one, zero, dim, inner, scalar, domain, codomain, eltype, scalartype, leftorth, rightorth, leftnull, rightnull, tsvd, adjoint, normalize!, norm, axpy!, axpby!, add!, dot, mul!, rmul!, NoTruncation, fuse
+@reexport import TensorKit: ×, one, zero, dim, inner, scalar, domain, codomain, eltype, scalartype, leftorth, rightorth, leftnull, rightnull, tsvd, adjoint, normalize!, norm, axpy!, axpby!, add!, add!!, dot, mul!, rmul!, NoTruncation, fuse, zerovector!, zerovector, scale, scale!, scale!!
 @reexport import LinearAlgebra: BLAS, rank, qr, diag, I, diagm
 @reexport import AbstractTrees: parent, isroot
 

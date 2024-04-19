@@ -3,7 +3,7 @@ function __init__()
      println("Julia Version $(VERSION)")
      # throw a warning for v1.10
      if VERSION ≥ v"1.10"
-          @warn "It seems the new GC algorithm in Julia v1.10.0 will lead to bad performance of multi-threading parallelism in this package, v1.9 is strongly recommended!"
+          @warn "It seems the new GC algorithm after Julia v1.10.0 will lead to bad performance of multi-threading parallelism in this package, v1.9 is strongly recommended!"
      end
 
      println("FiniteMPS Version $(pkgversion(FiniteMPS))")
@@ -31,8 +31,6 @@ function _init_multithreading()
           @warn "n_threads * n_mkl > n_cpus, may lead to bad performance!" 
           end
      end
-
-    
 
      # close Strided in TensorKit
      TensorKit.Strided.set_num_threads(1)

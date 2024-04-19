@@ -31,7 +31,6 @@ function normalize!(A::AbstractTensorWrapper)
      return A
 end
 
-==(A::AbstractTensorWrapper, B::AbstractTensorWrapper) = A.A == B.A
 
 *(A::AbstractTensorWrapper, B::AbstractTensorWrapper) = A.A * B.A
 
@@ -72,6 +71,38 @@ axpby!(α::Number, A::AbstractTensorWrapper, β::Number, ::Nothing) = axpy!(α, 
 add!(A::AbstractTensorWrapper, B::AbstractTensorWrapper) = axpy!(true, B, A)
 add!(A::AbstractTensorWrapper, ::Nothing) = A
 add!(::Nothing, A::AbstractTensorWrapper) = A
+
+# add methods for vectorinterface.jl, which is used in KrylovKit after v0.7
+function add!!(A::AbstractTensorWrapper,
+     B::AbstractTensorWrapper,
+     β::Number = one(scalartype(B)),
+     α::Number = one(scalartype(A))
+     ) 
+     T = promote_type(scalartype(A.A), scalartype(B.A), typeof(α), typeof(β))
+     if T <: scalartype(A.A)
+          return axpby!(β, B, α, A)
+     else
+          return α*A + β*B
+     end
+end
+function zerovector(A::T, ::Type{S}) where {S<:Number, T<:AbstractTensorWrapper}
+     return convert(T, zerovector(A.A, S))
+end  
+function zerovector!(A::AbstractTensorWrapper) 
+     zerovector!(A.A)
+     return A
+end
+similar(A::AbstractTensorWrapper, ::Type{S}) where {S<:Number} = zerovector(A, S)
+scale!(A::AbstractTensorWrapper, α::Number) = rmul!(A, α)
+scale(A::AbstractTensorWrapper, α::Number) = α * A
+function scale!!(A::AbstractTensorWrapper, α::S) where {S<:Number}
+     T = promote_type(scalartype(A.A), S)
+     if T <: scalartype(A)
+          return scale!(A, α)
+     else
+          return scale(A, α)
+     end
+end
 
 """
      tsvd(A::AbstractTensorWrapper,

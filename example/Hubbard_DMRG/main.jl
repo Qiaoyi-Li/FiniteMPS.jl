@@ -2,11 +2,13 @@ using FiniteMPS, FiniteLattices
 
 include("model.jl")
 verbose = 1
-GCstep = false
+GCstep = true
 Latt = YCSqua(8, 4) |> Zigzag!
 t′ = 0.0
 U = 8
-Ndop = 4 # number of hole doping
+Ndop = 0 # number of hole doping
+Qspin = 0 # SU2 spin, half integer
+@assert Qspin % 1 == (iseven(Ndop) ? 0 : 1//2) 
 
 lsD = let
      lsD = broadcast(Int64 ∘ round, 2 .^ vcat(6:12))
@@ -18,7 +20,7 @@ lsTimer = Vector{Any}(undef, length(lsD))
 
 # initial state
 Ψ = let
-     aspace = vcat(Rep[U₁×SU₂]((Ndop, 0) => 1), repeat([Rep[U₁×SU₂]((i, j) => 1 for i in -(abs(Ndop) + 1):(abs(Ndop)+1) for j in 0:1//2:1),], size(Latt) - 1))
+     aspace = vcat(Rep[U₁×SU₂]((Ndop, Qspin) => 1), repeat([Rep[U₁×SU₂]((i, j) => 1 for i in -(abs(Ndop) + 1):(abs(Ndop)+1) for j in 0:1//2:1),], size(Latt) - 1))
      randMPS(U₁SU₂Fermion.pspace, aspace)
 end
 
@@ -54,13 +56,13 @@ Obs = let
           i > k && continue  # note ⟨Δᵢⱼ^dag Δₖₗ⟩ = ⟨Δₖₗ^dag Δᵢⱼ⟩
 
           # singlet pairing
-          addObs!(Tree, U₁SU₂Fermion.ΔₛdagΔₛ, (i, j, k, l), 1; Z=U₁SU₂Fermion.Z, name=(:Fdag, :Fdag, :F, :F))
+          addObs!(Tree, U₁SU₂Fermion.ΔₛdagΔₛ, (i, j, k, l), 1; Z=U₁SU₂Fermion.Z, name=(:Fdag, :FdagS, :FS, :F))
           # triplet pairing
-          addObs!(Tree, U₁SU₂Fermion.ΔₜdagΔₜ, (i, j, k, l), 1; Z=U₁SU₂Fermion.Z, name=(:Fdag, :FdagT, :F, :F))
+          addObs!(Tree, U₁SU₂Fermion.ΔₜdagΔₜ, (i, j, k, l), 1; Z=U₁SU₂Fermion.Z, name=(:Fdag, :FdagT, :FT, :F))
      end
 
      @time calObs!(Tree, Ψ; GCspacing=1000, verbose=verbose, showtimes=10)
 
-     convert(Dict, Tree, [(:n,), (:S, :S), (:n, :n), (:Fdag, :F), (:Fdag, :Fdag, :F, :F), (:Fdag, :FdagT, :F, :F)])
+     convert(Dict, Tree, [(:n,), (:S, :S), (:n, :n), (:Fdag, :F), (:Fdag, :FdagS, :FS, :F), (:Fdag, :FdagT, :FT, :F)])
 end
 

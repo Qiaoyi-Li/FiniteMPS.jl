@@ -26,13 +26,22 @@ function addIntr4!(Root::InteractionTreeNode, O::NTuple{4,AbstractTensorMap}, si
      Z::Union{Nothing,AbstractTensorMap}=nothing,
      name::NTuple{4,Union{Symbol,String}}=(:A, :B, :C, :D))
 
-     @assert si[1] < si[2] && si[3] < si[4]
-
      (A, B, C, D) = map(1:4) do i
           LocalOperator(O[i], name[i], si[i])
      end
      _addtag!(A, B, C, D)
 
+     # deal with the permutation 1<->2 and 3<->4
+     if si[1] > si[2]
+          A, B = _leftOp(B), _rightOp(A)
+          si = (si[2], si[1], si[3], si[4])
+          !isnothing(Z) && (strength *= -1)
+     end
+     if si[3] > si[4]
+          C, D = _leftOp(D), _rightOp(C)
+          si = (si[1], si[2], si[4], si[3])
+          !isnothing(Z) && (strength *= -1)
+     end
 
      if A.si == C.si && B.si == D.si
           #          D
@@ -207,5 +216,16 @@ function _addtag!(A::LocalOperator{1,2}, B::LocalOperator{2,2}, C::LocalOperator
      return A, B, C, D
 end
 
-
-
+function _addtag!(A::LocalOperator{1, 2}, B::LocalOperator{2, 1}, C::LocalOperator{1, 2}, D::LocalOperator{2, 1})
+     name = map(x -> x.name, [A, B, C, D])
+     for i = 2:4 # make sure each name is unique
+          if any(==(name[i]), view(name, 1:i-1))
+               name[i] = name[i] * "$i"
+          end
+     end
+     A.tag = (("phys",), ("phys", "$(name[1])<-$(name[2])"))
+     B.tag = (("$(name[1])<-$(name[2])", "phys"), ("phys",))
+     C.tag = (("phys", ), ("phys", "$(name[3])<-$(name[4])"))
+     D.tag = (("$(name[3])<-$(name[4])", "phys"), ("phys",))
+     return A, B, C, D
+end
