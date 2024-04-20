@@ -3,6 +3,7 @@
           Op::NTuple{4,AbstractTensorMap},
           si::NTuple{4,Int64},
           strength::Number;
+          Obs::Bool = false,
           Z::Union{Nothing,AbstractTensorMap} = nothing,
           name::NTuple{4,Union{Symbol,String}} = (:A, :B, :C, :D)) -> nothing
 
@@ -16,15 +17,23 @@ Add a 4-site interaction `Op` at site `si` (4tuple) to a given interaction tree.
           C::LocalOperator,
           D::LocalOperator,
           strength::Number,
-          Z::Union{Nothing,AbstractTensorMap}) -> nothing
+          Z::Union{Nothing,AbstractTensorMap};
+          value = nothing) -> nothing
 
 Expert version, each method finally reduces to this one. 
 
 Note if there exist repeated si, it will recurse to `addIntr2!` or `addIntr3!`(TODO) automatically.
 """
 function addIntr4!(Root::InteractionTreeNode, O::NTuple{4,AbstractTensorMap}, si::NTuple{4,Int64}, strength::Number;
+     Obs::Bool=false,
      Z::Union{Nothing,AbstractTensorMap}=nothing,
      name::NTuple{4,Union{Symbol,String}}=(:A, :B, :C, :D))
+
+     # convert to string
+     name = string.(name)
+
+     strength == 0 && return nothing
+     value = Obs ? (prod(name), si...) : nothing
 
      (A, B, C, D) = map(1:4) do i
           LocalOperator(O[i], name[i], si[i])
@@ -49,7 +58,7 @@ function addIntr4!(Root::InteractionTreeNode, O::NTuple{4,AbstractTensorMap}, si
           #          B   -->   AC   
           #  A Z Z Z Z
           !isnothing(Z) && (strength = -strength)
-          return addIntr2!(Root, _leftOp(A * C), _rightOp(B * D), strength)
+          return addIntr2!(Root, _leftOp(A * C), _rightOp(B * D), strength, nothing; value = value)
      end
      # ============ reduce to 3-site term ===========
      if A.si == C.si
@@ -59,13 +68,13 @@ function addIntr4!(Root::InteractionTreeNode, O::NTuple{4,AbstractTensorMap}, si
                #      B      -->   AC   -B Z Z  
                #  A Z Z  
                !isnothing(Z) && (strength = -strength)
-               return addIntr3!(Root, _leftOp(A * C), B, D, strength, Z; fermionic=(false, true, true))
+               return addIntr3!(Root, _leftOp(A * C), B, D, strength, Z; fermionic=(false, true, true), value = value)
           else
                #      D                    
                #  C Z Z                    B
                #          B  -->   AC  D Z Z   
                #  A Z Z Z Z
-               return addIntr3!(Root, _leftOp(A * C), D, _rightOp(B), strength, Z; fermionic=(false, true, true))
+               return addIntr3!(Root, _leftOp(A * C), D, _rightOp(B), strength, Z; fermionic=(false, true, true), value = value)
           end
      end
      if B.si == C.si
@@ -73,7 +82,7 @@ function addIntr4!(Root::InteractionTreeNode, O::NTuple{4,AbstractTensorMap}, si
           #     C Z Z            BC    D 
           #     B       -->  A Z Z  Z  Z
           # A Z Z
-          return addIntr3!(Root, A, B * C, D, strength, Z; fermionic=(true, false, false))
+          return addIntr3!(Root, A, B * C, D, strength, Z; fermionic=(true, false, false), value = value)
      end
      if B.si == D.si
           if A.si < C.si
@@ -82,14 +91,14 @@ function addIntr4!(Root::InteractionTreeNode, O::NTuple{4,AbstractTensorMap}, si
                #         B  -->  A Z Z 
                # A Z Z Z Z  
                !isnothing(Z) && (strength = -strength)
-               return addIntr3!(Root, A, _leftOp(C), _rightOp(B * D), strength, Z; fermionic=(true, true, false))
+               return addIntr3!(Root, A, _leftOp(C), _rightOp(B * D), strength, Z; fermionic=(true, true, false), value = value)
           else
                # note AZ = -ZA
                #         D
                # C Z Z Z Z           -A   -BD         A   BD
                #         B  -->  C Z  Z       --> C Z Z  
                #     A Z Z                 
-               return addIntr3!(Root, _leftOp(C), A, _rightOp(B * D), strength, Z; fermionic=(true, true, false))
+               return addIntr3!(Root, _leftOp(C), A, _rightOp(B * D), strength, Z; fermionic=(true, true, false), value = value)
           end
      end
      # ----------------------------------------------
@@ -98,7 +107,7 @@ function addIntr4!(Root::InteractionTreeNode, O::NTuple{4,AbstractTensorMap}, si
           #         C Z Z 
           #     B 
           # A Z Z 
-          return addIntr4!(Root, A, B, C, D, strength, Z)
+          return addIntr4!(Root, A, B, C, D, strength, Z; value = value)
      else
           if A.si < C.si
                if B.si < D.si
@@ -107,14 +116,14 @@ function addIntr4!(Root::InteractionTreeNode, O::NTuple{4,AbstractTensorMap}, si
                     #         B       -->      C 
                     # A Z Z Z Z            A Z Z 
                     !isnothing(Z) && (strength = -strength)
-                    return addIntr4!(Root, A, _leftOp(C), _rightOp(B), D, strength, Z)
+                    return addIntr4!(Root, A, _leftOp(C), _rightOp(B), D, strength, Z; value = value)
                else
                     A.si < C.si && B.si > D.si
                     #         D                       B
                     #     C Z Z                   D Z Z  
                     #             B   -->      C
                     # A Z Z Z Z Z Z        A Z Z 
-                    return addIntr4!(Root, A, _leftOp(C), D, _rightOp(B), strength, Z)
+                    return addIntr4!(Root, A, _leftOp(C), D, _rightOp(B), strength, Z; value = value)
                end
           elseif A.si < D.si
                if B.si < D.si
@@ -122,21 +131,21 @@ function addIntr4!(Root::InteractionTreeNode, O::NTuple{4,AbstractTensorMap}, si
                     # C Z Z Z Z Z Z                     D                    D
                     #         B       -->      -A  -B Z Z  -->      A    B Z Z  
                     #     A Z Z            C Z  Z               C Z Z 
-                    return addIntr4!(Root, _leftOp(C), A, _rightOp(B), D, strength, Z)
+                    return addIntr4!(Root, _leftOp(C), A, _rightOp(B), D, strength, Z; value = value)
                else
                     #         D
                     # C Z Z Z Z                        B               
                     #             B   -->      -A  D Z Z  
                     #     A Z Z Z Z        C Z  Z             
                     !isnothing(Z) && (strength = -strength)
-                    return addIntr4!(Root, _leftOp(C), A, D, _rightOp(B), strength, Z)
+                    return addIntr4!(Root, _leftOp(C), A, D, _rightOp(B), strength, Z; value = value)
                end
           else
                #      D
                #  C Z Z  
                #             B
                #         A Z Z 
-               return addIntr4!(Root, _leftOp(C), D, A, _rightOp(B), strength, Z)
+               return addIntr4!(Root, _leftOp(C), D, A, _rightOp(B), strength, Z; value = value)
           end
      end
 
@@ -145,7 +154,8 @@ function addIntr4!(Root::InteractionTreeNode, O::NTuple{4,AbstractTensorMap}, si
 end
 
 function addIntr4!(Root::InteractionTreeNode, A::LocalOperator, B::LocalOperator, C::LocalOperator, D::LocalOperator,
-     strength::Number, Z::Union{Nothing,AbstractTensorMap})
+     strength::Number, Z::Union{Nothing,AbstractTensorMap};
+     value = nothing)
      @assert A.si < B.si < C.si < D.si
 
      #             D
@@ -192,9 +202,12 @@ function addIntr4!(Root::InteractionTreeNode, A::LocalOperator, B::LocalOperator
 
      idx = findfirst(x -> x.Op == D, current_node.children)
      if isnothing(idx)
-          addchild!(current_node, D)
+          addchild!(current_node, D, value)
           current_node.children[end].Op.strength = strength
      else
+          if !isnothing(value)
+               current_node.children[idx].value = value
+          end
           _update_strength!(current_node.children[idx], strength) && deleteat!(current_node.children, idx)
      end
 

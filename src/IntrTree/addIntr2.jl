@@ -3,6 +3,7 @@
           Op::NTuple{2,AbstractTensorMap},
           si::NTuple{2,Int64},
           strength::Number;
+          Obs::Bool = false,
           Z::Union{Nothing,AbstractTensorMap} = nothing,
           name::NTuple{2,Union{Symbol,String}} = (:A, :B)) -> nothing
 
@@ -14,23 +15,28 @@ Add a two-site interaction `Op` at site `si` (2tuple) to a given interaction tre
           OL::LocalOperator,
           OR::LocalOperator,
           strength::Number,
-          Z::Union{Nothing,AbstractTensorMap}) -> nothing
+          Z::Union{Nothing,AbstractTensorMap};
+          value = nothing) -> nothing
 
-Expert version, each method finally reduces to this one. 
+Expert version, each method finally reduces to this one. The `value` will be stored in the last node.
 
 Note if `OL.si == OR.si`, it will recurse to `addIntr1!` automatically.
 """
 function addIntr2!(Root::InteractionTreeNode, Op::NTuple{2,AbstractTensorMap}, si::NTuple{2,Int64}, strength::Number;
+     Obs::Bool=false,
      Z::Union{Nothing,AbstractTensorMap}=nothing,
      name::NTuple{2,Union{Symbol,String}}=(:A, :B))
-     # add two site interaction term
+
+     # convert to string
+     name = string.(name)
 
      strength == 0 && return nothing
+     value = Obs ? (prod(name), si...) : nothing
 
      if si[1] == si[2]
           OL = LocalOperator(Op[1], name[1], si[1])
           OR = LocalOperator(Op[2], name[2], si[2])
-          return addIntr1!(Root, OL*OR, strength)
+          return addIntr1!(Root, OL * OR, strength; value=value)
      end
 
      if si[1] < si[2]
@@ -38,20 +44,22 @@ function addIntr2!(Root::InteractionTreeNode, Op::NTuple{2,AbstractTensorMap}, s
           OR = LocalOperator(Op[2], name[2], si[2])
           !isnothing(Z) && _addZ!(OR, Z)
      else
-          OL = LocalOperator(Op[2], name[2], si[2]; swap = true)
-          OR = LocalOperator(Op[1], name[1], si[1]; swap = true)
+          OL = LocalOperator(Op[2], name[2], si[2]; swap=true)
+          OR = LocalOperator(Op[1], name[1], si[1]; swap=true)
           if !isnothing(Z)
                _addZ!(OR, Z)
-               strength = - strength # note ZFZ = -F
+               strength = -strength # note ZFZ = -F
           end
      end
-     return addIntr2!(Root, OL, OR, strength, Z)
+     return addIntr2!(Root, OL, OR, strength, Z; value=value)
 
 end
 addIntr2!(Tree::InteractionTree, args...) = addIntr2!(Tree.Root.children[1], args...)
 
-function addIntr2!(Root::InteractionTreeNode, OL::LocalOperator, OR::LocalOperator,
-     strength::Number, Z::Union{Nothing,AbstractTensorMap})
+function addIntr2!(Root::InteractionTreeNode,
+     OL::LocalOperator, OR::LocalOperator,
+     strength::Number, Z::Union{Nothing,AbstractTensorMap};
+     value=nothing)
      @assert OL.si < OR.si
 
      current_node = Root
@@ -79,9 +87,12 @@ function addIntr2!(Root::InteractionTreeNode, OL::LocalOperator, OR::LocalOperat
 
      idx = findfirst(x -> x.Op == OR, current_node.children)
      if isnothing(idx)
-          addchild!(current_node, OR)
+          addchild!(current_node, OR, value)
           current_node.children[end].Op.strength = strength
      else
+          if !isnothing(value)
+               current_node.children[idx].value = value
+          end
           _update_strength!(current_node.children[idx], strength) && deleteat!(current_node.children, idx)
      end
 

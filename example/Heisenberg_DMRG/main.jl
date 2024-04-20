@@ -63,9 +63,9 @@ Obs = let
      @time calObs!(Tree, Ψ; GCspacing=1000, verbose=verbose, showtimes=10)
 
      if Sym == :U₁
-          convert(Dict, Tree, [(:Sz, :Sz), (:Su, :Sd),])
+          convert(Dict, Tree)
      elseif Sym == :SU₂
-          convert(Dict, Tree, [(:S, :S),])
+          convert(Dict, Tree)
      end
 end
 

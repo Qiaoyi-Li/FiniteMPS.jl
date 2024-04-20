@@ -63,6 +63,6 @@ Obs = let
 
      @time calObs!(Tree, Ψ; GCspacing=1000, verbose=verbose, showtimes=10)
 
-     convert(Dict, Tree, [(:n,), (:S, :S), (:n, :n), (:Fdag, :F), (:Fdag, :FdagS, :FS, :F), (:Fdag, :FdagT, :FT, :F)])
+     convert(Dict, Tree)
 end
 

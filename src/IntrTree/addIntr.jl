@@ -12,6 +12,9 @@ Generic function to add an N-site interaction via `addIntr1!`, `addIntr2!` and `
      name::NTuple{N,Union{Symbol,String}}
 
 Detailed usage of kwargs see `addIntr1!`, `addIntr2!` and `addIntr4!`.
+
+     Obs::Bool = false
+`Obs == true` means this interaction is used for calculating observables, and thus the `name` and `si` information will be stored in the last node additionally.   
 """
 function addIntr!(Root::InteractionTreeNode,
      Op::NTuple{1,AbstractTensorMap},

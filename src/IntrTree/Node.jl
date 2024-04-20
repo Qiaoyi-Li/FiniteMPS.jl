@@ -19,6 +19,12 @@ mutable struct InteractionTreeNode{T}
      value::Union{Nothing, T}
      parent::Union{Nothing,InteractionTreeNode}
      children::Vector{InteractionTreeNode}
+     function InteractionTreeNode{T}(Op::Union{Nothing,AbstractLocalOperator},
+          value::T,
+          parent::Union{Nothing,InteractionTreeNode} = nothing,
+          children::Vector{InteractionTreeNode} = InteractionTreeNode[]) where T
+          return new{T}(Op, value, parent, children)
+     end
      function InteractionTreeNode(Op::Union{Nothing,AbstractLocalOperator},
           value::T,
           parent::Union{Nothing,InteractionTreeNode},
@@ -72,6 +78,15 @@ function addchild!(node::InteractionTreeNode{T}, Op::AbstractLocalOperator) wher
 end
 function addchild!(node::InteractionTreeNode, Op::AbstractLocalOperator, value)
      child = InteractionTreeNode(Op, value, node)
+     return addchild!(node, child)
+end
+# for Obs tree
+function addchild!(node::InteractionTreeNode{T}, Op::AbstractLocalOperator, ::Nothing) where T <: Tuple{String, Vararg{Int64}}
+     # convert nothing to the required type 
+     return addchild!(node, Op, ("",))
+end
+function addchild!(node::InteractionTreeNode{T}, Op::AbstractLocalOperator, value::Tuple{String, Vararg{Int64}} = ("",)) where T <: Tuple{String, Vararg{Int64}}
+     child = InteractionTreeNode{Tuple{String, Vararg{Int64}}}(Op, value, node)
      return addchild!(node, child)
 end
 

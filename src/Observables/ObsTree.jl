@@ -1,20 +1,20 @@
 """
      struct ObservableTree{N}
-          Root::InteractionTreeNode{Nothing}
+          Root::InteractionTreeNode{Tuple{String, Vararg{Int64}}}
      end
      
-Similar to `InteractionTree` but specially used for calculation of observables.
+Similar to `InteractionTree` but specially used for calculation of observables. The `value` field is used to tell which observable corresponds to the current node.
 
 # Constructors
      ObservableTree{N}()
 Initialize an empty object.
 """
 struct ObservableTree{N}
-     Root::InteractionTreeNode{Nothing}
+     Root::InteractionTreeNode{Tuple{String, Vararg{Int64}}}
      function ObservableTree{N}() where N
-          Root = InteractionTreeNode(nothing, nothing)
+          Root = InteractionTreeNode{Tuple{String, Vararg{Int64}}}(nothing, ("",), nothing)
           for i = 1:N
-               addchild!(Root, InteractionTreeNode(IdentityOperator(0), nothing))
+               addchild!(Root, InteractionTreeNode{Tuple{String, Vararg{Int64}}}(IdentityOperator(0),("",),nothing))
           end
           return new{N}(Root)     
      end
@@ -39,14 +39,14 @@ function addObs!(Tree::ObservableTree{M},
      n::Int64 = 1; 
      kwargs...) where {N, M}
      @assert n ≤ M
-     return addIntr!(Tree.Root.children[n], Op, si, 1; kwargs...)
+     return addIntr!(Tree.Root.children[n], Op, si, 1; Obs = true, kwargs...)
 end
 function addObs!(Tree::ObservableTree,
      Op::AbstractTensorMap,
      si::Int64,
      n::Int64 = 1; 
      kwargs...)
-     return addIntr!(Tree.Root.children[n], Op, si, 1; kwargs...)
+     return addIntr!(Tree.Root.children[n], Op, si, 1; Obs = true, kwargs...)
 end
 
 
