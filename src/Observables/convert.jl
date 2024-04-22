@@ -25,6 +25,6 @@ function convert(::Type{NamedTuple}, Root::InteractionTreeNode; kwargs...)
      return NamedTuple{k}(values(Rslt))
 end
 
-function convert(::Type{T}, Tree::ObservableTree; kwargs...) where T
+function convert(::Type{T}, Tree::ObservableTree; kwargs...) where T <:Union{NamedTuple, Dict}
      return convert(T, Tree.Root; kwargs...) 
 end
