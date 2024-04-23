@@ -59,7 +59,12 @@ function _update_strength!(node::InteractionTreeNode, strength::Number)
           node.Op.strength = NaN 
      end
      return false
-     
+end
+
+function _update_strength!(node::InteractionTreeNode{T}, strength::Number) where T <: Tuple{String, Vararg{Int64}}
+     # directly update the value when used for calculating observables
+     node.Op.strength = strength
+     return false
 end
 
 function _addZ!(OR::LocalOperator{1, R₂}, Z::AbstractTensorMap) where R₂

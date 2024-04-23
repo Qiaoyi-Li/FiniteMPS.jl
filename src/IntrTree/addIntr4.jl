@@ -215,6 +215,8 @@ function addIntr4!(Root::InteractionTreeNode, A::LocalOperator, B::LocalOperator
 
 end
 
+_addtag!(::LocalOperator{1, 1}, ::LocalOperator{1, 1}, ::LocalOperator{1, 1}, ::LocalOperator{1, 1}) = nothing
+
 function _addtag!(A::LocalOperator{1,2}, B::LocalOperator{2,2}, C::LocalOperator{2,2}, D::LocalOperator{2,1})
      name = map(x -> x.name, [A, B, C, D])
      for i = 2:4 # make sure each name is unique
@@ -226,7 +228,7 @@ function _addtag!(A::LocalOperator{1,2}, B::LocalOperator{2,2}, C::LocalOperator
      B.tag = (("$(name[1])<-$(name[2])", "phys"), ("phys", "$(name[2])<-$(name[3])"))
      C.tag = (("$(name[2])<-$(name[3])", "phys"), ("phys", "$(name[3])<-$(name[4])"))
      D.tag = (("$(name[3])<-$(name[4])", "phys"), ("phys",))
-     return A, B, C, D
+     return nothing
 end
 
 function _addtag!(A::LocalOperator{1, 2}, B::LocalOperator{2, 1}, C::LocalOperator{1, 2}, D::LocalOperator{2, 1})
@@ -240,5 +242,5 @@ function _addtag!(A::LocalOperator{1, 2}, B::LocalOperator{2, 1}, C::LocalOperat
      B.tag = (("$(name[1])<-$(name[2])", "phys"), ("phys",))
      C.tag = (("phys", ), ("phys", "$(name[3])<-$(name[4])"))
      D.tag = (("$(name[3])<-$(name[4])", "phys"), ("phys",))
-     return A, B, C, D
+     return nothing
 end
