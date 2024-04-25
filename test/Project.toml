@@ -1,4 +1,5 @@
 [deps]
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MKL = "33e6dc65-8f57-5167-99aa-e5a354878fb2"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TestExtras = "5ed8adda-3752-4e41-b88a-e8b09835ee3a"
