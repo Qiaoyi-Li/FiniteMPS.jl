@@ -116,7 +116,7 @@ const ΔₜdagΔₜ = let
      @tensor B[d a; b e] := A[a b c] * iso[c d e]
      C = permute(B', ((2, 1), (4, 3)))
      # -1 here as Δₜ is anti-symmetric with site indices
-     D = - permute(A', ((2, 1), (3,)))
+     D = -permute(A', ((2, 1), (3,)))
      A, B, C, D
 end
 
@@ -268,6 +268,11 @@ Two rank-`3` operators of hopping `c↑^dag c↑` and `c↓^dag c↓`.
      FFdag₊::NTuple{2, TensorMap}
      FFdag₋::NTuple{2, TensorMap}
 Two rank-`3` operators of hopping `c↑ c↑^dag` and `c↓ c↓^dag`.
+
+     ΔdagΔ₊₊::NTuple{4, TensorMap}
+     ΔdagΔ₋₋::NTuple{4, TensorMap}
+     ΔdagΔ₊₋::NTuple{4, TensorMap}
+Rank-`4` operators of pairing correlation. Note `ΔdagΔ₊₋` means `c↑^dag c↓^dag c↓ c↑`.
 """
 module U₁U₁Fermion
 
@@ -351,8 +356,38 @@ const FFdag₋ = let
      F₋, Fdag₋
 end
 
-# TODO pairing Δ↑↓^dag, ...
-
+const ΔdagΔ₊₊ = let
+     A = FdagF₊[1]
+     aspace = Rep[U₁×U₁]((1, 1 / 2) => 1)
+     aspace2 = Rep[U₁×U₁]((2, 1) => 1)
+     iso = isometry(aspace ⊗ aspace, aspace2)
+     @tensor B[d a; b e] := A[a b c] * iso[c d e]
+     C = permute(B', ((2, 1), (4, 3)))
+     D = permute(A', ((2, 1), (3,)))
+     A, B, C, D
+end
+const ΔdagΔ₋₋ = let
+     A = FdagF₋[1]
+     aspace = Rep[U₁×U₁]((1, -1 / 2) => 1)
+     aspace2 = Rep[U₁×U₁]((2, -1) => 1)
+     iso = isometry(aspace ⊗ aspace, aspace2)
+     @tensor B[d a; b e] := A[a b c] * iso[c d e]
+     C = permute(B', ((2, 1), (4, 3)))
+     D = permute(A', ((2, 1), (3,)))
+     A, B, C, D
+end
+const ΔdagΔ₊₋ = let
+     A = FdagF₊[1]
+     B = FdagF₋[1]
+     aspace_A = Rep[U₁×U₁]((1, 1 / 2) => 1)
+     aspace_B = Rep[U₁×U₁]((1, -1 / 2) => 1)
+     aspace2 = Rep[U₁×U₁]((2, 0) => 1)
+     iso = isometry(aspace_A ⊗ aspace_B, aspace2)
+     @tensor B[d a; b e] := B[a b c] * iso[d c e]
+     C = permute(B', ((2, 1), (4, 3)))
+     D = permute(A', ((2, 1), (3,)))
+     A, B, C, D
+end
 
 end
 

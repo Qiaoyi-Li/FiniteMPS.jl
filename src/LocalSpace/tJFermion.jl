@@ -82,3 +82,127 @@ end
      const U1SU2tJFermion = U₁SU₂tJFermion
 """
 const U1SU2tJFermion = U₁SU₂tJFermion
+
+"""
+     module U₁U₁tJFermion
+
+Prepare some commonly used objects for U₁×U₁ `tJ` fermions, i.e. local `d = 3` Hilbert space without double occupancy. 
+     
+Behaviors of all operators are the same as `U₁U₁Fermion` up to the projection, details please see `U₁U₁Fermion`. 
+"""
+module U₁U₁tJFermion
+
+using TensorKit
+
+const pspace = Rep[U₁×U₁]((-1, 0) => 1, (0, -1 // 2) => 1, (0, 1 // 2) => 1)
+
+const Z = let
+     Z = TensorMap(ones, pspace, pspace)
+     block(Z, Irrep[U₁×U₁](0, 1 // 2)) .= -1
+     block(Z, Irrep[U₁×U₁](0, -1 // 2)) .= -1
+     Z
+end
+
+const n₊ = let
+     n₊ = TensorMap(zeros, pspace, pspace)
+     block(n₊, Irrep[U₁×U₁](0, 1 / 2)) .= 1
+     n₊
+end
+
+const n₋ = let
+     n₋ = TensorMap(zeros, pspace, pspace)
+     block(n₋, Irrep[U₁×U₁](0, -1 / 2)) .= 1
+     n₋
+end
+
+const n = n₊ + n₋
+
+const Sz = (n₊ - n₋) / 2
+
+# S+ S- interaction
+# convention: S⋅S = SzSz + (S₊₋ + S₋₊)/2
+const S₊₋ = let
+     aspace = Rep[U₁×U₁]((0, 1) => 1)
+     S₊ = TensorMap(ones, pspace, pspace ⊗ aspace)
+     S₋ = TensorMap(ones, aspace ⊗ pspace, pspace)
+     S₊, S₋
+end
+
+const S₋₊ = let
+     aspace = Rep[U₁×U₁]((0, 1) => 1)
+     iso = isometry(aspace, flip(aspace))
+     @tensor S₋[a; c d] := S₊₋[1]'[a, b, c] * iso'[d, b]
+     @tensor S₊[d a; c] := S₊₋[2]'[a, b, c] * iso[b, d]
+     S₋, S₊
+end
+
+# hopping term, FdagF₊ = c↑^dag c↑
+const FdagF₊ = let
+     aspace = Rep[U₁×U₁]((1, 1 // 2) => 1)
+     Fdag₊ = TensorMap(ones, pspace, pspace ⊗ aspace)
+     F₊ = TensorMap(ones, aspace ⊗ pspace, pspace)
+     Fdag₊, F₊
+end
+const FdagF₋ = let
+     # note c↓^dag|↑⟩ = -|↑↓⟩, c↓|↑↓⟩ = -|↑⟩  
+     aspace = Rep[U₁×U₁]((1, -1 // 2) => 1)
+     Fdag₋ = TensorMap(ones, pspace, pspace ⊗ aspace)
+     block(Fdag₋, Irrep[U₁×U₁](1, 0)) .= -1
+     F₋ = TensorMap(ones, aspace ⊗ pspace, pspace)
+     block(F₋, Irrep[U₁×U₁](1, 0)) .= -1
+     Fdag₋, F₋
+end
+const FFdag₊ = let
+     aspace = Rep[U₁×U₁]((1, 1 // 2) => 1)
+     iso = isometry(aspace, flip(aspace))
+     @tensor F₊[a; c d] := FdagF₊[1]'[a, b, c] * iso'[d, b]
+     @tensor Fdag₊[d a; c] := FdagF₊[2]'[a, b, c] * iso[b, d]
+     F₊, Fdag₊
+end
+const FFdag₋ = let
+     aspace = Rep[U₁×U₁]((1, -1 // 2) => 1)
+     iso = isometry(aspace, flip(aspace))
+     @tensor F₋[a; c d] := FdagF₋[1]'[a, b, c] * iso'[d, b]
+     @tensor Fdag₋[d a; c] := FdagF₋[2]'[a, b, c] * iso[b, d]
+     F₋, Fdag₋
+end
+
+const ΔdagΔ₊₊ = let
+     A = FdagF₊[1]
+     aspace = Rep[U₁×U₁]((1, 1 / 2) => 1)
+     aspace2 = Rep[U₁×U₁]((2, 1) => 1)
+     iso = isometry(aspace ⊗ aspace, aspace2)
+     @tensor B[d a; b e] := A[a b c] * iso[c d e]
+     C = permute(B', ((2, 1), (4, 3)))
+     D = permute(A', ((2, 1), (3,)))
+     A, B, C, D
+end
+const ΔdagΔ₋₋ = let
+     A = FdagF₋[1]
+     aspace = Rep[U₁×U₁]((1, -1 / 2) => 1)
+     aspace2 = Rep[U₁×U₁]((2, -1) => 1)
+     iso = isometry(aspace ⊗ aspace, aspace2)
+     @tensor B[d a; b e] := A[a b c] * iso[c d e]
+     C = permute(B', ((2, 1), (4, 3)))
+     D = permute(A', ((2, 1), (3,)))
+     A, B, C, D
+end
+const ΔdagΔ₊₋ = let
+     A = FdagF₊[1]
+     B = FdagF₋[1]
+     aspace_A = Rep[U₁×U₁]((1, 1 / 2) => 1)
+     aspace_B = Rep[U₁×U₁]((1, -1 / 2) => 1)
+     aspace2 = Rep[U₁×U₁]((2, 0) => 1)
+     iso = isometry(aspace_A ⊗ aspace_B, aspace2)
+     @tensor B[d a; b e] := B[a b c] * iso[d c e]
+     C = permute(B', ((2, 1), (4, 3)))
+     D = permute(A', ((2, 1), (3,)))
+     A, B, C, D
+end
+
+end
+
+"""
+     const U1U1tJFermion = U₁U₁tJFermion
+"""
+const U1U1tJFermion = U₁U₁tJFermion
