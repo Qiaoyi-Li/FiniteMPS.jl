@@ -53,18 +53,7 @@ function _TDVPUpdate0(H::SparseProjectiveHamiltonian{0}, A::MPSTensor{2}, dt::Nu
 end
 
 function _LanczosExp(f, t::Number, x, args...; kwargs...)
-     # wrap KrylovKit.exponentiate to make sure the integrate step length is exactly t
-     # TODO, unknown bugs if t is too large
-
      x, info = exponentiate(f, t, x, args...; kwargs...)
-     residual = info.residual
-     K_sum = info.numops
-     while residual != 0
-          dt = sign(t) * residual
-          x, info = exponentiate(f, dt, x, args...; kwargs...)
-          residual = info.residual
-          K_sum += info.numops
-     end
-     info = LanczosInfo(info.converged > 0, [info.normres,], info.numiter, K_sum)
-     return x, info
+     @assert info.residual ≈ 0
+     return x, LanczosInfo(info.converged > 0, [info.normres,], info.numiter, info.numops)
 end
