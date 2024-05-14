@@ -75,7 +75,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
           end
 
      end
-     Ψ[L] = Al
+     Ψ[L] = normalize!(Al)
 
      # GC manually
      GCsweep && manualGC(TimerSweep)
@@ -136,7 +136,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
                flush(stdout)
           end
      end
-     Ψ[1] = Ar
+     Ψ[1] = normalize!(Ar)
 
      # GC manually
      GCsweep && manualGC(TimerSweep)
@@ -209,7 +209,7 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
                # remember to change Center of Ψ manually
                Center(Ψ)[:] = [si + 1, si + 1]
           else
-               Ψ[si] = xg
+               Ψ[si] = normalize!(xg)
                info_svd = BondInfo(xg, :R)
           end
           info_dmrg[si] = DMRGInfo(eg, info_Lanczos, info_svd)
@@ -275,7 +275,7 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
                # remember to change Center of Ψ manually
                Center(Ψ)[:] = [si - 1, si - 1]
           else
-               Ψ[si] = xg
+               Ψ[si] = normalize!(xg)
                info_svd = BondInfo(xg, :L)
           end
           info_dmrg[si] = DMRGInfo(eg, info_Lanczos, info_svd)
