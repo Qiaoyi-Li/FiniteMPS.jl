@@ -38,20 +38,25 @@ function addIntr4!(Root::InteractionTreeNode, O::NTuple{4,AbstractTensorMap}, si
      (A, B, C, D) = map(1:4) do i
           LocalOperator(O[i], name[i], si[i])
      end
-     _addtag!(A, B, C, D)
 
      # deal with the permutation 1<->2 and 3<->4
      if si[1] > si[2]
-          A, B = _leftOp(B), _rightOp(A)
+          A, B = _swap(A, B)
           si = (si[2], si[1], si[3], si[4])
           !isnothing(Z) && (strength *= -1)
      end
      if si[3] > si[4]
-          C, D = _leftOp(D), _rightOp(C)
+          C, D = _swap(C, D)
           si = (si[1], si[2], si[4], si[3])
           !isnothing(Z) && (strength *= -1)
      end
 
+     _addtag!(A, B, C, D)
+
+     # ============ reduce to 2-site term ===========
+     if A.si == B.si && C.si == D.si
+          return addIntr2!(Root, A * B, C * D, strength, nothing; value = value)
+     end
      if A.si == C.si && B.si == D.si
           #          D
           #  C Z Z Z Z              -BD
