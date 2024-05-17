@@ -1,11 +1,17 @@
 """
-     calObs!(Tree::ObservableTree, Ψ::AbstractMPS{L}; kwargs...) -> Tree::InteractionTree
+     calObs!(Tree::ObservableTree, Ψ::AbstractMPS{L}; kwargs...) -> Timer::TimerOutput
 
 Calculate observables respect to state `Ψ`, the info to tell which observables to calculate is stored in `Tree`. The results are stored in each leaf node of `Tree`. Note the value in each node will be in-place updated, so do not call this function twice with the same `Tree` object.  
 
-Note only multi-threading backend is supported now.
+# Kwargs 
+     serial::Bool = false
+Force to compute in serial mode, usually used for debugging.
 """
 function calObs!(Tree::ObservableTree, Ψ::AbstractMPS{L}; kwargs...) where {L}
+
+     if get(kwargs, :serial, false)
+          return _calObs_serial!(Tree, Ψ; kwargs...)
+     end
 
      if get_num_workers() > 1
           # TODO
@@ -17,9 +23,69 @@ function calObs!(Tree::ObservableTree, Ψ::AbstractMPS{L}; kwargs...) where {L}
                return _calObs_threading!(Tree, Ψ, StoreMemory(); kwargs...)
           end
      else
-          # TODO
+          # fallback to serial
           return _calObs_serial!(Tree, Ψ; kwargs...)
      end
+end
+
+function _calObs_serial!(Tree::ObservableTree, Ψ::AbstractMPS{L}; kwargs...) where {L}
+     
+     GCspacing::Int64 = get(kwargs, :GCspacing, 100)
+     verbose::Int64 = get(kwargs, :verbose, 0)
+     showtimes::Int64 = get(kwargs, :showtimes, 100)
+
+     # store the map from nodes to corresponding left environment tensors
+     Dict_El = Dict{InteractionTreeNode, LocalLeftTensor}()
+
+     # print
+     Timer_acc = TimerOutput()
+     num_tot = 0
+     for _ in PreOrderDFS(Tree.Root)
+          num_tot += 1
+     end
+     num_count = 0
+     showspacing::Int64 = cld(num_tot, showtimes)
+     GC_count = 0
+
+     for node in PreOrderDFS(Tree.Root)
+          num_count += 1
+          isnothing(node.Op) && continue
+          si = node.Op.si
+          if si == 0 # initialize
+               Dict_El[node] = isometry(codomain(Ψ[1])[1], codomain(Ψ[1])[1])
+               continue
+          end
+
+          # update 
+          El = _update_node!(node.Op, Dict_El[node.parent], Ψ[si]', Ψ[si], Timer_acc)
+
+          # store El only if there exist children
+          if !isempty(node.children)
+               Dict_El[node] = El
+          end
+
+          # delete entry if all children are visited
+          if node === last(node.parent.children)
+               delete!(Dict_El, node.parent)
+          end
+
+          # print
+          if verbose > 0 && iszero(num_count % showspacing)
+               show(Timer_acc; title="$(num_count) / $(num_tot)")
+               println()
+               flush(stdout)
+          end
+
+          # manual GC
+          GC_count += 1
+          if GC_count == GCspacing
+               GC_count = 0
+               manualGC(Timer_acc)
+          end
+
+     end
+
+     return Timer_acc
 end
 
 function _calObs_threading!(Tree::ObservableTree, Ψ::AbstractMPS{L}, ::StoreMemory; kwargs...) where {L}
