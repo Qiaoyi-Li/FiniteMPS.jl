@@ -3,12 +3,14 @@ module FiniteMPS
 using Reexport
 using AbstractTrees, SerializedElementArrays, Serialization
 using Base.Threads, Distributed
+using Graphs, MetaGraphs
 @reexport import SerializedElementArrays: SerializedElementArray, SerializedElementVector
 @reexport using TensorKit, KrylovKit, TensorKit.TensorOperations, TimerOutputs
-@reexport import Base: +, -, *, /, ==, promote_rule, convert, length, show, getindex, setindex!, lastindex, keys, similar, merge, iterate, complex
+@reexport import Base: +, -, *, /, ==, promote_rule, convert, length, show, getindex, setindex!, lastindex, keys, similar, merge, merge!, iterate, complex
 @reexport import TensorKit: ×, one, zero, dim, inner, scalar, domain, codomain, eltype, scalartype, leftorth, rightorth, leftnull, rightnull, tsvd, adjoint, normalize!, norm, axpy!, axpby!, add!, add!!, dot, mul!, rmul!, NoTruncation, fuse, zerovector!, zerovector, scale, scale!, scale!!
 @reexport import LinearAlgebra: BLAS, rank, qr, diag, I, diagm
-@reexport import AbstractTrees: parent, isroot
+import AbstractTrees: parent, isroot
+import Graphs: rem_vertices!
 
 # global settings
 include("Globals.jl")
@@ -27,12 +29,13 @@ include("utils/oplus.jl")
 include("utils/Direction.jl")
 
 # Wrapper types for classifying tensors
-export AbstractTensorWrapper, AbstractMPSTensor, MPSTensor, CompositeMPSTensor, AdjointMPSTensor, AbstractEnvironmentTensor, LocalLeftTensor, LocalRightTensor, SimpleLeftTensor, SimpleRightTensor, SparseLeftTensor, SparseRightTensor, AbstractLocalOperator, hastag, getPhysSpace, getOpName, IdentityOperator, tag2Tuple, LocalOperator, SparseMPOTensor, AbstractStoreType, StoreMemory, StoreDisk, LeftPreFuseTensor, SparseLeftPreFuseTensor, noise!
+export AbstractTensorWrapper, AbstractMPSTensor, MPSTensor, CompositeMPSTensor, AdjointMPSTensor, AbstractEnvironmentTensor, LocalLeftTensor, LocalRightTensor, SimpleLeftTensor, SimpleRightTensor, SparseLeftTensor, SparseRightTensor, BilayerLeftTensor, BilayerRightTensor, AbstractLocalOperator, hastag, getPhysSpace, getOpName, IdentityOperator, tag2Tuple, LocalOperator, SparseMPOTensor, AbstractStoreType, StoreMemory, StoreDisk, LeftPreFuseTensor, SparseLeftPreFuseTensor, noise!
 include("TensorWrapper/TensorWrapper.jl")
 include("TensorWrapper/MPSTensor.jl")
 include("TensorWrapper/CompositeMPSTensor.jl")
 include("TensorWrapper/AdjointMPSTensor.jl")
 include("TensorWrapper/EnvironmentTensor.jl")
+include("TensorWrapper/BilayerEnvTensor.jl")
 include("TensorWrapper/LocalOperator.jl")
 include("TensorWrapper/SparseMPOTensor.jl")
 include("TensorWrapper/StoreType.jl")
@@ -97,21 +100,24 @@ include("Algorithm/CBE/CBE.jl")
 
 
 # Interaction tree for generating Hamiltonian MPO and calculate observables
-export InteractionTreeNode, InteractionTree, addchild!, addIntr!, addIntr1!, addIntr2!, addIntr4!, AutomataMPO
+export InteractionTreeNode, InteractionTree, addchild!, addIntr!, addIntr1!, addIntr2!, addIntr4!, AutomataMPO, AbstractInteractionIterator, OnSiteInteractionIterator, TwoSiteInteractionIterator, ArbitraryInteractionIterator
 include("IntrTree/Node.jl")
 include("IntrTree/addIntr.jl")
 include("IntrTree/addIntr1.jl")
 include("IntrTree/addIntr2.jl")
 include("IntrTree/addIntr4.jl")
 include("IntrTree/Automata.jl")
+include("IntrTree/IntrIterator.jl")
 
 
 # Observables
-export calObs!, ObservableTree, addObs!
+export calObs!, ObservableTree, addObs!, ImagTimeProxyGraph, addITP2!, calITP!
 include("Observables/ObsTree.jl")
 include("Observables/calObs.jl")
 include("Observables/convert.jl")
-
+include("Observables/ITPGraph.jl")
+include("Observables/addITP.jl")
+include("Observables/calITP.jl")
 
 # predefined local spaces
 export SU₂Spin, SU2Spin, U₁Spin, U1Spin, NoSymSpinOneHalf, U₁SU₂Fermion, U1SU2Fermion, ℤ₂SU₂Fermion, Z2SU2Fermion, U₁SpinlessFermion, U1SpinlessFermion, U₁SU₂tJFermion, U1SU2tJFermion, U₁U₁Fermion, U1U1Fermion, U₁U₁tJFermion, U1U1tJFermion

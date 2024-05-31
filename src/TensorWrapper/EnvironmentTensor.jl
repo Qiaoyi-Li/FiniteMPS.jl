@@ -12,7 +12,7 @@ abstract type AbstractEnvironmentTensor <: AbstractTensorWrapper end
           tag::NTuple{R, String}
      end
 
-Wrapper type for rank-R left environment tenosr, with an additional field `tag` to distinguish legs of different channels.
+Wrapper type for rank-R left environment tensor, with an additional field `tag` to distinguish legs of different channels.
 
 Convention (' marks codomain):
      
@@ -56,7 +56,7 @@ end
           tag::NTuple{R, String}
      end
 
-Wrapper type for rank-R right environment tenosr, with an additional field `tag` to distinguish legs of different channels.
+Wrapper type for rank-R right environment tensor, with an additional field `tag` to distinguish legs of different channels.
 
 Convention (' marks codomain):
      
@@ -126,7 +126,7 @@ const SparseRightTensor = Vector{SimpleRightTensor}
 """
      *(A::LocalLeftTensor{R}, B::LocalRightTensor{R}) -> ::Number
 
-Contract a left environment tenosr and a right environment tensor with the same virtual spaces to get a scalar.
+Contract a left environment tensor and a right environment tensor with the same virtual spaces to get a scalar.
 """
 function *(A::LocalLeftTensor{R}, B::LocalRightTensor{R}) where R
      if R ≥ 4
