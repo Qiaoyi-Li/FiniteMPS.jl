@@ -14,8 +14,11 @@ function addITP2!(G::ImagTimeProxyGraph{L},
      end
      G.Refs[ITPname][si] = Ref{ValueType}()
 
-     O₁ = OnSiteInteractionIterator{L}(Op[1], si[1], Opname[1]; Z=Z)
-     O₂ = OnSiteInteractionIterator{L}(Op[2], si[2], Opname[2]; Z=Z)
+     # if i > j, swap the direction of the horizontal bond
+     swap = si[1] > si[2] 
+
+     O₁ = OnSiteInteractionIterator{L}(Op[1], si[1], Opname[1]; Z=Z, swap = swap)
+     O₂ = OnSiteInteractionIterator{L}(Op[2], si[2], Opname[2]; Z=Z, swap = swap)
      return _addITP!(G, O₁, O₂, G.Refs[ITPname][si])
 
 end

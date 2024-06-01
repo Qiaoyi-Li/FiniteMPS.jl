@@ -17,9 +17,10 @@ struct OnSiteInteractionIterator{L, T} <: AbstractInteractionIterator{L}
      function OnSiteInteractionIterator{L}(Op::AbstractTensorMap,
           si::Int64,
           name::Union{String, Symbol};
+          swap::Bool=false,
           Z = nothing) where {L}
           @assert 1 ≤ si ≤ L
-          return OnSiteInteractionIterator{L}(LocalOperator(Op, name, si), Z)
+          return OnSiteInteractionIterator{L}(LocalOperator(Op, name, si; swap=swap), Z)
      end
 end
 function iterate(iter::OnSiteInteractionIterator{L, Nothing}, i::Int64 = 1) where {L} 
