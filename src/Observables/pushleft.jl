@@ -47,3 +47,19 @@ end
 function _pushleft(Er::BilayerRightTensor{1, 2}, A::AdjointMPSTensor{4}, ::IdentityOperator, B::MPSTensor{4}, ::IdentityOperator)::BilayerRightTensor{1, 2}
      return @tensor tmp[j; c l] := (A.A[e d l g] * Er.A[b c d]) * B.A[j g e b] 
 end
+
+function _pushleft(Er::BilayerRightTensor{1, 1}, A::AdjointMPSTensor{4}, ::IdentityOperator, B::MPSTensor{4}, O2::LocalOperator{1, 1})::BilayerRightTensor{1, 1}
+     return @tensor tmp[j; l] := ((B.A[j g f b] * Er.A[b d]) * A.A[e d l g]) * O2.A[f e]
+end
+
+function _pushleft(Er::BilayerRightTensor{1, 1}, A::AdjointMPSTensor{4}, O1::LocalOperator{2, 1}, B::MPSTensor{4}, O2::LocalOperator{1, 1})::BilayerRightTensor{1, 2}
+     return @tensor tmp[j; k l] := (((O2.A[f e] * B.A[j g f b]) * Er.A[b d]) * A.A[e d l h]) * O1.A[k h g]
+end
+
+function _pushleft(Er::BilayerRightTensor{1, 1}, A::AdjointMPSTensor{4}, O1::LocalOperator{1, 1}, B::MPSTensor{4}, ::IdentityOperator)::BilayerRightTensor{1, 1}
+     return @tensor tmp[j; l] := ((O1.A[h g] * B.A[j g e b]) * Er.A[b d]) * A.A[e d l h]
+end
+
+function _pushleft(Er::BilayerRightTensor{1, 2}, A::AdjointMPSTensor{4}, ::IdentityOperator, B::MPSTensor{4}, O2::LocalOperator{1, 1})::BilayerRightTensor{1, 2}
+     return @tensor tmp[j; c l] := ((B.A[j g f b] * O2.A[f e]) *  Er.A[b c d]) * A.A[e d l g]
+end

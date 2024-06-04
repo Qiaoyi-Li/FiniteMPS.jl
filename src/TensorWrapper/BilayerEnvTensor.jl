@@ -76,32 +76,3 @@ function *(A::BilayerLeftTensor{R₁,R₂}, B::BilayerRightTensor{R₂,R₁}) wh
      R = R₁ + R₂
      return scalar(TensorOperations.tensorcontract(A.A, 1:R, B.A, reverse(1:R)))
 end
-
-function *(A::BilayerLeftTensor{2, 1}, B::BilayerRightTensor{2, 1})
-     #          b---
-     #         /    |
-     #  ---c  / c---|
-     # |     /      |
-     # El--b        Er
-     # |            |
-     #  ---a    a--- 
-     @tensor tmp[] := A.A[a b c] * B.A[b c a]
-     return scalar(tmp)
-end
-
-function *(A::BilayerLeftTensor{1, 2}, B::BilayerRightTensor{1, 2})
-     #  ---c       
-     # |    \       
-     # |---b \ b---
-     # |      \    |
-     # El      c---Er
-     # |           |
-     #  ---a   a--- 
-     @tensor tmp[] := A.A[a b c] * B.A[b c a]
-     return scalar(tmp)
-end
-
-
-
-
-

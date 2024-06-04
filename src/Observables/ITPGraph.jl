@@ -65,16 +65,20 @@ function rem_vertices!(g::MetaDiGraph{Int64}, vs::AbstractVector{Int64}; keep_or
      return vmap
 end
 
-function merge!(G::ImagTimeProxyGraph{L}) where {L}
+function merge!(G::ImagTimeProxyGraph{L}; verbose::Int64 = 0) where {L}
 
      v_rm = Set{Int64}()
      for si in 0:L
-          @show si
-          @time _left_merge!(G, v_rm, si)
-          @time _right_merge!(G, v_rm, L + 1 - si)
+          _left_merge!(G, v_rm, si)
+          _right_merge!(G, v_rm, L + 1 - si)
 
-          @time rem_vertices!(G.graph, collect(v_rm); keep_order =true)
-          empty!(v_rm) 
+          t = @elapsed rem_vertices!(G.graph, collect(v_rm); keep_order =true)
+ 
+          if verbose > 0
+               println("si = $si, remove $(length(v_rm))/$(nv(G.graph)) vertices, time = $(t)s")
+          end
+
+          empty!(v_rm)
      end
 
      _expand_left_tree!(G)

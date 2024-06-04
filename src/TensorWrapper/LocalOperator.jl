@@ -283,7 +283,7 @@ function _leftOp(obj::LocalOperator{R₁, R₂}) where {R₁, R₂}
      tag = ((obj.tag[1][end],), (obj.tag[2][1], obj.tag[1][1:end-1]..., obj.tag[2][2:end]...))
      return LocalOperator(O, obj.name, obj.si, obj.strength, tag)
 end
-
+_leftOp(obj::LocalOperator{1, 1}) = obj
 
 function _rightOp(obj::LocalOperator{R₁, R₂}) where {R₁, R₂}
      # transform to a right operator, i.e. R₂ == 1
@@ -292,6 +292,8 @@ function _rightOp(obj::LocalOperator{R₁, R₂}) where {R₁, R₂}
      tag = ((obj.tag[1][1:end-1]..., obj.tag[2][2:end]..., obj.tag[1][end]), (obj.tag[2][1], ))
      return LocalOperator(O, obj.name, obj.si, obj.strength, tag)
 end
+_rightOp(obj::LocalOperator{1, 1}) = obj
+
 
 # dimension of left/right auxiliary bond
 function _vdim(::IdentityOperator, idx::Int64)

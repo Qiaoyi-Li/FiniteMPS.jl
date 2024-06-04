@@ -69,6 +69,9 @@ function _calITP_serial!(G::ImagTimeProxyGraph, ρ::MPO{L}; kwargs...) where {L}
           end
      end
 
+     # one more GC to free the environment tensors 
+     manualGC(Timer_acc)
+
      return Timer_acc
 end
 

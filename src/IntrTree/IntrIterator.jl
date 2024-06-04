@@ -15,8 +15,8 @@ struct OnSiteInteractionIterator{L, T} <: AbstractInteractionIterator{L}
           return new{L, T}(Op, Z)
      end
      function OnSiteInteractionIterator{L}(Op::AbstractTensorMap,
-          si::Int64,
-          name::Union{String, Symbol};
+          name::Union{String, Symbol},
+          si::Int64;
           swap::Bool=false,
           Z = nothing) where {L}
           @assert 1 ≤ si ≤ L
@@ -58,8 +58,8 @@ struct TwoSiteInteractionIterator{L, T} <: AbstractInteractionIterator{L}
           return new{L, T}(O₁, O₂, Z)
      end
      function TwoSiteInteractionIterator{L}(Op::NTuple{2, AbstractTensorMap},
-          si::NTuple{2, Int64},
-          name::NTuple{2, Union{String, Symbol}};
+          name::NTuple{2, Union{String, Symbol}},
+          si::NTuple{2, Int64};
           Z=nothing) where {L}
           @assert 1 ≤ si[1] ≤ L && 1 ≤ si[2] ≤ L && si[1] ≠ si[2]
           
