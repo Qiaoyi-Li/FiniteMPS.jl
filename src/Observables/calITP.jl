@@ -1,16 +1,4 @@
 function calITP!(G::ImagTimeProxyGraph, ρ::MPO{L}; kwargs...) where {L}
-     if get(kwargs, :serial, false)
-          return _calITP_serial!(G, ρ; kwargs...)
-     end
-
-     # TODO
-end
-
-function _calITP_serial!(G::ImagTimeProxyGraph, ρ::MPO{L}; kwargs...) where {L}
-
-     GCspacing::Int64 = get(kwargs, :GCspacing, 100)
-     verbose::Int64 = get(kwargs, :verbose, 0)
-     showtimes::Int64 = get(kwargs, :showtimes, 100)
 
      # set traversal status for vertices and edges
      for v in vertices(G.graph)
@@ -21,6 +9,24 @@ function _calITP_serial!(G::ImagTimeProxyGraph, ρ::MPO{L}; kwargs...) where {L}
                set_prop!(G.graph, e, :passed, false)
           end
      end
+
+     if get(kwargs, :serial, false)
+          return _calITP_serial!(G, ρ; kwargs...)
+     end
+
+     if get_num_threads_julia() > 1
+          return _calITP_threading!(G, ρ; kwargs...)
+     else
+          # fallback to serial
+          return _calITP_serial!(G, ρ; kwargs...)
+     end
+end
+
+function _calITP_serial!(G::ImagTimeProxyGraph, ρ::MPO{L}; kwargs...) where {L}
+
+     GCspacing::Int64 = get(kwargs, :GCspacing, 100)
+     verbose::Int64 = get(kwargs, :verbose, 0)
+     showtimes::Int64 = get(kwargs, :showtimes, 100)
 
      # initialize the boundary environment
      set_prop!(G.graph, 1, :El, BilayerLeftTensor{1,1}(isometry(codomain(ρ[1])[1], codomain(ρ[1])[1])))
@@ -141,31 +147,32 @@ function _priority_vertex(G::ImagTimeProxyGraph, v::Int64)
 
 end
 
-function _update_vertex!(G::ImagTimeProxyGraph, v::Int64, A::AdjointMPSTensor, B::MPSTensor, LocalTimer::TimerOutput)
+function _update_vertex!(G::ImagTimeProxyGraph, v::Int64, A::AdjointMPSTensor, B::MPSTensor, LocalTimer::TimerOutput; spawn::Bool=false)
 
      if get_prop(G.graph, v, :st) == :L
-          @timeit LocalTimer "update L vertex" _update_vertex_L!(G, v, A, B)
+          @timeit LocalTimer "update L vertex" _update_vertex_L!(G, v, A, B; spawn=spawn)
      else
-          @timeit LocalTimer "update R vertex" _update_vertex_R!(G, v, A, B)
+          @timeit LocalTimer "update R vertex" _update_vertex_R!(G, v, A, B; spawn=spawn)
      end
      return nothing
 
 end
 
-function _update_vertex_L!(G::ImagTimeProxyGraph, v::Int64, A::AdjointMPSTensor, B::MPSTensor)
+function _update_vertex_L!(G::ImagTimeProxyGraph, v::Int64, A::AdjointMPSTensor, B::MPSTensor; spawn::Bool=false)
 
      si = get_prop(G.graph, v, :si)
      idx_Op = get_prop(G.graph, v, :idx_Op)
      O₁, O₂ = G.Ops[si][idx_Op]
 
-     # compute Er 
+     # compute El
      v_parent = parent(G, v)
-
-     # =========================================
      El = _pushright(get_prop(G.graph, v_parent, :El), A, O₁, B, O₂)
      set_prop!(G.graph, v, :El, El)
+
+     # checking is done by master thread
+     spawn && return nothing
+
      set_prop!(G.graph, v, :passed, true)
-     # ========================================
 
      # check if the parent vertex can be cleared
      if _cond_clear(G, v_parent)
@@ -198,7 +205,7 @@ function _update_vertex_L!(G::ImagTimeProxyGraph, v::Int64, A::AdjointMPSTensor,
 end
 
 
-function _update_vertex_R!(G::ImagTimeProxyGraph, v::Int64, A::AdjointMPSTensor, B::MPSTensor)
+function _update_vertex_R!(G::ImagTimeProxyGraph, v::Int64, A::AdjointMPSTensor, B::MPSTensor; spawn::Bool=false)
 
      si = get_prop(G.graph, v, :si)
      idx_Op = get_prop(G.graph, v, :idx_Op)
@@ -206,12 +213,13 @@ function _update_vertex_R!(G::ImagTimeProxyGraph, v::Int64, A::AdjointMPSTensor,
 
      # compute Er 
      v_parent = parent(G, v)
-
-     # =========================================
      Er = _pushleft(get_prop(G.graph, v_parent, :Er), A, O₁, B, O₂)
      set_prop!(G.graph, v, :Er, Er)
+
+     # checking is done by master thread
+     spawn && return nothing
+
      set_prop!(G.graph, v, :passed, true)
-     # ========================================
 
      # check if the parent vertex can be cleared
      if _cond_clear(G, v_parent)
@@ -242,3 +250,128 @@ function _update_vertex_R!(G::ImagTimeProxyGraph, v::Int64, A::AdjointMPSTensor,
      return nothing
 
 end
+
+function _calITP_threading!(G::ImagTimeProxyGraph, ρ::MPO{L}; kwargs...) where {L}
+
+     ntasks::Int64 = get(kwargs, :ntasks, get_num_threads_julia() - 1)
+     @assert ntasks ≤ get_num_threads_julia() - 1
+     GCspacing::Int64 = get(kwargs, :GCspacing, 100)
+     verbose::Int64 = get(kwargs, :verbose, 0)
+     showtimes::Int64 = get(kwargs, :showtimes, 100)
+
+     Ch = Channel{Union{Int64,Tuple{Int64,Int64}}}(Inf) # vertex or edge
+     Ch_Timer = Channel{TimerOutput}(Inf)
+
+     Lock = ReentrantLock()
+     # workers
+     tasks_c = map(1:ntasks) do _
+          Threads.@spawn while isopen(Ch)
+               TO = _calITP_worker!(Ch, G, ρ, Lock)
+               put!(Ch_Timer, TO)
+          end |> errormonitor
+     end
+
+     # initialize the recursion
+     put!(Ch, 1)
+     put!(Ch, 2)
+
+     # main thread
+     Timer_acc = TimerOutput()
+     num_tot = nv(G.graph) + mapreduce(+, edges(G.graph)) do e
+          has_prop(G.graph, e, :Refs) ? 1 : 0
+     end
+     showspacing::Int64 = cld(num_tot, showtimes)
+     num_count = GC_count = 0
+     while num_count < num_tot
+          # check and rethrow if any task failed
+          for task in tasks_c
+               istaskfailed(task) && fetch(task)
+          end
+          to = take!(Ch_Timer)
+          merge!(Timer_acc, to)
+          num_count += 1
+          GC_count += 1
+          if GC_count == GCspacing
+               GC_count = 0
+               manualGC(Timer_acc)
+          end
+          if verbose > 0 && iszero(num_count % showspacing)
+               show(Timer_acc; title="ITP $(num_count) / $(num_tot)")
+               println()
+               flush(stdout)
+          end    
+
+          # check if any El or Er can be cleared
+          for v in vertices(G.graph)
+               !get_prop(G.graph, v, :passed) && continue
+               !_cond_clear(G, v) && continue  
+               if get_prop(G.graph, v, :st) == :L
+                    delete!(G.graph.vprops[v], :El)
+               else
+                    delete!(G.graph.vprops[v], :Er)
+               end
+          end
+     end
+
+     # kill tasks
+     close(Ch)
+     close(Ch_Timer)
+    
+     return Timer_acc
+end
+
+function _calITP_worker!(Ch::Channel, G::ImagTimeProxyGraph, ρ::MPO, Lock::ReentrantLock)
+
+     TO = TimerOutput()
+     @timeit TO "take" v = take!(Ch)
+     if isa(v, Int64) # vertex
+          si = get_prop(G.graph, v, :si)
+          st = get_prop(G.graph, v, :st)
+          if v == 1
+               set_prop!(G.graph, 1, :El, BilayerLeftTensor{1,1}(isometry(codomain(ρ[1])[1], codomain(ρ[1])[1])))
+          elseif v == 2
+               set_prop!(G.graph, 2, :Er, BilayerRightTensor{1,1}(isometry(domain(ρ[end])[end], domain(ρ[end])[end])))
+          else
+               _update_vertex!(G, v, ρ[si]', ρ[si], TO; spawn=true)
+          end
+          lock(Lock)
+          try
+               set_prop!(G.graph, v, :passed, true)
+          catch     
+               rethrow()
+          finally
+               unlock(Lock)
+          end
+
+          # put children into the channel
+          for child in children(G, v)
+               # in the same tree
+               if get_prop(G.graph, child, :st) == st
+                    put!(Ch, child)
+               else
+                    # this checking is not thread safe
+                    lock(Lock)
+                    try
+                         if get_prop(G.graph, child, :passed)
+                              put!(Ch, st == :L ? (v, child) : (child, v))
+                         end
+                    catch
+                         rethrow()
+                    finally
+                         unlock(Lock)
+                    end
+               end
+          end
+
+     else # edge
+          e = Edge(v...)
+          @timeit TO "trace" val = get_prop(G.graph, v[1], :El) * get_prop(G.graph, v[2], :Er)
+          for ref in get_prop(G.graph, e, :Refs)
+               ref[] = val
+          end
+          set_prop!(G.graph, e, :passed, true)
+     end
+
+     return TO
+end
+
