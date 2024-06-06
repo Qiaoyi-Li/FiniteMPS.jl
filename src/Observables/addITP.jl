@@ -78,6 +78,7 @@ function _addITP_merge!(G::ImagTimeProxyGraph{L},
                lsv = outneighbors(G.graph, v_last)
                idx_v = findfirst(lsv) do i
                     # compare idx instead of the operator to accelerate
+                    get_prop(G.graph, i, :st) == :R && return false
                     return idx_Op == get_prop(G.graph, i, :idx_Op)
                end
                new_flag = isnothing(idx_v)
@@ -121,6 +122,7 @@ function _addITP_merge!(G::ImagTimeProxyGraph{L},
                lsv = inneighbors(G.graph, v_right)
                idx_v = findfirst(inneighbors(G.graph, v_right)) do i
                     # compare idx instead of the operator to accelerate
+                    get_prop(G.graph, i, :st) == :L && return false
                     return idx_Op == get_prop(G.graph, i, :idx_Op)
                end
                new_flag = isnothing(idx_v)

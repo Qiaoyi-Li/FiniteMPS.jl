@@ -57,9 +57,18 @@ function rem_vertices!(g::MetaDiGraph{Int64}, vs::AbstractVector{Int64}; keep_or
 
      g.vprops = typeof(g.vprops)(i => g.vprops[vmap[i]] for i in 1:length(vmap))
 
-     k_valid = filter(keys(g.eprops)) do k
-          k.src ∉ vs && k.dst ∉ vs
+     if length(vs) < length(vmap)
+          vs_set = sort(vs)
+          k_valid = filter(keys(g.eprops)) do k
+               !insorted(k.src, vs_set) && !insorted(k.dst, vs_set)
+          end
+     else
+          vset = sort(vmap)
+          k_valid = filter(keys(g.eprops)) do k
+               insorted(k.src, vset) && insorted(k.dst, vset)
+          end
      end
+
      g.eprops = typeof(g.eprops)(Edge(vmap_inv[k.src], vmap_inv[k.dst]) => g.eprops[k] for k in k_valid)
 
      return vmap
@@ -81,6 +90,8 @@ function merge!(G::ImagTimeProxyGraph{L}; verbose::Int64=0, half::Bool=false) wh
 
           empty!(v_rm)
      end
+
+     # rem_vertices!(G.graph, collect(v_rm); keep_order=true)
 
      return nothing
 end
