@@ -1,5 +1,8 @@
 function calITP!(G::ImagTimeProxyGraph, ρ::MPO{L}; kwargs...) where {L}
 
+     # make sure a vertex is either in left or right tree
+     _expand_left_tree!(G)
+
      # set traversal status for vertices and edges
      for v in vertices(G.graph)
           set_prop!(G.graph, v, :passed, false)

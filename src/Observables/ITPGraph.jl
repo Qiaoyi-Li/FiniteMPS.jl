@@ -76,12 +76,11 @@ function merge!(G::ImagTimeProxyGraph{L}; verbose::Int64 = 0) where {L}
  
           if verbose > 0
                println("si = $si, remove $(length(v_rm))/$(nv(G.graph)) vertices, time = $(t)s")
+               flush(stdout)
           end
 
           empty!(v_rm)
      end
-
-     _expand_left_tree!(G)
 
      return nothing
 end
