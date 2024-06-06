@@ -65,10 +65,10 @@ function rem_vertices!(g::MetaDiGraph{Int64}, vs::AbstractVector{Int64}; keep_or
      return vmap
 end
 
-function merge!(G::ImagTimeProxyGraph{L}; verbose::Int64 = 0) where {L}
+function merge!(G::ImagTimeProxyGraph{L}; verbose::Int64 = 0, half::Bool = false) where {L}
 
      v_rm = Set{Int64}()
-     for si in 0:L
+     for si in 0:(half ? div(L, 2) : L)
           _left_merge!(G, v_rm, si)
           _right_merge!(G, v_rm, L + 1 - si)
 
