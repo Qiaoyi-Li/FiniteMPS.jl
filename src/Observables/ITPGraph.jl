@@ -17,7 +17,7 @@ mutable struct ImagTimeProxyGraph{L}
      end
 end
 
-function parent(G::ImagTimeProxyGraph{L}, v::Int64) where L
+function parent(G::ImagTimeProxyGraph{L}, v::Int64) where {L}
      get_prop(G.graph, v, :si) ∈ [0, L + 1] && return nothing
      if get_prop(G.graph, v, :st) == :L
           return inneighbors(G.graph, v)[1]
@@ -28,7 +28,7 @@ function parent(G::ImagTimeProxyGraph{L}, v::Int64) where L
      end
 end
 
-function children(G::ImagTimeProxyGraph{L}, v::Int64) where L
+function children(G::ImagTimeProxyGraph{L}, v::Int64) where {L}
      if get_prop(G.graph, v, :st) == :L
           return outneighbors(G.graph, v)
      elseif get_prop(G.graph, v, :st) == :R
@@ -38,7 +38,7 @@ function children(G::ImagTimeProxyGraph{L}, v::Int64) where L
      end
 end
 
-function siblings(G::ImagTimeProxyGraph{L}, v::Int64) where L
+function siblings(G::ImagTimeProxyGraph{L}, v::Int64) where {L}
      v_parent = parent(G, v)
      isnothing(v_parent) && return nothing
 
@@ -65,15 +65,15 @@ function rem_vertices!(g::MetaDiGraph{Int64}, vs::AbstractVector{Int64}; keep_or
      return vmap
 end
 
-function merge!(G::ImagTimeProxyGraph{L}; verbose::Int64 = 0, half::Bool = false) where {L}
+function merge!(G::ImagTimeProxyGraph{L}; verbose::Int64=0, half::Bool=false) where {L}
 
      v_rm = Set{Int64}()
      for si in 0:(half ? div(L, 2) : L)
           _left_merge!(G, v_rm, si)
           _right_merge!(G, v_rm, L + 1 - si)
 
-          t = @elapsed rem_vertices!(G.graph, collect(v_rm); keep_order =true)
- 
+          t = @elapsed rem_vertices!(G.graph, collect(v_rm); keep_order=true)
+
           if verbose > 0
                println("si = $si, remove $(length(v_rm))/$(nv(G.graph)) vertices, time = $(t)s")
                flush(stdout)
@@ -96,32 +96,36 @@ function _left_merge!(G::ImagTimeProxyGraph{L}, v_rm::Set{Int64}, si::Int64) whe
      end
 
      for v in lsv
-          children = filter(outneighbors(G.graph, v)) do i
+          v_children = filter(outneighbors(G.graph, v)) do i
                get_prop(G.graph, i, :st) != :R
           end
-          lsidx_Op = map(children) do i
+          lsidx_Op = map(v_children) do i
                get_prop(G.graph, i, :idx_Op)
           end
-          for j in 2:length(children)
+          for j in 2:length(v_children)
                first_equal = findfirst(x -> x == lsidx_Op[j], lsidx_Op[1:j-1])
                isnothing(first_equal) && continue
 
-               v_parent = children[first_equal]
-               for v_next in outneighbors(G.graph, children[j])
+               v_parent = v_children[first_equal]
+               for v_next in outneighbors(G.graph, v_children[j])
                     if has_edge(G.graph, v_parent, v_next)
-                         append!(get_prop(G.graph, Edge(v_parent, v_next), :Refs), get_prop(G.graph, Edge(children[j], v_next), :Refs))
+                         if get_prop(G.graph, v_next, :st) != :L
+                              append!(get_prop(G.graph, Edge(v_parent, v_next), :Refs), get_prop(G.graph, Edge(v_children[j], v_next), :Refs))
+                         end
                     else
                          add_edge!(G.graph, v_parent, v_next)
-                         set_prop!(G.graph, Edge(v_parent, v_next), :Refs, get_prop(G.graph, Edge(children[j], v_next), :Refs))
+                         if get_prop(G.graph, v_next, :st) != :L
+                              set_prop!(G.graph, Edge(v_parent, v_next), :Refs, get_prop(G.graph, Edge(v_children[j], v_next), :Refs))
+                         end
                     end
                end
 
-               # label children[j] as removed
-               push!(v_rm, children[j])
+               # label v_children[j] as removed
+               push!(v_rm, v_children[j])
 
-               if get_prop(G.graph, children[first_equal], :st) != :L
-                    set_prop!(G.graph, children[first_equal], :st, :L)
-                    clear_props!(G.graph, Edge(v, children[first_equal]))
+               if get_prop(G.graph, v_children[first_equal], :st) != :L
+                    set_prop!(G.graph, v_children[first_equal], :st, :L)
+                    clear_props!(G.graph, Edge(v, v_children[first_equal]))
                end
 
 
@@ -144,32 +148,36 @@ function _right_merge!(G::ImagTimeProxyGraph{L}, v_rm::Set{Int64}, si::Int64) wh
      end
 
      for v in lsv
-          children = filter(inneighbors(G.graph, v)) do i
+          v_children = filter(inneighbors(G.graph, v)) do i
                get_prop(G.graph, i, :st) != :L
           end
-          lsidx_Op = map(children) do i
+          lsidx_Op = map(v_children) do i
                get_prop(G.graph, i, :idx_Op)
           end
-          for j in 2:length(children)
+          for j in 2:length(v_children)
                first_equal = findfirst(x -> x == lsidx_Op[j], lsidx_Op[1:j-1])
                isnothing(first_equal) && continue
 
-               v_parent = children[first_equal]
-               for v_next in inneighbors(G.graph, children[j])
+               v_parent = v_children[first_equal]
+               for v_next in inneighbors(G.graph, v_children[j])
                     if has_edge(G.graph, v_next, v_parent)
-                         append!(get_prop(G.graph, Edge(v_next, v_parent), :Refs), get_prop(G.graph, Edge(v_next, children[j]), :Refs))
+                         if get_prop(G.graph, v_next, :st) != :R
+                              append!(get_prop(G.graph, Edge(v_next, v_parent), :Refs), get_prop(G.graph, Edge(v_next, v_children[j]), :Refs))
+                         end
                     else
                          add_edge!(G.graph, v_next, v_parent)
-                         set_prop!(G.graph, Edge(v_next, v_parent), :Refs, get_prop(G.graph, Edge(v_next, children[j]), :Refs))
+                         if get_prop(G.graph, v_next, :st) != :R
+                              set_prop!(G.graph, Edge(v_next, v_parent), :Refs, get_prop(G.graph, Edge(v_next, v_children[j]), :Refs))
+                         end
                     end
                end
 
-               # label children[j] as removed
-               push!(v_rm, children[j])
+               # label v_children[j] as removed
+               push!(v_rm, v_children[j])
 
-               if get_prop(G.graph, children[first_equal], :st) != :R
-                    set_prop!(G.graph, children[first_equal], :st, :R)
-                    clear_props!(G.graph, Edge(children[first_equal], v))
+               if get_prop(G.graph, v_children[first_equal], :st) != :R
+                    set_prop!(G.graph, v_children[first_equal], :st, :R)
+                    clear_props!(G.graph, Edge(v_children[first_equal], v))
                end
           end
      end
