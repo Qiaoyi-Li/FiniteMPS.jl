@@ -16,6 +16,8 @@ Wrap `TDVPSweep1!` with a symmetric integrator, i.e., sweeping from left to righ
      GCsweep::Bool = false
      verbose::Int64 = 0
      CBEAlg::CBEAlgorithm = NoCBE()
+     E_shift::Float64 = 0.0
+Apply `exp(dt(H - E_shift))` to avoid possible `Inf` in imaginary time evolution. This energy shift is different from `E₀` in projective Hamiltonian, the later will give back the shifted energy thus not altering the final result. Note this is a temporary approach, we intend to store `log(norm)` in MPS to avoid this divergence in the future.
 """
 function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::SweepL2R; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,DenseMPS}}
      krylovalg = get(kwargs, :krylovalg, TDVPDefaultLanczos)
@@ -24,6 +26,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
      GCsweep = get(kwargs, :GCsweep, false)
      verbose::Int64 = get(kwargs, :verbose, 0)
      CBEAlg::CBEAlgorithm{SweepL2R} = get(kwargs, :CBEAlg, NoCBE())
+     E_shift::Float64 = get(kwargs, :E_shift, 0.0)
 
      TimerSweep = TimerOutput()
      info_forward = Vector{TDVPInfo{1}}(undef, L)
@@ -48,7 +51,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
 
           @timeit TimerStep "pushEnv" canonicalize!(Env, si)
           @timeit TimerStep "TDVPUpdate1" x1, Norm, info_Lanczos = _TDVPUpdate1(ProjHam(Env, si; E₀=E₀), Al, dt, krylovalg; kwargs...)
-          rmul!(Ψ, Norm * exp(dt * E₀))
+          rmul!(Ψ, Norm * exp(dt * (E₀ - E_shift)))
 
           if si < L
                # TODO, test truncation after backward evolution
@@ -60,7 +63,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
                # backward evolution
                @timeit TimerStep "pushEnv" canonicalize!(Env, si + 1, si)
                @timeit TimerStep "TDVPUpdate0" S, Norm, info_Lanczos = _TDVPUpdate0(ProjHam(Env, si + 1, si; E₀=E₀), S, -dt, krylovalg; kwargs...)
-               rmul!(Ψ, Norm * exp(-dt * E₀))
+               rmul!(Ψ, Norm * exp(-dt * (E₀ - E_shift)))
 
                # next Al
                Al = S * Ψ[si+1]
@@ -113,6 +116,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
      GCsweep = get(kwargs, :GCsweep, false)
      verbose::Int64 = get(kwargs, :verbose, 0)
      CBEAlg::CBEAlgorithm{SweepR2L} = get(kwargs, :CBEAlg, NoCBE())
+     E_shift::Float64 = get(kwargs, :E_shift, 0.0)
 
      TimerSweep = TimerOutput()
      info_forward = Vector{TDVPInfo{1}}(undef, L)
@@ -137,7 +141,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
 
           @timeit TimerStep "pushEnv" canonicalize!(Env, si)
           @timeit TimerStep "TDVPUpdate1" x1, Norm, info_Lanczos = _TDVPUpdate1(ProjHam(Env, si; E₀=E₀), Ar, dt, krylovalg; kwargs...)
-          rmul!(Ψ, Norm * exp(dt * E₀))
+          rmul!(Ψ, Norm * exp(dt * (E₀ - E_shift)))
 
           if si > 1
                @timeit TimerStep "svd" S::MPSTensor, Ψ[si], info_svd = rightorth(x1; trunc=trunc)
@@ -148,7 +152,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
                # backward evolution
                @timeit TimerStep "pushEnv" canonicalize!(Env, si, si - 1)
                @timeit TimerStep "TDVPUpdate0" S, Norm, info_Lanczos = _TDVPUpdate0(ProjHam(Env, si, si - 1; E₀=E₀), S, -dt, krylovalg; kwargs...)
-               rmul!(Ψ, Norm * exp(-dt * E₀))
+               rmul!(Ψ, Norm * exp(-dt * (E₀-E_shift)))
 
                # next Ar
                Ar = Ψ[si-1] * S
