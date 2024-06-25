@@ -305,23 +305,25 @@ function _calITP_threading!(G::ImagTimeProxyGraph, ρ::MPO{L}; kwargs...) where 
      # final clear
      @timeit Timer_acc "clear" begin
           for v in vertices(G.graph)
-               if _cond_clear(G, v)
-                    # delete!(G.graph.vprops[v], :E)
+               if has_prop(G.graph, v, :E)
+                    delete!(G.graph.vprops[v], :E)
                end
           end
      end
-
+     disk && rm(tmppath; recursive=true)
+     
      return Timer_acc
 end
 
 _pushEnv(E::BilayerLeftTensor, args...) = _pushright(E, args...)
 _pushEnv(E::BilayerRightTensor, args...) = _pushleft(E, args...)
 
-function _calITP_worker!(Ch::Channel, Ch_Timer::Channel, G::ImagTimeProxyGraph, ρ::MPO, Lock::ReentrantLock; tmppath::Union{Nothing, String}=nothing)
+function _calITP_worker!(Ch::Channel, Ch_Timer::Channel, G::ImagTimeProxyGraph, ρ::MPO, Lock::ReentrantLock; tmppath::Union{Nothing,String}=nothing)
 
      TO = TimerOutput()
      @timeit TO "take" v = take!(Ch)
 
+     S_clear = Int64[]
      if isa(v, Int64) # vertex
           st = get_prop(G.graph, v, :st)
           # load the environment tensor of current vertex
@@ -334,7 +336,7 @@ function _calITP_worker!(Ch::Channel, Ch_Timer::Channel, G::ImagTimeProxyGraph, 
                @timeit TO "loadEnv" local E = _load_Env(G, v)
           end
 
-          @timeit TO "saveEnv" v ≤ 2 && _save_Env(G, v, E, Lock,  tmppath)
+          @timeit TO "saveEnv" v ≤ 2 && _save_Env!(G, v, E, Lock, tmppath)
 
 
           S_next = Union{Int64,NTuple{2,Int64}}[]
@@ -344,7 +346,7 @@ function _calITP_worker!(Ch::Channel, Ch_Timer::Channel, G::ImagTimeProxyGraph, 
                O₁, O₂ = G.Ops[si][get_prop(G.graph, v_child, :idx_Op)]
                @timeit TO "pushEnv" local E_child = _pushEnv(E, ρ[si]', O₁, ρ[si], O₂)
 
-               @timeit TO "saveEnv" _save_Env(G, v_child, E_child, Lock, tmppath)
+               @timeit TO "saveEnv" _save_Env!(G, v_child, E_child, Lock, tmppath)
                push!(S_next, v_child)
 
           end
@@ -364,11 +366,10 @@ function _calITP_worker!(Ch::Channel, Ch_Timer::Channel, G::ImagTimeProxyGraph, 
                     end
 
                     # check if the current vertex can be cleared
-                    @timeit TO "clear" begin
-                         if all(x -> get_prop(G.graph, st == :L ? Edge(v, x) : Edge(x, v), :passed), child_op)
-                              delete!(G.graph.vprops[v], :E)
-                         end
+                    if all(x -> get_prop(G.graph, st == :L ? Edge(v, x) : Edge(x, v), :passed), child_op)
+                         push!(S_clear, v)
                     end
+
                catch
                     rethrow()
                finally
@@ -395,10 +396,8 @@ function _calITP_worker!(Ch::Channel, Ch_Timer::Channel, G::ImagTimeProxyGraph, 
                try
                     set_prop!(G.graph, e, :passed, true)
                     # check if any vertex can be cleared
-                    @timeit TO "clear" begin
-                         for x in filter(x -> _cond_clear(G, x; edge_only=true), v)
-                              delete!(G.graph.vprops[x], :E)
-                         end
+                    for x in filter(x -> _cond_clear(G, x; edge_only=true), v)
+                         push!(S_clear, x)
                     end
                catch
                     rethrow()
@@ -407,6 +406,11 @@ function _calITP_worker!(Ch::Channel, Ch_Timer::Channel, G::ImagTimeProxyGraph, 
                end
           end
 
+     end
+
+     # clear
+     @timeit TO "clear" for v in S_clear
+          _clear_Env!(G, v, tmppath)   
      end
 
      put!(Ch_Timer, TO)
@@ -420,7 +424,7 @@ _load_Env(E::Union{BilayerLeftTensor,BilayerRightTensor}) = E
 function _load_Env(filename::String)
      return deserialize(filename)
 end
-function _save_Env(G::ImagTimeProxyGraph, v::Int64, E::Union{BilayerLeftTensor,BilayerRightTensor}, Lock::ReentrantLock, tmppath::String)
+function _save_Env!(G::ImagTimeProxyGraph, v::Int64, E::Union{BilayerLeftTensor,BilayerRightTensor}, Lock::ReentrantLock, tmppath::String)
      filename = joinpath(tmppath, "E$(v).bin")
      # there exists data race only when storing the filename in the dict 
      lock(Lock)
@@ -434,7 +438,7 @@ function _save_Env(G::ImagTimeProxyGraph, v::Int64, E::Union{BilayerLeftTensor,B
      serialize(filename, E)
      return nothing
 end
-function _save_Env(G::ImagTimeProxyGraph, v::Int64, E::Union{BilayerLeftTensor,BilayerRightTensor}, Lock::ReentrantLock, ::Nothing)
+function _save_Env!(G::ImagTimeProxyGraph, v::Int64, E::Union{BilayerLeftTensor,BilayerRightTensor}, Lock::ReentrantLock, ::Nothing)
      lock(Lock)
      try
           set_prop!(G.graph, v, :E, E)
@@ -445,4 +449,16 @@ function _save_Env(G::ImagTimeProxyGraph, v::Int64, E::Union{BilayerLeftTensor,B
      end
      return nothing
 end
+
+function _clear_Env!(G::ImagTimeProxyGraph, v::Int64, ::Nothing)
+     delete!(G.graph.vprops[v], :E)
+     return nothing
+end
+function _clear_Env!(G::ImagTimeProxyGraph, v::Int64, tmppath::String)
+     delete!(G.graph.vprops[v], :E)
+     rm(joinpath(tmppath, "E$(v).bin"))
+     return nothing
+end
+
+
 
