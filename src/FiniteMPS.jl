@@ -111,7 +111,7 @@ include("IntrTree/IntrIterator.jl")
 
 
 # Observables
-export calObs!, ObservableTree, addObs!, ImagTimeProxyGraph, addITP2!, calITP!
+export calObs!, ObservableTree, addObs!, ImagTimeProxyGraph, addITP2!, addITP4!, calITP!
 include("Observables/ObsTree.jl")
 include("Observables/calObs.jl")
 include("Observables/convert.jl")

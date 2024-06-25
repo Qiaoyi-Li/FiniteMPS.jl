@@ -1,3 +1,34 @@
+function addITP4!(G::ImagTimeProxyGraph{L},
+     Op::NTuple{4,AbstractTensorMap},
+     si::NTuple{4,Int64},
+     Opname::NTuple{4,Union{Symbol,String}},
+     ValueType::Type{<:Number}=Number;
+     ITPname::Union{Symbol,String}=prod(string.(Opname)),
+     Z::Union{Nothing,AbstractTensorMap}=nothing,
+     merge::Bool=true
+) where {L}
+     @assert all(x -> 1 ≤ x ≤ L, si)
+     ITPname = String(ITPname)
+
+
+     if !haskey(G.Refs, ITPname)
+          G.Refs[ITPname] = Dict{NTuple{4,Int64},Ref{ValueType}}()
+     end
+     G.Refs[ITPname][si] = Ref{ValueType}()
+
+     O₁ = TwoSiteInteractionIterator{L}((Op[1], Op[2]),
+          (Opname[1], Opname[2]), (si[1], si[2]);
+          convertRight = true, Z = Z)
+     O₂ = TwoSiteInteractionIterator{L}((Op[3], Op[4]),
+          (Opname[3], Opname[4]), (si[3], si[4]);
+          convertRight = true, Z = Z)
+     if merge
+          return _addITP_merge!(G, O₁, O₂, G.Refs[ITPname][si])
+     else
+          return _addITP!(G, O₁, O₂, G.Refs[ITPname][si])
+     end
+end
+
 function addITP2!(G::ImagTimeProxyGraph{L},
      Op::NTuple{2,AbstractTensorMap},
      si::NTuple{2,Int64},
@@ -7,8 +38,9 @@ function addITP2!(G::ImagTimeProxyGraph{L},
      Z::Union{Nothing,AbstractTensorMap}=nothing,
      merge::Bool=true
 ) where {L}
-
      @assert all(x -> 1 ≤ x ≤ L, si)
+     ITPname = String(ITPname)
+
 
      if !haskey(G.Refs, ITPname)
           G.Refs[ITPname] = Dict{NTuple{2,Int64},Ref{ValueType}}()
@@ -167,3 +199,4 @@ function _addITP_merge!(G::ImagTimeProxyGraph{L},
 
      return nothing
 end
+

@@ -60,7 +60,9 @@ struct TwoSiteInteractionIterator{L, T} <: AbstractInteractionIterator{L}
      function TwoSiteInteractionIterator{L}(Op::NTuple{2, AbstractTensorMap},
           name::NTuple{2, Union{String, Symbol}},
           si::NTuple{2, Int64};
-          Z=nothing) where {L}
+          convertRight::Bool = false,
+          Z=nothing
+          ) where {L}
           @assert 1 ≤ si[1] ≤ L && 1 ≤ si[2] ≤ L && si[1] ≠ si[2]
           
           O₁ = LocalOperator(Op[1], name[1], si[1])
@@ -70,6 +72,10 @@ struct TwoSiteInteractionIterator{L, T} <: AbstractInteractionIterator{L}
               # swap if si is not in ascending order
               fac = isnothing(Z) ? 1 : -1
               O₁, O₂ = _swap(O₁, LocalOperator(fac * Op[2], name[2], si[2]))
+          end
+          if convertRight
+               # convert to right operator, i.e. the horizontal bond is on the left
+               O₁, O₂ = _rightOp(O₁, O₂)
           end
           return TwoSiteInteractionIterator{L}(O₁, O₂, Z)
      end
@@ -116,5 +122,15 @@ struct ArbitraryInteractionIterator{L} <: AbstractInteractionIterator{L}
      end
 end
 iterate(iter::ArbitraryInteractionIterator, args...) = iterate(iter.Op, args...) 
-     
+
+# make sure the additional horizontal bond is on the left, used in ITP
+function _rightOp(A::LocalOperator{R₁, R₂}, B::LocalOperator{R₂, 1}) where {R₁, R₂}
+     return A, B     
+end
+function _rightOp(A::LocalOperator{1, 2}, B::LocalOperator{2, 2})
+     @tensor AB[f a b; d e] := A.A[a b c] * B.A[c d e f]  
+     # QR
+     TA, TB = leftorth(AB)
+     return LocalOperator(permute(TA, ((1, 2), (3, 4))), A.name, A.si, A.strength), LocalOperator(permute(TB, ((1, 2), (3, ))), B.name, B.si, B.strength)
+end
 
