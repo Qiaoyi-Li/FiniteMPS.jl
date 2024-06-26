@@ -129,10 +129,20 @@ function _addITP_merge!(G::ImagTimeProxyGraph{L},
                set_prop!(G.graph, Edge(v_last, num_v), :Refs, [ref,])
 
                # check if the parent is a left vertex now 
-               if length(outneighbors(G.graph, v_last)) > 1 && get_prop(G.graph, v_last, :st) != :L
-                    set_prop!(G.graph, v_last, :st, :L)
-                    # clear refs
-                    clear_props!(G.graph, Edge(inneighbors(G.graph, v_last)[1], v_last))
+               if length(outneighbors(G.graph, v_last)) > 1  
+                    # recursive search
+                    v_current = v_last
+                    while get_prop(G.graph, v_current, :st) != :L
+                         set_prop!(G.graph, v_current, :st, :L)
+                         # clear refs
+                         in_vertex = inneighbors(G.graph, v_current)
+                         @assert length(in_vertex) == 1
+                         clear_props!(G.graph, Edge(in_vertex[1], v_current))
+
+                         # go to parent vertex
+                         v_current = in_vertex[1]
+                    end
+
                end
                v_last = num_v
           else
@@ -173,10 +183,18 @@ function _addITP_merge!(G::ImagTimeProxyGraph{L},
                set_prop!(G.graph, Edge(num_v, v_right), :Refs, [ref,])
 
                # check if the parent is a right vertex now 
-               if length(inneighbors(G.graph, v_right)) > 1 && get_prop(G.graph, v_right, :st) != :R
-                    set_prop!(G.graph, v_right, :st, :R)
-                    # clear refs
-                    clear_props!(G.graph, Edge(v_right, outneighbors(G.graph, v_right)[1]))
+               if length(inneighbors(G.graph, v_right)) > 1
+                    v_current = v_right
+                    while get_prop(G.graph, v_current, :st) != :R
+                         set_prop!(G.graph, v_current, :st, :R)
+                         # clear refs
+                         out_vertex = outneighbors(G.graph, v_current)
+                         @assert length(out_vertex) == 1
+                         clear_props!(G.graph, Edge(v_current, out_vertex[1]))
+
+                         # go to parent vertex
+                         v_current = out_vertex[1]
+                    end
                end
                v_right = num_v
           else
