@@ -250,9 +250,25 @@ function _calITP_threading!(G::ImagTimeProxyGraph, ρ::MPO{L}; kwargs...) where 
      verbose::Int64 = get(kwargs, :verbose, 0)
      showtimes::Int64 = get(kwargs, :showtimes, 100)
      disk::Bool = get(kwargs, :disk, false)
+     maxdegree::Int64 = get(kwargs, :maxdegree, 4)
      if disk
           # set up a temporary directory for storing the environment tensors
           tmppath = mktempdir()
+
+          # still store E in memory for some high-degree vertices
+          for v in vertices(G.graph)
+               st = get_prop(G.graph, v, :st)
+               d = mapreduce(+, children(G, v)) do x
+                    # only count the opposite children 
+                    get_prop(G.graph, x, :st) == st ? 0 : 1
+               end
+               # max degree for storing E in disk
+               set_prop!(G.graph, v, :E, d ≤ maxdegree ? joinpath(tmppath, "E$(v).bin") : nothing)
+          end
+     else
+          for v in vertices(G.graph)
+               set_prop!(G.graph, v, :E, nothing)
+          end
      end
 
      num_tot = nv(G.graph) + mapreduce(+, edges(G.graph)) do e
@@ -266,7 +282,7 @@ function _calITP_threading!(G::ImagTimeProxyGraph, ρ::MPO{L}; kwargs...) where 
      # workers
      tasks_c = map(1:ntasks) do _
           Threads.@spawn while isopen(Ch)
-               _calITP_worker!(Ch, Ch_Timer, G, ρ, Lock; tmppath=disk ? tmppath : nothing)
+               _calITP_worker!(Ch, Ch_Timer, G, ρ, Lock)
           end
      end
 
@@ -291,7 +307,7 @@ function _calITP_threading!(G::ImagTimeProxyGraph, ρ::MPO{L}; kwargs...) where 
                GC_count = 0
                manualGC(Timer_acc)
           end
-          if verbose > 0 && iszero(num_count % showspacing)
+          if verbose > 0 && (iszero(num_count % showspacing) || num_count == num_tot) 
                show(Timer_acc; title="ITP $(num_count) / $(num_tot)")
                println()
                flush(stdout)
@@ -306,7 +322,7 @@ function _calITP_threading!(G::ImagTimeProxyGraph, ρ::MPO{L}; kwargs...) where 
      @timeit Timer_acc "clear" begin
           for v in vertices(G.graph)
                if has_prop(G.graph, v, :E)
-                    delete!(G.graph.vprops[v], :E)
+                    _clear_Env!(G, v)
                end
           end
      end
@@ -318,7 +334,7 @@ end
 _pushEnv(E::BilayerLeftTensor, args...) = _pushright(E, args...)
 _pushEnv(E::BilayerRightTensor, args...) = _pushleft(E, args...)
 
-function _calITP_worker!(Ch::Channel, Ch_Timer::Channel, G::ImagTimeProxyGraph, ρ::MPO, Lock::ReentrantLock; tmppath::Union{Nothing,String}=nothing)
+function _calITP_worker!(Ch::Channel, Ch_Timer::Channel, G::ImagTimeProxyGraph, ρ::MPO, Lock::ReentrantLock)
 
      TO = TimerOutput()
      @timeit TO "take" v = take!(Ch)
@@ -336,7 +352,7 @@ function _calITP_worker!(Ch::Channel, Ch_Timer::Channel, G::ImagTimeProxyGraph, 
                @timeit TO "loadEnv" local E = _load_Env(G, v)
           end
 
-          @timeit TO "saveEnv" v ≤ 2 && _save_Env!(G, v, E, Lock, tmppath)
+          @timeit TO "saveEnv" v ≤ 2 && _save_Env!(G, v, E)
 
 
           S_next = Union{Int64,NTuple{2,Int64}}[]
@@ -346,9 +362,8 @@ function _calITP_worker!(Ch::Channel, Ch_Timer::Channel, G::ImagTimeProxyGraph, 
                O₁, O₂ = G.Ops[si][get_prop(G.graph, v_child, :idx_Op)]
                @timeit TO "pushEnv" local E_child = _pushEnv(E, ρ[si]', O₁, ρ[si], O₂)
 
-               @timeit TO "saveEnv" _save_Env!(G, v_child, E_child, Lock, tmppath)
+               @timeit TO "saveEnv" _save_Env!(G, v_child, E_child)
                push!(S_next, v_child)
-
           end
 
           child_op = filter(children(G, v)) do child
@@ -410,7 +425,7 @@ function _calITP_worker!(Ch::Channel, Ch_Timer::Channel, G::ImagTimeProxyGraph, 
 
      # clear
      @timeit TO "clear" for v in S_clear
-          _clear_Env!(G, v, tmppath)   
+          _clear_Env!(G, v)   
      end
 
      put!(Ch_Timer, TO)
@@ -424,39 +439,21 @@ _load_Env(E::Union{BilayerLeftTensor,BilayerRightTensor}) = E
 function _load_Env(filename::String)
      return deserialize(filename)
 end
-function _save_Env!(G::ImagTimeProxyGraph, v::Int64, E::Union{BilayerLeftTensor,BilayerRightTensor}, Lock::ReentrantLock, tmppath::String)
-     filename = joinpath(tmppath, "E$(v).bin")
-     # there exists data race only when storing the filename in the dict 
-     lock(Lock)
-     try
-          set_prop!(G.graph, v, :E, filename)
-     catch
-          rethrow()
-     finally
-          unlock(Lock)
-     end
-     serialize(filename, E)
-     return nothing
-end
-function _save_Env!(G::ImagTimeProxyGraph, v::Int64, E::Union{BilayerLeftTensor,BilayerRightTensor}, Lock::ReentrantLock, ::Nothing)
-     lock(Lock)
-     try
-          set_prop!(G.graph, v, :E, E)
-     catch
-          rethrow()
-     finally
-          unlock(Lock)
+function _save_Env!(G::ImagTimeProxyGraph, v::Int64, E::Union{BilayerLeftTensor,BilayerRightTensor})
+     filename = get_prop(G.graph, v, :E)
+     if isnothing(filename)
+          G.graph.vprops[v][:E] = E
+     else
+          serialize(filename, E)
      end
      return nothing
 end
 
-function _clear_Env!(G::ImagTimeProxyGraph, v::Int64, ::Nothing)
+function _clear_Env!(G::ImagTimeProxyGraph, v::Int64)
+     if isa(G.graph.vprops[v][:E], String)
+          rm(G.graph.vprops[v][:E])
+     end
      delete!(G.graph.vprops[v], :E)
-     return nothing
-end
-function _clear_Env!(G::ImagTimeProxyGraph, v::Int64, tmppath::String)
-     delete!(G.graph.vprops[v], :E)
-     rm(joinpath(tmppath, "E$(v).bin"))
      return nothing
 end
 
