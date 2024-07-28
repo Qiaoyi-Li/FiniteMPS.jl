@@ -273,6 +273,10 @@ Two rank-`3` operators of hopping `c↑ c↑^dag` and `c↓ c↓^dag`.
      ΔdagΔ₋₋::NTuple{4, TensorMap}
      ΔdagΔ₊₋::NTuple{4, TensorMap}
 Rank-`4` operators of pairing correlation. Note `ΔdagΔ₊₋` means `c↑^dag c↓^dag c↓ c↑`.
+
+     EdagE₊::NTuple{4, TensorMap}
+     EdagE₋::NTuple{4, TensorMap}
+Rank-`4` operators of triplet exciton correlation. Note `EdagE₊` means `c↑^dag c↓ c↑ c↓^dag` so `(i, j, i, j)` gives the correlation of the same pair.  
 """
 module U₁U₁Fermion
 
@@ -386,6 +390,26 @@ const ΔdagΔ₊₋ = let
      @tensor B[d a; b e] := B[a b c] * iso[d c e]
      C = permute(B', ((2, 1), (4, 3)))
      D = permute(A', ((2, 1), (3,)))
+     A, B, C, D
+end
+
+const EdagE₊ = let
+     A, C = FdagF₊
+     B, D = FFdag₋
+     aspace2 = Rep[U₁×U₁]((0, 1) => 1)
+     iso = isometry(domain(A)[2] ⊗ domain(B)[2], aspace2)
+     @tensor B[d a; b e] := B[a b c] * iso[d c e]
+     @tensor C[a d; e c] := iso'[a b c] * C[b d e]
+     A, B, C, D
+end
+
+const EdagE₋ = let
+     A, C = FdagF₋
+     B, D = FFdag₊
+     aspace2 = Rep[U₁×U₁]((0, -1) => 1)
+     iso = isometry(domain(A)[2] ⊗ domain(B)[2], aspace2)
+     @tensor B[d a; b e] := B[a b c] * iso[d c e]
+     @tensor C[a d; e c] := iso'[a b c] * C[b d e]
      A, B, C, D
 end
 
