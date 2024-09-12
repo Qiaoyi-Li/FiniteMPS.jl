@@ -18,10 +18,10 @@ function addITP4!(G::ImagTimeProxyGraph{L},
 
      O₁ = TwoSiteInteractionIterator{L}((Op[1], Op[2]),
           (Opname[1], Opname[2]), (si[1], si[2]);
-          convertRight = true, Z = Z)
+          convertRight=true, Z=Z)
      O₂ = TwoSiteInteractionIterator{L}((Op[3], Op[4]),
           (Opname[3], Opname[4]), (si[3], si[4]);
-          convertRight = true, Z = Z)
+          convertRight=true, Z=Z)
      if merge
           return _addITP_merge!(G, O₁, O₂, G.Refs[ITPname][si])
      else
@@ -129,7 +129,7 @@ function _addITP_merge!(G::ImagTimeProxyGraph{L},
                set_prop!(G.graph, Edge(v_last, num_v), :Refs, [ref,])
 
                # check if the parent is a left vertex now 
-               if length(outneighbors(G.graph, v_last)) > 1  
+               if length(outneighbors(G.graph, v_last)) > 1
                     # recursive search
                     v_current = v_last
                     while get_prop(G.graph, v_current, :st) != :L
@@ -206,13 +206,33 @@ function _addITP_merge!(G::ImagTimeProxyGraph{L},
      add_edge!(G.graph, v_last, v_right)
      set_prop!(G.graph, Edge(v_last, v_right), :Refs, [ref,])
      # check if the middle two vertices are left and right
-     if get_prop(G.graph, v_last, :st) != :L && length(outneighbors(G.graph, v_last)) > 1
-          set_prop!(G.graph, v_last, :st, :L)
-          clear_props!(G.graph, Edge(inneighbors(G.graph, v_last)[1], v_last))
+     if length(outneighbors(G.graph, v_last)) > 1
+          # recursive search
+          v_current = v_last
+          while get_prop(G.graph, v_current, :st) != :L
+               set_prop!(G.graph, v_current, :st, :L)
+               # clear refs
+               in_vertex = inneighbors(G.graph, v_current)
+               @assert length(in_vertex) == 1
+               clear_props!(G.graph, Edge(in_vertex[1], v_current))
+
+               # go to parent vertex
+               v_current = in_vertex[1]
+          end
+
      end
-     if get_prop(G.graph, v_right, :st) != :R && length(inneighbors(G.graph, v_right)) > 1
-          set_prop!(G.graph, v_right, :st, :R)
-          clear_props!(G.graph, Edge(v_right, outneighbors(G.graph, v_right)[1]))
+     if length(inneighbors(G.graph, v_right)) > 1
+          v_current = v_right
+          while get_prop(G.graph, v_current, :st) != :R
+               set_prop!(G.graph, v_current, :st, :R)
+               # clear refs
+               out_vertex = outneighbors(G.graph, v_current)
+               @assert length(out_vertex) == 1
+               clear_props!(G.graph, Edge(v_current, out_vertex[1]))
+
+               # go to parent vertex
+               v_current = out_vertex[1]
+          end
      end
 
      return nothing

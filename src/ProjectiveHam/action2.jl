@@ -302,6 +302,16 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
      # @tensor Hx[a d; g i] := (((El.A[a c] * x.A[c e h k]) * Hl.A[d e f]) * Hr.A[f g h]) * Er.A[k i] # 1.8s/10(D=8192)
      return Hl.strength * Hr.strength * _permute2(Hx, x.A)
 end
+
+function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
+     Hl::LocalOperator{2,1}, Hr::LocalOperator{1, 1},
+     Er::LocalRightTensor{2}; kwargs...) where {T<:NTuple{2,MPSTensor{3}}}
+
+     @tensor Hx[a d; g i] := ((El.A[a b c] * (x.A[c e h k] * Hr.A[g h])) * Hl.A[b d e]) * Er.A[k i] 
+
+     return Hl.strength * Hr.strength * _permute2(Hx, x.A)
+end
+
 # -----------------------------------------------------------------------
 # ========================= 2 rank-4 MPO tensors ========================
 #          l(d)     m(d) 
