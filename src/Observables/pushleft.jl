@@ -85,7 +85,7 @@ function _pushleft(Er::BilayerRightTensor{2, 2}, A::AdjointMPSTensor{4}, O1::Loc
 end
 
 function _pushleft(Er::BilayerRightTensor{2, 2}, A::AdjointMPSTensor{4}, ::IdentityOperator, B::MPSTensor{4}, O2::LocalOperator{1, 1})::BilayerRightTensor{2, 2}
-     return @tensor tmp[a j; c l] := (B.A[j g e b] * Er.A[a b c d]) * A.A[e d l g] 
+     return @tensor tmp[a j; c l] := ((B.A[j g f b] * O2.A[f e]) * Er.A[a b c d]) * A.A[e d l g] 
 end
 
 function _pushleft(Er::BilayerRightTensor{1, 2}, A::AdjointMPSTensor{4}, O1::LocalOperator{1, 1}, B::MPSTensor{4}, O2::LocalOperator{2, 1})::BilayerRightTensor{2, 2}
