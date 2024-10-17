@@ -4,7 +4,7 @@
 Use series-expansion thermal tensor network (SETTN)`[https://doi.org/10.1103/PhysRevB.95.161104]` method to initialize a high-temperature MPO `ρ = e^(-βH/2)`. Note `ρ` is unnormalized. The list of free energy `F = -lnTr[ρρ^†]/β` with different expansion orders is also returned.
 
 # Kwargs
-     trunc::TruncationScheme = truncbelow(D) (this keyword argument is necessary!) 
+     trunc::TruncationScheme = truncdim(D) (this keyword argument is necessary!) 
      disk::Bool = false
      maxorder::Int64 = 4
      tol::Float64 = 1e-8
