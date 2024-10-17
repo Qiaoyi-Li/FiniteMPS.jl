@@ -1,0 +1,4 @@
+[deps]
+FiniteLattices = "650210df-7c64-40ac-8e1f-94ea4f378b07"
+FiniteMPS = "6b572690-f317-4dad-a5fe-5fe73a0b7d42"
+MKL = "33e6dc65-8f57-5167-99aa-e5a354878fb2"
