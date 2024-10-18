@@ -1,3 +1,30 @@
+"""
+     calITP!(G::ImagTimeProxyGraph, ρ::MPO; kwargs...) -> ::TimerOutput 
+
+Calculate the values of ITP stroed in graph `G` and assign the results to `G.Refs`. Return the `TimerOutput` object which collects the time cost.
+
+# Kwargs
+     serial::Bool = false
+Force to compute in serial mode, usually used for debugging.
+
+     GCspacing::Int64 = 100
+The spacing of manual garbage collection.
+
+     verbose::Int64 = 0
+Display the timer outputs during the calculation if `verbose > 0`.
+
+     showtimes::Int64 = 100
+The number of times to show the timer outputs.
+
+     ntasks::Int64 = get_num_threads_julia() - 1
+The number of tasks to be used in multi-threading mode.
+
+     disk::Bool = false
+Store the environment tensors in disk if `true`.
+
+     maxdegree::Int64 = 4
+This argument is only used if `disk=true`. The environment tensor in a vectex will be stored in disk only if its degree `< maxdegree`, otherwise it will be left in memory to avoid frequent disk I/O.
+"""
 function calITP!(G::ImagTimeProxyGraph, ρ::MPO{L}; kwargs...) where {L}
 
      # make sure a vertex is either in left or right tree

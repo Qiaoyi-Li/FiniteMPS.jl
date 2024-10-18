@@ -1,3 +1,16 @@
+"""
+     addITP4!(G::ImagTimeProxyGraph,
+          Op::NTuple{4,AbstractTensorMap},
+          si::NTuple{4,Int64},
+          Opname::NTuple{4,Union{Symbol,String}},
+          ValueType::Type{<:Number}=Number;
+          ITPname::Union{Symbol,String}=prod(string.(Opname)),
+          Z::Union{Nothing,AbstractTensorMap}=nothing,
+          merge::Bool=true
+     ) -> nothing
+
+Add a 4-site term `A(β/2)B(β/2)CD)` to the ITP graph. If `Z` is given, assume each operator is fermionic. 
+"""
 function addITP4!(G::ImagTimeProxyGraph{L},
      Op::NTuple{4,AbstractTensorMap},
      si::NTuple{4,Int64},
@@ -29,6 +42,19 @@ function addITP4!(G::ImagTimeProxyGraph{L},
      end
 end
 
+"""
+     addITP2!(G::ImagTimeProxyGraph,
+          Op::NTuple{2,AbstractTensorMap},
+          si::NTuple{2,Int64},
+          Opname::NTuple{2,Union{Symbol,String}},
+          ValueType::Type{<:Number}=Number;
+          ITPname::Union{Symbol,String}=prod(string.(Opname)),
+          Z::Union{Nothing,AbstractTensorMap}=nothing,
+          merge::Bool=true
+     ) -> nothing
+
+Add a two-site term `A(β/2)B` to the ITP graph. If `Z` is given, assume each operator is fermionic.
+"""
 function addITP2!(G::ImagTimeProxyGraph{L},
      Op::NTuple{2,AbstractTensorMap},
      si::NTuple{2,Int64},

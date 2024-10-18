@@ -1,8 +1,31 @@
+"""
+     mutable struct ImagTimeProxyGraph{L}
+          Ops::Vector{Vector{NTuple{2,AbstractLocalOperator}}} # Ops[si][idx]
+          Refs::Dict{String,Dict}
+          graph::MetaDiGraph{Int64,Float64}
+     end
+
+The concrete type for storing the `imaginary time proxy (ITP)` to be calculated with a graph structure.
+     
+# Fields
+     Ops::Vector{Vector{NTuple{2,AbstractLocalOperator}}}
+Store the operators in a sparse way. `Ops[si][idx]` stores the `idx`-th operator on site `si`.
+
+     Refs::Dict{String,Dict}
+Store the references of the values to be calculated. `Refs[ITPname][si]` stores the reference to the value of `ITPname` with the site indices `si`.
+
+     graph::MetaDiGraph{Int64,Float64}
+The graph with the ITP information binding to its vertices and edges, provided by `MetaGraphs.jl[https://github.com/JuliaGraphs/MetaGraphs.jl]`.
+
+# Constructors
+     ImagTimeProxyGraph(L::Int64) -> ::ImagTimeProxyGraph{L}
+The only constructor for `ImagTimeProxyGraph`, which creates an empty graph with `L` sites. The ITP terms can be added to it by methods like `addITP2!` or `addITP4!` later.  
+"""
 mutable struct ImagTimeProxyGraph{L}
      Ops::Vector{Vector{NTuple{2,AbstractLocalOperator}}} # Ops[si][idx]
-     Refs::Dict{String,Dict} # store the references of the values to be calculated
+     Refs::Dict{String,Dict} 
      graph::MetaDiGraph{Int64,Float64}
-     function ImagTimeProxyGraph(L)
+     function ImagTimeProxyGraph(L::Int64)
 
           Ops = Vector{Vector{NTuple{2,AbstractLocalOperator}}}(undef, L)
           for i in 1:L
@@ -74,6 +97,20 @@ function rem_vertices!(g::MetaDiGraph{Int64}, vs::AbstractVector{Int64}; keep_or
      return vmap
 end
 
+"""
+     merge!(G::ImagTimeProxyGraph;
+          verbose::Int64=0,
+          half::Bool=false) -> nothing
+
+Search and merge some repeated vertices in the ITP graph `G`.
+
+# Kwargs
+     verbose::Int64 = 0
+Display the merging process if `verbose > 0`.
+
+     half::Bool = false
+Only execute the left(right) merging for the left(right) half sites if `half = true`.  
+"""
 function merge!(G::ImagTimeProxyGraph{L}; verbose::Int64=0, half::Bool=false) where {L}
 
      v_rm = Set{Int64}()

@@ -1,8 +1,51 @@
+""" 
+     abstract type AbstractInteractionIterator{L} 
+The abstract type for the iterator of interaction terms. All the concrete subtypes should implement the `iterate` method so that the following usages are both valid where 
+`Ops` is an instance of `AbstractInteractionIterator`.
+```julia
+for O in Ops
+     # the i-th loop will give the i-th LocalOperator
+end
+
+collect(Ops) # return the vector of all LocalOperators 
+```
+"""
 abstract type AbstractInteractionIterator{L} end
+
 Base.IteratorSize(::Type{<:AbstractInteractionIterator}) = Base.HasLength()
 Base.eltype(::Type{<:AbstractInteractionIterator}) = AbstractLocalOperator
 length(::AbstractInteractionIterator{L}) where L = L
 
+"""
+     struct OnSiteInteractionIterator{L, T} <: AbstractInteractionIterator{L}
+          Op::AbstractLocalOperator
+          Z::T
+     end
+     
+The iterator for on-site terms such as bosonic `n_i` or fermionic `c_i` together with its Jordan-Wigner string`Z_{i+1} Z_{i+2} ... Z_{L}`.
+
+# Fields
+     Op::AbstractLocalOperator
+The local operator which tells both the operator and its site index.
+
+     Z::Nothing 
+For bosonic operators.
+     Z::AbstractTensorMap
+For fermionic operators. Assume all sites are fermionic therefore each site after `Op` will give `Z` operator.
+     Z::AbstractVector{<:AbstractTensorMap}
+Directly give the `Z` operator for each site to deal with the systems mixed with bosons and fermions.
+
+# Constructors
+     OnSiteInteractionIterator{L}(Op::AbstractLocalOperator, Z::T) where {L, T}
+Direct constructor.
+
+     OnSiteInteractionIterator{L}(Op::AbstractTensorMap,
+          name::Union{String, Symbol},
+          si::Int64;
+          swap::Bool=false,
+          Z=nothing)
+Generate the `LocalOperator` object with `Op`, `name`, `si` and kwarg `swap`, details please see the constructors of `LocalOperator`. 
+"""
 struct OnSiteInteractionIterator{L, T} <: AbstractInteractionIterator{L}
      Op::AbstractLocalOperator
      Z::T
@@ -44,6 +87,40 @@ function iterate(iter::OnSiteInteractionIterator{L, <:AbstractTensorMap}, i::Int
      return Op_wrap, i + 1
 end
 
+"""
+     struct TwoSiteInteractionIterator{L, T} <: AbstractInteractionIterator{L}
+          O₁::AbstractLocalOperator
+          O₂::AbstractLocalOperator
+          Z::T
+     end
+
+The iterator for two-site terms such as bosonic `n_i n_j` or fermionic `c_i c_j` together with its Jordan-Wigner string `Z_{i+1} Z_{i+2} ... Z_{j}`.
+     
+Note the two site indices can be in both ascending and descending order but should not be the same. For the latter case, please use `OnSiteInteractionIterator` to get an on-site term instead.
+
+# Fields
+     O₁::AbstractLocalOperator
+     O₂::AbstractLocalOperator
+The local operators.
+
+     Z::Nothing
+For bosonic operators.
+     Z::AbstractTensorMap
+For fermionic operators. Note we assume both `O₁` and `O₂` are fermionic operators if `Z ≠ nothing`. 
+     Z::AbstractVector{<:AbstractTensorMap}
+Directly give the `Z` operator for each site to deal with the systems mixed with bosons and fermions.
+
+# Constructors
+     TwoSiteInteractionIterator{L}(O₁::AbstractLocalOperator, O₂::AbstractLocalOperator, Z::T) where {L, T}
+Direct constructor.
+
+     TwoSiteInteractionIterator{L}(Op::NTuple{2, AbstractTensorMap},
+          name::NTuple{2, Union{String, Symbol}},
+          si::NTuple{2, Int64};
+          convertRight::Bool=false,
+          Z=nothing)
+Generate the `LocalOperator` objects with 2-tuples `Op`, `name` and `si`. If `convertRight == true`, convert the the second operator (with larger site index, can be `O₁` or `O₂`) to a right one (i.e. only have left horizontal leg), which is used to uniquely determine the contraction when calculating ITP. 
+"""
 struct TwoSiteInteractionIterator{L, T} <: AbstractInteractionIterator{L}
      O₁::AbstractLocalOperator
      O₂::AbstractLocalOperator
