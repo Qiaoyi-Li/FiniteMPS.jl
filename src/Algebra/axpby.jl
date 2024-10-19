@@ -66,7 +66,7 @@ function axpby!(α::Number, x::DenseMPS{L}, β::Number, y::DenseMPS{L}; kwargs..
                y.c *= norm_A
 
                # apply noise
-               iter ≤ length(lsnoise) && noise!(x, lsnoise[iter])
+               iter ≤ length(lsnoise) && noise!(A, lsnoise[iter])
 
                # svd
                if direction == :L2R
