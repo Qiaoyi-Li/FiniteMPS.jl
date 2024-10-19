@@ -17,7 +17,7 @@ Compute `C = A*B` by letting `α = 1` and `β = 0`.
      verbose::Int64 = 0
      lsnoise::AbstractVector{Float64} = Float64[]
 """
-function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Number; kwargs...) where L
+function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Number; kwargs...) where {L}
      @assert α != 0 || β != 0
      @assert !(B === C)
 
@@ -120,14 +120,16 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
                flush(stdout)
           end
 
-          convergence < tol && break
+          if iter > length(lsnoise) && convergence < tol
+               break
+          end
 
      end
      return C
 
 end
 
-function mul!(C::DenseMPS, A::SparseMPO, B::DenseMPS; kwargs...) 
+function mul!(C::DenseMPS, A::SparseMPO, B::DenseMPS; kwargs...)
      # C = A*B
      return mul!(C, A, B, 1, 0; kwargs...)
 end

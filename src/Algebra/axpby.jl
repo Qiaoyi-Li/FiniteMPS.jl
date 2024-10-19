@@ -11,8 +11,9 @@ Compute `y = α*x + β*y` variationally via 2-site update, where `x` and `y` are
      disk::Bool = false
      tol::Float64 = 1e-8
      verbose::Int64 = 0
+     lsnoise::AbstractVector{Float64} = Float64[]
 """
-function axpby!(α::Number, x::DenseMPS{L}, β::Number, y::DenseMPS{L}; kwargs...) where L
+function axpby!(α::Number, x::DenseMPS{L}, β::Number, y::DenseMPS{L}; kwargs...) where {L}
      α == 0 && return rmul!(y, β)
      if β == 0 || coef(y) == 0
           # copy the data to y
@@ -33,7 +34,7 @@ function axpby!(α::Number, x::DenseMPS{L}, β::Number, y::DenseMPS{L}; kwargs..
      disk::Bool = get(kwargs, :disk, false)
      tol::Float64 = get(kwargs, :tol, 1e-8)
      verbose::Int64 = get(kwargs, :verbose, 0)
-
+     lsnoise::Vector{Float64} = get(kwargs, :lsnoise, Float64[])
 
      Env_x = Environment(y', x; disk=disk)
      canonicalize!(Env_x, 1)
@@ -63,6 +64,9 @@ function axpby!(α::Number, x::DenseMPS{L}, β::Number, y::DenseMPS{L}; kwargs..
                norm_A = norm(A)
                rmul!(A, 1 / norm_A)
                y.c *= norm_A
+
+               # apply noise
+               iter ≤ length(lsnoise) && noise!(x, lsnoise[iter])
 
                # svd
                if direction == :L2R
@@ -104,8 +108,9 @@ function axpby!(α::Number, x::DenseMPS{L}, β::Number, y::DenseMPS{L}; kwargs..
                flush(stdout)
           end
 
-          convergence < tol && break
-
+          if iter > length(lsnoise) && convergence < tol
+               break
+          end
      end
      return y
 
