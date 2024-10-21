@@ -19,8 +19,11 @@ TimerOutputs = "a759f4b9-e2f1-59dc-863e-4aeb61b1ea8f"
 [compat]
 AbstractTrees = "0.4.5"
 KrylovKit = "0.8"
+TensorKit = "0.12.1 - 0.12.7"
 Reexport = "1.2.2"
 SerializedElementArrays = "0.1.0"
 TimerOutputs = "0.5.23"
 julia = "1.9"
 Graphs = "1.12"
+MetaGraphs = "0.8"
+
