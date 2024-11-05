@@ -1,13 +1,14 @@
 """
      calObs!(Tree::ObservableTree, Ψ::AbstractMPS{L}; kwargs...) -> Timer::TimerOutput
 
-Calculate observables respect to state `Ψ`, the info to tell which observables to calculate is stored in `Tree`. The results are stored in each leaf node of `Tree`. Note the value in each node will be in-place updated, so do not call this function twice with the same `Tree` object.  
+Calculate observables respect to state `Ψ`, the info to tell which observables to calculate is stored in `Tree`. The results are stored in each leaf node of `Tree`. Note the value in each node will be in-place updated, so do not call this function twice with the same `Tree` object.
 
-# Kwargs 
+# Kwargs
      serial::Bool = false
 Force to compute in serial mode, usually used for debugging.
 """
 function calObs!(Tree::ObservableTree, Ψ::AbstractMPS{L}; kwargs...) where {L}
+     @assert Center(Ψ) == [1,1] "MPS must be canonicalized at the first site for calObs! to work correctly!"
 
      if get(kwargs, :serial, false)
           return _calObs_serial!(Tree, Ψ; kwargs...)
@@ -29,7 +30,7 @@ function calObs!(Tree::ObservableTree, Ψ::AbstractMPS{L}; kwargs...) where {L}
 end
 
 function _calObs_serial!(Tree::ObservableTree, Ψ::AbstractMPS{L}; kwargs...) where {L}
-     
+
      GCspacing::Int64 = get(kwargs, :GCspacing, 100)
      verbose::Int64 = get(kwargs, :verbose, 0)
      showtimes::Int64 = get(kwargs, :showtimes, 100)
@@ -56,7 +57,7 @@ function _calObs_serial!(Tree::ObservableTree, Ψ::AbstractMPS{L}; kwargs...) wh
                continue
           end
 
-          # update 
+          # update
           El = _update_node!(node.Op, Dict_El[node.parent], Ψ[si]', Ψ[si], Timer_acc)
 
           # store El only if there exist children
@@ -149,7 +150,7 @@ function _calObs_threading!(Tree::ObservableTree, Ψ::AbstractMPS{L}, ::StoreMem
                GC_count = 0
                manualGC(Timer_acc)
           end
-          if verbose > 0 && num_count ≥ showspacing 
+          if verbose > 0 && num_count ≥ showspacing
                num_left -= num_count
                num_count = 0
                show(Timer_acc; title="$(num_leaves - num_left) / $(num_leaves)")
@@ -188,7 +189,7 @@ end
 #           if sz < ntasks && isready(Ch_swap)
 #                str = take!(Ch_swap)
 #                put!(Ch, deserialize(str))
-#                # clean 
+#                # clean
 #                rm(str; force=true)
 #           elseif sz > cachesize - ntasks
 #                # save to disk
@@ -256,14 +257,14 @@ function _calObs_worker!(Ch::Channel, Ch_swap::Channel, Ψ::AbstractMPS{L}) wher
                     El_child = _update_node!(node.Op, El, A, B, LocalTimer)
                     if isempty(node.children) # leaf node
                          leaves_count += 1
-                         continue 
+                         continue
                     end
 
                     if length(worklist) < 1 # choose as next parent
                          push!(worklist, (node, El_child))
                     else # put to swap
                          @timeit LocalTimer "put" put!(Ch_swap, (node, El_child))
-                    end                   
+                    end
                end
           end
 
@@ -272,7 +273,7 @@ function _calObs_worker!(Ch::Channel, Ch_swap::Channel, Ψ::AbstractMPS{L}) wher
 end
 
 function _update_node!(Op::AbstractLocalOperator, El::LocalLeftTensor, A::AdjointMPSTensor, B::MPSTensor, LocalTimer::TimerOutput)
-     
+
      if isnan(Op.strength)
           # propagate
           Op.strength = 1
@@ -287,4 +288,3 @@ function _update_node!(Op::AbstractLocalOperator, El::LocalLeftTensor, A::Adjoin
      end
      return El_next
 end
-
