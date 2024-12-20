@@ -73,6 +73,19 @@ const SS = let
      SL, SR
 end
 
+# chiral operator S⋅(S×S)
+const SSS = let
+    aspace = Rep[U₁×SU₂]((0, 1) => 1)
+
+    SL = TensorMap(ones, Float64, pspace, pspace ⊗ aspace)
+    SM = TensorMap(zeros, ComplexF64, aspace ⊗ pspace, pspace ⊗ aspace)
+    block(SM, Irrep[U₁×SU₂](0, 1/2)) .= 3im/4
+    block(SM, Irrep[U₁×SU₂](0, 3/2)) .= 3im/8
+    SR = TensorMap(ones, Float64, aspace ⊗ pspace, pspace)
+
+    SL, SM, SR
+end
+
 # hopping term, FdagF
 const FdagF = let
      aspace = Rep[U₁×SU₂]((1, 1 / 2) => 1)
