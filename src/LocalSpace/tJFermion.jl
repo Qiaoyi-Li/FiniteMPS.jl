@@ -36,9 +36,9 @@ const SSS = let
     aspace = Rep[U₁×SU₂]((0, 1) => 1)
 
     SL = TensorMap(ones, Float64, pspace, pspace ⊗ aspace)
-    SM = TensorMap(zeros, ComplexF64, aspace ⊗ pspace, pspace ⊗ aspace)
-    block(SM, Irrep[U₁×SU₂](0, 1/2)) .= 3im/4
-    block(SM, Irrep[U₁×SU₂](0, 3/2)) .= 3im/8
+    SM = TensorMap(zeros, Float64, aspace ⊗ pspace, pspace ⊗ aspace)
+    block(SM, Irrep[U₁×SU₂](0, 1/2)) .= 3/4
+    block(SM, Irrep[U₁×SU₂](0, 3/2)) .= 3/8
     SR = TensorMap(ones, Float64, aspace ⊗ pspace, pspace)
 
     SL, SM, SR

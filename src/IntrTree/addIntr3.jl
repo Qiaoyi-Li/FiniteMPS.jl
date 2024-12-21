@@ -70,15 +70,18 @@ end
 function addIntr3!(Root::InteractionTreeNode,
      A::LocalOperator, B::LocalOperator, C::LocalOperator,
      strength::Number, Z::Union{Nothing,AbstractTensorMap};
-     value=nothing)
+     fermionic::NTuple{2,Bool}=(false, false), value=nothing)
 
     @assert A.si < B.si < C.si
 
-    #         C
-    #     B
-    # A Z Z
+    #            C
+    #      B
+    # A [Z Z] [Z Z]
 
-    !isnothing(Z) && _addZ!(B, Z)
+    if !isnothing(Z)
+        fermionic[1] && _addZ!(B, Z)
+        fermionic[2] && _addZ!(C, Z)
+    end
 
     current_node = Root
     si = 1
@@ -89,8 +92,12 @@ function addIntr3!(Root::InteractionTreeNode,
             Op_i = A
         elseif si == B.si
             Op_i = B
-        elseif !isnothing(Z) && A.si < si < B.si
-            Op_i = LocalOperator(Z, :Z, si)
+        elseif !isnothing(Z)
+            if fermionic[1] && A.si < si < B.si
+                Op_i = LocalOperator(Z, :Z, si)
+            elseif fermionic[2] && B.si < si < C.si
+                Op_i = LocalOperator(Z, :Z, si)
+            end
         else
             Op_i = IdentityOperator(pspace, si)
         end
