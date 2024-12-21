@@ -5,6 +5,7 @@
          strength::Number;
          Obs::Bool = false,
          Z::Union{Nothing,AbstractTensorMap} = nothing,
+         fermionic::NTuple{2,Bool} = (false, false),
          name::NTuple{3,Union{Symbol,String}} = (:A, :B, :C)) -> nothing
 
     addIntr3!(Tree::InteractionTree, args...) = addIntr3!(Tree.Root.children[1], args...)
@@ -17,6 +18,7 @@ Add a 3-site interaction `Op` at site `si` (3tuple) to a given interaction tree.
          C::LocalOperator,
          strength::Number,
          Z::Union{Nothing,AbstractTensorMap};
+         fermionic::NTuple{2,Bool}=(false, false),
          value = nothing) -> nothing
 
 Expert version, each method finally reduces to this one. The `value` will be stored in the last node.
@@ -65,7 +67,7 @@ function addIntr3!(Root::InteractionTreeNode, Op::NTuple{3,AbstractTensorMap}, s
         return addIntr2!(Root, A, B * C, strength, Z; value=value)
     end
 
-    return addIntr3!(Root, A, B, C, strength, Z; value=value)
+    return addIntr3!(Root, A, B, C, strength, Z; fermionic=fermionic, value=value)
 end
 
 function addIntr3!(Root::InteractionTreeNode,
