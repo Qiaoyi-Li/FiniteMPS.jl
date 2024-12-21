@@ -60,7 +60,7 @@ function addIntr4!(Root::InteractionTreeNode, O::NTuple{4,AbstractTensorMap}, si
      if A.si == C.si && B.si == D.si
           #          D
           #  C Z Z Z Z              -BD
-          #          B   -->   AC   
+          #          B   -->   AC
           #  A Z Z Z Z
           !isnothing(Z) && (strength = -strength)
           return addIntr2!(Root, _leftOp(A * C), _rightOp(B * D), strength, nothing; value = value)
@@ -68,88 +68,88 @@ function addIntr4!(Root::InteractionTreeNode, O::NTuple{4,AbstractTensorMap}, si
      # ============ reduce to 3-site term ===========
      if A.si == C.si
           if B.si < D.si
-               #          D                  
+               #          D
                #  C Z Z Z Z                  D
-               #      B      -->   AC   -B Z Z  
-               #  A Z Z  
+               #      B      -->   AC   -B Z Z
+               #  A Z Z
                !isnothing(Z) && (strength = -strength)
-               return addIntr3!(Root, _leftOp(A * C), B, D, strength, Z; fermionic=(false, true, true), value = value)
+               return addIntr3!(Root, _leftOp(A * C), B, D, strength, Z; fermionic=(false, true), value = value)
           else
-               #      D                    
+               #      D
                #  C Z Z                    B
-               #          B  -->   AC  D Z Z   
+               #          B  -->   AC  D Z Z
                #  A Z Z Z Z
-               return addIntr3!(Root, _leftOp(A * C), D, _rightOp(B), strength, Z; fermionic=(false, true, true), value = value)
+               return addIntr3!(Root, _leftOp(A * C), D, _rightOp(B), strength, Z; fermionic=(false, true), value = value)
           end
      end
      if B.si == C.si
-          #         D                
-          #     C Z Z            BC    D 
+          #         D
+          #     C Z Z            BC    D
           #     B       -->  A Z Z  Z  Z
           # A Z Z
-          return addIntr3!(Root, A, B * C, D, strength, Z; fermionic=(true, false, false), value = value)
+          return addIntr3!(Root, A, B * C, D, strength, Z; fermionic=(true, true), value = value)
      end
      if B.si == D.si
           if A.si < C.si
                #         D
-               #     C Z Z           C   -BD  
-               #         B  -->  A Z Z 
-               # A Z Z Z Z  
+               #     C Z Z           C   -BD
+               #         B  -->  A Z Z
+               # A Z Z Z Z
                !isnothing(Z) && (strength = -strength)
-               return addIntr3!(Root, A, _leftOp(C), _rightOp(B * D), strength, Z; fermionic=(true, true, false), value = value)
+               return addIntr3!(Root, A, _leftOp(C), _rightOp(B * D), strength, Z; fermionic=(true, false), value = value)
           else
                # note AZ = -ZA
                #         D
                # C Z Z Z Z           -A   -BD         A   BD
-               #         B  -->  C Z  Z       --> C Z Z  
-               #     A Z Z                 
-               return addIntr3!(Root, _leftOp(C), A, _rightOp(B * D), strength, Z; fermionic=(true, true, false), value = value)
+               #         B  -->  C Z  Z       --> C Z Z
+               #     A Z Z
+               return addIntr3!(Root, _leftOp(C), A, _rightOp(B * D), strength, Z; fermionic=(true, false), value = value)
           end
      end
      # ----------------------------------------------
      if B.si < C.si
           #             D
-          #         C Z Z 
-          #     B 
-          # A Z Z 
+          #         C Z Z
+          #     B
+          # A Z Z
           return addIntr4!(Root, A, B, C, D, strength, Z; value = value)
      else
           if A.si < C.si
                if B.si < D.si
                     #             D                    D
-                    #     C Z Z Z Z               -B Z Z 
-                    #         B       -->      C 
-                    # A Z Z Z Z            A Z Z 
+                    #     C Z Z Z Z               -B Z Z
+                    #         B       -->      C
+                    # A Z Z Z Z            A Z Z
                     !isnothing(Z) && (strength = -strength)
                     return addIntr4!(Root, A, _leftOp(C), _rightOp(B), D, strength, Z; value = value)
                else
                     A.si < C.si && B.si > D.si
                     #         D                       B
-                    #     C Z Z                   D Z Z  
+                    #     C Z Z                   D Z Z
                     #             B   -->      C
-                    # A Z Z Z Z Z Z        A Z Z 
+                    # A Z Z Z Z Z Z        A Z Z
                     return addIntr4!(Root, A, _leftOp(C), D, _rightOp(B), strength, Z; value = value)
                end
           elseif A.si < D.si
                if B.si < D.si
                     #             D
                     # C Z Z Z Z Z Z                     D                    D
-                    #         B       -->      -A  -B Z Z  -->      A    B Z Z  
-                    #     A Z Z            C Z  Z               C Z Z 
+                    #         B       -->      -A  -B Z Z  -->      A    B Z Z
+                    #     A Z Z            C Z  Z               C Z Z
                     return addIntr4!(Root, _leftOp(C), A, _rightOp(B), D, strength, Z; value = value)
                else
                     #         D
-                    # C Z Z Z Z                        B               
-                    #             B   -->      -A  D Z Z  
-                    #     A Z Z Z Z        C Z  Z             
+                    # C Z Z Z Z                        B
+                    #             B   -->      -A  D Z Z
+                    #     A Z Z Z Z        C Z  Z
                     !isnothing(Z) && (strength = -strength)
                     return addIntr4!(Root, _leftOp(C), A, D, _rightOp(B), strength, Z; value = value)
                end
           else
                #      D
-               #  C Z Z  
+               #  C Z Z
                #             B
-               #         A Z Z 
+               #         A Z Z
                return addIntr4!(Root, _leftOp(C), D, A, _rightOp(B), strength, Z; value = value)
           end
      end
@@ -164,9 +164,9 @@ function addIntr4!(Root::InteractionTreeNode, A::LocalOperator, B::LocalOperator
      @assert A.si < B.si < C.si < D.si
 
      #             D
-     #         C Z Z 
-     #     B 
-     # A Z Z 
+     #         C Z Z
+     #     B
+     # A Z Z
 
      !isnothing(Z) && map(x -> _addZ!(x, Z), (B, D))
 
@@ -191,7 +191,7 @@ function addIntr4!(Root::InteractionTreeNode, A::LocalOperator, B::LocalOperator
                x.Op ≠ Op_i && return false
                if hastag(x.Op) && hastag(Op_i)
                     x.Op.tag ≠ Op_i.tag && return false
-               end 
+               end
                return true
           end
           if isnothing(idx)
@@ -199,7 +199,7 @@ function addIntr4!(Root::InteractionTreeNode, A::LocalOperator, B::LocalOperator
                current_node = current_node.children[end]
           else
                current_node = current_node.children[idx]
-               # replace the tag 
+               # replace the tag
                hastag(current_node.Op) && (current_node.Op.tag = Op_i.tag)
           end
           si += 1

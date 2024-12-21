@@ -38,6 +38,13 @@ function addIntr!(Root::InteractionTreeNode,
      return addIntr2!(Root, Op, si, strength; kwargs...)
 end
 function addIntr!(Root::InteractionTreeNode,
+    Op::NTuple{3,AbstractTensorMap},
+    si::NTuple{3,Int64},
+    strength::Number;
+    kwargs...)
+    return addIntr3!(Root, Op, si, strength; kwargs...)
+end
+function addIntr!(Root::InteractionTreeNode,
      Op::NTuple{4,AbstractTensorMap},
      si::NTuple{4,Int64},
      strength::Number;
