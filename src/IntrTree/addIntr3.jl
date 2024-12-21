@@ -26,6 +26,7 @@ Note if there exist repeated si, it will recurse to `addIntr2!` or `addIntr1!` a
 function addIntr3!(Root::InteractionTreeNode, Op::NTuple{3,AbstractTensorMap}, si::NTuple{3,Int64}, strength::Number;
      Obs::Bool=false,
      Z::Union{Nothing,AbstractTensorMap}=nothing,
+     fermionic::NTuple{2,Bool}=(false, false),
      name::NTuple{3,Union{Symbol,String}}=(:A, :B, :C))
 
     # Convert names to strings
@@ -42,17 +43,17 @@ function addIntr3!(Root::InteractionTreeNode, Op::NTuple{3,AbstractTensorMap}, s
     if si[1] > si[2]
         A, B = _swap(A, B)
         si = (si[2], si[1], si[3])
-        !isnothing(Z) && (strength *= -1)
+        !isnothing(Z) && fermionic[1] && (strength *= -1)
     end
     if si[2] > si[3]
         B, C = _swap(B, C)
         si = (si[1], si[3], si[2])
-        !isnothing(Z) && (strength *= -1)
+        !isnothing(Z) && fermionic[2] && (strength *= -1)
     end
     if si[1] > si[2]
         A, B = _swap(A, B)
         si = (si[2], si[1], si[3])
-        !isnothing(Z) && (strength *= -1)
+        !isnothing(Z) && fermionic[1] && (strength *= -1)
     end
 
     _addtag!(A, B, C)
