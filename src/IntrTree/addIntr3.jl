@@ -102,7 +102,15 @@ function addIntr3!(Root::InteractionTreeNode,
      strength::Number, Z::Union{Nothing,AbstractTensorMap};
      fermionic::NTuple{3,Bool}=(false, false, false), value=nothing)
 
+    if isnothing(Z)
+        # note addIntr4! may propagate a true even if Z == nothing
+        fermionic = (false, false, false)
+    end
+
+
     @assert A.si < B.si < C.si
+    # only consider even number of fermionic operators
+    @assert !(fermionic[1] ⊻ fermionic[2] ⊻ fermionic[3])
 
     #           C
     #      B [Z Z]
@@ -127,11 +135,12 @@ function addIntr3!(Root::InteractionTreeNode,
                 Op_i = LocalOperator(Z, :Z, si)
             elseif (fermionic[1] != fermionic[2]) && B.si < si < C.si
                 Op_i = LocalOperator(Z, :Z, si)
+            else 
+                Op_i = IdentityOperator(pspace, si)
             end
         else
             Op_i = IdentityOperator(pspace, si)
         end
-
         idx = findfirst(current_node.children) do x
             x.Op ≠ Op_i && return false
             if hastag(x.Op) && hastag(Op_i)

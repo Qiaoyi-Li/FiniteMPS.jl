@@ -135,8 +135,29 @@ function _swap(A::LocalOperator{2, 2}, B::LocalOperator{2,1})
      return LocalOperator(permute(TA, (1, 2), (3, 4)), B.name, B.si, B.strength), LocalOperator(permute(TB, (1, 2), (3,)), A.name, A.si, A.strength)
 end
 
-
-
-
-
-
+# fuse the possible multiple bonds between two operators
+function _reduceOp(A::LocalOperator{1, R}, B::LocalOperator{R, 1}) where R 
+     # match tags 
+     tagA = A.tag[2][2:end]
+     tagB = B.tag[1][1:end-1]
+     permB = map(tagA) do t
+          findfirst(x -> x == t, tagB)
+     end 
+     pA = ((1, 2), Tuple(3:R+1))
+     pB = (permB, (R, R+1))
+     pC = ((1,2), (3, 4))
+     AB = tensorcontract(pC, A.A, pA, :N, B.A, pB, :N)
+     # QR 
+     TA, TB = leftorth(AB)
+     if !isnan(A.strength) && !isnan(B.strength)
+          sA = 1
+          sB = A.strength * B.strength
+     else
+          sA = sB = NaN
+     end
+     OA = LocalOperator(permute(TA, (1,), (2, 3)), A.name, A.si, sA)
+     OB = LocalOperator(permute(TB, (1, 2), (3,)), B.name, B.si, sB)
+     return OA, OB
+end
+_reduceOp(A::LocalOperator{1, 1}, B::LocalOperator{1, 1}) = A, B
+_reduceOp(A::LocalOperator{1, 2}, B::LocalOperator{2, 1}) = A, B
