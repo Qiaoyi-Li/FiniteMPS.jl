@@ -2,7 +2,7 @@
      module U₁SU₂tJFermion
 
 Prepare some commonly used objects for U₁×SU₂ `tJ` fermions, i.e. local `d = 3` Hilbert space without double occupancy. 
-     
+
 Behaviors of all operators are the same as `U₁SU₂Fermion` up to the projection, details please see `U₁SU₂Fermion`. 
 """
 module U₁SU₂tJFermion
@@ -31,7 +31,7 @@ const SS = let
      SL, SR
 end
 
-# chiral operator S⋅(S×S)
+# chiral operator imag(S⋅(S×S))
 const SSS = let
     aspace = Rep[U₁×SU₂]((0, 1) => 1)
 

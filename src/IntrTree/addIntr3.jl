@@ -5,7 +5,7 @@
          strength::Number;
          Obs::Bool = false,
          Z::Union{Nothing,AbstractTensorMap} = nothing,
-         fermionic::NTuple{2,Bool} = (false, false),
+         fermionic::NTuple{3,Bool} = (false, false, false),
          name::NTuple{3,Union{Symbol,String}} = (:A, :B, :C)) -> nothing
 
     addIntr3!(Tree::InteractionTree, args...) = addIntr3!(Tree.Root.children[1], args...)
@@ -18,7 +18,7 @@ Add a 3-site interaction `Op` at site `si` (3tuple) to a given interaction tree.
          C::LocalOperator,
          strength::Number,
          Z::Union{Nothing,AbstractTensorMap};
-         fermionic::NTuple{2,Bool}=(false, false),
+         fermionic::NTuple{3,Bool}=(false, false, false),
          value = nothing) -> nothing
 
 Expert version, each method finally reduces to this one. The `value` will be stored in the last node.
@@ -28,7 +28,7 @@ Note if there exist repeated si, it will recurse to `addIntr2!` or `addIntr1!` a
 function addIntr3!(Root::InteractionTreeNode, Op::NTuple{3,AbstractTensorMap}, si::NTuple{3,Int64}, strength::Number;
      Obs::Bool=false,
      Z::Union{Nothing,AbstractTensorMap}=nothing,
-     fermionic::NTuple{2,Bool}=(false, false),
+     fermionic::NTuple{3,Bool}=(false, false, false),
      name::NTuple{3,Union{Symbol,String}}=(:A, :B, :C))
 
     # Convert names to strings
@@ -45,45 +45,72 @@ function addIntr3!(Root::InteractionTreeNode, Op::NTuple{3,AbstractTensorMap}, s
     if si[1] > si[2]
         A, B = _swap(A, B)
         si = (si[2], si[1], si[3])
-        !isnothing(Z) && fermionic[1] && (strength *= -1)
+        fermionic = (fermionic[2], fermionic[1], fermionic[3])
+        !isnothing(Z) && fermionic[1] && _addZ!(B, Z)
     end
     if si[2] > si[3]
         B, C = _swap(B, C)
         si = (si[1], si[3], si[2])
-        !isnothing(Z) && fermionic[2] && (strength *= -1)
+        fermionic = (fermionic[1], fermionic[3], fermionic[2])
+        !isnothing(Z) && fermionic[2] && _addZ!(C, Z)
     end
     if si[1] > si[2]
         A, B = _swap(A, B)
         si = (si[2], si[1], si[3])
-        !isnothing(Z) && fermionic[1] && (strength *= -1)
+        fermionic = (fermionic[2], fermionic[1], fermionic[3])
+        !isnothing(Z) && fermionic[1] && _addZ!(B, Z)
     end
 
     _addtag!(A, B, C)
 
-    # Reduce to two-site if indices overlap
-    if si[1] == si[2]
-        return addIntr2!(Root, A * B, C, strength, Z; value=value)
+    # ============ reduce to 1-site term ===========
+    if si[1] == si[2] == si[3]
+        return addIntr1!(Root, A * B * C, strength, nothing; value=value)
+    # ============ reduce to 2-site term ===========
+    elseif si[1] == si[2]
+        if fermionic[1] == fermionic[2]
+            #         C           C
+            # B Z Z Z Z  or  B       -->        C
+            # A Z Z Z Z      A            AB
+            return addIntr2!(Root, A * B, C, strength, nothing; value=value)
+        else
+            #         C              C
+            # B          or  B Z Z Z Z  -->           C
+            # A Z Z Z Z      A               AB Z Z Z Z
+        end
     elseif si[2] == si[3]
-        return addIntr2!(Root, A, B * C, strength, Z; value=value)
+        if fermionic[1] == true
+            #         C
+            #         B  -->         BC
+            # A Z Z Z Z      A Z Z Z Z
+            return addIntr2!(Root, A, B * C, strength, Z; value=value)
+        else
+            #     C
+            #     B  -->       BC
+            # A           A
+            return addIntr2!(Root, A, B * C, strength, nothing; value=value)
+        end
+    else
+        return addIntr3!(Root, A, B, C, strength, Z; fermionic=fermionic, value=value)
     end
 
-    return addIntr3!(Root, A, B, C, strength, Z; fermionic=fermionic, value=value)
+    @assert false # make sure all cases are considered
 end
 
 function addIntr3!(Root::InteractionTreeNode,
      A::LocalOperator, B::LocalOperator, C::LocalOperator,
      strength::Number, Z::Union{Nothing,AbstractTensorMap};
-     fermionic::NTuple{2,Bool}=(false, false), value=nothing)
+     fermionic::NTuple{3,Bool}=(false, false, false), value=nothing)
 
     @assert A.si < B.si < C.si
 
-    #            C
-    #      B
-    # A [Z Z] [Z Z]
+    #           C
+    #      B [Z Z]
+    # A [Z Z  Z Z]
 
     if !isnothing(Z)
         fermionic[1] && _addZ!(B, Z)
-        fermionic[2] && _addZ!(C, Z)
+        (fermionic[1] != fermionic[2]) && _addZ!(C, Z)
     end
 
     current_node = Root
@@ -98,7 +125,7 @@ function addIntr3!(Root::InteractionTreeNode,
         elseif !isnothing(Z)
             if fermionic[1] && A.si < si < B.si
                 Op_i = LocalOperator(Z, :Z, si)
-            elseif fermionic[2] && B.si < si < C.si
+            elseif (fermionic[1] != fermionic[2]) && B.si < si < C.si
                 Op_i = LocalOperator(Z, :Z, si)
             end
         else

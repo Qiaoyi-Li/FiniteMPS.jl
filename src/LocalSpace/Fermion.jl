@@ -19,7 +19,13 @@ Rank-`2` particle number operator `n = n↑ + n↓`.
 Rank-`2` double occupancy operator `nd = n↑n↓`.
 
      SS::NTuple{2, TensorMap}
-Two rank-`3` operators of Heisenberg `S⋅S` interaction.  
+Two rank-`3` operators of Heisenberg `S⋅S` interaction.
+
+     SSS::NTuple{3, TensorMap}
+Three operators of chiral operator `imag(S⋅(S×S))`. Rank = `(3, 4, 3)`.
+SSS = imag(S⋅(S×S)) = -im * S⋅(S×S)  -->  S⋅(S×S) = im * SSS
+NOTICE: The chiral operator `S⋅(S×S)` is a pure imaginary operator under the current basis.
+Thus define `SSS` as the imaginary part of S⋅(S×S) to reduce the computational overhead.
 
      FdagF::NTuple{2, TensorMap}
 Two rank-`3` operators of hopping `c↑^dag c↑ + c↓^dag c↓`. 
@@ -73,7 +79,7 @@ const SS = let
      SL, SR
 end
 
-# chiral operator S⋅(S×S)
+# chiral operator imag(S⋅(S×S))
 const SSS = let
     aspace = Rep[U₁×SU₂]((0, 1) => 1)
 
