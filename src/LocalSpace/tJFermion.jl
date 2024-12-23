@@ -219,3 +219,76 @@ end
      const U1U1tJFermion = U₁U₁tJFermion
 """
 const U1U1tJFermion = U₁U₁tJFermion
+
+
+module ℤ₂SU₂tJFermion
+
+using TensorKit
+
+const pspace = Rep[ℤ₂×SU₂]((0, 0) => 1, (1, 1 // 2) => 1)
+
+const Z = let
+     Z = isometry(pspace, pspace)
+     block(Z, Irrep[ℤ₂×SU₂](1, 1 // 2)) .= -1
+     Z
+end
+
+const n = let
+     n = isometry(pspace, pspace)
+     block(n, Irrep[ℤ₂×SU₂](0, 0))[1, 1] = 0
+     n
+end
+
+# S⋅S interaction
+const SS = let
+     aspace = Rep[ℤ₂×SU₂]((0, 1) => 1)
+     SL = TensorMap(ones, Float64, pspace, pspace ⊗ aspace) * sqrt(3) / 2
+     SR = permute(SL', ((2, 1), (3,)))
+     SL, SR
+end
+
+# hopping term, FdagF
+const FdagF = let
+     aspace = Rep[ℤ₂×SU₂]((1, 1 // 2) => 1)
+     Fdag = TensorMap(zeros, pspace, pspace ⊗ aspace)
+     block(Fdag, Irrep[ℤ₂×SU₂](1, 1 // 2))[1, 1] = 1
+     F = TensorMap(zeros, aspace ⊗ pspace, pspace)
+     block(F, Irrep[ℤ₂×SU₂](1, 1 // 2))[1, 1] = 1
+
+     Fdag, F
+end
+
+# hopping term, FFdag
+# warning: each hopping term == Fᵢ^dag Fⱼ - Fᵢ Fⱼ^dag
+const FFdag = let
+
+     aspace = Rep[ℤ₂×SU₂]((1, 1 // 2) => 1)
+     iso = isometry(aspace, flip(aspace))
+     @tensor F[a; c d] := FdagF[1]'[a, b, c] * iso'[d, b]
+     @tensor Fdag[d a; c] := FdagF[2]'[a, b, c] * iso[b, d]
+
+     F, Fdag
+end
+
+# singlet pairing correlation Δᵢⱼ^dag Δₖₗ
+const ΔₛdagΔₛ = let
+     A = FdagF[1]
+     aspace = Rep[ℤ₂×SU₂]((1, 1 // 2) => 1)
+     iso = isometry(aspace, flip(aspace)) / sqrt(2)
+     @tensor B[d a; b] := A[a b c] * iso[c d]
+     C = permute(B', ((1,), (3, 2)))
+     D = permute(A', ((2, 1), (3,)))
+     A, B, C, D
+end
+
+# singlet pairing operator
+const Δₛ = (ΔₛdagΔₛ[3], ΔₛdagΔₛ[4])
+
+const Δₛdag = (ΔₛdagΔₛ[1], ΔₛdagΔₛ[2])
+
+end
+
+"""
+     const Z2SU2tJFermion = ℤ₂SU₂tJFermion
+"""
+const Z2SU2tJFermion = ℤ₂SU₂tJFermion
