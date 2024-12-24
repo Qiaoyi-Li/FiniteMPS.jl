@@ -10,11 +10,11 @@ Similar to `InteractionTree` but specially used for calculation of observables. 
 Initialize an empty object.
 """
 struct ObservableTree{N}
-     Root::InteractionTreeNode{Tuple{String, Vararg{Int64}}}
+     Root::InteractionTreeNode{Dict{Tuple, String}}
      function ObservableTree{N}() where N
-          Root = InteractionTreeNode{Tuple{String, Vararg{Int64}}}(nothing, ("",), nothing)
+          Root = InteractionTreeNode{Dict{Tuple, String}}(nothing, Dict{Tuple, String}(), nothing)
           for i = 1:N
-               addchild!(Root, InteractionTreeNode{Tuple{String, Vararg{Int64}}}(IdentityOperator(0),("",),nothing))
+               addchild!(Root, InteractionTreeNode{Dict{Tuple, String}}(IdentityOperator(0), Dict{Tuple, String}(),nothing))
           end
           return new{N}(Root)     
      end

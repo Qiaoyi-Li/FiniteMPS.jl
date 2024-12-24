@@ -100,11 +100,12 @@ include("Algorithm/CBE/CBE.jl")
 
 
 # Interaction tree for generating Hamiltonian MPO and calculate observables
-export InteractionTreeNode, InteractionTree, addchild!, addIntr!, addIntr1!, addIntr2!, addIntr4!, AutomataMPO, AbstractInteractionIterator, OnSiteInteractionIterator, TwoSiteInteractionIterator, ArbitraryInteractionIterator
+export InteractionTreeNode, InteractionTree, addchild!, addIntr!, addIntr1!, addIntr2!, addIntr3!, addIntr4!, AutomataMPO, AbstractInteractionIterator, OnSiteInteractionIterator, TwoSiteInteractionIterator, ArbitraryInteractionIterator
 include("IntrTree/Node.jl")
 include("IntrTree/addIntr.jl")
 include("IntrTree/addIntr1.jl")
 include("IntrTree/addIntr2.jl")
+include("IntrTree/addIntr3.jl")
 include("IntrTree/addIntr4.jl")
 include("IntrTree/Automata.jl")
 include("IntrTree/IntrIterator.jl")
@@ -122,7 +123,7 @@ include("Observables/pushleft.jl")
 include("Observables/pushright.jl")
 
 # predefined local spaces
-export SU₂Spin, SU2Spin, U₁Spin, U1Spin, NoSymSpinOneHalf, U₁SU₂Fermion, U1SU2Fermion, ℤ₂SU₂Fermion, Z2SU2Fermion, U₁SpinlessFermion, U1SpinlessFermion, U₁SU₂tJFermion, U1SU2tJFermion, U₁U₁Fermion, U1U1Fermion, U₁U₁tJFermion, U1U1tJFermion
+export SU₂Spin, SU2Spin, U₁Spin, U1Spin, NoSymSpinOneHalf, U₁SU₂Fermion, U1SU2Fermion, ℤ₂SU₂Fermion, Z2SU2Fermion, U₁SpinlessFermion, U1SpinlessFermion, U₁SU₂tJFermion, U1SU2tJFermion, U₁U₁Fermion, U1U1Fermion, U₁U₁tJFermion, U1U1tJFermion, ℤ₂SU₂tJFermion, Z2SU2tJFermion
 include("LocalSpace/Spin.jl")
 include("LocalSpace/Fermion.jl")
 include("LocalSpace/tJFermion.jl")

@@ -18,6 +18,11 @@ for i in 1:L, j in 1:L, k in 1:L, l in 1:L
      addObs!(Tree, Tuple(fill(OpSz, 4)), (i, j, k, l); name = (:Sz, :Sz, :Sz, :Sz)) 
 end
 
+for i in 1:L, j in 1:L, k in 1:L
+    !allunique([i, j, k]) && continue
+    addObs!(Tree, Tuple(fill(OpSz, 3)), (i, j, k); name = (:Sz, :Sz, :Sz))
+end
+
 for i in 1:L, j in 1:L
      i == j && continue
      addObs!(Tree, Tuple(fill(OpSz, 2)), (i, j); name = (:Sz, :Sz))
@@ -40,6 +45,12 @@ end
      for (k, v) in Obs.SzSz
           @test v ≈ lsSz[k[1]] * lsSz[k[2]]
      end
+end
+
+@testset "3-site" begin
+    for (k, v) in Obs.SzSzSz
+         @test v ≈ lsSz[k[1]] * lsSz[k[2]] * lsSz[k[3]]
+    end
 end
 
 @testset "4-site" begin

@@ -38,6 +38,13 @@ function addIntr!(Root::InteractionTreeNode,
      return addIntr2!(Root, Op, si, strength; kwargs...)
 end
 function addIntr!(Root::InteractionTreeNode,
+    Op::NTuple{3,AbstractTensorMap},
+    si::NTuple{3,Int64},
+    strength::Number;
+    kwargs...)
+    return addIntr3!(Root, Op, si, strength; kwargs...)
+end
+function addIntr!(Root::InteractionTreeNode,
      Op::NTuple{4,AbstractTensorMap},
      si::NTuple{4,Int64},
      strength::Number;
@@ -60,13 +67,25 @@ function _update_strength!(node::InteractionTreeNode, strength::Number)
      end
      return false
 end
-
-function _update_strength!(node::InteractionTreeNode{T}, strength::Number) where T <: Tuple{String, Vararg{Int64}}
-     # directly update the value when used for calculating observables
-     node.Op.strength = strength
+function _update_strength!(node::InteractionTreeNode{T}, strength::Number) where T <: Dict{<:Tuple, String}
+     # used for calculating observables
+     if isnan(node.Op.strength)
+          node.Op.strength = strength
+     else
+          @assert node.Op.strength == strength
+     end
      return false
 end
 
+function _addZ!(OR::LocalOperator{1, 1}, Z::AbstractTensorMap)
+     OR.A = Z * OR.A
+     if OR.name[1] == 'Z' 
+          OR.name = OR.name[2:end]
+     else
+          OR.name = "Z" * OR.name
+     end
+     return OR
+end
 function _addZ!(OR::LocalOperator{1, R₂}, Z::AbstractTensorMap) where R₂
      OR.A = Z * OR.A
      if OR.name[1] == 'Z' 
@@ -76,7 +95,6 @@ function _addZ!(OR::LocalOperator{1, R₂}, Z::AbstractTensorMap) where R₂
      end
      return OR
 end
-
 function _addZ!(OR::LocalOperator{R₁, 1}, Z::AbstractTensorMap) where R₁
      # note ZA = - AZ
      OR.A = - OR.A * Z
@@ -101,7 +119,9 @@ end
 # swap two operators to deal with horizontal bond
 _swap(A::LocalOperator{1, 1}, B::LocalOperator{1, 1}) = B, A
 _swap(A::LocalOperator{1, 1}, B::LocalOperator{1, 2}) = B, A
+_swap(A::LocalOperator{1, 2}, B::LocalOperator{1, 1}) = B, A
 _swap(A::LocalOperator{2, 1}, B::LocalOperator{1, 1}) = B, A
+_swap(A::LocalOperator{1, 1}, B::LocalOperator{2, 1}) = B, A
 function _swap(A::LocalOperator{1, 2}, B::LocalOperator{2, 1})
      return _swapOp(B), _swapOp(A)
 end
@@ -128,8 +148,53 @@ function _swap(A::LocalOperator{2, 2}, B::LocalOperator{2,1})
      return LocalOperator(permute(TA, (1, 2), (3, 4)), B.name, B.si, B.strength), LocalOperator(permute(TB, (1, 2), (3,)), A.name, A.si, A.strength)
 end
 
-
-
-
-
-
+# fuse the possible multiple bonds between two operators
+function _reduceOp(A::LocalOperator{1, R}, B::LocalOperator{R, 1}) where R 
+     # match tags 
+     tagA = A.tag[2][2:end]
+     tagB = B.tag[1][1:end-1]
+     permB = map(tagA) do t
+          findfirst(x -> x == t, tagB)
+     end 
+     pA = ((1, 2), Tuple(3:R+1))
+     pB = (permB, (R, R+1))
+     pC = ((1,2), (3, 4))
+     AB = tensorcontract(pC, A.A, pA, :N, B.A, pB, :N)
+     # QR 
+     TA, TB = leftorth(AB)
+     if !isnan(A.strength) && !isnan(B.strength)
+          sA = 1
+          sB = A.strength * B.strength
+     else
+          sA = sB = NaN
+     end
+     OA = LocalOperator(permute(TA, (1,), (2, 3)), A.name, A.si, sA)
+     OB = LocalOperator(permute(TB, (1, 2), (3,)), B.name, B.si, sB)
+     return OA, OB
+end
+_reduceOp(A::LocalOperator{1, 1}, B::LocalOperator{1, 1}) = A, B
+_reduceOp(A::LocalOperator{1, 2}, B::LocalOperator{2, 1}) = A, B
+# contract the possible outer bonds between 3 operators
+# C AD B case from 4-site terms
+#   |     |     |
+# --A-- --B-- --C--   
+#   |     |     |
+function _reduceOp(A::LocalOperator{2, 2}, B::LocalOperator{2,2}, C::LocalOperator{2,2})
+     @tensor ABC[b c; e f h i] := A.A[a b c d] * B.A[d e f g] * C.A[g h i a]
+     # QR
+     TA, TBC = leftorth(ABC)
+     TB, TC = leftorth(permute(TBC, (1, 2, 3), (4, 5)))
+     # strength
+     if isnan(A.strength) || isnan(B.strength) || isnan(C.strength)
+          sA = sB = sC = NaN
+     else
+          sA = sB = 1
+          sC = A.strength * B.strength * C.strength
+     end
+     OA = LocalOperator(permute(TA, (1,), (2, 3)), A.name, A.si, sA)
+     OB = LocalOperator(permute(TB, (1, 2), (3, 4)), B.name, B.si, sB)
+     OC = LocalOperator(permute(TC, (1, 2), (3,)), C.name, C.si, sC)
+     return OA, OB, OC
+end
+_reduceOp(A::LocalOperator{1, 2}, B::LocalOperator{2, 2}, C::LocalOperator{2, 1}) = A, B, C
+_reduceOp(A::LocalOperator{1, 1}, B::LocalOperator{1, 1}, C::LocalOperator{1, 1}) = A, B, C
