@@ -135,8 +135,8 @@ mutable struct LocalOperator{R₁, R₂} <: AbstractLocalOperator
 			@assert (R₁ = rank(O, 1)) ≤ 2
 			@assert (R₂ = rank(O, 2)) ≤ 2
 		end
-		tag1 = R₁ == 1 ? ("phys",) : (name, "phys")
-		tag2 = R₂ == 1 ? ("phys",) : ("phys", name)
+		tag1 = R₁ == 1 ? ("phys",) : ("", "phys")
+		tag2 = R₂ == 1 ? ("phys",) : ("phys", "")
 		return new{R₁, R₂}(O, name, si, strength, (tag1, tag2))
 	end
 	LocalOperator(O::AbstractTensorMap, name::Symbol, args...; kwargs...) = LocalOperator(O, String(name), args...; kwargs...)
@@ -230,6 +230,12 @@ function *(A::LocalOperator{1, 1}, B::LocalOperator{1, 2})
 	tag = (A.tag[1], B.tag[2])
 	return LocalOperator(O, A.name * B.name, A.si, tag)
 end
+function *(A::LocalOperator{1, 1}, B::LocalOperator{2, 1})
+	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
+	@tensor O[c a; d] := A.A[a b] * B.A[c b d]
+     tag = ((B.tag[1][1], A.tag[1][1]), B.tag[2])
+	return LocalOperator(O, A.name * B.name, A.si, tag)
+end
 function *(A::LocalOperator{2, 1}, B::LocalOperator{1, 2})
 	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
 	@tensor O[a b; d e] := A.A[a b c] * B.A[c d e]
@@ -244,8 +250,15 @@ function *(A::LocalOperator{1, 2}, B::LocalOperator{1, 1})
 end
 function *(A::LocalOperator{1, 2}, B::LocalOperator{2, 1})
 	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
-	@tensor O[a; d] := A.A[a b c] * B.A[c b d]
-	return LocalOperator(O, A.name * B.name, A.si)
+     # match tags
+     if A.tag[2][2] == B.tag[1][1]
+	     @tensor O[a; d] := A.A[a b c] * B.A[c b d]
+          tag = (A.tag[1], B.tag[2])
+     else 
+          @tensor O[d a; e c] := A.A[a b c] * B.A[d b e]
+          tag = ((B.tag[1][1], A.tag[1][1]), (B.tag[2][1], A.tag[2][2]))
+     end
+	return LocalOperator(O, A.name * B.name, A.si, tag)
 end
 function *(A::LocalOperator{1, 2}, B::LocalOperator{1, 2})
 	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)

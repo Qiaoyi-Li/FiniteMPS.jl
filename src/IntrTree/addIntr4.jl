@@ -27,13 +27,16 @@ Note if there exist repeated si, it will recurse to `addIntr2!` or `addIntr3!`(T
 function addIntr4!(Root::InteractionTreeNode, O::NTuple{4, AbstractTensorMap}, si::NTuple{4, Int64}, strength::Number;
 	Obs::Bool = false,
 	Z::Union{Nothing, AbstractTensorMap} = nothing,
-	name::NTuple{4, Union{Symbol, String}} = (:A, :B, :C, :D))
+	name::NTuple{4, Union{Symbol, String}} = (:A, :B, :C, :D),
+	value = Obs ? si => prod(string.(name)) : nothing)
 
 	# convert to string
 	name = string.(name)
 
 	strength == 0 && return nothing
-	value = Obs ? (prod(name), si...) : nothing
+
+	# fermi flag 
+	Zflag = !isnothing(Z)
 
 	(A, B, C, D) = map(1:4) do i
 		LocalOperator(O[i], name[i], si[i])
@@ -64,16 +67,22 @@ function addIntr4!(Root::InteractionTreeNode, O::NTuple{4, AbstractTensorMap}, s
 			# now C.si < D.si must be true
 			return addIntr2!(Root, A * B * C, D, strength, Z; value = value)
 		elseif C.si == D.si
-			return addIntr2!(Root, A * B, C * D, strength, nothing; value = value)
-          elseif A.si == D.si
-               #     D           D
-               # C Z Z  -->      B 
-               #     B           A
-               #     A       C Z Z 
-               C_L = _leftOp(C)
-               ABD_R = _rightOp((A * B) * D)
-               C_L, ABD_R = _reduceOp(C_L, ABD_R)
-               return addIntr2!(Root, C_L, ABD_R, strength, Z; value = value)
+			AB = A * B
+			CD = C * D
+			if AB.si > CD.si
+				# AB and CD must be bosonic 
+				AB, CD = _swap(AB, CD)
+			end
+			return addIntr2!(Root, AB, CD, strength, nothing; value = value)
+		elseif A.si == D.si
+			#     D           D
+			# C Z Z  -->      B 
+			#     B           A
+			#     A       C Z Z 
+			C_L = _leftOp(C)
+			ABD_R = _rightOp((A * B) * D)
+			C_L, ABD_R = _reduceOp(C_L, ABD_R)
+			return addIntr2!(Root, C_L, ABD_R, strength, Z; value = value)
 		end
 	end
 	if A.si == C.si
@@ -83,45 +92,45 @@ function addIntr4!(Root::InteractionTreeNode, O::NTuple{4, AbstractTensorMap}, s
 			#          B   -->   AC   
 			#  A Z Z Z Z
 			!isnothing(Z) && (strength = -strength)
-               AC = _leftOp(A*C)
-               BD = _rightOp(B*D)
-               AC, BD = _reduceOp(AC, BD)
+			AC = _leftOp(A * C)
+			BD = _rightOp(B * D)
+			AC, BD = _reduceOp(AC, BD)
 			return addIntr2!(Root, AC, BD, strength, nothing; value = value)
-          elseif A.si == D.si
-               # D 
-               # C     
-               #     B 
-               # A Z Z
-               return addIntr2!(Root, A * (C * D), B, strength, Z; value = value) 
+		elseif A.si == D.si
+			# D 
+			# C     
+			#     B 
+			# A Z Z
+			return addIntr2!(Root, A * (C * D), B, strength, Z; value = value)
 		end
 	end
-     if B.si == C.si == D.si
-          #     D
-          #     C
-          #     B 
-          # A Z Z 
-          return addIntr2!(Root, A, B * (C * D), strength, Z; value = value)
-     end
+	if B.si == C.si == D.si
+		#     D
+		#     C
+		#     B 
+		# A Z Z 
+		return addIntr2!(Root, A, B * (C * D), strength, Z; value = value)
+	end
 
 	# ============ reduce to 3-site term ===========
 	if A.si == B.si
-        if A.si < C.si
-            #        D
-            #    C Z Z
-            # B
-            # A
-		    return addIntr3!(Root, A * B, C, D, strength, Z; fermionic = (false, true, true), value = value)
-        else
-            #     D          D
-            # C Z Z      C Z Z
-            #   B    or         B
-            #   A               A
-            AB = A * B
-            Op3 = (AB.A, C.A, D.A)
-            si3 = (AB.si, C.si, D.si)
-            name3 = (AB.name, C.name, D.name)
-            return addIntr3!(Root, Op3, si3, strength; Obs=Obs, Z=Z, fermionic=(false, true, true), name=name3)
-        end
+		if A.si < C.si
+			#        D
+			#    C Z Z
+			# B
+			# A
+			return addIntr3!(Root, A * B, C, D, strength, Z; fermionic = (false, Zflag, Zflag), value = value)
+		else
+			#     D          D
+			# C Z Z      C Z Z
+			#   B    or         B
+			#   A               A
+			AB = A * B
+			Op3 = (AB.A, C.A, D.A)
+			si3 = (AB.si, C.si, D.si)
+			name3 = (AB.name, C.name, D.name)
+			return addIntr3!(Root, Op3, si3, strength; Obs = Obs, Z = Z, fermionic = (false, Zflag, Zflag), name = name3, value = value)
+		end
 	end
 	if A.si == C.si
 		if B.si < D.si
@@ -130,30 +139,32 @@ function addIntr4!(Root::InteractionTreeNode, O::NTuple{4, AbstractTensorMap}, s
 			#      B      -->   AC   -B Z Z  
 			#  A Z Z  
 			!isnothing(Z) && (strength = -strength)
-			return addIntr3!(Root, _leftOp(A * C), B, D, strength, Z; fermionic = (false, true, true), value = value)
+			return addIntr3!(Root, _leftOp(A * C), B, D, strength, Z; fermionic = (false, Zflag, Zflag), value = value)
 		else
 			#      D                    
 			#  C Z Z                    B
 			#          B  -->   AC  D Z Z   
 			#  A Z Z Z Z
-			return addIntr3!(Root, _leftOp(A * C), D, _rightOp(B), strength, Z; fermionic = (false, true, true), value = value)
+			return addIntr3!(Root, _leftOp(A * C), D, _rightOp(B), strength, Z; fermionic = (false, Zflag, Zflag), value = value)
 		end
 	end
-    if A.si == D.si
-        # note: AZ = -Z
-        #     D                      B
-        # C Z Z                D
-        #         B  -->      -A
-        #     A Z Z       C Z  Z  Z  Z
-        !isnothing(Z) && (strength = -strength)
-        return addIntr3!(Root, _leftOp(C), A * D, _rightOp(B), strength, Z; fermionic = (true, false, true), value = value)
-    end
+	if A.si == D.si
+		# note: AZ = -ZA
+		#     D                      B
+		# C Z Z                D
+		#         B  -->      -A
+		#     A Z Z       C Z  Z  Z  Z
+		!isnothing(Z) && (strength = -strength)
+		AD = A * D
+		Op3 = _reduceOp(C, AD, B)
+		return addIntr3!(Root, Op3..., strength, Z; fermionic = (Zflag, false, Zflag), value = value)
+	end
 	if B.si == C.si
 		#         D                
 		#     C Z Z            BC    D 
 		#     B       -->  A Z Z  Z  Z
 		# A Z Z
-		return addIntr3!(Root, A, B * C, D, strength, Z; fermionic = (true, false, true), value = value)
+		return addIntr3!(Root, A, B * C, D, strength, Z; fermionic = (Zflag, false, Zflag), value = value)
 	end
 	if B.si == D.si
 		if A.si < C.si
@@ -162,36 +173,36 @@ function addIntr4!(Root::InteractionTreeNode, O::NTuple{4, AbstractTensorMap}, s
 			#         B  -->  A Z Z 
 			# A Z Z Z Z  
 			!isnothing(Z) && (strength = -strength)
-			return addIntr3!(Root, A, _leftOp(C), _rightOp(B * D), strength, Z; fermionic = (true, true, false), value = value)
+			return addIntr3!(Root, A, _leftOp(C), _rightOp(B * D), strength, Z; fermionic = (Zflag, Zflag, false), value = value)
 		else
 			# note AZ = -ZA
 			#         D
 			# C Z Z Z Z           -A   -BD         A   BD
 			#         B  -->  C Z  Z       --> C Z Z  
 			#     A Z Z                 
-			return addIntr3!(Root, _leftOp(C), A, _rightOp(B * D), strength, Z; fermionic = (true, true, false), value = value)
+			return addIntr3!(Root, _leftOp(C), A, _rightOp(B * D), strength, Z; fermionic = (Zflag, Zflag, false), value = value)
 		end
 	end
-     if C.si == D.si
-          if B.si < C.si 
-               #        D 
-               #        C 
-               #      B 
-               #  A Z Z 
-               return addIntr3!(Root, A, B, C * D, strength, Z; fermionic = (true, true, false), value = value)
-          else
-               #    D        D
-               #    C        C
-               #      B  or        B
-               #  A Z Z        A Z Z
-               CD = C * D
-               Op3 = (A.A, B.A, CD.A)
-               si3 = (A.si, B.si, CD.si)
-               name3 = (A.name, B.name, CD.name)
-               return addIntr3!(Root, Op3, si3, strength; Obs=Obs, Z=Z, fermionic=(true, true, false), name=name3)
-          end
+	if C.si == D.si
+		if B.si < C.si
+			#        D 
+			#        C 
+			#      B 
+			#  A Z Z 
+			return addIntr3!(Root, A, B, C * D, strength, Z; fermionic = (Zflag, Zflag, false), value = value)
+		else
+			#    D        D
+			#    C        C
+			#      B  or        B
+			#  A Z Z        A Z Z
+			CD = C * D
+			Op3 = (A.A, B.A, CD.A)
+			si3 = (A.si, B.si, CD.si)
+			name3 = (A.name, B.name, CD.name)
+			return addIntr3!(Root, Op3, si3, strength; Obs = Obs, Z = Z, fermionic = (Zflag, Zflag, false), name = name3, value = value)
+		end
 
-     end
+	end
 	# ----------------------------------------------
 	if B.si < C.si
 		#             D
@@ -297,7 +308,8 @@ function addIntr4!(Root::InteractionTreeNode, A::LocalOperator, B::LocalOperator
 		current_node.children[end].Op.strength = strength
 	else
 		if !isnothing(value)
-			current_node.children[idx].value = value
+			# observable
+			push!(current_node.children[idx].value, value)
 		end
 		_update_strength!(current_node.children[idx], strength) && deleteat!(current_node.children, idx)
 	end

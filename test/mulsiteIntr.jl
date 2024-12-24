@@ -1,5 +1,4 @@
 using BenchmarkFreeFermions
-using Combinatorics
 
 L = 8 # L must be even here
 D = 32
@@ -37,17 +36,30 @@ errEg = Eg - sum(ϵ[1:div(L, 2)])
 
 # =============== calculate observables ===============
 Tree = ObservableTree()
-# 2-site 
-for i in 1:L, j in 1:L
-	!duplicated && i == j && continue
-	addObs!(Tree, U1SpinlessFermion.FFdag, (i, j);
-		Z = U1SpinlessFermion.Z, name = (:F, :Fdag))
-end
 # 4-site 
 for i in 1:L, j in 1:L, k in 1:L, l in 1:L
 	!duplicated && !allunique([i, j, k, l]) && continue
 	addObs!(Tree, (U1SpinlessFermion.FdagF..., U1SpinlessFermion.FdagF...), (i, j, k, l); Z = U1SpinlessFermion.Z, name = (:Fdag, :F, :Fdag, :F))
 	addObs!(Tree, Tuple(fill(U1SpinlessFermion.n, 4)), (i, j, k, l); name = (:n, :n, :n, :n))
+end
+# 3-site 
+for i in 1:L, j in 1:L, k in 1:L
+	!duplicated && !allunique([i, j, k]) && continue
+	addObs!(Tree, (U1SpinlessFermion.n, U1SpinlessFermion.n, U1SpinlessFermion.n), (i, j, k); name = (:n, :n, :n))
+	addObs!(Tree, (U1SpinlessFermion.FdagF..., U1SpinlessFermion.n), (i, j, k); Z = U1SpinlessFermion.Z, name = (:Fdag, :F, :n), fermionic = (true, true, false))
+end
+# 2-site 
+for i in 1:L, j in 1:L
+	!duplicated && i == j && continue
+	addObs!(Tree, U1SpinlessFermion.FFdag, (i, j);
+		Z = U1SpinlessFermion.Z, name = (:F, :Fdag))
+	addObs!(Tree, U1SpinlessFermion.FdagF, (i, j);
+		Z = U1SpinlessFermion.Z, name = (:Fdag, :F))
+	addObs!(Tree, (U1SpinlessFermion.n, U1SpinlessFermion.n), (i, j); name = (:n, :n))
+end
+# 1-site
+for i in 1:L 
+     addObs!(Tree, U1SpinlessFermion.n, i; name = :n)
 end
 
 calObs!(Tree, Ψ)
@@ -59,10 +71,50 @@ Obs = convert(NamedTuple, Tree)
 ξ = ϵ .- μ
 G = GreenFunction(ξ, V, Inf)
 
+@testset "Boson-1" begin 
+	for i in 1:L
+		@test haskey(Obs.n, (i,)) && abs(Obs.n[(i,)] - (1 - G[i, i])) < tol
+	end
+end
+
+@testset "Boson-2" begin
+	for i in 1:L, j in 1:L
+		!duplicated && i == j && continue
+		O_ex = ExpectationValue(G, [i, i, j, j,], [1, 3,])
+		@test haskey(Obs.nn, (i, j)) && abs(Obs.nn[(i, j)] - O_ex) < tol
+	end
+end
+
 @testset "Fermion-2" begin
 	for i in 1:L, j in 1:L
 		!duplicated && i == j && continue
 		@test haskey(Obs.FFdag, (i, j)) && abs(Obs.FFdag[(i, j)] - G[i, j]) < tol
+		O_ex = i == j ? 1 - G[i, i] : -G[j, i]
+		@test haskey(Obs.FdagF, (i, j)) && abs(Obs.FdagF[(i, j)] - O_ex) < tol
+	end
+end
+
+@testset "Boson-3" begin
+	for i in 1:L, j in 1:L, k in 1:L
+		!duplicated && !allunique([i, j, k]) && continue
+		O_ex = ExpectationValue(G, [i, i, j, j, k, k], [1, 3, 5])
+		@test haskey(Obs.nnn, (i,j,k)) && abs(Obs.nnn[(i, j, k)] - O_ex) < tol
+	end
+end
+
+@testset "Boson-1-Fermion-2" begin 
+	for i in 1:L, j in 1:L, k in 1:L
+		!duplicated && !allunique([i, j, k]) && continue
+		O_ex = ExpectationValue(G, [i, j, k, k], [1, 3])
+		@test haskey(Obs.FdagFn, (i, j, k)) && abs(Obs.FdagFn[(i, j, k)] - O_ex) < tol
+	end
+end
+
+@testset "Boson-4" begin
+	for i in 1:L, j in 1:L, k in 1:L, l in 1:L
+		!duplicated && !allunique([i, j, k, l]) && continue
+		O_ex = ExpectationValue(G, [i, i, j, j, k, k, l, l], [1, 3, 5, 7])
+		@test haskey(Obs.nnnn, (i, j, k, l)) && abs(Obs.nnnn[(i, j, k, l)] - O_ex) < tol
 	end
 end
 
@@ -74,17 +126,5 @@ end
 	end
 end
 
-lsperms = permutations(1:4) |> collect 
-@testset "Boson-4" begin
-	for i in 1:L, j in 1:L, k in 1:L, l in 1:L
-		!duplicated && !allunique([i, j, k, l]) && continue
-		O_ex = ExpectationValue(G, [i, i, j, j, k, k, l, l], [1, 3, 5, 7])
-		# note the indices are only valid up to a permutation when the operators are the same
-		sites = [i, j, k, l]
-		idx = findfirst(lsperms) do perm
-			permuted_sites = sites[perm]
-			haskey(Obs.nnnn, Tuple(permuted_sites))
-		end
-		@test !isnothing(idx) && abs(Obs.nnnn[Tuple(sites[lsperms[idx]])] - O_ex) < tol
-	end
-end
+
+
