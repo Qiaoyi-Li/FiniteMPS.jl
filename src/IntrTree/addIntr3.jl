@@ -90,6 +90,7 @@ function addIntr3!(Root::InteractionTreeNode, Op::NTuple{3,AbstractTensorMap}, s
             # A           A
             return addIntr2!(Root, A, B * C, strength, nothing; value=value)
         end
+    # ============ 3-site term ===========
     else
         return addIntr3!(Root, A, B, C, strength, Z; fermionic=fermionic, value=value)
     end

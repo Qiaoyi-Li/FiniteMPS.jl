@@ -105,15 +105,27 @@ function addIntr4!(Root::InteractionTreeNode, O::NTuple{4, AbstractTensorMap}, s
 
 	# ============ reduce to 3-site term ===========
 	if A.si == B.si
-		#        D
-		#    C Z Z
-		# B 
-		# A 
-		return addIntr3!(Root, A * B, C, D, strength, Z; fermionic = (false, true, true), value = value)
+        if A.si < C.si
+            #        D
+            #    C Z Z
+            # B
+            # A
+		    return addIntr3!(Root, A * B, C, D, strength, Z; fermionic = (false, true, true), value = value)
+        else
+            #     D          D
+            # C Z Z      C Z Z
+            #   B    or         B
+            #   A               A
+            AB = A * B
+            Op3 = (AB.A, C.A, D.A)
+            si3 = (AB.si, C.si, D.si)
+            name3 = (AB.name, C.name, D.name)
+            return addIntr3!(Root, Op3, si3, strength; Obs=Obs, Z=Z, fermionic=(false, true, true), name=name3)
+        end
 	end
 	if A.si == C.si
 		if B.si < D.si
-			#          D                  
+			#          D
 			#  C Z Z Z Z                  D
 			#      B      -->   AC   -B Z Z  
 			#  A Z Z  
@@ -127,12 +139,21 @@ function addIntr4!(Root::InteractionTreeNode, O::NTuple{4, AbstractTensorMap}, s
 			return addIntr3!(Root, _leftOp(A * C), D, _rightOp(B), strength, Z; fermionic = (false, true, true), value = value)
 		end
 	end
+    if A.si == D.si
+        # note: AZ = -Z
+        #     D                      B
+        # C Z Z                D
+        #         B  -->      -A
+        #     A Z Z       C Z  Z  Z  Z
+        !isnothing(Z) && (strength = -strength)
+        return addIntr3!(Root, _leftOp(C), A * D, _rightOp(B), strength, Z; fermionic = (true, false, true), value = value)
+    end
 	if B.si == C.si
 		#         D                
 		#     C Z Z            BC    D 
 		#     B       -->  A Z Z  Z  Z
 		# A Z Z
-		return addIntr3!(Root, A, B * C, D, strength, Z; fermionic = (true, false, false), value = value)
+		return addIntr3!(Root, A, B * C, D, strength, Z; fermionic = (true, false, true), value = value)
 	end
 	if B.si == D.si
 		if A.si < C.si
@@ -158,20 +179,16 @@ function addIntr4!(Root::InteractionTreeNode, O::NTuple{4, AbstractTensorMap}, s
                #      B 
                #  A Z Z 
                return addIntr3!(Root, A, B, C * D, strength, Z; fermionic = (true, true, false), value = value)
-          elseif A.si < C.si
-               #    D 
-               #    C 
-               #      B 
-               #  A Z Z 
-               
-               # TODO swap B and CD
-               @assert false
           else
-               # D 
-               # C 
-               #      B 
-               #  A Z Z 
-               @assert false
+               #    D        D
+               #    C        C
+               #      B  or        B
+               #  A Z Z        A Z Z
+               CD = C * D
+               Op3 = (A.A, B.A, CD.A)
+               si3 = (A.si, B.si, CD.si)
+               name3 = (A.name, B.name, CD.name)
+               return addIntr3!(Root, Op3, si3, strength; Obs=Obs, Z=Z, fermionic=(true, true, false), name=name3)
           end
 
      end
