@@ -52,6 +52,13 @@ Interface of `AbstractLocalOperator`, return `"I"` for `IdentityOperator` and `O
 """
 getOpName(::IdentityOperator) = "I"
 
+"""
+	isfermionic(::AbstractLocalOperator) -> ::Bool
+
+Return the boolean value indicating whether the operator is fermionic or not.
+"""
+isfermionic(::IdentityOperator) = false
+
 function Base.show(io::IO, obj::IdentityOperator)
 	print(io, "I$(String(collect("$(obj.si)") .+ 8272))")
 	if !isnan(obj.strength)
@@ -78,8 +85,9 @@ const tag2Tuple{R₁, R₂} = Tuple{NTuple{R₁, String}, NTuple{R₂, String}}
 		  A::AbstractTensorMap
 		  name::String
 		  si::Int64
+		  fermionic::Bool
 		  strength::Number
-		  tag::tag2Tuple{R₁,R₂}
+		  tag::tag2Tuple{R₁,R₂}  
 	 end
 
 Warpper type for local operators, the building blocks of sparse MPO. 
@@ -100,6 +108,7 @@ Convention (' marks codomain):
 	 LocalOperator(O::AbstractTensorMap,
 		  name::Union{String,Symbol},
 		  si::Int64,
+		  fermionic::Bool,
 		  [,strength::Number = NaN]
 		  [, tag::tag2Tuple{R₁,R₂}];
 		  swap::Bool=false)
@@ -112,19 +121,25 @@ mutable struct LocalOperator{R₁, R₂} <: AbstractLocalOperator
 	A::Union{Nothing, AbstractTensorMap}
 	name::String
 	si::Int64
+	fermionic::Bool
 	strength::Number
 	tag::tag2Tuple{R₁, R₂}
-	function LocalOperator(O::AbstractTensorMap, name::String, si::Int64, strength::Number,
-		tag::tag2Tuple{R₁, R₂}; swap::Bool = false) where {R₁, R₂}
+	function LocalOperator(O::AbstractTensorMap,
+		name::String,
+		si::Int64,
+		fermionic::Bool,
+		strength::Number,
+		tag::tag2Tuple{R₁, R₂};
+		swap::Bool = false) where {R₁, R₂}
 		if swap
 			perms = (((R₂+2:R₁+R₂)..., R₂), (R₂ + 1, (1:R₂-1)...))
 			O = permute(O, perms)
 		end
 		@assert rank(O, 1) == R₁ && rank(O, 2) == R₂
-		return new{R₁, R₂}(O, name, si, strength, tag)
+		return new{R₁, R₂}(O, name, si, fermionic, strength, tag)
 	end
-	LocalOperator(O::AbstractTensorMap, name::String, si::Int64, tag::tag2Tuple{R₁, R₂}; kwargs...) where {R₁, R₂} = LocalOperator(O, name, si, NaN, tag; kwargs...) # default strength = NaN
-	function LocalOperator(O::AbstractTensorMap, name::String, si::Int64, strength::Number = NaN; swap::Bool = false)
+	LocalOperator(O::AbstractTensorMap, name::String, si::Int64, fermionic::Bool, tag::tag2Tuple{R₁, R₂}; kwargs...) where {R₁, R₂} = LocalOperator(O, name, si, fermionic, NaN, tag; kwargs...) # default strength = NaN
+	function LocalOperator(O::AbstractTensorMap, name::String, si::Int64, fermionic::Bool, strength::Number = NaN; swap::Bool = false)
 		# default tag, only for rank ≤ 4
 		if swap
 			@assert (R₁ = rank(O, 2)) ≤ 2
@@ -137,7 +152,7 @@ mutable struct LocalOperator{R₁, R₂} <: AbstractLocalOperator
 		end
 		tag1 = R₁ == 1 ? ("phys",) : ("", "phys")
 		tag2 = R₂ == 1 ? ("phys",) : ("phys", "")
-		return new{R₁, R₂}(O, name, si, strength, (tag1, tag2))
+		return new{R₁, R₂}(O, name, si, fermionic, strength, (tag1, tag2))
 	end
 	LocalOperator(O::AbstractTensorMap, name::Symbol, args...; kwargs...) = LocalOperator(O, String(name), args...; kwargs...)
 end
@@ -147,6 +162,7 @@ getOpName(O::LocalOperator) = O.name
 function getPhysSpace(O::LocalOperator)
 	return domain(O)[1]
 end
+isfermionic(O::LocalOperator) = O.fermionic
 
 function Base.show(io::IO, obj::LocalOperator{R₁, R₂}) where {R₁, R₂}
 	print(io, "$(obj.name)$(String(collect("$(obj.si)") .+ 8272)){$R₁,$R₂}")
@@ -222,50 +238,57 @@ Warning: we write this function case by case via multiple dispatch, hence it may
 function *(A::LocalOperator{1, 1}, B::LocalOperator{1, 1})
 	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
 	@tensor O[a; c] := A.A[a b] * B.A[b c]
-	return LocalOperator(O, A.name * B.name, A.si)
+	fermionic = A.fermionic ⊻ B.fermionic
+	return LocalOperator(O, A.name * B.name, A.si, fermionic)
 end
 function *(A::LocalOperator{1, 1}, B::LocalOperator{1, 2})
 	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
 	@tensor O[a; c d] := A.A[a b] * B.A[b c d]
 	tag = (A.tag[1], B.tag[2])
-	return LocalOperator(O, A.name * B.name, A.si, tag)
+	fermionic = A.fermionic ⊻ B.fermionic
+	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag)
 end
 function *(A::LocalOperator{1, 1}, B::LocalOperator{2, 1})
 	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
 	@tensor O[c a; d] := A.A[a b] * B.A[c b d]
-     tag = ((B.tag[1][1], A.tag[1][1]), B.tag[2])
-	return LocalOperator(O, A.name * B.name, A.si, tag)
+	tag = ((B.tag[1][1], A.tag[1][1]), B.tag[2])
+	fermionic = A.fermionic ⊻ B.fermionic
+	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag)
 end
 function *(A::LocalOperator{2, 1}, B::LocalOperator{1, 2})
 	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
 	@tensor O[a b; d e] := A.A[a b c] * B.A[c d e]
 	tag = (A.tag[1], B.tag[2])
-	return LocalOperator(O, A.name * B.name, A.si, tag)
+	fermionic = A.fermionic ⊻ B.fermionic
+	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag)
 end
 function *(A::LocalOperator{1, 2}, B::LocalOperator{1, 1})
 	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
 	@tensor O[a; d c] := A.A[a b c] * B.A[b d]
 	tag = (A.tag[1], (B.tag[2][1], A.tag[2][2]))
-	return LocalOperator(O, A.name * B.name, A.si, tag)
+	fermionic = A.fermionic ⊻ B.fermionic
+	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag)
 end
 function *(A::LocalOperator{1, 2}, B::LocalOperator{2, 1})
 	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
-     # match tags
-     if A.tag[2][2] == B.tag[1][1]
-	     @tensor O[a; d] := A.A[a b c] * B.A[c b d]
-          tag = (A.tag[1], B.tag[2])
-     else 
-          @tensor O[d a; e c] := A.A[a b c] * B.A[d b e]
-          tag = ((B.tag[1][1], A.tag[1][1]), (B.tag[2][1], A.tag[2][2]))
-     end
-	return LocalOperator(O, A.name * B.name, A.si, tag)
+	# match tags
+	if A.tag[2][2] == B.tag[1][1]
+		@tensor O[a; d] := A.A[a b c] * B.A[c b d]
+		tag = (A.tag[1], B.tag[2])
+	else
+		@tensor O[d a; e c] := A.A[a b c] * B.A[d b e]
+		tag = ((B.tag[1][1], A.tag[1][1]), (B.tag[2][1], A.tag[2][2]))
+	end
+	fermionic = A.fermionic ⊻ B.fermionic
+	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag)
 end
 function *(A::LocalOperator{1, 2}, B::LocalOperator{1, 2})
 	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
 
 	@tensor O[a; d c e] := A.A[a b c] * B.A[b d e]
 	tag = (A.tag[1], (B.tag[2][1], A.tag[2][2], B.tag[2][2]))
-	return LocalOperator(O, A.name * B.name, A.si, tag)
+	fermionic = A.fermionic ⊻ B.fermionic
+	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag)
 end
 function *(A::LocalOperator{1, 2}, B::LocalOperator{2, 2})
 	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
@@ -278,20 +301,23 @@ function *(A::LocalOperator{1, 2}, B::LocalOperator{2, 2})
 		@tensor O[d a; e c f] := A.A[a b c] * B.A[d b e f]
 		tag = ((B.tag[1][1], A.tag[1][1]), (B.tag[2][1], A.tag[2][2], B.tag[2][2]))
 	end
-	return LocalOperator(O, A.name * B.name, A.si, tag)
+	fermionic = A.fermionic ⊻ B.fermionic
+	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag)
 end
-function *(A::LocalOperator{2, 1}, B::LocalOperator{1,1})
-     @assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
-     @tensor O[a b; d] := A.A[a b c] * B.A[c d]
-     tag = (A.tag[1], B.tag[2])
-     return LocalOperator(O, A.name * B.name, A.si, tag)
+function *(A::LocalOperator{2, 1}, B::LocalOperator{1, 1})
+	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
+	@tensor O[a b; d] := A.A[a b c] * B.A[c d]
+	tag = (A.tag[1], B.tag[2])
+	fermionic = A.fermionic ⊻ B.fermionic
+	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag)
 end
 function *(A::LocalOperator{2, 1}, B::LocalOperator{2, 1})
-     @assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
+	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
 
-     @tensor O[a d b; e] := A.A[a b c] * B.A[d c e]
-     tag = ((A.tag[1][1], B.tag[1][1], A.tag[1][2]), B.tag[2])
-     return LocalOperator(O, A.name * B.name, A.si, tag)
+	@tensor O[a d b; e] := A.A[a b c] * B.A[d c e]
+	tag = ((A.tag[1][1], B.tag[1][1], A.tag[1][2]), B.tag[2])
+	fermionic = A.fermionic ⊻ B.fermionic
+	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag)
 end
 function *(A::LocalOperator{2, 2}, B::LocalOperator{2, 1})
 	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
@@ -304,7 +330,8 @@ function *(A::LocalOperator{2, 2}, B::LocalOperator{2, 1})
 		@tensor O[a e b; f d] := A.A[a b c d] * B.A[e c f]
 		tag = ((A.tag[1][1], B.tag[1][1], A.tag[1][2]), (B.tag[2][1], A.tag[2][2]))
 	end
-	return LocalOperator(O, A.name * B.name, A.si, tag)
+	fermionic = A.fermionic ⊻ B.fermionic
+	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag)
 end
 function *(A::LocalOperator{2, 2}, B::LocalOperator{2, 2})
 	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
@@ -317,14 +344,15 @@ function *(A::LocalOperator{2, 2}, B::LocalOperator{2, 2})
 		@tensor O[a e b; f d g] := A.A[a b c d] * B.A[e c f g]
 		tag = ((A.tag[1][1], B.tag[1][1], A.tag[1][2]), (B.tag[2][1], A.tag[2][2], B.tag[2][2]))
 	end
-	return LocalOperator(O, A.name * B.name, A.si, tag)
+	fermionic = A.fermionic ⊻ B.fermionic
+	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag)
 end
 
 function _swapOp(obj::LocalOperator{R₁, R₂}) where {R₁, R₂}
 	perms = (((R₁+2:R₁+R₂)..., R₁), (R₁ + 1, (1:R₁-1)...))
 	O = permute(obj.A, perms)
 	tag = ((obj.tag[2][2:end]..., obj.tag[1][end]), (obj.tag[2][1], obj.tag[1][1:end-1]...))
-	return LocalOperator(O, obj.name, obj.si, obj.strength, tag)
+	return LocalOperator(O, obj.name, obj.si, obj.fermionic, obj.strength, tag)
 end
 
 function _leftOp(obj::LocalOperator{R₁, R₂}) where {R₁, R₂}
@@ -332,7 +360,7 @@ function _leftOp(obj::LocalOperator{R₁, R₂}) where {R₁, R₂}
 	perms = ((R₁,), (R₁ + 1, (1:R₁-1)..., (R₁+2:R₁+R₂)...))
 	O = permute(obj.A, perms)
 	tag = ((obj.tag[1][end],), (obj.tag[2][1], obj.tag[1][1:end-1]..., obj.tag[2][2:end]...))
-	return LocalOperator(O, obj.name, obj.si, obj.strength, tag)
+	return LocalOperator(O, obj.name, obj.si, obj.fermionic, obj.strength, tag)
 end
 _leftOp(obj::LocalOperator{1, 1}) = obj
 
@@ -341,7 +369,7 @@ function _rightOp(obj::LocalOperator{R₁, R₂}) where {R₁, R₂}
 	perms = (((1:R₁-1)..., (R₁+2:R₁+R₂)..., R₁), (R₁ + 1,))
 	O = permute(obj.A, perms)
 	tag = ((obj.tag[1][1:end-1]..., obj.tag[2][2:end]..., obj.tag[1][end]), (obj.tag[2][1],))
-	return LocalOperator(O, obj.name, obj.si, obj.strength, tag)
+	return LocalOperator(O, obj.name, obj.si, obj.fermionic, obj.strength, tag)
 end
 _rightOp(obj::LocalOperator{1, 1}) = obj
 

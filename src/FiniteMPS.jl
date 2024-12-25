@@ -29,7 +29,7 @@ include("utils/oplus.jl")
 include("utils/Direction.jl")
 
 # Wrapper types for classifying tensors
-export AbstractTensorWrapper, AbstractMPSTensor, MPSTensor, CompositeMPSTensor, AdjointMPSTensor, AbstractEnvironmentTensor, LocalLeftTensor, LocalRightTensor, SimpleLeftTensor, SimpleRightTensor, SparseLeftTensor, SparseRightTensor, BilayerLeftTensor, BilayerRightTensor, AbstractLocalOperator, hastag, getPhysSpace, getOpName, IdentityOperator, tag2Tuple, LocalOperator, SparseMPOTensor, AbstractStoreType, StoreMemory, StoreDisk, LeftPreFuseTensor, SparseLeftPreFuseTensor, noise!
+export AbstractTensorWrapper, AbstractMPSTensor, MPSTensor, CompositeMPSTensor, AdjointMPSTensor, AbstractEnvironmentTensor, LocalLeftTensor, LocalRightTensor, SimpleLeftTensor, SimpleRightTensor, SparseLeftTensor, SparseRightTensor, BilayerLeftTensor, BilayerRightTensor, AbstractLocalOperator, hastag, getPhysSpace, getOpName, isfermionic, IdentityOperator, tag2Tuple, LocalOperator, StringOperator, SparseMPOTensor, AbstractStoreType, StoreMemory, StoreDisk, LeftPreFuseTensor, SparseLeftPreFuseTensor, noise!
 include("TensorWrapper/TensorWrapper.jl")
 include("TensorWrapper/MPSTensor.jl")
 include("TensorWrapper/CompositeMPSTensor.jl")
@@ -37,6 +37,7 @@ include("TensorWrapper/AdjointMPSTensor.jl")
 include("TensorWrapper/EnvironmentTensor.jl")
 include("TensorWrapper/BilayerEnvTensor.jl")
 include("TensorWrapper/LocalOperator.jl")
+include("TensorWrapper/StringOperator.jl")
 include("TensorWrapper/SparseMPOTensor.jl")
 include("TensorWrapper/StoreType.jl")
 include("TensorWrapper/PreFuseTensor.jl")

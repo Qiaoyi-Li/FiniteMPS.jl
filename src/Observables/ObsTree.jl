@@ -38,10 +38,11 @@ Warning: there is a known issue that only one permutation will be calculated if 
 function addObs!(Tree::ObservableTree{M},
      Op::NTuple{N,AbstractTensorMap},
      si::NTuple{N,Int64},
+     fermionic::NTuple{N,Bool},
      n::Int64 = 1; 
      kwargs...) where {N, M}
      @assert n ≤ M
-     return addIntr!(Tree.Root.children[n], Op, si, 1; Obs = true, kwargs...)
+     return addIntr!(Tree.Root.children[n], Op, si, fermionic, 1; Obs = true, kwargs...)
 end
 function addObs!(Tree::ObservableTree,
      Op::AbstractTensorMap,
