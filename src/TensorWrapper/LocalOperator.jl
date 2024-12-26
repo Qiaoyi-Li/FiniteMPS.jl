@@ -194,9 +194,10 @@ Field `name` of output obj is `"A.name(A.strength) + B.name(B.strength)"`.
 """
 function +(A::LocalOperator{R₁, R₂}, B::LocalOperator{R₁, R₂}) where {R₁, R₂}
 	@assert A.si == B.si && !isnan(A.strength) && !isnan(B.strength)
+	@assert A.fermionic == B.fermionic
 	Op = A.A * A.strength + B.A * B.strength
 	name = "$(A.name)($(A.strength)) + $(B.name)($(B.strength))"
-	return LocalOperator(Op, name, A.si, 1)
+	return LocalOperator(Op, name, A.si, A.fermionic, 1)
 end
 
 """
