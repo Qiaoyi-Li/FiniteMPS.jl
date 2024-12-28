@@ -38,6 +38,7 @@ end
 +(A::T, B::T) where {T<:AbstractTensorWrapper} = convert(T, A.A + B.A)
 +(A::AbstractTensorWrapper, ::Nothing) = A
 +(::Nothing, A::AbstractTensorWrapper) = A
++(::Nothing, ::Nothing) = nothing
 -(A::T) where {T<:AbstractTensorWrapper} = convert(T, -A.A)
 -(A::T, B::T) where {T<:AbstractTensorWrapper} = convert(T, A.A - B.A)
 -(A::AbstractTensorWrapper, ::Nothing) = A
