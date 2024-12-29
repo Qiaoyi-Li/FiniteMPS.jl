@@ -106,9 +106,8 @@ Randomize the data of tensor `A` based on `randStiefel`.
 `σ` of gaussian distribution. No default value. It will throw an error if `σ` is not given and `Dist = :Gaussian`.
 """
 function randisometry!(A::AbstractTensorMap; kwargs...)
-     Data = data(A)
-     for k in keys(Data)
-          _rand_data!(Data[k]; kwargs...)
+     for (c, b) in blocks(A)
+          _rand_data!(b; kwargs...)
      end
      return A
 end

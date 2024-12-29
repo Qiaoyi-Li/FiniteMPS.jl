@@ -48,9 +48,9 @@ Contract the virtual bond between 2 neighbor local tensors.
 """
 function *(A::MPSTensor{R₁}, B::MPSTensor{R₂}) where {R₁,R₂}
      C = TensorOperations.tensorcontract(
-          (Tuple(1:R₁-1), Tuple(R₁:(R₁+R₂-2))),
-          A.A, (Tuple(1:R₁-1), (R₁,)), :N,
-          B.A, ((1,), Tuple(2:R₂)), :N)
+          A.A, (Tuple(1:R₁-1), (R₁,)), false,
+          B.A, ((1,), Tuple(2:R₂)), false, 
+          (Tuple(1:R₁-1), Tuple(R₁:(R₁+R₂-2))))
      return C
 end
 promote_rule(::Type{<:MPSTensor}, ::Type{<:AbstractTensorMap}) = MPSTensor

@@ -11,6 +11,7 @@ using Graphs, MetaGraphs
 @reexport import LinearAlgebra: BLAS, rank, qr, diag, I, diagm
 import AbstractTrees: parent, isroot
 import Graphs: rem_vertices!
+using Bumper
 
 # global settings
 include("Globals.jl")

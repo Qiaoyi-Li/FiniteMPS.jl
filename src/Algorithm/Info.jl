@@ -51,20 +51,20 @@ struct BondInfo
      BondInfo(D::Int64, DD::Int64, TrunErr::Float64, SE::Float64) = new(D, DD, TrunErr, SE)
 end
 
-function BondInfo(s::AbstractTensorMap{T}, ϵ::Float64=0.0) where T <: GradedSpace
+function BondInfo(s::AbstractTensorMap{<:Union{Float64, ComplexF64} ,T}, ϵ::Float64=0.0) where T <: GradedSpace
      D = DD = 0
      Norm2 = SE = 0.0
-     for k in keys(data(s))
-          λ = diag(data(s)[k])
+     for (c, b) in blocks(s)
+          λ = diag(b)
           D += length(λ)
-          DD += length(λ) * dim(k)
-          Norm2 += norm(λ)^2 * dim(k)
-          SE += mapreduce(x -> x == 0 ? 0 : x^2 * log(x), +, λ) * dim(k)
+          DD += length(λ) * dim(c)
+          Norm2 += norm(λ)^2 * dim(c)
+          SE += mapreduce(x -> x == 0 ? 0 : x^2 * log(x), +, λ) * dim(c)
      end
      SE = -2SE / Norm2 + log(Norm2)
      return BondInfo(D, DD, ϵ, SE)
 end
-function BondInfo(s::AbstractTensorMap{T}, ϵ::Float64=0.0) where T <: Union{CartesianSpace, ComplexSpace}
+function BondInfo(s::AbstractTensorMap{<:Union{Float64, ComplexF64}, T}, ϵ::Float64=0.0) where T <: Union{CartesianSpace, ComplexSpace}
     D = DD = 0
     Norm2 = SE = 0.0
 

@@ -5,7 +5,7 @@ Return the dimension of a given index of tensor `A`.
 
 `D` is the number of multiplets, `DD` is the number of equivalent no symmetry states. Note `D == DD` for abelian groups.
 """
-function dim(A::AbstractTensorMap{F}, idx::Int64) where F<:GradedSpace
+function dim(A::AbstractTensorMap{<:Union{Float64, ComplexF64}, F}, idx::Int64) where F<:GradedSpace
      rcod = rank(A, 1)
      if idx ≤ rcod[1]
           D = mapreduce(i -> codomain(A).spaces[idx].dims[i], +, eachindex(codomain(A).spaces[idx].dims))
@@ -17,7 +17,7 @@ function dim(A::AbstractTensorMap{F}, idx::Int64) where F<:GradedSpace
     return D, DD
 end
 
-function dim(A::AbstractTensorMap{F}, idx::Int64) where F<:Union{CartesianSpace,ComplexSpace}
+function dim(A::AbstractTensorMap{<:Union{Float64, ComplexF64} ,F}, idx::Int64) where F<:Union{CartesianSpace,ComplexSpace}
      return dim(space(A, idx)), dim(space(A, idx))
 end
 
@@ -46,8 +46,8 @@ Base.lastindex(V::ProductSpace) = typeof(V).parameters[2]
 
 Interface of `AbstractTensorMap`, return the data of a given tensor.
 """
-data(A::AbstractTensorMap{<:GradedSpace}) = A.data
-data(A::AbstractTensorMap{<:Union{CartesianSpace,ComplexSpace}}) = [A.data,]
+data(A::AbstractTensorMap{<:Union{Float64, ComplexF64}, <:GradedSpace}) = A.data
+data(A::AbstractTensorMap{<:Union{Float64, ComplexF64}, <:Union{CartesianSpace,ComplexSpace}}) = [A.data,]
 data(A::TensorKit.AdjointTensorMap) = data(A.parent)
 
 # support nothing initialization when using @reduce

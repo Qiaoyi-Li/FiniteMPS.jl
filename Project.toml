@@ -5,6 +5,7 @@ version = "1.5.0"
 
 [deps]
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
+Bumper = "8ce10254-0962-460f-a3d8-1f77fea1446e"
 Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 Graphs = "86223c79-3864-5bf0-83f7-82e725a168b6"
 KrylovKit = "0b1a1467-8014-51b9-945f-bf0ae24f4b77"
@@ -18,12 +19,12 @@ TimerOutputs = "a759f4b9-e2f1-59dc-863e-4aeb61b1ea8f"
 
 [compat]
 AbstractTrees = "0.4.5"
+Bumper = "0.7.1"
+Graphs = "1.12"
 KrylovKit = "0.8"
-TensorKit = "0.12.1 - 0.12.7"
+MetaGraphs = "0.8"
 Reexport = "1.2.2"
 SerializedElementArrays = "0.1.0"
+TensorKit = "0.14.0"
 TimerOutputs = "0.5.23"
 julia = "1.9"
-Graphs = "1.12"
-MetaGraphs = "0.8"
-
