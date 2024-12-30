@@ -68,12 +68,13 @@ include("Environment/scalar.jl")
 include("Environment/connection.jl")
 
 # Projective Hamiltonian
-export AbstractProjectiveHamiltonian, IdentityProjectiveHamiltonian, SparseProjectiveHamiltonian, ProjHam, action2, action1, action0, PreFuseProjectiveHamiltonian
+export AbstractProjectiveHamiltonian, IdentityProjectiveHamiltonian, SparseProjectiveHamiltonian, ProjHam, action2, action1, action0, action, PreFuseProjectiveHamiltonian
 include("ProjectiveHam/ProjectiveHam.jl")
 include("ProjectiveHam/prefuse.jl")
 include("ProjectiveHam/action2.jl")
 include("ProjectiveHam/action1.jl")
 include("ProjectiveHam/action0.jl")
+include("ProjectiveHam/action.jl")
 
 
 # Algebra operations

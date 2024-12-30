@@ -22,6 +22,10 @@ function convert(::Type{LanczosInfo}, Info::KrylovKit.ConvergenceInfo)
      end
      return LanczosInfo(Info.converged > 0, normres, Info.numiter, Info.numops)
 end
+function convert(::Type{LanczosInfo}, Info::NamedTuple)
+     # my simple Lanczos 
+     return LanczosInfo(true, Float64[], 1, length(Info.V))
+end
 
 """
      struct BondInfo
