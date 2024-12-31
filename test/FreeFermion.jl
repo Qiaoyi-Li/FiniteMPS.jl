@@ -1,5 +1,6 @@
 # use free fermion DMRG to test if the AutomataMPO works correctly
 using LinearAlgebra: eigvals
+
 function _free_fermion_U1DMRG(Tij::Matrix{T}, a::Int64) where {T<:Union{Float64,ComplexF64}}
      @assert a in [1, 2] # 2 ways to add terms
      @assert ishermitian(Tij)
@@ -81,7 +82,7 @@ function _free_fermion_U1U1DMRG(T₊::Matrix{T}, T₋::Matrix{T}, a::Int64) wher
      Env = Environment(Ψ', H, Ψ)
      Eg = 0.0
      for _ in 1:10
-          info, _ = DMRGSweep2!(Env; trunc=truncdim(64))
+          info, _ = DMRGSweep2!(Env; trunc=truncdim(128))
           Eg = info[2][1].Eg
      end
 
