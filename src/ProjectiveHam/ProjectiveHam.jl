@@ -18,7 +18,9 @@ mutable struct SimpleProjectiveHamiltonian{N} <: AbstractProjectiveHamiltonian
 		obj = new{N}(El, Er, Tuple(H), AbstractTensorMap[])
 
 		# clean 
-		finalizer(x -> empty!(x.cache), obj)
+		finalizer(obj) do o
+			empty!(o.cache)
+		end
 		return obj
 	end
 end
@@ -309,11 +311,47 @@ function _countIntr(El::SparseLeftTensor, Er::SparseRightTensor, H::NTuple{2, Sp
 
 		cost = rank(El[i]) + rank(Er[k])
 		if !isa(H[1][i, j], IdentityOperator)
-			cost += rank(H[1][i, j]) - 2
+			cost += rank(H[1][i, j]) - 1
 		end
 		if !isa(H[2][j, k], IdentityOperator)
-			cost += rank(H[2][j, k]) - 2
+			cost += rank(H[2][j, k]) - 1
 		end
+		push!(lscost, cost)
+	end
+	# sort
+	perms = sortperm(lscost; rev = true)
+	return validIdx[perms]
+end
+
+function _countIntr(El::SparseLeftTensor, Er::SparseRightTensor, H::NTuple{1, SparseMPOTensor})
+	# count the valid interactions
+	validIdx = NTuple{2, Int64}[]
+	lscost = Int64[]
+	for i in 1:length(El), j in 1:length(Er)
+		isnothing(El[i]) && continue
+		isnothing(H[1][i, j]) && continue
+		isnothing(Er[j]) && continue
+		push!(validIdx, (i, j))
+
+		cost = rank(El[i]) + rank(Er[j])
+		if !isa(H[1][i, j], IdentityOperator)
+			cost += rank(H[1][i, j]) - 1
+		end
+		push!(lscost, cost)
+	end
+	# sort
+	perms = sortperm(lscost; rev = true)
+	return validIdx[perms]
+end
+
+function _countIntr(El::SparseLeftTensor, Er::SparseRightTensor, ::NTuple{0, SparseMPOTensor})
+	validIdx = Tuple{Int64}[]
+	lscost = Int64[]
+	for i in 1:length(El)
+		isnothing(El[i]) && continue
+		isnothing(Er[i]) && continue
+		push!(validIdx, (i,))
+		cost = rank(El[i]) + rank(Er[i])
 		push!(lscost, cost)
 	end
 	# sort

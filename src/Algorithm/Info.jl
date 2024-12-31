@@ -141,8 +141,8 @@ struct TDVPInfo{N,T}
      dt::T
      Lanczos::LanczosInfo
      Bond::BondInfo
-     function TDVPInfo{N}(dt::Number, Lanczos::LanczosInfo, Bond::BondInfo) where {N}
+     function TDVPInfo{N}(dt::Number, Lanczos, Bond::BondInfo) where {N}
           T = isa(dt, Real) ? Float64 : ComplexF64
-          return new{N,T}(convert(T, dt), Lanczos, Bond)
+          return new{N,T}(convert(T, dt), convert(LanczosInfo, Lanczos), Bond)
      end
 end

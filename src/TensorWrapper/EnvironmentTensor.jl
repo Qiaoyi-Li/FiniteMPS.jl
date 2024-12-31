@@ -171,7 +171,7 @@ function fuse(lsEl::SparseLeftTensor)
      lsV = map(lsIso) do iso
           domain(iso)[1]
      end
-     lsembed = oplusEmbed(lsV; reverse = true)
+     lsembed = oplusEmbed(lsV; rev = true)
      return map(lsIso, lsembed) do iso, embed
           iso * embed
      end

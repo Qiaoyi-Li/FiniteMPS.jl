@@ -20,7 +20,9 @@ Wrap `TDVPSweep1!` with a symmetric integrator, i.e., sweeping from left to righ
 Apply `exp(dt(H - E_shift))` to avoid possible `Inf` in imaginary time evolution. This energy shift is different from `E₀` in projective Hamiltonian, the later will give back the shifted energy thus not altering the final result. Note this is a temporary approach, we intend to store `log(norm)` in MPS to avoid this divergence in the future.
 """
 function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::SweepL2R; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,DenseMPS}}
-     krylovalg = get(kwargs, :krylovalg, TDVPDefaultLanczos)
+     # krylovalg = get(kwargs, :krylovalg, TDVPDefaultLanczos)
+     K = get(kwargs, :K, 32)
+     tol = get(kwargs, :tol, 1e-8)
      trunc = get(kwargs, :trunc, notrunc())
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
@@ -50,7 +52,12 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
           end
 
           @timeit TimerStep "pushEnv" canonicalize!(Env, si)
-          @timeit TimerStep "TDVPUpdate1" x1, Norm, info_Lanczos = _TDVPUpdate1(ProjHam(Env, si; E₀=E₀), Al, dt, krylovalg; kwargs...)
+          PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si], (Env[2][si],), E₀)
+          @timeit TimerStep "TDVPUpdate1" x1, info_Lanczos = LanczosExp(action, Al, dt, PH; K=K, tol=tol, verbose=false)
+          finalize(PH)
+          Norm = norm(x1)
+          rmul!(x1, 1 / Norm)
+          # @timeit TimerStep "TDVPUpdate1" x1, Norm, info_Lanczos = _TDVPUpdate1(ProjHam(Env, si; E₀=E₀), Al, dt, krylovalg; kwargs...)
           rmul!(Ψ, Norm * exp(dt * (E₀ - E_shift)))
 
           if si < L
@@ -62,7 +69,12 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
 
                # backward evolution
                @timeit TimerStep "pushEnv" canonicalize!(Env, si + 1, si)
-               @timeit TimerStep "TDVPUpdate0" S, Norm, info_Lanczos = _TDVPUpdate0(ProjHam(Env, si + 1, si; E₀=E₀), S, -dt, krylovalg; kwargs...)
+               PH = CompositeProjectiveHamiltonian(Env.El[si + 1], Env.Er[si], (), E₀)
+               @timeit TimerStep "TDVPUpdate0" S, info_Lanczos = LanczosExp(action, S, -dt, PH; K=K, tol=tol, verbose=false)
+               finalize(PH)
+               Norm = norm(S)
+               rmul!(S, 1 / Norm)
+               # @timeit TimerStep "TDVPUpdate0" S, Norm, info_Lanczos = _TDVPUpdate0(ProjHam(Env, si + 1, si; E₀=E₀), S, -dt, krylovalg; kwargs...)
                rmul!(Ψ, Norm * exp(-dt * (E₀ - E_shift)))
 
                # next Al
@@ -110,7 +122,9 @@ end
 
 function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::SweepR2L; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,DenseMPS}}
      # right to left sweep
-     krylovalg = get(kwargs, :krylovalg, TDVPDefaultLanczos)
+     # krylovalg = get(kwargs, :krylovalg, TDVPDefaultLanczos)
+     K = get(kwargs, :K, 32)
+     tol = get(kwargs, :tol, 1e-8)
      trunc = get(kwargs, :trunc, notrunc())
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
@@ -140,7 +154,13 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
           end
 
           @timeit TimerStep "pushEnv" canonicalize!(Env, si)
-          @timeit TimerStep "TDVPUpdate1" x1, Norm, info_Lanczos = _TDVPUpdate1(ProjHam(Env, si; E₀=E₀), Ar, dt, krylovalg; kwargs...)
+
+          PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si], (Env[2][si],), E₀)
+          @timeit TimerStep "TDVPUpdate1" x1, info_Lanczos = LanczosExp(action, Ar, dt, PH; K=K, tol=tol, verbose=false)
+          finalize(PH)
+          Norm = norm(x1)
+          rmul!(x1, 1 / Norm)
+          # @timeit TimerStep "TDVPUpdate1" x1, Norm, info_Lanczos = _TDVPUpdate1(ProjHam(Env, si; E₀=E₀), Ar, dt, krylovalg; kwargs...)
           rmul!(Ψ, Norm * exp(dt * (E₀ - E_shift)))
 
           if si > 1
@@ -151,7 +171,13 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
 
                # backward evolution
                @timeit TimerStep "pushEnv" canonicalize!(Env, si, si - 1)
-               @timeit TimerStep "TDVPUpdate0" S, Norm, info_Lanczos = _TDVPUpdate0(ProjHam(Env, si, si - 1; E₀=E₀), S, -dt, krylovalg; kwargs...)
+
+               PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si - 1], (), E₀)
+               @timeit TimerStep "TDVPUpdate0" S, info_Lanczos = LanczosExp(action, S, -dt, PH; K=K, tol=tol, verbose=false)
+               finalize(PH)
+               Norm = norm(S)
+               rmul!(S, 1 / Norm)
+               # @timeit TimerStep "TDVPUpdate0" S, Norm, info_Lanczos = _TDVPUpdate0(ProjHam(Env, si, si - 1; E₀=E₀), S, -dt, krylovalg; kwargs...)
                rmul!(Ψ, Norm * exp(-dt * (E₀-E_shift)))
 
                # next Ar
