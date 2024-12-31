@@ -1,6 +1,8 @@
 using Test
 using FiniteMPS
 
+FiniteMPS.set_num_threads_mkl(1)
+
 # @testset "replace TensorKit" verbose = true begin
 #      include("replaced.jl")
 # end
@@ -19,6 +21,7 @@ end
 
 # test multi-site interaction
 @testset "Multi-site Intr" verbose = true begin
-     include("mulsiteIntr.jl")
+     @testset "spinless" verbose = true include("mulsiteIntr.jl")
+     @testset "spinful" verbose = true include("mulsiteIntr2.jl")
 end
 

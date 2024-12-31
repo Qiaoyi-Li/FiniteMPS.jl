@@ -1,16 +1,12 @@
 using BenchmarkFreeFermions
-using TensorKit
 import LinearAlgebra.Diagonal, LinearAlgebra.det
 using Combinatorics
 
-L = 8 # L must be even here
-D = 512 # ≥ d^(L/2)
+L = 6 # L must be even here
+D = 64 # ≥ d^(L/2)
 tol = 1e-8
-tol4 = 1e-7
+tol4 = 1e-8
 duplicated = true
-
-Hup = 2     # spin-↑ dop(+ hole; - electron)
-Hdn = -1    # spin-↓ dop(+ hole; - electron)
 
 # generate a random TB model
 Tij = rand(ComplexF64, L, L)
@@ -18,8 +14,6 @@ Tij += Tij'
 
 # exact results
 ϵ, V = EigenModes(Tij)
-
-
 
 # =============== DMRG ===============
 Root = InteractionTreeNode()
@@ -320,8 +314,6 @@ function ex_FdagFFdagF(G::Matrix, i::Int, j::Int, k::Int, l::Int)
     end
     return ex
 end
-
-
 
 
 # ================ test ==================
