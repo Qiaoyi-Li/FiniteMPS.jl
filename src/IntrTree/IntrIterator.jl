@@ -63,7 +63,7 @@ struct OnSiteInteractionIterator{L, T} <: AbstractInteractionIterator{L}
           swap::Bool=false,
           Z = nothing) where {L}
           @assert 1 ≤ si ≤ L
-          return OnSiteInteractionIterator{L}(LocalOperator(Op, name, si; swap=swap), Z)
+          return OnSiteInteractionIterator{L}(LocalOperator(Op, name, si, !isnothing(Z); swap=swap), Z)
      end
 end
 function iterate(iter::OnSiteInteractionIterator{L, Nothing}, i::Int64 = 1) where {L} 
@@ -80,7 +80,7 @@ function iterate(iter::OnSiteInteractionIterator{L, <:AbstractTensorMap}, i::Int
      if i == iter.Op.si
           Op_wrap = iter.Op
      elseif i > iter.Op.si
-          Op_wrap = LocalOperator(iter.Z, :Z, i)
+          Op_wrap = LocalOperator(iter.Z, :Z, i, false)
      else
           Op_wrap = IdentityOperator(i)
      end
@@ -142,13 +142,15 @@ struct TwoSiteInteractionIterator{L, T} <: AbstractInteractionIterator{L}
           ) where {L}
           @assert 1 ≤ si[1] ≤ L && 1 ≤ si[2] ≤ L && si[1] ≠ si[2]
           
-          O₁ = LocalOperator(Op[1], name[1], si[1])
+          Zflag = !isnothing(Z)
+
+          O₁ = LocalOperator(Op[1], name[1], si[1], Zflag)
           if si[1] < si[2]
-               O₂ = LocalOperator(Op[2], name[2], si[2])
+               O₂ = LocalOperator(Op[2], name[2], si[2], Zflag)
           else
               # swap if si is not in ascending order
               fac = isnothing(Z) ? 1 : -1
-              O₁, O₂ = _swap(O₁, LocalOperator(fac * Op[2], name[2], si[2]))
+              O₁, O₂ = _swap(O₁, LocalOperator(fac * Op[2], name[2], si[2], Zflag))
           end
           if convertRight
                # convert to right operator, i.e. the horizontal bond is on the left
@@ -176,7 +178,7 @@ function iterate(iter::TwoSiteInteractionIterator{L, <:AbstractTensorMap}, i::In
           # add Z here 
           Op_wrap = _addZ!(iter.O₂, iter.Z) 
      elseif i > iter.O₁.si && i < iter.O₂.si
-          Op_wrap = LocalOperator(iter.Z, :Z, i)
+          Op_wrap = LocalOperator(iter.Z, :Z, i, false)
      else
           Op_wrap = IdentityOperator(i)
      end
@@ -191,6 +193,7 @@ struct ArbitraryInteractionIterator{L} <: AbstractInteractionIterator{L}
      end
      function ArbitraryInteractionIterator(Op::Vector{<:AbstractTensorMap},
           name::Union{String, Symbol})
+          @assert false "# TODO deal with the JW string"
           L = length(Op)
           Op = map(1:L) do i
                LocalOperator(Op[i], name, i)
@@ -208,6 +211,6 @@ function _rightOp(A::LocalOperator{1, 2}, B::LocalOperator{2, 2})
      @tensor AB[f a b; d e] := A.A[a b c] * B.A[c d e f]  
      # QR
      TA, TB = leftorth(AB)
-     return LocalOperator(permute(TA, ((1, 2), (3, 4))), A.name, A.si, A.strength), LocalOperator(permute(TB, ((1, 2), (3, ))), B.name, B.si, B.strength)
+     return LocalOperator(permute(TA, ((1, 2), (3, 4))), A.name, A.si, A.fermionic, A.strength), LocalOperator(permute(TB, ((1, 2), (3, ))), B.name, B.si, B.fermionic, B.strength)
 end
 

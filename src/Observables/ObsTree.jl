@@ -1,20 +1,20 @@
 """
      struct ObservableTree{N}
-          Root::InteractionTreeNode{Tuple{String, Vararg{Int64}}}
+          Root::InteractionTreeNode{Dict{Tuple, String}}
      end
      
-Similar to `InteractionTree` but specially used for calculation of observables. The `value` field is used to tell which observable corresponds to the current node.
+Similar to `InteractionTree` but specially used for calculation of observables. The `value` field is used to tell which observable corresponds to the current node. `N` is used to divide the tree into `N` parts. In most cases, the default `N = 1` is sufficient.
 
 # Constructors
-     ObservableTree{N}()
-Initialize an empty object.
+     ObservableTree{N}() 
+Initialize an empty object. Default `N=1`.
 """
 struct ObservableTree{N}
-     Root::InteractionTreeNode{Tuple{String, Vararg{Int64}}}
+     Root::InteractionTreeNode{Dict{Tuple, String}}
      function ObservableTree{N}() where N
-          Root = InteractionTreeNode{Tuple{String, Vararg{Int64}}}(nothing, ("",), nothing)
+          Root = InteractionTreeNode{Dict{Tuple, String}}(nothing, Dict{Tuple, String}(), nothing)
           for i = 1:N
-               addchild!(Root, InteractionTreeNode{Tuple{String, Vararg{Int64}}}(IdentityOperator(0),("",),nothing))
+               addchild!(Root, InteractionTreeNode{Dict{Tuple, String}}(IdentityOperator(0), Dict{Tuple, String}(),nothing))
           end
           return new{N}(Root)     
      end
@@ -22,26 +22,23 @@ struct ObservableTree{N}
 end
 
 """
-     addObs!(Tree::ObservableTree{M},
+     addObs!(Tree::ObservableTree,
           Op::NTuple{N,AbstractTensorMap},
-          si::NTuple{N,Int64}
+          si::NTuple{N,Int64},
+          fermionic::NTuple{N,Bool},
           n::Int64 = 1; 
-          Z::Union{Nothing,AbstractTensorMap} = nothing,
-          name::NTuple{N,Union{Symbol,String}} = (:A, :B, ...))
+          kwargs...)
 
-Add a term to the `n`-th root of `ObservableTree{M}`. Detailed usage see `addIntr!`. 
-
-Warning: a same `name` can be given to two local operators iff they are exactly the same, otherwise, it will confuse the `convert` function when trying to extract the values stored in the tree to a dictionary. For example, you can simply name `SzSz` correlation as `(:S, :S)`. However this name is inappropriate for `S+S-` correlation. 
-
-Warning: there is a known issue that only one permutation will be calculated if there exist multiple permutations with the same operator and name. For example, if you add `(:Sz,:Sz)` with sites `(1, 2)` and `(2, 1)`, only one of them will appear in the final result. Changing the name to distinguish the 1st and 2nd `Sz` by using e.g. `(:Sz1, :Sz2)` can solve this issue. However, a more elegant solution is to avoid adding both of them as we know the expected value must be the same. Thus, we will not prioritize fixing this issue in the near future.
+Add a term to the `n`-th root of `ObservableTree`. This function is a wrapper of `addIntr!` with `Obs = true`. Detailed usage please refer to `addIntr!`. 
 """
 function addObs!(Tree::ObservableTree{M},
      Op::NTuple{N,AbstractTensorMap},
      si::NTuple{N,Int64},
+     fermionic::NTuple{N,Bool},
      n::Int64 = 1; 
      kwargs...) where {N, M}
      @assert n ≤ M
-     return addIntr!(Tree.Root.children[n], Op, si, 1; Obs = true, kwargs...)
+     return addIntr!(Tree.Root.children[n], Op, si, fermionic, 1; Obs = true, kwargs...)
 end
 function addObs!(Tree::ObservableTree,
      Op::AbstractTensorMap,

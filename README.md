@@ -130,7 +130,7 @@ Then, you can use a similar interface `addObs!` to generate the tree that stores
 Tree = ObservableTree()
 # all to all spin correlation
 for i in 1:L, j in i + 1:L
-     addObs!(Tree, (U₁Spin.Sz, U₁Spin.Sz), (i, j); name = (:Sz, :Sz))
+     addObs!(Tree, (U₁Spin.Sz, U₁Spin.Sz), (i, j), (false, false); name = (:Sz, :Sz))
 end
 # local moment
 for i in 1:L

@@ -73,8 +73,10 @@ function addITP2!(G::ImagTimeProxyGraph{L},
      end
      G.Refs[ITPname][si] = Ref{ValueType}()
 
-     O₁ = OnSiteInteractionIterator{L}(_rightOp(LocalOperator(Op[1], Opname[1], si[1])), Z)
-     O₂ = OnSiteInteractionIterator{L}(_rightOp(LocalOperator(Op[2], Opname[2], si[2])), Z)
+     Zflag = !isnothing(Z)
+
+     O₁ = OnSiteInteractionIterator{L}(_rightOp(LocalOperator(Op[1], Opname[1], si[1], Zflag)), Z)
+     O₂ = OnSiteInteractionIterator{L}(_rightOp(LocalOperator(Op[2], Opname[2], si[2], Zflag)), Z)
      if merge
           return _addITP_merge!(G, O₁, O₂, G.Refs[ITPname][si])
      else

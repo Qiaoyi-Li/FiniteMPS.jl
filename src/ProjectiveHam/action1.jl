@@ -200,6 +200,11 @@ function _action1(x::MPSTensor{3}, El::LocalLeftTensor{2}, H::LocalOperator{1,2}
      return Hx
 end
 
+function _action1(x::MPSTensor{3}, El::LocalLeftTensor{3}, H::LocalOperator{2,2}, Er::LocalRightTensor{3}; kwargs...)
+     @tensor Hx[a d; f] := El.A[a b c] * x.A[c e h] * H.A[b d e g] * Er.A[h g f]
+     return rmul!(Hx, H.strength)
+end
+
 # ========================= rank-4 MPO tensor ========================
 #          i(d)
 #           |

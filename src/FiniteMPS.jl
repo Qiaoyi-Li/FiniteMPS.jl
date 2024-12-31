@@ -30,7 +30,7 @@ include("utils/oplus.jl")
 include("utils/Direction.jl")
 
 # Wrapper types for classifying tensors
-export AbstractTensorWrapper, AbstractMPSTensor, MPSTensor, CompositeMPSTensor, AdjointMPSTensor, AbstractEnvironmentTensor, LocalLeftTensor, LocalRightTensor, SimpleLeftTensor, SimpleRightTensor, SparseLeftTensor, SparseRightTensor, BilayerLeftTensor, BilayerRightTensor, AbstractLocalOperator, hastag, getPhysSpace, getOpName, IdentityOperator, tag2Tuple, LocalOperator, SparseMPOTensor, AbstractStoreType, StoreMemory, StoreDisk, LeftPreFuseTensor, SparseLeftPreFuseTensor, noise!
+export AbstractTensorWrapper, AbstractMPSTensor, MPSTensor, CompositeMPSTensor, AdjointMPSTensor, AbstractEnvironmentTensor, LocalLeftTensor, LocalRightTensor, SimpleLeftTensor, SimpleRightTensor, SparseLeftTensor, SparseRightTensor, BilayerLeftTensor, BilayerRightTensor, AbstractLocalOperator, hastag, getPhysSpace, getOpName, isfermionic, IdentityOperator, tag2Tuple, LocalOperator, StringOperator, SparseMPOTensor, AbstractStoreType, StoreMemory, StoreDisk, LeftPreFuseTensor, SparseLeftPreFuseTensor, noise!
 include("TensorWrapper/TensorWrapper.jl")
 include("TensorWrapper/MPSTensor.jl")
 include("TensorWrapper/CompositeMPSTensor.jl")
@@ -38,6 +38,7 @@ include("TensorWrapper/AdjointMPSTensor.jl")
 include("TensorWrapper/EnvironmentTensor.jl")
 include("TensorWrapper/BilayerEnvTensor.jl")
 include("TensorWrapper/LocalOperator.jl")
+include("TensorWrapper/StringOperator.jl")
 include("TensorWrapper/SparseMPOTensor.jl")
 include("TensorWrapper/StoreType.jl")
 include("TensorWrapper/PreFuseTensor.jl")
@@ -76,7 +77,6 @@ include("ProjectiveHam/action1.jl")
 include("ProjectiveHam/action0.jl")
 include("ProjectiveHam/action.jl")
 
-
 # Algebra operations
 include("Algebra/inner.jl")
 include("Algebra/mul.jl")
@@ -98,7 +98,6 @@ include("Algorithm/CBE/finalselect.jl")
 include("Algorithm/CBE/SparseSVD.jl")
 include("Algorithm/CBE/CBEAlgorithm.jl")
 include("Algorithm/CBE/CBE.jl")
-
 
 
 # Interaction tree for generating Hamiltonian MPO and calculate observables
@@ -124,7 +123,7 @@ include("Observables/pushleft.jl")
 include("Observables/pushright.jl")
 
 # predefined local spaces
-export SU₂Spin, SU2Spin, U₁Spin, U1Spin, NoSymSpinOneHalf, U₁SU₂Fermion, U1SU2Fermion, ℤ₂SU₂Fermion, Z2SU2Fermion, U₁SpinlessFermion, U1SpinlessFermion, U₁SU₂tJFermion, U1SU2tJFermion, U₁U₁Fermion, U1U1Fermion, U₁U₁tJFermion, U1U1tJFermion
+export SU₂Spin, SU2Spin, U₁Spin, U1Spin, NoSymSpinOneHalf, U₁SU₂Fermion, U1SU2Fermion, ℤ₂SU₂Fermion, Z2SU2Fermion, U₁SpinlessFermion, U1SpinlessFermion, U₁SU₂tJFermion, U1SU2tJFermion, U₁U₁Fermion, U1U1Fermion, U₁U₁tJFermion, U1U1tJFermion, ℤ₂SU₂tJFermion, Z2SU2tJFermion
 include("LocalSpace/Spin.jl")
 include("LocalSpace/Fermion.jl")
 include("LocalSpace/tJFermion.jl")
