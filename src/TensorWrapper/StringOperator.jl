@@ -1,3 +1,22 @@
+"""
+     mutable struct StringOperator
+          Ops::Vector{AbstractLocalOperator}
+          strength::Number
+     end
+
+Concrete type for an arbitrary string operator. The `Ops` field stores the local operators and `strength` is the overall strength.
+
+# Constructor
+     StringOperator(Ops::AbstractVector{<:AbstractLocalOperator}, strength::Number = 1.0) 
+     StringOperator(Ops::AbstractLocalOperator..., strength::Number = 1.0)
+     
+# key methods 
+     sort!(Ops::StringOperator)
+Sort the operators by their site index in ascending order. Note the fermionic sign will be considered if necessary and will be absorbed into the `strength`.
+
+     reduce!(Ops::StringOperator)
+Reduce the string operator to a shorter one by numerically performing the composition of operators at the same site. Note this function can only be applied to a sorted string operator.
+"""
 mutable struct StringOperator
      Ops::Vector{AbstractLocalOperator}
      strength::Number

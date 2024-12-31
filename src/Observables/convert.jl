@@ -1,3 +1,8 @@
+"""
+	convert(T::Type, Tree::ObservableTree; kwargs...)
+
+Collect the observables from the tree and store them in a dictionary or a named tuple. Current valid types are `Dict` and `NamedTuple`.  
+"""
 function convert(::Type{Dict}, Root::InteractionTreeNode; kwargs...)
 
 	T = Dict{Tuple{Vararg{Int64}}, Number}

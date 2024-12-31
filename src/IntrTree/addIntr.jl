@@ -2,55 +2,28 @@
 	 addIntr!(Root::InteractionTreeNode,
 		  Op::NTuple{N,AbstractTensorMap},
 		  si::NTuple{N,Int64},
+		  fermionic::NTuple{N,Bool},
 		  strength::Number;
 		  kwargs...) 
 
-Generic function to add an N-site interaction via `addIntr1!`, `addIntr2!` and `addIntr4!`.
+Generic function to add an N-site interaction. `fermionic` is a tuple of bools indicating whether the corresponding operator is fermionic. If any operator is fermionic, `Z` should be provided via kwargs. For example, `addIntr!(Root, (A, B), (i, j), (false, false), s)` will add a bosonic two-site term `sAᵢBⱼ` between site `i` and `j`. 
 
 # Kwargs
-	 Z::Union{Nothing,AbstractTensorMap}=nothing
-	 name::NTuple{N,Union{Symbol,String}}
+	Z::Union{Nothing, AbstractTensorMap, Vector{<:AbstractTensorMap}} = nothing
+`Z = nothing` means all operators are bosonic. A single `Z::AbstractTensorMap` means all sites share the same `Z`. For systems with mixed physical spaces, please provide a vector of `Z` with length equal to the system size. 
 
-Detailed usage of kwargs see `addIntr1!`, `addIntr2!` and `addIntr4!`.
+	pspace::Union{Nothing, VectorSpace, Vector{<:VectorSpace}} = nothing
+The physical space of each site. If `pspace == nothing`, program will try to deduce it from `Z` or the first operator, which works in most cases.    
 
-	 Obs::Bool = false
-`Obs == true` means this interaction is used for calculating observables, and thus the `name` and `si` information will be stored in the last node additionally.   
+	Obs::Bool = false
+This kwarg is usually added automatically by `addObs!`. `Obs == true` means this term is used for calculating observables. When adding an interaction twice, `Obs = true` will not result in a doubling of strength, and vice versa. Moreover, the information such as `name` and `si` will be stored in the leaf node additionally. 
+
+	name::NTuple{N,Union{Symbol,String}} = (:A, :B, :C, ...)
+Give a name to each operator. If `Obs == true`, the name to label the observable will be its string product. For example, setting `name = (:S, :S)` will label the observable as `"SS"`.
+
+	value = nothing
+Used for collecting observables from the tree via `convert` function, `DO NOT` set it manually. 
 """
-# function addIntr!(Root::InteractionTreeNode,
-# 	Op::NTuple{1, AbstractTensorMap},
-# 	si::NTuple{1, Int64},
-# 	strength::Number;
-# 	kwargs...)
-# 	return addIntr1!(Root, Op[1], si[1], strength; kwargs...)
-# end
-# function addIntr!(Root::InteractionTreeNode,
-# 	Op::AbstractTensorMap,
-# 	si::Int64,
-# 	strength::Number;
-# 	kwargs...)
-# 	return addIntr1!(Root, Op, si, strength; kwargs...)
-# end
-# function addIntr!(Root::InteractionTreeNode,
-# 	Op::NTuple{2, AbstractTensorMap},
-# 	si::NTuple{2, Int64},
-# 	strength::Number;
-# 	kwargs...)
-# 	return addIntr2!(Root, Op, si, strength; kwargs...)
-# end
-# function addIntr!(Root::InteractionTreeNode,
-# 	Op::NTuple{3, AbstractTensorMap},
-# 	si::NTuple{3, Int64},
-# 	strength::Number;
-# 	kwargs...)
-# 	return addIntr3!(Root, Op, si, strength; kwargs...)
-# end
-# function addIntr!(Root::InteractionTreeNode,
-# 	Op::NTuple{4, AbstractTensorMap},
-# 	si::NTuple{4, Int64},
-# 	strength::Number;
-# 	kwargs...)
-# 	return addIntr4!(Root, Op, si, strength; kwargs...)
-# end
 function addIntr!(Root::InteractionTreeNode,
 	Op::NTuple{N, AbstractTensorMap},
 	si::NTuple{N, Int64},
@@ -80,6 +53,7 @@ function addIntr!(Root::InteractionTreeNode,
 	return addIntr!(Root, S, Z; value = value, pspace = pspace)
 
 end
+addIntr!(Tree::InteractionTree, args...; kwargs...) = addIntr!(Tree.Root, args...; kwargs...)
 function addIntr!(Root::InteractionTreeNode,
      Op::AbstractTensorMap,
      si::Int64,
@@ -90,7 +64,6 @@ function addIntr!(Root::InteractionTreeNode,
 	value = Obs ? (si,) => string(name) : nothing)
      return addIntr!(Root, (Op,), (si,), (false,), strength; Obs = Obs, pspace = pspace, name = (name,), value = value)
 end
-
 function addIntr!(Root::InteractionTreeNode,
 	S::StringOperator,
 	Z::Union{Nothing, AbstractTensorMap, Vector{<:AbstractTensorMap}};

@@ -75,7 +75,6 @@ include("ProjectiveHam/action2.jl")
 include("ProjectiveHam/action1.jl")
 include("ProjectiveHam/action0.jl")
 
-
 # Algebra operations
 include("Algebra/inner.jl")
 include("Algebra/mul.jl")
@@ -99,14 +98,12 @@ include("Algorithm/CBE/CBEAlgorithm.jl")
 include("Algorithm/CBE/CBE.jl")
 
 
-
 # Interaction tree for generating Hamiltonian MPO and calculate observables
-export InteractionTreeNode, InteractionTree, addchild!, addIntr!, addIntr1!, addIntr2!, addIntr3!, addIntr4!, AutomataMPO, AbstractInteractionIterator, OnSiteInteractionIterator, TwoSiteInteractionIterator, ArbitraryInteractionIterator
+export InteractionTreeNode, InteractionTree, addchild!, addIntr!, addIntr1!, addIntr2!, addIntr4!, AutomataMPO, AbstractInteractionIterator, OnSiteInteractionIterator, TwoSiteInteractionIterator, ArbitraryInteractionIterator
 include("IntrTree/Node.jl")
 include("IntrTree/addIntr.jl")
 include("IntrTree/addIntr1.jl")
 include("IntrTree/addIntr2.jl")
-include("IntrTree/addIntr3.jl")
 include("IntrTree/addIntr4.jl")
 include("IntrTree/Automata.jl")
 include("IntrTree/IntrIterator.jl")
