@@ -1,10 +1,12 @@
 using BenchmarkFreeFermions
 using TensorKit
-import LinearAlgebra.Diagonal
+import LinearAlgebra.Diagonal, LinearAlgebra.det
+using Combinatorics
 
 L = 8 # L must be even here
 D = 512 # ≥ d^(L/2)
 tol = 1e-8
+tol4 = 1e-7
 duplicated = true
 
 Hup = 2     # spin-↑ dop(+ hole; - electron)
@@ -90,48 +92,27 @@ function singreen(φL::AbstractVecOrMat{T1}, φR::AbstractVecOrMat{T2}) where {T
         rethrow(e)
     end
 end
-# const term (from e.g. c_i c†_j = δ_{ij} - c†_j c_i)
-function expectation(::AbstractVecOrMat{T1}, O::Number, ::AbstractVecOrMat{T2}) where {T1, T2}
-    return O
-end
-# expectation of monomer operator O = O_{ij} c†_i c_j
-function expectation(φ::AbstractVecOrMat{T1}, O::AbstractMatrix{T2}, φ′::AbstractVecOrMat{T3}) where {T1, T2, T3}
-    ((N,M) = size(φ)) == size(φ′) || throw(DimensionMismatch("Mismatched Slater determinant dimensions: $(size(φ)) and $(size(φ′))"))
-    size(O) == (N, N) || throw(DimensionMismatch("Mismatched operator dimensions: $(size(O)) and ($N, $N)"))
-    indices = findall(!iszero, O)
-    G = singreen(φ, φ′)
-    return sum(map(x -> O[x] * G[x], indices))
-end
-# expectation of two-body operator O = O_{ijkl} c†_i c†_j c_k c_l
-function expectation(φ::AbstractVecOrMat{T1}, O::AbstractArray{T2, 4}, φ′::AbstractVecOrMat{T3}) where {T1, T2, T3}
-    function _wick(index::CartesianIndex{4})
-        i = index[1]; j = index[2]; k = index[3]; l = index[4];
-        G = singreen(φ, φ′)
-        return O[index] * (G[j,k] * G[i,l] - G[i,k] * G[j,l])
-    end
-    ((N,M) = size(φ)) == size(φ′) || throw(DimensionMismatch("Mismatched Slater determinant dimensions: $(size(φ)) and $(size(φ′))"))
-    size(O) == (N, N, N, N) || throw(DimensionMismatch("Mismatched operator dimensions: $(size(O)) and ($N, $N, $N, $N)"))
-    indices = findall(!iszero, O)
-    return sum(map(x->_wick(x), indices))
-end
-# expectation of three-body operator O = O_{ijklmn} c†_i c†_j c†_k c_l c_m c_n
-function expectation(φ::AbstractVecOrMat{T1}, O::AbstractArray{T2, 6}, φ′::AbstractVecOrMat{T3}) where {T1, T2, T3}
-    function _wick(index::CartesianIndex{6})
-        i = index[1]; j = index[2]; k = index[3]; l = index[4]; m = index[5]; n = index[6];
-        G = singreen(φ, φ′)
-        return O[index] * (G[k,l] * G[j,m] * G[i,n] + G[k,m] * G[j,n] * G[i,l] + G[k,n] * G[j,l] * G[i,m]
-                         - G[k,l] * G[j,n] * G[i,m] - G[k,m] * G[j,l] * G[i,n] - G[k,n] * G[j,m] * G[i,l])
-    end
-    ((N,M) = size(φ)) == size(φ′) || throw(DimensionMismatch("Mismatched Slater determinant dimensions: $(size(φ)) and $(size(φ′))"))
-    size(O) == (N, N, N, N, N, N) || throw(DimensionMismatch("Mismatched operator dimensions: $(size(O)) and ($N, $N, $N, $N, $N, $N)"))
-    indices = findall(!iszero, O)
-    return sum(map(x->_wick(x), indices))
-end
-# generic interface of `expectation`, O = O1_{ij} + O2_{ijkl} + O3_{ijklmn} + ⋯ --> (O1, O2, O3, ⋯)
-function expectation(φ::AbstractVecOrMat{T1}, O::NTuple{N, Union{Number, AbstractArray{T2}}}, φ′::AbstractVecOrMat{T3}) where {T1, T2, T3, N}
-    return sum(map(op->expectation(φ, op, φ′), O))
-end
 
+function wick(G::Matrix, i::Int, j::Int, k::Int, l::Int)
+    return G[j,k] * G[i,l] - G[i,k] * G[j,l]
+end
+function wick(G::Matrix, i::Int, j::Int, k::Int, l::Int, m::Int, n::Int)
+    return G[k,l] * G[j,m] * G[i,n] + G[k,m] * G[j,n] * G[i,l] + G[k,n] * G[j,l] * G[i,m] - G[k,l] * G[j,n] * G[i,m] - G[k,m] * G[j,l] * G[i,n] - G[k,n] * G[j,m] * G[i,l]
+end
+function wick(G::Matrix, i::Int, j::Int, k::Int, l::Int, m::Int, n::Int, p::Int, q::Int)
+    index_index_permutation = collect(permutations(1:4))
+    index = (m, n, p, q)
+    return sum((_permutation_sign(x)*G[l,index[x[1]]]*G[k,index[x[2]]]*G[j,index[x[3]]]*G[i,index[x[4]]] for x in index_index_permutation))
+end
+function _permutation_sign(p)
+    n = length(p)
+    @assert Set(p) == Set(1:n)
+    perm_matrix = zeros(Int, n, n)
+    for (i, val) in enumerate(p)
+        perm_matrix[i, val] = 1
+    end
+    return det(perm_matrix) == 1 ? 1 : -1
+end
 
 function PauliMatrix()
     σx = zeros(2, 2)
@@ -146,58 +127,201 @@ function PauliMatrix()
     return σx, σy, σz
 end
 
-
 # operators
-function op_n(i::Int)
-    op1 = zeros(2*L, 2*L)
-    op1[i, i] += 1
-    op1[i+L, i+L] += 1
-    return op1
-end
-function op_nn(i::Int, j::Int)
-    op2 = zeros(2*L, 2*L, 2*L, 2*L)
-    op2[i,j,i,j] -=1
-    op2[i,j+L,i,j+L] -= 1
-    op2[i+L,j,i+L,j] -= 1
-    op2[i+L,j+L,i+L,j+L] -= 1
+function ex_n(G::Matrix, i::Int)
+    ex = 0
+    for σ1=1:2
+        i1 = i + (σ1-1)*L
 
-    if i != j
-        return op2
-    else
-        return (op_n(i), op2)
+        ex += G[i1,i1]
     end
+    return ex
 end
-function op_SS(i::Int, j::Int)
-    σx, σy, σz = PauliMatrix()
+function ex_nn(G::Matrix, i::Int, j::Int)
+    ex = 0
+    for σ1=1:2, σ2=1:2
+        i1 = i+(σ1-1)*L; j2 = j+(σ2-1)*L;
 
-    op1 = zeros(2*L, 2*L)
-    op2 = zeros(2*L, 2*L, 2*L, 2*L)
+        ex -= wick(G, i1, j2, i1, j2)
+
+        if (i==j) && (σ1==σ2)
+            ex += G[i1, j2]
+        end
+    end
+    return ex
+end
+function ex_SS(G::Matrix, i::Int, j::Int)
+    σx, σy, σz = PauliMatrix()
+    ex = 0
     for σ1=1:2, σ2=1:2, σ3=1:2, σ4=1:2
         value = 1/4 * (σx[σ1, σ2] * σx[σ3, σ4] + σy[σ1, σ2] * σy[σ3, σ4] + σz[σ1, σ2] * σz[σ3, σ4])
-        if i == j && σ2 == σ3
-            op1[i+(σ1-1)*L, j+(σ4-1)*L] += value
-        end
-        op2[i+(σ1-1)*L, j+(σ3-1)*L, i+(σ2-1)*L, j+(σ4-1)*L] -= value
-    end
+        i1 = i+(σ1-1)*L; j3 = j+(σ3-1)*L; i2 = i+(σ2-1)*L; j4 = j+(σ4-1)*L;
 
-    return (op1, op2)
-end
-function op_FdagF(i::Int, j::Int)
-    op1 = zeros(2*L, 2*L)
-    op1[i, j] += 1
-    op1[i+L, j+L] += 1
-    return op1
-end
-function op_FFdag(i::Int, j::Int)
-    op1 = zeros(2*L, 2*L)
-    op1[j, i] -= 1
-    op1[j+L, i+L] -= 1
-    if i != j
-        return op1
-    else
-        return (2, op1)
+        ex -= value * wick(G, i1,j3,i2,j4)
+
+        if (i==j) && (σ2==σ3)
+            ex += value * G[i1, j4]
+        end
     end
+    return ex
 end
+function ex_FdagF(G::Matrix, i::Int, j::Int)
+    ex = 0
+    for σ1=1:2
+        i1 = i+(σ1-1)*L; j1 = j+(σ1-1)*L;
+
+        ex += G[i1, j1]
+    end
+    return ex
+end
+function ex_FFdag(G::Matrix, i::Int, j::Int)
+    ex = 0
+    for σ1=1:2
+        i1 = i+(σ1-1)*L; j1 = j+(σ1-1)*L;
+
+        ex -= G[j1, i1]
+
+        if (i==j)
+            ex += 1
+        end
+    end
+    return ex
+end
+function ex_nnn(G::Matrix, i::Int, j::Int, k::Int)
+    ex = 0
+    for σ1=1:2, σ2=1:2, σ3=1:2
+        i1 = i + (σ1-1)*L; j2 = j+(σ2-1)*L; k3 = k+(σ3-1)*L;
+
+        ex -= wick(G, i1, j2, k3, i1, j2, k3)
+
+        if (i==j) && (σ1==σ2)
+            ex -= wick(G, i1, k3, j2, k3)
+        end
+        if (j==k) && (σ2==σ3)
+            ex -= wick(G, i1,j2,i1,k3)
+        end
+        if (i==k) && (σ1==σ3)
+            ex += wick(G, i1, j2, j2, k3)
+        end
+
+        if (i==j==k) && (σ1==σ2==σ3)
+            ex += G[i1,k3]
+        end
+    end
+    return ex
+end
+function ex_SSS(G::Matrix, i::Int, j::Int, k::Int)
+    σx, σy, σz = PauliMatrix()
+    ex = 0
+    for σ1=1:2, σ2=1:2, σ3=1:2, σ4=1:2, σ5=1:2, σ6=1:2
+        value = 1/8 * (σx[σ1, σ2] * σy[σ3, σ4] * σz[σ5, σ6]
+                     + σy[σ1, σ2] * σz[σ3, σ4] * σx[σ5, σ6]
+                     + σz[σ1, σ2] * σx[σ3, σ4] * σy[σ5, σ6]
+                     - σz[σ1, σ2] * σy[σ3, σ4] * σx[σ5, σ6]
+                     - σy[σ1, σ2] * σx[σ3, σ4] * σz[σ5, σ6]
+                     - σx[σ1, σ2] * σz[σ3, σ4] * σy[σ5, σ6])
+        i1 = i+(σ1-1)*L; i2 = i+(σ2-1)*L; j3 = j+(σ3-1)*L; j4 = j+(σ4-1)*L; k5 = k+(σ5-1)*L; k6 = k+(σ6-1)*L;
+
+        ex -= value * wick(G, i1, j3, k5, i2, j4, k6)
+
+        if (σ2==σ3) && (i==j)
+            ex -= value * wick(G, i1, k5, j4, k6)
+        end
+        if (σ4==σ5) && (j==k)
+            ex -= value * wick(G, i1, j3, i2, k6)
+        end
+        if (σ2==σ5) && (i==k)
+            ex += value * wick(G, i1, j3, j4, k6)
+        end
+
+        if (σ2==σ3) && (σ4==σ5) && (i==j==k)
+            ex += value * G[i1, k6]
+        end
+    end
+    return ex
+end
+function ex_FdagFn(G::Matrix, i::Int, j::Int, k::Int)
+    ex = 0
+    for σ1 = 1:2, σ2 = 1:2
+        i1 = i+(σ1-1)*L; j1 = j+(σ1-1)*L; k2 = k+(σ2-1)*L;
+
+        ex -= wick(G, i1, k2, j1, k2)
+
+        if (σ1==σ2) && (j==k)
+            ex += G[i1,k2]
+        end
+    end
+    return ex
+end
+function ex_nnnn(G::Matrix, i::Int, j::Int, k::Int, l::Int)
+    ex = 0
+    for σ1 = 1:2, σ2 = 1:2, σ3 = 1:2, σ4 = 1:2
+        i1 = i+(σ1-1)*L; j2 = j+(σ2-1)*L; k3 = k+(σ3-1)*L; l4 = l+(σ4-1)*L;
+
+        ex += wick(G, i1, j2, k3, l4, i1, j2, k3, l4)
+
+        if (i==j) && (σ1==σ2)
+            ex -= wick(G, i1, k3, l4, j2, k3, l4)
+        end
+        if (j==k) && (σ2==σ3)
+            ex -= wick(G, i1, j2, l4, i1, k3, l4)
+        end
+        if (k==l) && (σ3==σ4)
+            ex -= wick(G, i1, j2, k3, i1, j2, l4)
+        end
+        if (l==i) && (σ4==σ1)
+            ex -= wick(G, i1, j2, k3, j2, k3, l4)
+        end
+        if (i==k) && (σ1==σ3)
+            ex += wick(G, i1, j2, l4, j2, k3, l4)
+        end
+        if (j==l) && (σ2==σ4)
+            ex += wick(G, i1, j2, k3, i1, k3, l4)
+        end
+
+        if (i==j==k) && (σ1==σ2==σ3)
+            ex -= wick(G, i1, l4, k3, l4)
+        end
+        if (i==j) && (k==l) && (σ1==σ2) && (σ3==σ4)
+            ex -= wick(G, i1, k3, j2, l4)
+        end
+        if (j==k==l) && (σ2==σ3==σ4)
+            ex -= wick(G, i1, j2, i1, l4)
+        end
+        if (i==k) && (j==l) && (σ1==σ3) && (σ2==σ4)
+            ex -= wick(G, i1, j2, k3, l4)
+        end
+        if (i==j==l) && (σ1==σ2==σ4)
+            ex += wick(G, i1, k3, k3, l4)
+        end
+        if (i==l) && (j==k) && (σ1==σ4) && (σ2==σ3)
+            ex += wick(G, i1, j2, k3, l4)
+        end
+        if (i==k==l) && (σ1==σ3==σ4)
+            ex += wick(G, i1, j2, j2, l4)
+        end
+
+        if (i==j==k==l) && (σ1==σ2==σ3==σ4)
+            ex += G[i1, l4]
+        end
+    end
+    return ex
+end
+function ex_FdagFFdagF(G::Matrix, i::Int, j::Int, k::Int, l::Int)
+    ex = 0
+    for σ1 = 1:2, σ2 = 1:2
+        i1 = i+(σ1-1)*L; j1 = j+(σ1-1)*L; k2 = k+(σ2-1)*L; l2 = l+(σ2-1)*L
+
+        ex -= wick(G, i1, k2, j1, l2)
+
+        if (j==k) && (σ1==σ2)
+            ex += G[i1,l2]
+        end
+    end
+    return ex
+end
+
+
 
 
 # ================ test ==================
@@ -205,55 +329,56 @@ end
 ψ_ex = zeros(ComplexF64, 2*L, L)
 ψ_ex[1:L, 1:div(L,2)] = V[:, 1:div(L,2)]            # ψup
 ψ_ex[L+1:2*L, div(L,2)+1:L] = V[:, 1:div(L,2)]      # ψdn
-G′ = singreen(ψ_ex, ψ_ex)
+G′ = Matrix(singreen(ψ_ex, ψ_ex))
 
 @testset "Boson-1" begin
 	for i in 1:L
-		@test haskey(Obs.n, (i,)) && abs(Obs.n[(i,)] - expectation(ψ_ex, op_n(i), ψ_ex)) < tol
+		@test haskey(Obs.n, (i,)) && abs(Obs.n[(i,)] - ex_n(G′, i)) < tol
 	end
 end
 
 @testset "Boson-2" begin
 	for i in 1:L, j in 1:L
 		!duplicated && i == j && continue
-		@test haskey(Obs.nn, (i, j)) && abs(Obs.nn[(i, j)] - expectation(ψ_ex, op_nn(i, j), ψ_ex)) < tol
-		@test haskey(Obs.SS, (i, j)) && abs(Obs.SS[(i, j)] - expectation(ψ_ex, op_SS(i, j), ψ_ex)) < tol
+		@test haskey(Obs.nn, (i, j)) && abs(Obs.nn[(i, j)] - ex_nn(G′, i, j)) < tol
+		@test haskey(Obs.SS, (i, j)) && abs(Obs.SS[(i, j)] - ex_SS(G′, i, j)) < tol
 	end
 end
 
 @testset "Fermion-2" begin
 	for i in 1:L, j in 1:L
 		!duplicated && i == j && continue
-		@test haskey(Obs.FdagF, (i, j)) && abs(Obs.FdagF[(i, j)] - expectation(ψ_ex, op_FdagF(i, j), ψ_ex)) < tol
-		@test haskey(Obs.FFdag, (i, j)) && real(Obs.FFdag[(i, j)] - expectation(ψ_ex, op_FFdag(i, j), ψ_ex)) < tol
+		@test haskey(Obs.FdagF, (i, j)) && abs(Obs.FdagF[(i, j)] - ex_FdagF(G′, i, j)) < tol
+		@test haskey(Obs.FFdag, (i, j)) && abs(Obs.FFdag[(i, j)] - ex_FFdag(G′, i, j)) < tol
 	end
 end
 
-# @testset "Boson-3" begin
-# 	for i in 1:L, j in 1:L, k in 1:L
-# 		!duplicated && !allunique([i, j, k]) && continue
-# 		@test haskey(Obs.nnn, (i,j,k)) && abs(Obs.nnn[(i, j, k)] - expectation(ψ_ex, op_nnn(i, j), ψ_ex)) < tol
-# 	end
-# end
+@testset "Boson-3" begin
+	for i in 1:L, j in 1:L, k in 1:L
+		!duplicated && !allunique([i, j, k]) && continue
+		@test haskey(Obs.nnn, (i,j,k)) && abs(Obs.nnn[(i, j, k)] - ex_nnn(G′, i, j, k)) < tol
+		@test haskey(Obs.SSS, (i,j,k)) && abs(im*Obs.SSS[(i, j, k)] - ex_SSS(G′, i, j, k)) < tol
+        allunique([i, j, k]) && @test real(Obs.SSS[(i, j, k)]) < tol
+	end
+end
 
-# @testset "Boson-1-Fermion-2" begin
-# 	for i in 1:L, j in 1:L, k in 1:L
-# 		!duplicated && !allunique([i, j, k]) && continue
-# 		@test haskey(Obs.FdagFn, (i, j, k)) && abs(Obs.FdagFn[(i, j, k)] - expectation(ψ_ex, op_FdagFn(i, j), ψ_ex)) < tol
-# 	end
-# end
+@testset "Boson-1-Fermion-2" begin
+	for i in 1:L, j in 1:L, k in 1:L
+		!duplicated && !allunique([i, j, k]) && continue
+		@test haskey(Obs.FdagFn, (i, j, k)) && abs(Obs.FdagFn[(i, j, k)] - ex_FdagFn(G′, i, j, k)) < tol
+	end
+end
 
-# @testset "Boson-4" begin
-# 	for i in 1:L, j in 1:L, k in 1:L, l in 1:L
-# 		!duplicated && !allunique([i, j, k, l]) && continue
-# 		@test haskey(Obs.nnnn, (i, j, k, l)) && abs(Obs.nnnn[(i, j, k, l)] - expectation(ψ_ex, op_FdagFn(i, j), ψ_ex)) < tol
-# 	end
-# end
+@testset "Boson-4" begin
+	for i in 1:L, j in 1:L, k in 1:L, l in 1:L
+		!duplicated && !allunique([i, j, k, l]) && continue
+		@test haskey(Obs.nnnn, (i, j, k, l)) && abs(Obs.nnnn[(i, j, k, l)] - ex_nnnn(G′, i, j, k, l)) < tol4
+	end
+end
 
-# @testset "Fermion-4" begin
-# 	for i in 1:L, j in 1:L, k in 1:L, l in 1:L
-# 		!duplicated && !allunique([i, j, k, l]) && continue
-# 		@test haskey(Obs.FdagFFdagF, (i, j, k, l)) && abs(Obs.FdagFFdagF[(i, j, k, l)] - expectation(ψ_ex, op_FdagFn(i, j), ψ_ex)) < tol
-# 	end
-# end
-
+@testset "Fermion-4" begin
+	for i in 1:L, j in 1:L, k in 1:L, l in 1:L
+		duplicated && !allunique([i, j, k, l]) && continue
+		@test haskey(Obs.FdagFFdagF, (i, j, k, l)) && abs(Obs.FdagFFdagF[(i, j, k, l)] - ex_FdagFFdagF(G′, i, j, k, l)) < tol4
+	end
+end
