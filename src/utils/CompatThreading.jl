@@ -27,31 +27,15 @@ TensorKit._add_general_kernel!(tdst::AbstractTensorMap, tsrc::AbstractTensorMap,
 
 # multi-threading mul
 using TensorKit: hasblock
-function _blocktask_mul!(c, tA, tB, tC, α, β)
-	if hasblock(tA, c)
-		mul!(block(tC, c),
-			block(tA, c),
-			block(tB, c),
-			α, β)
-	elseif β != one(β)
-		rmul!(block(tC, c), β)
-	end
-	return nothing
-end
-
 function _mul_atomic!(tC::AbstractTensorMap,
 	tA::AbstractTensorMap,
-	tB::AbstractTensorMap, α = true, β = false)
-	if !(codomain(tC) == codomain(tA) && domain(tC) == domain(tB) &&
-		 domain(tA) == codomain(tB))
-		throw(SpaceMismatch("$(space(tC)) ≠ $(space(tA)) * $(space(tB))"))
-	end
+	tB::AbstractTensorMap, α::Number = 1.0, β::Number = 0.0)
+	TensorKit.compose(space(tA), space(tB)) == space(tC) ||
+		throw(SpaceMismatch(lazy"$(space(tC)) ≠ $(space(tA)) * $(space(tB))"))
 
 	ntasks = get_num_threads_mul()
 	if ntasks == 1 || !isa(blocksectors(tC), AbstractVector) || length(blocksectors(tC)) == 1
-		for c in blocksectors(tC)
-			_blocktask_mul!(c, tA, tB, tC, α, β)
-		end
+		return _mul_serial!(tC, tA, tB, α, β)
 	else
 		# sort sectors by size
 		function blockcost(c)
@@ -65,19 +49,71 @@ function _mul_atomic!(tC::AbstractTensorMap,
 
 		idx = Threads.Atomic{Int64}(1)
 		Threads.@sync for _ in 1:ntasks
-			Threads.@spawn while true
+			t = Threads.@spawn while true
 				i = Threads.atomic_add!(idx, 1)
 				i > length(sortedsectors) && break
-				_blocktask_mul!(sortedsectors[i], tA, tB, tC, α, β)
-			end
-		end
 
+				c = sortedsectors[i]
+				if hasblock(tA, c)
+					mul!(block(tC, c),
+						block(tA, c),
+						block(tB, c),
+						α, β)
+				elseif β != one(β)
+					rmul!(block(tC, c), β)
+				end
+			end
+			errormonitor(t)
+		end
 	end
 
 	return tC
 end
 
-TensorKit.mul!(tC::AbstractTensorMap{<:GradedSpace}, tA::AbstractTensorMap{<:GradedSpace}, tB::AbstractTensorMap{<:GradedSpace}, α, β) = _mul_atomic!(tC, tA, tB, α, β)
+function _mul_serial!(tC::AbstractTensorMap,
+	tA::AbstractTensorMap,
+	tB::AbstractTensorMap, α = 1.0, β = 0.0)
+	# copy from TensorKit.mul!
+
+	iterC = blocks(tC)
+	iterA = blocks(tA)
+	iterB = blocks(tB)
+	nextA = iterate(iterA)
+	nextB = iterate(iterB)
+	nextC = iterate(iterC)
+	while !isnothing(nextC)
+		(cC, C), stateC = nextC
+		if !isnothing(nextA) && !isnothing(nextB)
+			(cA, A), stateA = nextA
+			(cB, B), stateB = nextB
+			if cA == cC && cB == cC
+				mul!(C, A, B, α, β)
+				nextA = iterate(iterA, stateA)
+				nextB = iterate(iterB, stateB)
+				nextC = iterate(iterC, stateC)
+			elseif cA < cC
+				nextA = iterate(iterA, stateA)
+			elseif cB < cC
+				nextB = iterate(iterB, stateB)
+			else
+				if β != one(β)
+					rmul!(C, β)
+				end
+				nextC = iterate(iterC, stateC)
+			end
+		else
+			if β != one(β)
+				rmul!(C, β)
+			end
+			nextC = iterate(iterC, stateC)
+		end
+	end
+	return tC
+end
+
+function TensorKit.mul!(tC::TensorMap{TC, <:GradedSpace}, tA::TensorMap{TA, <:GradedSpace}, tB::TensorMap{TB, <:GradedSpace}, α::Number, β::Number) where {TA <: Union{Float64, ComplexF64}, TB <: Union{Float64, ComplexF64}, TC <: Union{Float64, ComplexF64}}
+	return _mul_atomic!(tC, tA, tB, α, β)
+end
 
 # multi-threading svd
 using TensorKit: SectorDict, MatrixAlgebra
@@ -89,7 +125,7 @@ function _compute_svddata_threads!(t::TensorMap, alg::Union{SVD, SDD})
 		for (c, b) in blocks(t)
 			U, Σ, V = MatrixAlgebra.svd!(b, alg)
 			SVDData[c] = (U, Σ, V)
-               dims[c] = length(Σ)
+			dims[c] = length(Σ)
 		end
 	else
 		# pre allocate
@@ -110,15 +146,6 @@ function _compute_svddata_threads!(t::TensorMap, alg::Union{SVD, SDD})
 		perms = sortperm(blocksectors(t); by = blockcost, rev = true)
 		sortedsectors = blocksectors(t)[perms]
 
-		# idx = Threads.Atomic{Int64}(1)
-		# Threads.@sync for _ in 1:ntasks
-		# 	Threads.@spawn while true
-		# 		i = Threads.atomic_add!(idx, 1)
-		# 		i > length(sortedsectors) && break
-
-		# 		_blocktask_svd!(sortedsectors[i], t, Udata, Σdata, Vdata, dims, alg)
-		# 	end
-		# end
 		Threads.@threads :greedy for c in sortedsectors
 			inplace_svd!(SVDData[c][1], SVDData[c][2], SVDData[c][3], block(t, c), alg)
 		end
@@ -129,6 +156,7 @@ end
 TensorKit._compute_svddata!(t::TensorMap{T, <:GradedSpace}, alg::Union{SVD, SDD}) where {T <: Union{Float64, ComplexF64}} = _compute_svddata_threads!(t, alg)
 
 # multi-threading eigh
+# TODO: implement in-place eig
 using TensorKit: similarstoragetype, Diagonal
 function _eigh_atomic!(t::TensorMap)
 	InnerProductStyle(t) === EuclideanProduct() || throw_invalid_innerproduct(:eigh!)
