@@ -75,6 +75,18 @@ struct CheapCBE{T<:SweepDirection} <: CBEAlgorithm{T}
      end
 end
 
+struct NaiveCBE{T<:SweepDirection} <: CBEAlgorithm{T}
+     D::Int64
+     tol::Float64
+     check::Bool
+     function NaiveCBE(D::Int64, tol::Float64, direction::T = AnyDirection(); check::Bool = false) where T <: SweepDirection
+          @assert D > 0
+          @assert tol ≥ 0
+          return new{T}(D, tol, check)
+     end
+end
+
+
 # auto convert
 function convert(::Type{CBEAlgorithm{T}}, Alg::NoCBE) where T <: Union{SweepL2R, SweepR2L}
      return NoCBE(T())
@@ -88,6 +100,10 @@ end
 function convert(::Type{CBEAlgorithm{T}}, Alg::CheapCBE{AnyDirection}) where T <: Union{SweepL2R, SweepR2L}
      return CheapCBE(Alg.D, Alg.tol, T(); check=Alg.check)
 end
+function convert(::Type{CBEAlgorithm{T}}, Alg::NaiveCBE{AnyDirection}) where T <: Union{SweepL2R, SweepR2L}
+     return NaiveCBE(Alg.D, Alg.tol, T(); check=Alg.check)
+end
+
 
 """
      struct CBEInfo{N}

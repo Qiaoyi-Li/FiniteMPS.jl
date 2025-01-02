@@ -19,14 +19,18 @@ mutable struct SimpleProjectiveHamiltonian{N} <: AbstractProjectiveHamiltonian
 
 		# clean 
 		finalizer(obj) do o
+			for t in o.cache
+				tensorfree!(t, ManualAllocator())
+			end
 			empty!(o.cache)
+			return nothing
 		end
 		return obj
 	end
 end
 
 mutable struct CompositeProjectiveHamiltonian{L, N} <: AbstractProjectiveHamiltonian
-	# PH::Vector{SimpleProjectiveHamiltonian{L}}
+	PH::Vector{SimpleProjectiveHamiltonian{L}}
 	CI::NTuple{N, Channel}
 	CO::NTuple{N, Channel}
 	tasks::NTuple{N, Task}
@@ -42,6 +46,13 @@ mutable struct CompositeProjectiveHamiltonian{L, N} <: AbstractProjectiveHamilto
 			N = min(get_num_threads_action(), length(validIdx))
 		else
 			@assert false "TODO: multiprocessing!"
+		end
+
+		lsPH = map(validIdx) do idx
+			Hi = map(1:L) do i
+				H[i][idx[i], idx[i+1]]
+			end
+			SimpleProjectiveHamiltonian(El[idx[1]], Er[idx[end]], Hi...)
 		end
 
 		# static distributing
@@ -73,37 +84,37 @@ mutable struct CompositeProjectiveHamiltonian{L, N} <: AbstractProjectiveHamilto
 		# tasks
 		tasks = map(lsids, CI, CO) do ids, c_in, c_out
 			t = Threads.@spawn begin
-				# task local PH 
-				local lsPH = map(validIdx[ids]) do idx
-					Hi = map(1:L) do i
-						H[i][idx[i], idx[i+1]]
-					end
-					SimpleProjectiveHamiltonian(El[idx[1]], Er[idx[end]], Hi...)
-				end
+				# # task local PH 
+				# local lsPH = map(validIdx[ids]) do idx
+				# 	Hi = map(1:L) do i
+				# 		H[i][idx[i], idx[i+1]]
+				# 	end
+				# 	SimpleProjectiveHamiltonian(El[idx[1]], Er[idx[end]], Hi...)
+				# end
 
 				while isopen(c_in)
 					# keep waiting state tensor
 					x = take!(c_in)
 					if isnothing(x)
 						# signal to kill the task
-						for PH in lsPH
-							finalize(PH)
-						end
+						# for PH in lsPH
+						# 	finalize(PH)
+						# end
 						break
 					end
 
 					try
 						# apply the action one by one 
 						s = zero(x)
-						for PH in lsPH
+						for PH in lsPH[ids]
 							add!(s, action(x, PH))
 						end
 						# put the result to c_out 
 						put!(c_out, s)
 					catch e
-						for PH in lsPH
-							finalize(PH)
-						end
+						# for PH in lsPH
+						# 	finalize(PH)
+						# end
 						# put the error to c_out
 						put!(c_out, e)
 						rethrow(e)
@@ -113,7 +124,7 @@ mutable struct CompositeProjectiveHamiltonian{L, N} <: AbstractProjectiveHamilto
                errormonitor(t)
 		end
 
-		obj = new{L, N}(CI, CO, tasks, E₀)
+		obj = new{L, N}(lsPH, CI, CO, tasks, E₀)
 
 		# finalizer 
 		finalizer(obj) do o
@@ -125,6 +136,10 @@ mutable struct CompositeProjectiveHamiltonian{L, N} <: AbstractProjectiveHamilto
 			for c in o.CO
 				Threads.@spawn close(c)
 			end
+			for PH in o.PH
+				finalize(PH)
+			end
+			wait.(o.tasks)
 			return nothing
 		end
 

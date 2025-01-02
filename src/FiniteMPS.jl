@@ -7,7 +7,8 @@ using Graphs, MetaGraphs
 @reexport import SerializedElementArrays: SerializedElementArray, SerializedElementVector
 @reexport using TensorKit, KrylovKit, TensorKit.TensorOperations, TimerOutputs
 @reexport import Base: +, -, *, /, ==, promote_rule, convert, length, show, getindex, setindex!, lastindex, keys, similar, merge, merge!, iterate, complex
-@reexport import TensorKit: ×, one, zero, dim, inner, scalar, domain, codomain, eltype, scalartype, leftorth, rightorth, leftnull, rightnull, tsvd, adjoint, normalize!, norm, axpy!, axpby!, add!, add!!, dot, mul!, rmul!, NoTruncation, fuse, zerovector!, zerovector, scale, scale!, scale!!
+@reexport import TensorKit: ×, one, zero, dim, inner, scalar, domain, codomain, eltype, scalartype, leftorth, rightorth, leftnull, rightnull, tsvd, adjoint, normalize!, norm, axpy!, axpby!, add!, add!!, dot, mul!, rmul!, NoTruncation, fuse, zerovector!, zerovector, scale, scale!, scale!!, fusionblockstructure
+import TensorKit.TensorOperations: tensoralloc, tensoralloc_add, ManualAllocator, tensorfree!
 @reexport import LinearAlgebra: BLAS, rank, qr, diag, I, diagm
 import AbstractTrees: parent, isroot
 import Graphs: rem_vertices!
@@ -22,6 +23,7 @@ export trivial, istrivial, data, UniformDistribution, GaussianDistribution, Norm
 include("utils/trivial.jl")
 include("utils/TensorMap.jl")
 include("utils/Random.jl")
+include("utils/SVD.jl")
 include("utils/CompatThreading.jl")
 include("utils/SerializedElementArrays.jl")
 include("utils/manualGC.jl")
@@ -83,7 +85,8 @@ include("Algebra/mul.jl")
 include("Algebra/axpby.jl")
 
 # Algorithm
-export LanczosInfo, BondInfo, DMRGInfo, TDVPInfo, DMRGSweep2!, DMRGSweep1!, SETTN, TDVPSweep2!, TDVPSweep1!, TDVPIntegrator, SymmetricIntegrator, CBEAlgorithm, NoCBE, FullCBE, StandardCBE, CheapCBE, CBE, LeftOrthComplement, RightOrthComplement
+export LanczosInfo, BondInfo, DMRGInfo, TDVPInfo, DMRGSweep2!, DMRGSweep1!, SETTN, TDVPSweep2!, TDVPSweep1!, TDVPIntegrator, SymmetricIntegrator
+export CBEAlgorithm, NoCBE, FullCBE, StandardCBE, CheapCBE, NaiveCBE, CBE # LeftOrthComplement, RightOrthComplement
 include("Algorithm/Info.jl")
 include("Algorithm/DMRG.jl")
 include("Algorithm/SETTN.jl")
@@ -92,10 +95,10 @@ include("Algorithm/TDVP/TDVP2.jl")
 include("Algorithm/TDVP/TDVP1.jl")
 include("Algorithm/TDVP/Integrator.jl")
 include("Algorithm/CBE/utils.jl")
-include("Algorithm/CBE/OrthComplement.jl")
-include("Algorithm/CBE/preselect.jl")
-include("Algorithm/CBE/finalselect.jl")
-include("Algorithm/CBE/SparseSVD.jl")
+# include("Algorithm/CBE/OrthComplement.jl")
+# include("Algorithm/CBE/preselect.jl")
+# include("Algorithm/CBE/finalselect.jl")
+# include("Algorithm/CBE/SparseSVD.jl")
 include("Algorithm/CBE/CBEAlgorithm.jl")
 include("Algorithm/CBE/CBE.jl")
 

@@ -1,6 +1,6 @@
 mutable struct LeftOrthComplement{N}
-     El::SparseLeftTensor
-     Al::Vector{MPSTensor}
+     El::AbstractTensorMap
+     Al::AbstractTensorMap
      const Al_c::MPSTensor
      function LeftOrthComplement(El::SparseLeftTensor, Al::Vector{MPSTensor}, Al_c::MPSTensor)
           # directly construct
