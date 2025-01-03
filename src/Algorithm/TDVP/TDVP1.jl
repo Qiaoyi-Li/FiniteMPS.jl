@@ -47,13 +47,13 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
           # CBE
           if !isa(CBEAlg, NoCBE) && si < L
                canonicalize!(Env, si, si + 1)
-               @timeit TimerStep "CBE" Al, Ψ[si+1], info_cbe[si] = CBE(ProjHam(Env, si, si + 1; E₀=E₀), Al, Ψ[si+1], CBEAlg)
-               merge!(TimerStep, get_timer("CBE"); tree_point=["CBE"])
+               @timeit TimerStep "CBE" Al, Ψ[si+1], info_cbe[si], TO_CBE = CBE(Al, Ψ[si+1], Env.El[si], Env.Er[si+1], Env[2][si], Env[2][si+1], CBEAlg)
+               merge!(TimerStep, TO_CBE; tree_point=["CBE"])
           end
 
           @timeit TimerStep "pushEnv" canonicalize!(Env, si)
           PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si], (Env[2][si],), E₀)
-          @timeit TimerStep "TDVPUpdate1" x1, info_Lanczos = LanczosExp(action, Al, dt, PH; K=K, tol=tol, verbose=false)
+          @timeit TimerStep "TDVPUpdate1" x1, info_Lanczos = LanczosExp(action, Al, dt, PH, TimerStep; K=K, tol=tol, verbose=false)
           finalize(PH)
           Norm = norm(x1)
           rmul!(x1, 1 / Norm)
@@ -70,7 +70,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
                # backward evolution
                @timeit TimerStep "pushEnv" canonicalize!(Env, si + 1, si)
                PH = CompositeProjectiveHamiltonian(Env.El[si + 1], Env.Er[si], (), E₀)
-               @timeit TimerStep "TDVPUpdate0" S, info_Lanczos = LanczosExp(action, S, -dt, PH; K=K, tol=tol, verbose=false)
+               @timeit TimerStep "TDVPUpdate0" S, info_Lanczos = LanczosExp(action, S, -dt, PH, TimerStep; K=K, tol=tol, verbose=false)
                finalize(PH)
                Norm = norm(S)
                rmul!(S, 1 / Norm)
@@ -95,8 +95,8 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
           GCstep && manualGC(TimerStep)
 
           # show
-          merge!(TimerStep, get_timer("action1"); tree_point=["TDVPUpdate1"])
-          si < L && merge!(TimerStep, get_timer("action0"); tree_point=["TDVPUpdate0"])
+          # merge!(TimerStep, get_timer("action1"); tree_point=["TDVPUpdate1"])
+          # si < L && merge!(TimerStep, get_timer("action0"); tree_point=["TDVPUpdate0"])
           merge!(TimerSweep, TimerStep; tree_point=["TDVPSweep1>>"])
           if verbose ≥ 2
                show(TimerStep; title="site $(si)->")
@@ -149,14 +149,14 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
           # CBE
           if !isa(CBEAlg, NoCBE) && si > 1
                canonicalize!(Env, si - 1, si)
-               @timeit TimerStep "CBE" Ψ[si-1], Ar, info_cbe[si - 1] = CBE(ProjHam(Env, si - 1, si; E₀=E₀), Ψ[si-1], Ar, CBEAlg)
-               merge!(TimerStep, get_timer("CBE"); tree_point=["CBE"])
+               @timeit TimerStep "CBE" Ψ[si-1], Ar, info_cbe[si - 1], TO_CBE = CBE(Ψ[si-1], Ar, Env.El[si-1], Env.Er[si], Env[2][si-1], Env[2][si], CBEAlg)
+               merge!(TimerStep, TO_CBE; tree_point=["CBE"])
           end
 
           @timeit TimerStep "pushEnv" canonicalize!(Env, si)
 
           PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si], (Env[2][si],), E₀)
-          @timeit TimerStep "TDVPUpdate1" x1, info_Lanczos = LanczosExp(action, Ar, dt, PH; K=K, tol=tol, verbose=false)
+          @timeit TimerStep "TDVPUpdate1" x1, info_Lanczos = LanczosExp(action, Ar, dt, PH, TimerStep; K=K, tol=tol, verbose=false)
           finalize(PH)
           Norm = norm(x1)
           rmul!(x1, 1 / Norm)
@@ -173,7 +173,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
                @timeit TimerStep "pushEnv" canonicalize!(Env, si, si - 1)
 
                PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si - 1], (), E₀)
-               @timeit TimerStep "TDVPUpdate0" S, info_Lanczos = LanczosExp(action, S, -dt, PH; K=K, tol=tol, verbose=false)
+               @timeit TimerStep "TDVPUpdate0" S, info_Lanczos = LanczosExp(action, S, -dt, PH, TimerStep; K=K, tol=tol, verbose=false)
                finalize(PH)
                Norm = norm(S)
                rmul!(S, 1 / Norm)
@@ -199,8 +199,8 @@ function TDVPSweep1!(Env::SparseEnvironment{L,3,T}, dt::Number, direction::Sweep
           GCstep && manualGC(TimerStep)
 
           # show
-          merge!(TimerStep, get_timer("action1"); tree_point=["TDVPUpdate1"])
-          si > 1 && merge!(TimerStep, get_timer("action0"); tree_point=["TDVPUpdate0"])
+          # merge!(TimerStep, get_timer("action1"); tree_point=["TDVPUpdate1"])
+          # si > 1 && merge!(TimerStep, get_timer("action0"); tree_point=["TDVPUpdate0"])
           merge!(TimerSweep, TimerStep; tree_point=["TDVPSweep1<<"])
           if verbose ≥ 2
                show(TimerStep; title="site <-$(si)")

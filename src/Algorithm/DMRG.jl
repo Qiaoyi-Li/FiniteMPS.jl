@@ -51,7 +51,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
 
           # @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = _DMRGUpdate2(ProjHam(Env, si, si + 1; E₀=E₀), Al, Ar, krylovalg; kwargs...)
           PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si+1], (Env[2][si], Env[2][si+1]), E₀)
-          @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = LanczosGS(action, CompositeMPSTensor(Al, Ar), PH;
+          @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = LanczosGS(action, CompositeMPSTensor(Al, Ar), PH, TimerStep;
                K = K, tol = tol, verbose = false)
           finalize(PH)
 
@@ -71,7 +71,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
           GCstep && manualGC(TimerStep)
 
           # show
-          merge!(TimerStep, get_timer("action2"); tree_point=["DMRGUpdate2"])
+          # merge!(TimerStep, get_timer("action2"); tree_point=["DMRGUpdate2"])
           merge!(TimerSweep, TimerStep; tree_point=["DMRGSweep2>>"])
           if verbose ≥ 2
                show(TimerStep; title="site $(si)->$(si+1)")
@@ -118,7 +118,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
 
           # @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = _DMRGUpdate2(ProjHam(Env, si - 1, si; E₀=E₀), Al, Ar, krylovalg; kwargs...)
           PH = CompositeProjectiveHamiltonian(Env.El[si-1], Env.Er[si], (Env[2][si-1], Env[2][si]), E₀)
-          @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = LanczosGS(action, CompositeMPSTensor(Al, Ar), PH;
+          @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = LanczosGS(action, CompositeMPSTensor(Al, Ar), PH, TimerStep;
                K = K, tol = tol, verbose = false)
           finalize(PH)
 
@@ -140,7 +140,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
           GCstep && manualGC(TimerStep)
 
           # show
-          merge!(TimerStep, get_timer("action2"); tree_point=["DMRGUpdate2"])
+          # merge!(TimerStep, get_timer("action2"); tree_point=["DMRGUpdate2"])
           merge!(TimerSweep, TimerStep; tree_point=["DMRGSweep2<<"])
           if verbose ≥ 2
                show(TimerStep; title="site $(si-1)<-$(si)")
