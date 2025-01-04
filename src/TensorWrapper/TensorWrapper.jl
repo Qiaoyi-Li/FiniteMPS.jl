@@ -133,7 +133,7 @@ function _tsvd_try(t::AbstractTensorMap;
      try
           return tsvd!(copy(t); trunc=trunc, p=p, alg=alg)
      catch
-          @assert alg = SDD()
+          @assert alg == SDD()
           @warn "SDD() failed, use SVD() instead."
           return tsvd!(copy(t); trunc=trunc, p=p, alg=SVD())
      end

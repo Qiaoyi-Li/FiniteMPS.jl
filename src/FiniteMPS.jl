@@ -102,6 +102,7 @@ include("Algorithm/CBE/OrthComplement.jl")
 # include("Algorithm/CBE/SparseSVD.jl")
 include("Algorithm/CBE/CBEAlgorithm.jl")
 include("Algorithm/CBE/CBE.jl")
+include("Algorithm/CBE/FullCBE.jl")
 include("Algorithm/CBE/NaiveCBE.jl")
 
 

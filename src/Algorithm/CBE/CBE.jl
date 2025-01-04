@@ -5,52 +5,52 @@
 		  Alg::CBEAlgorithm
 		  ) -> Al_ex::MPSTensor, Ar_ex::MPSTensor, info::CBEInfo, TO::TimerOutput
 
-Return the two local tensors `Al_ex` and `Ar_ex` after CBE.
+Return the two expanded local tensors `Al_ex` and `Ar_ex` after CBE.
 """
 function CBE(Al::MPSTensor, Ar::MPSTensor,
 	::SparseLeftTensor, ::SparseRightTensor,
 	::SparseMPOTensor, ::SparseMPOTensor,
-	Alg::NoCBE) 
-     D₀ = D = dim(Ar, 1)
+	Alg::NoCBE)
+	D₀ = D = dim(Ar, 1)
 	return Al, Ar, CBEInfo(Alg, (), D₀, D, NaN, 0.0), TimerOutput()
 end
 
-function CBE(Al::MPSTensor, Ar::MPSTensor,
-     El::SparseLeftTensor, Er::SparseRightTensor,
-     Hl::SparseMPOTensor, Hr::SparseMPOTensor,
-     Alg::NaiveCBE{S}) where S <: Union{SweepL2R, SweepR2L}
+function CBE(Al::MPSTensor{R₁}, Ar::MPSTensor{R₂},
+	El::SparseLeftTensor, Er::SparseRightTensor,
+	Hl::SparseMPOTensor, Hr::SparseMPOTensor,
+	Alg::NaiveCBE{S}) where {R₁, R₂, S <: Union{SweepL2R, SweepR2L}}
 
-     TO = TimerOutput()
-     @timeit TO "NaiveCBE" Al_ex, Ar_ex, info = _CBE(Al, Ar, El, Er, Hl, Hr, Alg, TO) 
+     
+     Dl = mapreduce(idx -> dim(Al, idx)[2], *, 1:R₁-1)
+	Dr = mapreduce(idx -> dim(Ar, idx)[2], *, 2:R₂)
+	# use FullCBE if the full bond dimension is even smaller than Alg.D
+     if Dl ≤ Alg.D || Dr ≤ Alg.D
+          return CBE(Al, Ar, El, Er, Hl, Hr, FullCBE(S(); check = Alg.check))
+     end
 
-     return Al_ex, Ar_ex, info, TO
+	TO = TimerOutput()
+	@timeit TO "NaiveCBE" Al_ex, Ar_ex, info = _CBE(Al, Ar, El, Er, Hl, Hr, Alg, TO)
+
+	return Al_ex, Ar_ex, info, TO
 end
 
-# function CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar::MPSTensor{R₂}, Alg::FullCBE{T}; kwargs...) where {R₁, R₂, T <: Union{SweepL2R, SweepR2L}}
+function CBE(Al::MPSTensor{R₁}, Ar::MPSTensor{R₂},
+	El::SparseLeftTensor, Er::SparseRightTensor,
+	Hl::SparseMPOTensor, Hr::SparseMPOTensor,
+	Alg::FullCBE{S}) where {R₁, R₂, S <: Union{SweepL2R, SweepR2L}}
 
-# 	LocalTimer = reset_timer!(get_timer("CBE"))
-# 	cbecheck::Bool = Alg.check
-# 	Dl = mapreduce(idx -> dim(Al, idx)[2], *, 1:R₁-1)
-# 	Dr = mapreduce(idx -> dim(Ar, idx)[2], *, 2:R₂)
-# 	Dc = dim(Ar, 1)[2]
-# 	if Dl ≤ Dc || Dr ≤ Dc # already full
-# 		Alg = NoCBE(T())
-# 		Al_ex, Ar_ex, info, to = _CBE(Al, Ar, Alg; kwargs...)
-# 	else
-# 		@timeit LocalTimer "FullCBE" Al_ex, Ar_ex, info, to = _CBE(Al, Ar, Alg; kwargs...)
-# 		merge!(LocalTimer, to; tree_point = ["FullCBE"])
-# 	end
+	Dl = mapreduce(idx -> dim(Al, idx)[2], *, 1:R₁-1)
+	Dr = mapreduce(idx -> dim(Ar, idx)[2], *, 2:R₂)
+	Dc = dim(Ar, 1)[2]
+	if Dl ≤ Dc || Dr ≤ Dc # already full
+		return CBE(Al, Ar, El, Er, Hl, Hr, NoCBE(S()))
+	end
 
-# 	if cbecheck
-# 		@timeit LocalTimer "check" ϵ = norm(Al * Ar - Al_ex * Ar_ex)
-# 	else
-# 		ϵ = NaN
-# 	end
+     TO = TimerOutput()
+	@timeit TO "FullCBE" Al_ex, Ar_ex, info = _CBE(Al, Ar, Alg, TO)
 
-# 	D₀ = dim(Ar, 1)
-# 	D = dim(Ar_ex, 1)
-# 	return Al_ex, Ar_ex, CBEInfo(Alg, info, D₀, D, ϵ)
-# end
+	return Al_ex, Ar_ex, info, TO
+end
 
 # function CBE(PH::SparseProjectiveHamiltonian{2}, Al::MPSTensor{R₁}, Ar::MPSTensor{R₂}, Alg::StandardCBE{T}; kwargs...) where {R₁, R₂, T <: Union{SweepL2R, SweepR2L}}
 
@@ -115,22 +115,6 @@ end
 # end
 
 # ================== implementation ==================
-# function _CBE(Al::MPSTensor, Ar::MPSTensor, Alg::FullCBE{SweepL2R}; kwargs...)
-
-# 	LocalTimer = TimerOutput()
-# 	@timeit LocalTimer "rightorth" Al_ex::MPSTensor, Ar_ex::MPSTensor, info = rightorth(CompositeMPSTensor(Al, Ar); trunc = notrunc())
-
-# 	return Al_ex, Ar_ex, (info,), LocalTimer
-# end
-
-# function _CBE(Al::MPSTensor, Ar::MPSTensor, Alg::FullCBE{SweepR2L}; kwargs...)
-
-# 	LocalTimer = TimerOutput()
-# 	@timeit LocalTimer "leftorth" Al_ex::MPSTensor, Ar_ex::MPSTensor, info = leftorth(CompositeMPSTensor(Al, Ar); trunc = notrunc())
-
-# 	return Al_ex, Ar_ex, (info,), LocalTimer
-# end
-
 # function _CBE(::SparseProjectiveHamiltonian{2}, Al::MPSTensor, Ar::MPSTensor, Alg::T; kwargs...) where {T <: Union{NoCBE, FullCBE}}
 # 	return _CBE(Al, Ar, Alg; kwargs...)
 # end

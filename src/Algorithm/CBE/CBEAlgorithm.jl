@@ -75,14 +75,32 @@ end
 #      end
 # end
 
+"""
+     struct NaiveCBE{T<:SweepDirection} <: CBEAlgorithm{T}
+          D::Int64
+          tol::Float64
+          rsvd::Bool
+          check::Bool
+     end
+
+An naive implementation of CBE, where we directly contract the 2-site environment and then perform svd. Note the svd is O(D^3d^3) or O(D^3d^6) for MPS or MPO, respectively, which becomes the bottleneck of the algorithm. Therefore, a random svd is used to reduce the svd cost to O(D^3d) or O(D^3d^2).  
+
+# Constructor
+     NaiveCBE(D::Int64,
+          tol::Float64,
+          direction::SweepDirection = AnyDirection();
+          rsvd::Bool = false,
+          check::Bool = false)
+"""
 struct NaiveCBE{T<:SweepDirection} <: CBEAlgorithm{T}
      D::Int64
      tol::Float64
+     rsvd::Bool
      check::Bool
-     function NaiveCBE(D::Int64, tol::Float64, direction::T = AnyDirection(); check::Bool = false) where T <: SweepDirection
+     function NaiveCBE(D::Int64, tol::Float64, direction::T = AnyDirection(); rsvd::Bool = false, check::Bool = false) where T <: SweepDirection
           @assert D > 0
           @assert tol ≥ 0
-          return new{T}(D, tol, check)
+          return new{T}(D, tol, rsvd, check)
      end
 end
 
@@ -101,7 +119,7 @@ end
 #      return CheapCBE(Alg.D, Alg.tol, T(); check=Alg.check)
 # end
 function convert(::Type{CBEAlgorithm{T}}, Alg::NaiveCBE{AnyDirection}) where T <: Union{SweepL2R, SweepR2L}
-     return NaiveCBE(Alg.D, Alg.tol, T(); check=Alg.check)
+     return NaiveCBE(Alg.D, Alg.tol, T(); check=Alg.check, rsvd = Alg.rsvd)
 end
 
 
