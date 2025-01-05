@@ -14,14 +14,14 @@ struct LanczosInfo
      numiter::Int64
      numops::Int64
 end
-function convert(::Type{LanczosInfo}, Info::KrylovKit.ConvergenceInfo)
-     if isa(Info.normres, Float64)
-          normres = [Info.normres,]
-     else
-          normres = Info.normres
-     end
-     return LanczosInfo(Info.converged > 0, normres, Info.numiter, Info.numops)
-end
+# function convert(::Type{LanczosInfo}, Info::KrylovKit.ConvergenceInfo)
+#      if isa(Info.normres, Float64)
+#           normres = [Info.normres,]
+#      else
+#           normres = Info.normres
+#      end
+#      return LanczosInfo(Info.converged > 0, normres, Info.numiter, Info.numops)
+# end
 function convert(::Type{LanczosInfo}, Info::NamedTuple)
      # my simple Lanczos 
      return LanczosInfo(true, Float64[], 1, length(Info.V))
@@ -123,6 +123,9 @@ struct DMRGInfo
      Eg::Float64
      Lanczos::LanczosInfo
      Bond::BondInfo
+     function DMRGInfo(Eg::Number, Lanczos, Bond::BondInfo)
+          return new(Float64(Eg), convert(LanczosInfo, Lanczos), Bond)
+     end
 end
 
 """

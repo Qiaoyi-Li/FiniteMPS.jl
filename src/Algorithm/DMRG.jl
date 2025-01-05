@@ -5,8 +5,11 @@
 2-site DMRG sweep from left to right or sweep back from right to left.  
 
 # Kwargs
-     krylovalg::KrylovKit.KrylovAlgorithm = DMRGDefaultLanczos
-Krylov algorithm used in DMRG update.
+     K::Int64 = 16
+Krylov space dimension.
+
+     tol::Real = 1e-8
+Tolerance for eagerly break in Lanczos iteration.
 
      trunc::TruncationScheme = truncbelow(MPSDefault.tol) & truncdim(MPSDefault.D)
 Control the truncation in svd after each 2-site update. Details see `tsvd`. 
@@ -26,7 +29,6 @@ Add noise to the 2-site local tensor after each update.
 function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,MPS}}
      @assert Center(Env[3])[2] ≤ 2
 
-     # krylovalg = get(kwargs, :krylovalg, DMRGDefaultLanczos)
      K = get(kwargs, :K, 16)
      tol = get(kwargs, :tol, 1e-8)
      trunc = get(kwargs, :trunc, truncbelow(MPSDefault.tol) & truncdim(MPSDefault.D))
@@ -49,7 +51,6 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
           @timeit TimerStep "pushEnv" canonicalize!(Env, si, si + 1)
           Ar = Ψ[si+1]
 
-          # @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = _DMRGUpdate2(ProjHam(Env, si, si + 1; E₀=E₀), Al, Ar, krylovalg; kwargs...)
           PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si+1], (Env[2][si], Env[2][si+1]), E₀)
           @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = LanczosGS(action, CompositeMPSTensor(Al, Ar), PH, TimerStep;
                K = K, tol = tol, verbose = false)
@@ -71,11 +72,10 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
           GCstep && manualGC(TimerStep)
 
           # show
-          # merge!(TimerStep, get_timer("action2"); tree_point=["DMRGUpdate2"])
           merge!(TimerSweep, TimerStep; tree_point=["DMRGSweep2>>"])
           if verbose ≥ 2
                show(TimerStep; title="site $(si)->$(si+1)")
-               let K = info_Lanczos.numops
+               let K = info[si].Lanczos.numops
                     println("\nK = $(K), $(info_svd), Eg = $(eg)")
                end
                flush(stdout)
@@ -96,7 +96,6 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
 
      K = get(kwargs, :K, 16)
      tol = get(kwargs, :tol, 1e-8)
-     # krylovalg = get(kwargs, :krylovalg, DMRGDefaultLanczos)
      trunc = get(kwargs, :trunc, truncbelow(MPSDefault.tol) & truncdim(MPSDefault.D))
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
@@ -116,7 +115,6 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
           @timeit TimerStep "pushEnv" canonicalize!(Env, si - 1, si)
           Al = Ψ[si-1]
 
-          # @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = _DMRGUpdate2(ProjHam(Env, si - 1, si; E₀=E₀), Al, Ar, krylovalg; kwargs...)
           PH = CompositeProjectiveHamiltonian(Env.El[si-1], Env.Er[si], (Env[2][si-1], Env[2][si]), E₀)
           @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = LanczosGS(action, CompositeMPSTensor(Al, Ar), PH, TimerStep;
                K = K, tol = tol, verbose = false)
@@ -140,11 +138,10 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
           GCstep && manualGC(TimerStep)
 
           # show
-          # merge!(TimerStep, get_timer("action2"); tree_point=["DMRGUpdate2"])
           merge!(TimerSweep, TimerStep; tree_point=["DMRGSweep2<<"])
           if verbose ≥ 2
                show(TimerStep; title="site $(si-1)<-$(si)")
-               let K = info_Lanczos.numops
+               let K = info[si-1].Lanczos.numops
                     println("\nK = $(K), $(info_svd), Eg = $(eg)")
                end
                flush(stdout)
@@ -166,8 +163,11 @@ end
 1-site DMRG sweep from left to right or sweep back from right to left.  
 
 # Kwargs
-     krylovalg::KrylovKit.KrylovAlgorithm = DMRGDefaultLanczos
-Krylov algorithm used in DMRG update.
+     K::Int64 = 16
+Krylov space dimension.
+
+     tol::Real = 1e-8
+Tolerance for eagerly break in Lanczos iteration.
 
      GCstep::Bool = false
 `GC.gc()` manually after each step if `true`.
@@ -186,7 +186,8 @@ Control the truncation after each update, only used together with CBE. Details s
 """
 function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,MPS}}
 
-     krylovalg = get(kwargs, :krylovalg, DMRGDefaultLanczos)
+     K = get(kwargs, :K, 16)
+     tol = get(kwargs, :tol, 1e-8)
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
      verbose::Int64 = get(kwargs, :verbose, 0)
@@ -209,12 +210,16 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
           # CBE 
           if !isa(CBEAlg, NoCBE) && si < L
                canonicalize!(Env, si, si + 1)
-               @timeit TimerStep "CBE" Al, Ψ[si+1], info_cbe[si] = CBE(ProjHam(Env, si, si + 1; E₀=E₀), Al, Ψ[si+1], CBEAlg)
-               merge!(TimerStep, get_timer("CBE"); tree_point=["CBE"])
+               @timeit TimerStep "CBE" Al, Ψ[si+1], info_cbe[si], TO_CBE  = CBE(Al, Ψ[si+1], Env.El[si], Env.Er[si+1], Env[2][si], Env[2][si+1], CBEAlg)
+               merge!(TimerStep, TO_CBE; tree_point=["CBE"])
           end
 
           @timeit TimerStep "pushEnv" canonicalize!(Env, si)
-          @timeit TimerStep "DMRGUpdate1" eg, xg, info_Lanczos = _DMRGUpdate1(ProjHam(Env, si; E₀=E₀), Al, krylovalg; kwargs...)
+          PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si], (Env[2][si],), E₀)
+          @timeit TimerStep "DMRGUpdate1" eg, xg, info_Lanczos = LanczosGS(action, Al, PH, TimerStep;
+               K = K, tol = tol, verbose = false)
+          finalize(PH)
+
           eg += E₀
           if si < L
                @timeit TimerStep "svd" Ψ[si], S::MPSTensor, info_svd = leftorth(xg; trunc=trunc)
@@ -232,11 +237,10 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
           GCstep && manualGC(TimerStep)
 
           # show
-          merge!(TimerStep, get_timer("action1"); tree_point=["DMRGUpdate1"])
           merge!(TimerSweep, TimerStep; tree_point=["DMRGSweep1>>"])
           if verbose ≥ 2
                show(TimerStep; title="site $(si)->")
-               let K = info_Lanczos.numops
+               let K = info_dmrg[si].Lanczos.numops
                     println("\nK = $(K), $(info_svd), Eg = $(eg)")
                end
                flush(stdout)
@@ -252,7 +256,8 @@ end
 
 function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,MPS}}
 
-     krylovalg = get(kwargs, :krylovalg, DMRGDefaultLanczos)
+     K = get(kwargs, :K, 16)
+     tol = get(kwargs, :tol, 1e-8)
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
      verbose::Int64 = get(kwargs, :verbose, 0)
@@ -275,12 +280,15 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
           # CBE
           if !isa(CBEAlg, NoCBE) && si > 1
                canonicalize!(Env, si - 1, si)
-               @timeit TimerStep "CBE" Ψ[si-1], Ar, info_cbe[si-1] = CBE(ProjHam(Env, si - 1, si; E₀=E₀), Ψ[si-1], Ar, CBEAlg)
-               merge!(TimerStep, get_timer("CBE"); tree_point=["CBE"])
+               @timeit TimerStep "CBE" Ψ[si-1], Ar, info_cbe[si-1], TO_CBE = CBE(Ψ[si-1], Ar, Env.El[si-1], Env.Er[si], Env[2][si-1], Env[2][si],  CBEAlg)
+               merge!(TimerStep, TO_CBE; tree_point=["CBE"])
           end
 
           @timeit TimerStep "pushEnv" canonicalize!(Env, si)
-          @timeit TimerStep "DMRGUpdate1" eg, xg, info_Lanczos = _DMRGUpdate1(ProjHam(Env, si; E₀=E₀), Ar, krylovalg; kwargs...)
+          PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si], (Env[2][si],), E₀)
+          @timeit TimerStep "DMRGUpdate1" eg, xg, info_Lanczos = LanczosGS(action, Ar, PH, TimerStep;
+               K = K, tol = tol, verbose = false)
+          finalize(PH)
           eg += E₀
           if si > 1
                @timeit TimerStep "svd" S::MPSTensor, Ψ[si], info_svd = rightorth(xg; trunc=trunc)
@@ -298,11 +306,10 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
           GCstep && manualGC(TimerStep)
 
           # show
-          merge!(TimerStep, get_timer("action1"); tree_point=["DMRGUpdate1"])
           merge!(TimerSweep, TimerStep; tree_point=["DMRGSweep1<<"])
           if verbose ≥ 2
                show(TimerStep; title="site <-$(si)")
-               let K = info_Lanczos.numops
+               let K = info_dmrg[si].Lanczos.numops
                     println("\nK = $(K), $(info_svd), Eg = $(eg)")
                end
                flush(stdout)
@@ -347,101 +354,3 @@ for func in (:DMRGSweep1!, :DMRGSweep2!)
      end
 end
 
-function _DMRGUpdate2(H::SparseProjectiveHamiltonian{2},
-     Al::MPSTensor,
-     Ar::MPSTensor,
-     alg::KrylovKit.KrylovAlgorithm;
-     kwargs...)
-
-     reset_timer!(get_timer("action2"))
-     eg, xg, info = eigsolve(x -> action2(H, x; kwargs...), CompositeMPSTensor(Al, Ar), 1, :SR, alg)
-
-     return eg[1], xg[1], info
-
-end
-
-function _DMRGUpdate1(H::SparseProjectiveHamiltonian{1},
-     A::MPSTensor,
-     alg::KrylovKit.KrylovAlgorithm;
-     kwargs...)
-
-     reset_timer!(get_timer("action1"))
-     eg, xg, info = eigsolve(x -> action1(H, x; kwargs...), A, 1, :SR, alg)
-     return eg[1], xg[1], info
-
-end
-
-
-function LanczosGS(f::Function, x₀, args...;
-	K::Int64 = 32,
-	tol::Real = 1e-8,
-	callback::Union{Nothing, Function} = nothing,
-     verbose = false)
-     # Solve ground state problem for hermitian map x -> f(x, args...)
-     # a in-placed callback function can be applied to x after each iteration
-     # required methods:
-     #    normalize!(x)
-     #    norm(x)
-     #    inner(x, y)
-     #    add!(x, y, α): x -> x + αy
-     #    rmul!(x, α): x -> αx
-
-	T = zeros(K + 1, K + 1)  # tridiagonal matrix
-	lsb = Vector{Any}(undef, K + 1) # Lanczos vectors
-
-	# first one
-	lsb[1] = normalize!(deepcopy(x₀))
-	Vg = zeros(K)
-     ϵg = fill(NaN, K)
-	for k in 1:K
-		# A * bₖ
-		lsb[k+1] = f(lsb[k], args...)
-
-		# ⟨bₖ| A |bₖ⟩
-		T[k, k] = real(inner(lsb[k], lsb[k+1]))
-
-		# orthgonalize
-		# bₖ₊₁ = bₖ₊₁ - ⟨bₖ|bₖ₊₁⟩bₖ - ⟨bₖ₋₁|bₖ⟩bₖ₋₁
-		add!(lsb[k+1], lsb[k], -T[k, k])
-		k > 1 && add!(lsb[k+1], lsb[k-1], -T[k-1, k])
-
-		T[k, k+1] = T[k+1, k] = norm(lsb[k+1])
-
-		# normalize
-		rmul!(lsb[k+1], 1 / T[k, k+1])
-
-          # callback function here
-          !isnothing(callback) && callback(x)
-
-		# convergence check 
-		ϵ, V = eigen(T[1:k, 1:k])
-		if k ≤ 2
-			err2 = Inf 
-		else
-			err2 = max(norm(V[:, 1] - Vg[1:k])^2, norm(V[end-1:end, 1])^2)
-		end
-		copyto!(Vg, V[:, 1])
-          ϵg[k] = ϵ[1]
-		if err2 < tol^2 # converged eigen vector
-               verbose && println("eigen vector converged, err2 = $(err2), break at K = $(k)!")
-               break
-          end 
-          # T[k, k+1] = ⟨bₖ|A|bₖ₊₁⟩, scale by the estimated eigval so that A -> a*A give a similar cutoff
-		if T[k, k+1] < tol * ϵ[end]
-               # closed subspace
-			verbose && println("T[$k, $(k+1)]/max(ϵ) = $(T[k, k+1]/ϵ[end]), break at K = $(k)!")
-			break
-		end
-	end
-	
-     # linear combination
-	xg = rmul!(lsb[1], Vg[1])
-     K_cut = findlast(!isnan, ϵg)
-	for k in 2:K_cut
-		add!(xg, lsb[k], Vg[k])
-	end
-
-	info = (V = Vg[1:K_cut], ϵ = ϵg[1:K_cut], T = T[1:K_cut, 1:K_cut])
-
-     return ϵg[K_cut], xg, info
-end
