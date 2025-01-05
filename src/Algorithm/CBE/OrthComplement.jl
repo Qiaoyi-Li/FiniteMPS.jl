@@ -3,11 +3,11 @@ struct LeftOrthComplement{N}
 	Al::Vector{AbstractTensorMap}
 	Al_c::AbstractTensorMap
 
-	# function LeftOrthComplement(El::SparseLeftTensor, Al::Vector{MPSTensor}, Al_c::MPSTensor)
-	#      # directly construct
-	#      N = length(El)
-	#      return new{N}(El, Al, Al_c)
-	# end
+	function LeftOrthComplement(El::Vector{AbstractTensorMap}, Al::Vector{AbstractTensorMap}, Al_c::AbstractTensorMap)
+	     # directly construct
+	     N = length(El)
+	     return new{N}(El, Al, Al_c)
+	end
 	function LeftOrthComplement(El_i::SparseLeftTensor, Al_c::MPSTensor{R}, Hl::SparseMPOTensor, Al_i::MPSTensor{R} = Al_c) where {R}
 		# initialize Al
 		Al = _initialize_Al(El_i, Al_i, Hl)
@@ -23,11 +23,11 @@ struct RightOrthComplement{N}
 	Er::Vector{AbstractTensorMap}
 	Ar::Vector{AbstractTensorMap}
 	Ar_c::AbstractTensorMap
-	# function RightOrthComplement(Er::SparseRightTensor, Ar::Vector{MPSTensor}, Ar_c::MPSTensor)
-	# 	# directly construct
-	# 	N = length(Er)
-	# 	return new{N}(Er, Ar, Ar_c)
-	# end
+	function RightOrthComplement(Er::Vector{AbstractTensorMap}, Ar::Vector{AbstractTensorMap}, Ar_c::AbstractTensorMap)
+		# directly construct
+		N = length(Er)
+		return new{N}(Er, Ar, Ar_c)
+	end
 	function RightOrthComplement(Er_i::SparseRightTensor, Ar_c::MPSTensor{R}, Hr::SparseMPOTensor, Ar_i::MPSTensor{R} = Ar_c) where {R}
 		# initialize Ar
 		Ar = _initialize_Ar(Er_i, Ar_i, Hr)
