@@ -62,7 +62,7 @@ export SparseMPO, issparse
 include("SparseMPO/SparseMPO.jl")
 
 # Environment
-export AbstractEnvironment, SimpleEnvironment, SparseEnvironment, Environment, initialize!, pushleft!, pushright!, canonicalize!, free!, scalar!, connection!
+export AbstractEnvironment, SimpleEnvironment, SparseEnvironment, Environment, initialize!, pushleft!, pushright!, canonicalize!, free!, scalar!, connection!, absorb!
 include("Environment/Environment.jl")
 include("Environment/initialize.jl")
 include("Environment/pushleft.jl")
@@ -70,6 +70,7 @@ include("Environment/pushright.jl")
 include("Environment/canonicalize.jl")
 include("Environment/scalar.jl")
 include("Environment/connection.jl")
+include("Environment/absorb.jl")
 
 # Projective Hamiltonian
 export AbstractProjectiveHamiltonian, IdentityProjectiveHamiltonian, SparseProjectiveHamiltonian, ProjHam, action2, action1, action0, action, PreFuseProjectiveHamiltonian
