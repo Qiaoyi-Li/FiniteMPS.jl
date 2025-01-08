@@ -199,6 +199,20 @@ function +(A::LocalOperator{R₁, R₂}, B::LocalOperator{R₁, R₂}) where {R�
 	name = "$(A.name)($(A.strength)) + $(B.name)($(B.strength))"
 	return LocalOperator(Op, name, A.si, A.fermionic, 1)
 end
+function +(A::LocalOperator{1, 1}, B::IdentityOperator)
+	@assert A.si == B.si && !isnan(A.strength) && !isnan(B.strength)
+	@assert !isfermionic(A)
+	Op = A.A * A.strength
+	add!(Op, id(domain(A)), B.strength)
+	name = "$(A.name)($(A.strength)) + I($(B.strength))"
+	return LocalOperator(Op, name, A.si, false, 1)
+end
++(A::IdentityOperator, B::LocalOperator{1, 1}) = B + A
+function +(A::IdentityOperator, B::IdentityOperator)
+	@assert A.si == B.si && !isnan(A.strength) && !isnan(B.strength)
+	@assert A.pspace == B.pspace
+	return IdentityOperator(A.pspace, A.si, A.strength + B.strength)
+end
 
 """
 	 *(O::LocalOperator{R₁,R₂}, A::MPSTensor{R₃}) -> ::MPSTensor{R₁ + R₂ +R₃ - 2}
