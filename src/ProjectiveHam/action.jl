@@ -718,6 +718,44 @@ function _action!(x::MPSTensor{4},
 	return x
 end
 
+function _action!(x::MPSTensor{4}, El::LocalLeftTensor{3}, H::LocalOperator{2, 2}, Er::LocalRightTensor{3}, cache::Vector{<:AbstractTensorMap}, TO::Union{Nothing, TimerOutput})
+
+     TT =  promote_type(eltype(x), eltype(El), eltype(H), eltype(Er))
+     # x, Er, H, El
+     if isempty(cache)
+          # [1] permute x
+          push!(cache, _permute_malloc(TT, x.A, ((1, 2, 3), (4,)), TO))
+          # [2] permute Er
+          push!(cache, _permute_malloc(TT, Er.A, ((1,), (2, 3)), TO))
+          # [3] x * Er 
+          push!(cache, _mul_malloc(TT, cache[1], cache[2], TO))
+          # [4] permute x * Er
+          push!(cache, _permute_malloc(TT, cache[3], ((2, 4), (1, 3, 5)), TO))
+          # [5] H * x * Er
+          push!(cache, _mul_malloc(TT, H.A, cache[4], TO))
+          # [6] permute H * x * Er
+          push!(cache, _permute_malloc(TT, cache[5], ((1, 3), (2, 4, 5)), TO))
+          # [7] El * H * x * Er
+          push!(cache, _mul_malloc(TT, El.A, cache[6], H.strength, TO))
+     else
+          # permute x 
+          _permute_TO!(cache[1], x.A, ((1, 2, 3), (4,)), TO)
+          # x * Er
+          _mul_TO!(cache[3], cache[1], cache[2], TO)
+          # permute x * Er
+          _permute_TO!(cache[4], cache[3], ((2, 4), (1, 3, 5)), TO)
+          # H * x * Er
+          _mul_TO!(cache[5], H.A, cache[4], TO)
+          # permute H * x * Er
+          _permute_TO!(cache[6], cache[5], ((1, 3), (2, 4, 5)), TO)
+          # El * H * x * Er
+          _mul_TO!(cache[7], El.A, cache[6], H.strength, 0.0, TO)
+     end
+
+     _permute_TO!(x.A, cache[7], ((1, 2), (3, 4)), TO)
+     return x
+end
+
 # ======================== bond ========================
 function _action!(x::MPSTensor{2},
 	El::LocalLeftTensor{3},

@@ -1,4 +1,4 @@
-# some functions in TensorKit use multi-threading to parallelize the computation however seem to conflict with the high-level multi-threading implementations 
+# some functions in TensorKit use multi-threading to parallelize the computation however seem to conflict with the high-level multi-threading implementations
 function _add_general_kernel_sequential!(tdst, tsrc, p, fusiontreetransform, α, β, backend...)
 	if iszero(β)
 		zerovector!(tdst)
@@ -7,8 +7,7 @@ function _add_general_kernel_sequential!(tdst, tsrc, p, fusiontreetransform, α,
 	end
 	for (f₁, f₂) in fusiontrees(tsrc)
 		for ((f₁′, f₂′), coeff) in fusiontreetransform(f₁, f₂)
-			TensorOperations.tensoradd!(tdst[f₁′, f₂′], p, tsrc[f₁, f₂], :N, α * coeff, true,
-				backend...)
+			TensorOperations.tensoradd!(tdst[f₁′, f₂′], tsrc[f₁, f₂], p, false, α * coeff, One(), backend...)
 		end
 	end
 	return nothing
