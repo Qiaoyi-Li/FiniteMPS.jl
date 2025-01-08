@@ -5,6 +5,7 @@ authors:
   given-names: "Qiaoyi"
   orcid: "https://orcid.org/0000-0003-3508-9925"
 title: "FiniteMPS.jl"
-version: 1.5.0
-date-released: 2024-10-28
+version: 1.6.1
+doi: 10.5281/zenodo.14615184
+date-released: 2025-01-08
 url: "https://github.com/Qiaoyi-Li/FiniteMPS.jl"
