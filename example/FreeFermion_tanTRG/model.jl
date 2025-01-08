@@ -25,15 +25,15 @@ function SpinlessFreeFermion(T::AbstractMatrix)
      # hopping
      for i = 1:L, j = i+1:L
           @assert T[i, j] == T[j, i]'
-          addIntr2!(Root, U₁SpinlessFermion.FdagF, (i, j), -T[i, j];
-               Z = U₁SpinlessFermion.Z, name = (:Fdag, :F))
-          addIntr2!(Root, U₁SpinlessFermion.FdagF, (j, i), -T[j, i];
-               Z = U₁SpinlessFermion.Z, name = (:Fdag, :F))
+          addIntr!(Root, U₁SpinlessFermion.FdagF, (i, j), (true, true),
+               -T[i, j]; Z = U₁SpinlessFermion.Z, name = (:Fdag, :F))
+          addIntr!(Root, U₁SpinlessFermion.FdagF, (j, i), (true, true),
+               -T[j, i]; Z = U₁SpinlessFermion.Z, name = (:Fdag, :F))
      end
 
      # chemical potential
      for i = 1:L
-          addIntr1!(Root, U₁SpinlessFermion.n, i, -T[i, i]; name = :n)
+          addIntr!(Root, U₁SpinlessFermion.n, i, -T[i, i]; name = :n)
      end
 
      return InteractionTree(Root)

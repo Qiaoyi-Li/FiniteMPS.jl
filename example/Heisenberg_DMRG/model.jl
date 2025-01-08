@@ -8,13 +8,13 @@ function SU₂Heisenberg(Latt::AbstractLattice; J::Number=1.0, J′::Number=0.0)
 
           # NN interaction
           for pairs in neighbor(Latt)
-               addIntr2!(Root, LocalSpace.SS, pairs,
+               addIntr!(Root, LocalSpace.SS, pairs, (false, false),
                     J; name=(:S, :S))
           end
 
           # NNN interaction
           for pairs in neighbor(Latt; level = 2)
-               addIntr2!(Root, LocalSpace.SS, pairs,
+               addIntr!(Root, LocalSpace.SS, pairs, (false, false),
                     J′; name=(:S, :S))
           end
 
@@ -34,21 +34,21 @@ function U₁Heisenberg(Latt::AbstractLattice; J::Number=1, J′::Number=0)
 
          # NN interaction
          for pairs in neighbor(Latt)
-              addIntr2!(Root, (LocalSpace.Sz, LocalSpace.Sz), pairs,
+              addIntr!(Root, (LocalSpace.Sz, LocalSpace.Sz), pairs, (false, false),
                    J; name=(:Sz, :Sz))
-              addIntr2!(Root, LocalSpace.S₋₊, pairs,
+              addIntr!(Root, LocalSpace.S₋₊, pairs, (false, false),
                    J/2; name=(:Sm, :Sp))
-              addIntr2!(Root, LocalSpace.S₊₋, pairs,
+              addIntr!(Root, LocalSpace.S₊₋, pairs, (false, false),
                    J/2; name=(:Sp, :Sm))
          end
 
         # NNN interaction
         for pairs in neighbor(Latt; level = 2)
-            addIntr2!(Root, (LocalSpace.Sz, LocalSpace.Sz), pairs,
+            addIntr!(Root, (LocalSpace.Sz, LocalSpace.Sz), pairs, (false, false),
                     J′; name=(:Sz, :Sz))
-            addIntr2!(Root, LocalSpace.S₋₊, pairs,
+            addIntr!(Root, LocalSpace.S₋₊, pairs, (false, false),
                    J′/2; name=(:Sm, :Sp))
-            addIntr2!(Root, LocalSpace.S₊₋, pairs,
+            addIntr!(Root, LocalSpace.S₊₋, pairs, (false, false),
                    J′/2; name=(:Sp, :Sm))
         end
 

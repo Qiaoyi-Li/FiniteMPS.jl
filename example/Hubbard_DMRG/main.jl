@@ -45,9 +45,9 @@ Obs = let
           addObs!(Tree, U₁SU₂Fermion.n, i, 1; name=:n)
      end
      for i in 1:size(Latt), j in i+1:size(Latt)
-          addObs!(Tree, U₁SU₂Fermion.SS, (i, j), 1; name=(:S, :S))
-          addObs!(Tree, (U₁SU₂Fermion.n, U₁SU₂Fermion.n), (i, j), 1; name=(:n, :n))
-          addObs!(Tree, U₁SU₂Fermion.FdagF, (i, j), 1; Z=U₁SU₂Fermion.Z, name=(:Fdag, :F))
+          addObs!(Tree, U₁SU₂Fermion.SS, (i, j), (false, false); name=(:S, :S))
+          addObs!(Tree, (U₁SU₂Fermion.n, U₁SU₂Fermion.n), (i, j), (false, false); name=(:n, :n))
+          addObs!(Tree, U₁SU₂Fermion.FdagF, (i, j), (true, true); Z=U₁SU₂Fermion.Z, name=(:Fdag, :F))
      end
 
      for (i, j) in neighbor(Latt), (k, l) in neighbor(Latt)
@@ -56,9 +56,9 @@ Obs = let
           i > k && continue  # note ⟨Δᵢⱼ^dag Δₖₗ⟩ = ⟨Δₖₗ^dag Δᵢⱼ⟩
 
           # singlet pairing
-          addObs!(Tree, U₁SU₂Fermion.ΔₛdagΔₛ, (i, j, k, l), 1; Z=U₁SU₂Fermion.Z, name=(:Fdag, :FdagS, :FS, :F))
+          addObs!(Tree, U₁SU₂Fermion.ΔₛdagΔₛ, (i, j, k, l), Tuple(fill(true, 4)); Z=U₁SU₂Fermion.Z, name=(:Fdag, :FdagS, :FS, :F))
           # triplet pairing
-          addObs!(Tree, U₁SU₂Fermion.ΔₜdagΔₜ, (i, j, k, l), 1; Z=U₁SU₂Fermion.Z, name=(:Fdag, :FdagT, :FT, :F))
+          addObs!(Tree, U₁SU₂Fermion.ΔₜdagΔₜ, (i, j, k, l), Tuple(fill(true, 4)); Z=U₁SU₂Fermion.Z, name=(:Fdag, :FdagT, :FT, :F))
      end
 
      @time calObs!(Tree, Ψ; GCspacing=1000, verbose=verbose, showtimes=10)
