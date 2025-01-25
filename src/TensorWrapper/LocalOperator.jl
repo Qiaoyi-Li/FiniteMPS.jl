@@ -14,7 +14,7 @@ hastag(::AbstractLocalOperator) = false
 
 function rmul!(O::AbstractLocalOperator, α::Number)
 	# change strength instead of the tensor
-	O.strength *= α
+	O.strength[] *= α
 	return O
 end
 
@@ -22,26 +22,32 @@ end
 	 mutable struct IdentityOperator <: AbstractLocalOperator
 		  pspace::Union{Nothing, VectorSpace}
 		  si::Int64
-		  strength::Number 
+		  strength::Ref{Number}
 	 end
 	 
 Lazy type of identity operator, used for skipping some tensor contractions.
 
 # Constructors
-	 IdentityOperator([pspace::VectorSpace,] si::Int64, strength::Number = NaN)
+	 IdentityOperator([pspace::VectorSpace,] si::Int64, strength::Ref{Number} = Ref{Number}(NaN))
 """
 mutable struct IdentityOperator <: AbstractLocalOperator
 	pspace::Union{Nothing, VectorSpace}
 	si::Int64
-	strength::Number
-	function IdentityOperator(si::Int64, strength::Number = NaN)
+	strength::Ref{Number}
+	function IdentityOperator(si::Int64, strength::Ref{<:Number} = Ref{Number}(NaN))
 		return new(nothing, si, strength)
 	end
-	function IdentityOperator(::Nothing, si::Int64, strength::Number = NaN)
+	function IdentityOperator(::Nothing, si::Int64, strength::Ref{<:Number} = Ref{Number}(NaN))
 		return new(nothing, si, strength)
 	end
-	function IdentityOperator(pspace::VectorSpace, si::Int64, strength::Number = NaN)
+	function IdentityOperator(pspace::VectorSpace, si::Int64, strength::Ref{<:Number} = Ref{Number}(NaN))
 		return new(pspace, si, strength)
+	end
+	function IdentityOperator(pspace::Union{Nothing, VectorSpace}, si::Int64, strength::Number)
+		return IdentityOperator(pspace, si, Ref{Number}(strength))
+	end
+	function IdentityOperator(si::Int64, strength::Number)
+		return IdentityOperator(nothing, si, strength)
 	end
 end
 
@@ -61,8 +67,8 @@ isfermionic(::IdentityOperator) = false
 
 function Base.show(io::IO, obj::IdentityOperator)
 	print(io, "I$(String(collect("$(obj.si)") .+ 8272))")
-	if !isnan(obj.strength)
-		print(io, "($(obj.strength))")
+	if !isnan(obj.strength[])
+		print(io, "($(obj.strength[]))")
 	end
 end
 
@@ -86,7 +92,7 @@ const tag2Tuple{R₁, R₂} = Tuple{NTuple{R₁, String}, NTuple{R₂, String}}
 		  name::String
 		  si::Int64
 		  fermionic::Bool
-		  strength::Number
+		  strength::Ref{Number}
 		  tag::tag2Tuple{R₁,R₂}  
 	 end
 
@@ -109,7 +115,7 @@ Convention (' marks codomain):
 		  name::Union{String,Symbol},
 		  si::Int64,
 		  fermionic::Bool,
-		  [,strength::Number = NaN]
+		  [,strength::Ref{Number} = Ref{Number}(NaN)]
 		  [, tag::tag2Tuple{R₁,R₂}];
 		  swap::Bool=false)
 
@@ -122,13 +128,13 @@ mutable struct LocalOperator{R₁, R₂} <: AbstractLocalOperator
 	name::String
 	si::Int64
 	fermionic::Bool
-	strength::Number
+	strength::Ref{Number}
 	tag::tag2Tuple{R₁, R₂}
 	function LocalOperator(O::AbstractTensorMap,
 		name::String,
 		si::Int64,
 		fermionic::Bool,
-		strength::Number,
+		strength::Ref{<:Number},
 		tag::tag2Tuple{R₁, R₂};
 		swap::Bool = false) where {R₁, R₂}
 		if swap
@@ -138,8 +144,8 @@ mutable struct LocalOperator{R₁, R₂} <: AbstractLocalOperator
 		@assert rank(O, 1) == R₁ && rank(O, 2) == R₂
 		return new{R₁, R₂}(O, name, si, fermionic, strength, tag)
 	end
-	LocalOperator(O::AbstractTensorMap, name::String, si::Int64, fermionic::Bool, tag::tag2Tuple{R₁, R₂}; kwargs...) where {R₁, R₂} = LocalOperator(O, name, si, fermionic, NaN, tag; kwargs...) # default strength = NaN
-	function LocalOperator(O::AbstractTensorMap, name::String, si::Int64, fermionic::Bool, strength::Number = NaN; swap::Bool = false)
+	LocalOperator(O::AbstractTensorMap, name::String, si::Int64, fermionic::Bool, tag::tag2Tuple{R₁, R₂}; kwargs...) where {R₁, R₂} = LocalOperator(O, name, si, fermionic, Ref{Number}(NaN), tag; kwargs...) # default strength = NaN
+	function LocalOperator(O::AbstractTensorMap, name::String, si::Int64, fermionic::Bool, strength::Ref{<:Number} = Ref{Number}(NaN); swap::Bool = false)
 		# default tag, only for rank ≤ 4
 		if swap
 			@assert (R₁ = rank(O, 2)) ≤ 2
@@ -155,6 +161,10 @@ mutable struct LocalOperator{R₁, R₂} <: AbstractLocalOperator
 		return new{R₁, R₂}(O, name, si, fermionic, strength, (tag1, tag2))
 	end
 	LocalOperator(O::AbstractTensorMap, name::Symbol, args...; kwargs...) = LocalOperator(O, String(name), args...; kwargs...)
+	# number to ref 
+	function LocalOperator(O::AbstractTensorMap, name::String, si::Int64, fermionic::Bool, strength::Number, args...; kwargs...)
+		return LocalOperator(O, name, si, fermionic, Ref{Number}(strength), args...; kwargs...)
+	end
 end
 
 hastag(::LocalOperator) = true
@@ -166,8 +176,8 @@ isfermionic(O::LocalOperator) = O.fermionic
 
 function Base.show(io::IO, obj::LocalOperator{R₁, R₂}) where {R₁, R₂}
 	print(io, "$(obj.name)$(String(collect("$(obj.si)") .+ 8272)){$R₁,$R₂}")
-	if !isnan(obj.strength)
-		print(io, "($(obj.strength))")
+	if !isnan(obj.strength[])
+		print(io, "($(obj.strength[]))")
 	end
 end
 
@@ -193,25 +203,25 @@ Plus of two local operators on the same site. Note the `strength` of each one mu
 Field `name` of output obj is `"A.name(A.strength) + B.name(B.strength)"`.
 """
 function +(A::LocalOperator{R₁, R₂}, B::LocalOperator{R₁, R₂}) where {R₁, R₂}
-	@assert A.si == B.si && !isnan(A.strength) && !isnan(B.strength)
+	@assert A.si == B.si && !isnan(A.strength[]) && !isnan(B.strength[])
 	@assert A.fermionic == B.fermionic
-	Op = A.A * A.strength + B.A * B.strength
-	name = "$(A.name)($(A.strength)) + $(B.name)($(B.strength))"
-	return LocalOperator(Op, name, A.si, A.fermionic, 1)
+	Op = A.A * A.strength[] + B.A * B.strength[]
+	name = "$(A.name)($(A.strength[])) + $(B.name)($(B.strength[]))"
+	return LocalOperator(Op, name, A.si, A.fermionic, Ref{Number}(1.0))
 end
 function +(A::LocalOperator{1, 1}, B::IdentityOperator)
-	@assert A.si == B.si && !isnan(A.strength) && !isnan(B.strength)
+	@assert A.si == B.si && !isnan(A.strength[]) && !isnan(B.strength[])
 	@assert !isfermionic(A)
-	Op = A.A * A.strength
-	add!(Op, id(domain(A)), B.strength)
-	name = "$(A.name)($(A.strength)) + I($(B.strength))"
-	return LocalOperator(Op, name, A.si, false, 1)
+	Op = A.A * A.strength[]
+	add!(Op, id(domain(A)), B.strength[])
+	name = "$(A.name)($(A.strength[])) + I($(B.strength[]))"
+	return LocalOperator(Op, name, A.si, false, Ref{Number}(1.0))
 end
 +(A::IdentityOperator, B::LocalOperator{1, 1}) = B + A
 function +(A::IdentityOperator, B::IdentityOperator)
-	@assert A.si == B.si && !isnan(A.strength) && !isnan(B.strength)
+	@assert A.si == B.si && !isnan(A.strength[]) && !isnan(B.strength[])
 	@assert A.pspace == B.pspace
-	return IdentityOperator(A.pspace, A.si, A.strength + B.strength)
+	return IdentityOperator(A.pspace, A.si, A.strength[] + B.strength[])
 end
 
 """
@@ -251,41 +261,41 @@ Field `name` of output obj is `"A.name" * "B.name"`.
 Warning: we write this function case by case via multiple dispatch, hence it may throw a "no method matching" error for some interactions. 
 """
 function *(A::LocalOperator{1, 1}, B::LocalOperator{1, 1})
-	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
+	@assert A.si == B.si && isnan(A.strength[]) && isnan(B.strength[])
 	@tensor O[a; c] := A.A[a b] * B.A[b c]
 	fermionic = A.fermionic ⊻ B.fermionic
 	return LocalOperator(O, A.name * B.name, A.si, fermionic)
 end
 function *(A::LocalOperator{1, 1}, B::LocalOperator{1, 2})
-	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
+	@assert A.si == B.si && isnan(A.strength[]) && isnan(B.strength[])
 	@tensor O[a; c d] := A.A[a b] * B.A[b c d]
 	tag = (A.tag[1], B.tag[2])
 	fermionic = A.fermionic ⊻ B.fermionic
 	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag)
 end
 function *(A::LocalOperator{1, 1}, B::LocalOperator{2, 1})
-	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
+	@assert A.si == B.si && isnan(A.strength[]) && isnan(B.strength[])
 	@tensor O[c a; d] := A.A[a b] * B.A[c b d]
 	tag = ((B.tag[1][1], A.tag[1][1]), B.tag[2])
 	fermionic = A.fermionic ⊻ B.fermionic
 	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag)
 end
 function *(A::LocalOperator{2, 1}, B::LocalOperator{1, 2})
-	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
+	@assert A.si == B.si && isnan(A.strength[]) && isnan(B.strength[])
 	@tensor O[a b; d e] := A.A[a b c] * B.A[c d e]
 	tag = (A.tag[1], B.tag[2])
 	fermionic = A.fermionic ⊻ B.fermionic
 	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag)
 end
 function *(A::LocalOperator{1, 2}, B::LocalOperator{1, 1})
-	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
+	@assert A.si == B.si && isnan(A.strength[]) && isnan(B.strength[])
 	@tensor O[a; d c] := A.A[a b c] * B.A[b d]
 	tag = (A.tag[1], (B.tag[2][1], A.tag[2][2]))
 	fermionic = A.fermionic ⊻ B.fermionic
 	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag)
 end
 function *(A::LocalOperator{1, 2}, B::LocalOperator{2, 1})
-	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
+	@assert A.si == B.si && isnan(A.strength[]) && isnan(B.strength[])
 	# match tags
 	if A.tag[2][2] == B.tag[1][1]
 		@tensor O[a; d] := A.A[a b c] * B.A[c b d]
@@ -298,7 +308,7 @@ function *(A::LocalOperator{1, 2}, B::LocalOperator{2, 1})
 	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag)
 end
 function *(A::LocalOperator{1, 2}, B::LocalOperator{1, 2})
-	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
+	@assert A.si == B.si && isnan(A.strength[]) && isnan(B.strength[])
 
 	@tensor O[a; d c e] := A.A[a b c] * B.A[b d e]
 	tag = (A.tag[1], (B.tag[2][1], A.tag[2][2], B.tag[2][2]))
@@ -306,7 +316,7 @@ function *(A::LocalOperator{1, 2}, B::LocalOperator{1, 2})
 	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag)
 end
 function *(A::LocalOperator{1, 2}, B::LocalOperator{2, 2})
-	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
+	@assert A.si == B.si && isnan(A.strength[]) && isnan(B.strength[])
 
 	# match tags
 	if A.tag[2][2] == B.tag[1][1]
@@ -320,14 +330,14 @@ function *(A::LocalOperator{1, 2}, B::LocalOperator{2, 2})
 	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag)
 end
 function *(A::LocalOperator{2, 1}, B::LocalOperator{1, 1})
-	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
+	@assert A.si == B.si && isnan(A.strength[]) && isnan(B.strength[])
 	@tensor O[a b; d] := A.A[a b c] * B.A[c d]
 	tag = (A.tag[1], B.tag[2])
 	fermionic = A.fermionic ⊻ B.fermionic
 	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag)
 end
 function *(A::LocalOperator{2, 1}, B::LocalOperator{2, 1})
-	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
+	@assert A.si == B.si && isnan(A.strength[]) && isnan(B.strength[])
 
 	@tensor O[a d b; e] := A.A[a b c] * B.A[d c e]
 	tag = ((A.tag[1][1], B.tag[1][1], A.tag[1][2]), B.tag[2])
@@ -335,7 +345,7 @@ function *(A::LocalOperator{2, 1}, B::LocalOperator{2, 1})
 	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag)
 end
 function *(A::LocalOperator{2, 2}, B::LocalOperator{2, 1})
-	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
+	@assert A.si == B.si && isnan(A.strength[]) && isnan(B.strength[])
 
 	# match tags
 	if A.tag[2][2] == B.tag[1][1]
@@ -349,7 +359,7 @@ function *(A::LocalOperator{2, 2}, B::LocalOperator{2, 1})
 	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag)
 end
 function *(A::LocalOperator{2, 2}, B::LocalOperator{2, 2})
-	@assert A.si == B.si && isnan(A.strength) && isnan(B.strength)
+	@assert A.si == B.si && isnan(A.strength[]) && isnan(B.strength[])
 
 	# match tags
 	if A.tag[2][2] == B.tag[1][1]
@@ -405,12 +415,12 @@ function _vdim(::LocalOperator{1, 1}, idx::Int64)
 end
 function _vdim(A::LocalOperator{2, 1}, idx::Int64)
 	@assert idx == 1 || idx == 2
-	return dim(A.A, 1)
+	return idx == 1 ? dim(A.A, 1) : (1, 1)
 end
 
 function _vdim(A::LocalOperator{1, 2}, idx::Int64)
 	@assert idx == 1 || idx == 2
-	return dim(A.A, 3)
+	return idx == 1 ? (1, 1) : dim(A.A, 3)
 end
 
 function _vdim(A::LocalOperator{2, 2}, idx::Int64)

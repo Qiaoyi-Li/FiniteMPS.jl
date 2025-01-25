@@ -86,7 +86,7 @@ function _action!(x::CompositeMPSTensor{2, T},
 		# [7] permute El*x*Hl
 		push!(cache, _permute_malloc(TT, cache[6], ((1, 4, 2), (3,)), TO))
 		# [8] contract Er 
-		push!(cache, _mul_malloc(TT, cache[7], Er.A, Hl.strength * Hr.strength, TO))
+		push!(cache, _mul_malloc(TT, cache[7], Er.A, Hl.strength[] * Hr.strength[], TO))
 	else
 		# permute x 
 		_permute_TO!(cache[2], x.A, ((1,), (2, 3, 4)), TO)
@@ -99,7 +99,7 @@ function _action!(x::CompositeMPSTensor{2, T},
 		# permute El*x*Hl
 		_permute_TO!(cache[7], cache[6], ((1, 4, 2), (3,)), TO)
 		# contract Er 
-		_mul_TO!(cache[8], cache[7], Er.A, Hl.strength * Hr.strength, 0.0, TO)
+		_mul_TO!(cache[8], cache[7], Er.A, Hl.strength[] * Hr.strength[], 0.0, TO)
 	end
 
 	_permute_TO!(x.A, cache[8], ((1, 2), (3, 4)), TO)
@@ -132,7 +132,7 @@ function _action!(x::CompositeMPSTensor{2, T},
 		# [7] permute Hl*x*Er*Hr
 		push!(cache, _permute_malloc(TT, cache[6], ((1, 3), (4, 2, 5)), TO))
 		# [8] El *Hl*x*Er*Hr
-		push!(cache, _mul_malloc(TT, El.A, cache[7], Hl.strength * Hr.strength, TO))
+		push!(cache, _mul_malloc(TT, El.A, cache[7], Hl.strength[] * Hr.strength[], TO))
 	else
 		# permute x 
 		_permute_TO!(cache[1], x.A, ((1, 2, 3), (4,)), TO)
@@ -149,7 +149,7 @@ function _action!(x::CompositeMPSTensor{2, T},
 		# permute Hl*x*Er*Hr
 		_permute_TO!(cache[7], cache[6], ((1, 3), (4, 2, 5)), TO)
 		# El *Hl*x*Er*Hr
-		_mul_TO!(cache[8], El.A, cache[7], Hl.strength * Hr.strength, 0.0, TO)
+		_mul_TO!(cache[8], El.A, cache[7], Hl.strength[] * Hr.strength[], 0.0, TO)
 	end
 
 	_permute_TO!(x.A, cache[8], ((1, 2), (3, 4)), TO)
@@ -184,7 +184,7 @@ function _action!(x::CompositeMPSTensor{2, T},
 		# [8] permute El*Hl*x*Hr
 		push!(cache, _permute_malloc(TT, cache[7], ((1, 3, 4), (5, 2)), TO))
 		# [9] El*Hl*x*Hr*Er
-		push!(cache, _mul_malloc(TT, cache[8], Er.A, Hl.strength * Hr.strength, TO))
+		push!(cache, _mul_malloc(TT, cache[8], Er.A, Hl.strength[] * Hr.strength[], TO))
 	else
 		# permute x
 		_permute_TO!(cache[1], x.A, ((2,), (1, 3, 4)), TO)
@@ -201,7 +201,7 @@ function _action!(x::CompositeMPSTensor{2, T},
 		# permute El*Hl*x*Hr
 		_permute_TO!(cache[8], cache[7], ((1, 3, 4), (5, 2)), TO)
 		# El*Hl*x*Hr*Er
-		_mul_TO!(cache[9], cache[8], Er.A, Hl.strength * Hr.strength, 0.0, TO)
+		_mul_TO!(cache[9], cache[8], Er.A, Hl.strength[] * Hr.strength[], 0.0, TO)
 
 	end
 
@@ -237,7 +237,7 @@ function _action!(x::CompositeMPSTensor{2, T},
 		# [8] permute Hl * Hr * El * x
 		push!(cache, _permute_malloc(TT, cache[7], ((3, 1, 4), (5, 2)), TO))
 		# [9] Hl * Hr * El * x * Er
-		push!(cache, _mul_malloc(TT, cache[8], Er.A, Hl.strength * Hr.strength, TO))
+		push!(cache, _mul_malloc(TT, cache[8], Er.A, Hl.strength[] * Hr.strength[], TO))
 	else
 		# permute x 
 		_permute_TO!(cache[1], x.A, ((1,), (2, 3, 4)), TO)
@@ -254,7 +254,7 @@ function _action!(x::CompositeMPSTensor{2, T},
 		# permute Hl * Hr * El * x
 		_permute_TO!(cache[8], cache[7], ((3, 1, 4), (5, 2)), TO)
 		# Hl * Hr * El * x * Er
-		_mul_TO!(cache[9], cache[8], Er.A, Hl.strength * Hr.strength, 0.0, TO)
+		_mul_TO!(cache[9], cache[8], Er.A, Hl.strength[] * Hr.strength[], 0.0, TO)
 
 	end
 
@@ -286,7 +286,7 @@ function _action!(x::CompositeMPSTensor{2, T},
 		# [6] permute Hr * El * x
 		push!(cache, _permute_malloc(TT, cache[5], ((3, 4, 1), (5, 2)), TO))
 		# [7] Hr * El * x * Er
-		push!(cache, _mul_malloc(TT, cache[6], Er.A, Hl.strength * Hr.strength, TO))
+		push!(cache, _mul_malloc(TT, cache[6], Er.A, Hl.strength[] * Hr.strength[], TO))
 	else
 		# permute x 
 		_permute_TO!(cache[1], x.A, ((1,), (2, 3, 4)), TO)
@@ -301,7 +301,7 @@ function _action!(x::CompositeMPSTensor{2, T},
 		# permute Hr * El * x
 		_permute_TO!(cache[6], cache[5], ((3, 4, 1), (5, 2)), TO)
 		# Hr * El * x * Er
-		_mul_TO!(cache[7], cache[6], Er.A, Hl.strength * Hr.strength, 0.0, TO)
+		_mul_TO!(cache[7], cache[6], Er.A, Hl.strength[] * Hr.strength[], 0.0, TO)
 	end
 
 	_permute_TO!(x.A, cache[7], ((1, 2), (3, 4)), TO)
@@ -326,7 +326,7 @@ function _action!(x::CompositeMPSTensor{2, T},
 		# [3] permute El*x
 		push!(cache, _permute_malloc(TT, cache[2], ((1, 2, 3), (4,)), TO))
 		# [4] El * x * Er
-		push!(cache, _mul_malloc(TT, cache[3], Er.A, Hl.strength * Hr.strength, TO))
+		push!(cache, _mul_malloc(TT, cache[3], Er.A, Hl.strength[] * Hr.strength[], TO))
 	else
 		# permute x 
 		_permute_TO!(cache[1], x.A, ((1,), (2, 3, 4)), TO)
@@ -335,7 +335,7 @@ function _action!(x::CompositeMPSTensor{2, T},
 		# permute El*x
 		_permute_TO!(cache[3], cache[2], ((1, 2, 3), (4,)), TO)
 		# El * x * Er
-		_mul_TO!(cache[4], cache[3], Er.A, Hl.strength * Hr.strength, 0.0, TO)
+		_mul_TO!(cache[4], cache[3], Er.A, Hl.strength[] * Hr.strength[], 0.0, TO)
 	end
 
 	_permute_TO!(x.A, cache[4], ((1, 2), (3, 4)), TO)
@@ -364,7 +364,7 @@ function _action!(x::CompositeMPSTensor{2, T},
 		# [5] permute Hl * El * x
 		push!(cache, _permute_malloc(TT, cache[4], ((2, 1, 3), (4,)), TO))
 		# [6] Hl * El * x * Er
-		push!(cache, _mul_malloc(TT, cache[5], Er.A, Hl.strength * Hr.strength, TO))
+		push!(cache, _mul_malloc(TT, cache[5], Er.A, Hl.strength[] * Hr.strength[], TO))
 	else
 		# permute x 
 		_permute_TO!(cache[1], x.A, ((1,), (2, 3, 4)), TO)
@@ -377,7 +377,7 @@ function _action!(x::CompositeMPSTensor{2, T},
 		# permute Hl * El * x
 		_permute_TO!(cache[5], cache[4], ((2, 1, 3), (4,)), TO)
 		# Hl * El * x * Er
-		_mul_TO!(cache[6], cache[5], Er.A, Hl.strength * Hr.strength, 0.0, TO)
+		_mul_TO!(cache[6], cache[5], Er.A, Hl.strength[] * Hr.strength[], 0.0, TO)
 	end
 
 	_permute_TO!(x.A, cache[6], ((1, 2), (3, 4)), TO)
@@ -406,7 +406,7 @@ function _action!(x::CompositeMPSTensor{2, T},
 		# [5] permute Hr * El * x
 		push!(cache, _permute_malloc(TT, cache[4], ((2, 3, 1), (4,)), TO))
 		# [6] Hr * El * x * Er
-		push!(cache, _mul_malloc(TT, cache[5], Er.A, Hl.strength * Hr.strength, TO))
+		push!(cache, _mul_malloc(TT, cache[5], Er.A, Hl.strength[] * Hr.strength[], TO))
 	else
 		# permute x 
 		_permute_TO!(cache[1], x.A, ((1,), (2, 3, 4)), TO)
@@ -419,7 +419,7 @@ function _action!(x::CompositeMPSTensor{2, T},
 		# permute Hr * El * x
 		_permute_TO!(cache[5], cache[4], ((2, 3, 1), (4,)), TO)
 		# Hr * El * x * Er
-		_mul_TO!(cache[6], cache[5], Er.A, Hl.strength * Hr.strength, 0.0, TO)
+		_mul_TO!(cache[6], cache[5], Er.A, Hl.strength[] * Hr.strength[], 0.0, TO)
 	end
 
 	_permute_TO!(x.A, cache[6], ((1, 2), (3, 4)), TO)
@@ -457,7 +457,7 @@ function _action!(x::CompositeMPSTensor{2, T},
 		# [9] permute Hl * El * x * Hr
 		push!(cache, _permute_malloc(TT, cache[8], ((1, 2, 4), (3,)), TO))
 		# [10] Hl * El * x * Hr * Er
-		push!(cache, _mul_malloc(TT, cache[9], Er.A, Hl.strength * Hr.strength, TO))
+		push!(cache, _mul_malloc(TT, cache[9], Er.A, Hl.strength[] * Hr.strength[], TO))
 	else
 		# permute x 
 		_permute_TO!(cache[1], x.A, ((1,), (2, 3, 4)), TO)
@@ -474,7 +474,7 @@ function _action!(x::CompositeMPSTensor{2, T},
 		# permute Hl * El * x * Hr
 		_permute_TO!(cache[9], cache[8], ((1, 2, 4), (3,)), TO)
 		# Hl * El * x * Hr * Er
-		_mul_TO!(cache[10], cache[9], Er.A, Hl.strength * Hr.strength, 0.0, TO)
+		_mul_TO!(cache[10], cache[9], Er.A, Hl.strength[] * Hr.strength[], 0.0, TO)
 	end
 
 	_permute_TO!(x.A, cache[10], ((1, 2), (3, 4)), TO)
@@ -505,7 +505,7 @@ function _action!(x::MPSTensor{4},
 		# [6] permute H * El * x
 		push!(cache, _permute_malloc(TT, cache[5], ((3, 1, 4), (5, 2)), TO))
 		# [7] H * El * x * Er
-		push!(cache, _mul_malloc(TT, cache[6], Er.A, H.strength, TO))
+		push!(cache, _mul_malloc(TT, cache[6], Er.A, H.strength[], TO))
 	else
 		# permute x
 		_permute_TO!(cache[1], x.A, ((1,), (2, 3, 4)), TO)
@@ -518,7 +518,7 @@ function _action!(x::MPSTensor{4},
 		# permute H * El * x
 		_permute_TO!(cache[6], cache[5], ((3, 1, 4), (5, 2)), TO)
 		# H * El * x * Er
-		_mul_TO!(cache[7], cache[6], Er.A, H.strength, 0.0, TO)
+		_mul_TO!(cache[7], cache[6], Er.A, H.strength[], 0.0, TO)
 	end
 
 	_permute_TO!(x.A, cache[7], ((1, 2), (3, 4)), TO)
@@ -542,7 +542,7 @@ function _action!(x::MPSTensor{4},
 		# [3] permute El * x
 		push!(cache, _permute_malloc(TT, cache[2], ((1, 2, 3), (4,)), TO))
 		# [4] El * x * Er
-		push!(cache, _mul_malloc(TT, cache[3], Er.A, H.strength, TO))
+		push!(cache, _mul_malloc(TT, cache[3], Er.A, H.strength[], TO))
 	else
 		# permute x
 		_permute_TO!(cache[1], x.A, ((1,), (2, 3, 4)), TO)
@@ -551,7 +551,7 @@ function _action!(x::MPSTensor{4},
 		# permute El * x
 		_permute_TO!(cache[3], cache[2], ((1, 2, 3), (4,)), TO)
 		# El * x * Er
-		_mul_TO!(cache[4], cache[3], Er.A, H.strength, 0.0, TO)
+		_mul_TO!(cache[4], cache[3], Er.A, H.strength[], 0.0, TO)
 	end
 
 	_permute_TO!(x.A, cache[4], ((1, 2), (3, 4)), TO)
@@ -579,7 +579,7 @@ function _action!(x::MPSTensor{4},
 		# [5] permute El * x
 		push!(cache, _permute_malloc(TT, cache[4], ((1, 2, 3), (4,)), TO))
 		# [6] El * x * Er
-		push!(cache, _mul_malloc(TT, cache[5], Er.A, H.strength, TO))
+		push!(cache, _mul_malloc(TT, cache[5], Er.A, H.strength[], TO))
 	else
 		# permute x
 		_permute_TO!(cache[1], x.A, ((2,), (1, 3, 4)), TO)
@@ -592,7 +592,7 @@ function _action!(x::MPSTensor{4},
 		# permute El * x
 		_permute_TO!(cache[5], cache[4], ((1, 2, 3), (4,)), TO)
 		# El * x * Er
-		_mul_TO!(cache[6], cache[5], Er.A, H.strength, 0.0, TO)
+		_mul_TO!(cache[6], cache[5], Er.A, H.strength[], 0.0, TO)
 	end
 
 	_permute_TO!(x.A, cache[6], ((1, 2), (3, 4)), TO)
@@ -620,7 +620,7 @@ function _action!(x::MPSTensor{4},
 		# [5] permute H * x * Er
 		push!(cache, _permute_malloc(TT, cache[4], ((1, 3), (2, 4, 5)), TO))
 		# [6] El * x * Er
-		push!(cache, _mul_malloc(TT, El.A, cache[5], H.strength, TO))
+		push!(cache, _mul_malloc(TT, El.A, cache[5], H.strength[], TO))
 	else
 		# permute x
 		_permute_TO!(cache[1], x.A, ((1, 2, 3), (4,)), TO)
@@ -633,7 +633,7 @@ function _action!(x::MPSTensor{4},
 		# permute H * x * Er
 		_permute_TO!(cache[5], cache[4], ((1, 3), (2, 4, 5)), TO)
 		# El * x * Er
-		_mul_TO!(cache[6], El.A, cache[5], H.strength, 0.0, TO)
+		_mul_TO!(cache[6], El.A, cache[5], H.strength[], 0.0, TO)
 	end
 
 	_permute_TO!(x.A, cache[6], ((1, 2), (3, 4)), TO)
@@ -663,7 +663,7 @@ function _action!(x::MPSTensor{4},
 		# [6] permute El * H * x
 		push!(cache, _permute_malloc(TT, cache[5], ((1, 3, 4), (5, 2)), TO))
 		# [7] El * H * x * Er
-		push!(cache, _mul_malloc(TT, cache[6], Er.A, H.strength, TO))
+		push!(cache, _mul_malloc(TT, cache[6], Er.A, H.strength[], TO))
 	else
 		# permute x
 		_permute_TO!(cache[1], x.A, ((2,), (1, 3, 4)), TO)
@@ -676,7 +676,7 @@ function _action!(x::MPSTensor{4},
 		# permute El * H * x
 		_permute_TO!(cache[6], cache[5], ((1, 3, 4), (5, 2)), TO)
 		# El * H * x * Er
-		_mul_TO!(cache[7], cache[6], Er.A, H.strength, 0.0, TO)
+		_mul_TO!(cache[7], cache[6], Er.A, H.strength[], 0.0, TO)
 	end
 
 	_permute_TO!(x.A, cache[7], ((1, 2), (3, 4)), TO)
@@ -702,7 +702,7 @@ function _action!(x::MPSTensor{4},
 		# [4] permute El * x
 		push!(cache, _permute_malloc(TT, cache[3], ((1, 3, 4), (5, 2)), TO))
 		# [5] El * x * Er
-		push!(cache, _mul_malloc(TT, cache[4], Er.A, H.strength, TO))
+		push!(cache, _mul_malloc(TT, cache[4], Er.A, H.strength[], TO))
 	else
 		# permute x
 		_permute_TO!(cache[1], x.A, ((1,), (2, 3, 4)), TO)
@@ -711,7 +711,7 @@ function _action!(x::MPSTensor{4},
 		# permute El * x
 		_permute_TO!(cache[4], cache[3], ((1, 3, 4), (5, 2)), TO)
 		# El * x * Er
-		_mul_TO!(cache[5], cache[4], Er.A, H.strength, 0.0, TO)
+		_mul_TO!(cache[5], cache[4], Er.A, H.strength[], 0.0, TO)
 	end
 
 	_permute_TO!(x.A, cache[5], ((1, 2), (3, 4)), TO)
@@ -736,7 +736,7 @@ function _action!(x::MPSTensor{4}, El::LocalLeftTensor{3}, H::LocalOperator{2, 2
           # [6] permute H * x * Er
           push!(cache, _permute_malloc(TT, cache[5], ((1, 3), (2, 4, 5)), TO))
           # [7] El * H * x * Er
-          push!(cache, _mul_malloc(TT, El.A, cache[6], H.strength, TO))
+          push!(cache, _mul_malloc(TT, El.A, cache[6], H.strength[], TO))
      else
           # permute x 
           _permute_TO!(cache[1], x.A, ((1, 2, 3), (4,)), TO)
@@ -749,7 +749,7 @@ function _action!(x::MPSTensor{4}, El::LocalLeftTensor{3}, H::LocalOperator{2, 2
           # permute H * x * Er
           _permute_TO!(cache[6], cache[5], ((1, 3), (2, 4, 5)), TO)
           # El * H * x * Er
-          _mul_TO!(cache[7], El.A, cache[6], H.strength, 0.0, TO)
+          _mul_TO!(cache[7], El.A, cache[6], H.strength[], 0.0, TO)
      end
 
      _permute_TO!(x.A, cache[7], ((1, 2), (3, 4)), TO)

@@ -185,54 +185,66 @@ end
 #    --- a(1)
 function _initialize_Al_single(El::LocalLeftTensor{2}, Al::MPSTensor{R}, Hl::IdentityOperator) where R
 	Al_f = El.A * permute(Al.A, ((1,), Tuple(2:R)))
-	return rmul!(permute(Al_f, (Tuple(1:R-1), (R,))), Hl.strength)
+	return rmul!(permute(Al_f, (Tuple(1:R-1), (R,))), Hl.strength[])
 end
 function _initialize_Al_single(El::LocalLeftTensor{2}, Al::MPSTensor{4}, Hl::LocalOperator{1, 1})
-	@tensor allocator = ManualAllocator() tmp[a g e; f] := Hl.strength * El.A[a c] * (Hl.A[g d] * Al.A[c d e f])
+	s = Hl.strength[]
+	@tensor allocator = ManualAllocator() tmp[a g e; f] := s * El.A[a c] * (Hl.A[g d] * Al.A[c d e f])
 	return tmp
 end
 function _initialize_Al_single(El::LocalLeftTensor{2}, Al::MPSTensor{3}, Hl::LocalOperator{1, 1})
-	@tensor allocator = ManualAllocator() tmp[a g; f] := Hl.strength * El.A[a c] * (Hl.A[g d] * Al.A[c d f])
+	s = Hl.strength[]
+	@tensor allocator = ManualAllocator() tmp[a g; f] := s * El.A[a c] * (Hl.A[g d] * Al.A[c d f])
 	return tmp
 end
 function _initialize_Al_single(El::LocalLeftTensor{2}, Al::MPSTensor{4}, Hl::LocalOperator{1, 2})
-	@tensor allocator = ManualAllocator() tmp[a g e; h f] := Hl.strength * (El.A[a c] * Al.A[c d e f]) * Hl.A[g d h]
+	s = Hl.strength[]
+	@tensor allocator = ManualAllocator() tmp[a g e; h f] := s * (El.A[a c] * Al.A[c d e f]) * Hl.A[g d h]
 	return tmp
 end
 function _initialize_Al_single(El::LocalLeftTensor{2}, Al::MPSTensor{3}, Hl::LocalOperator{1, 2})
-	@tensor allocator = ManualAllocator() tmp[a g; h f] := Hl.strength * (El.A[a c] * Al.A[c d f]) * Hl.A[g d h]
+	s = Hl.strength[]
+	@tensor allocator = ManualAllocator() tmp[a g; h f] := s * (El.A[a c] * Al.A[c d f]) * Hl.A[g d h]
 	return tmp
 end
 function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{4}, Hl::IdentityOperator)
-	@tensor allocator = ManualAllocator() tmp[a d e; b f] := Hl.strength * El.A[a b c] * Al.A[c d e f]
+	s = Hl.strength[]
+	@tensor allocator = ManualAllocator() tmp[a d e; b f] := s * El.A[a b c] * Al.A[c d e f]
 	return tmp
 end
 function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{3}, Hl::IdentityOperator)
-	@tensor allocator = ManualAllocator() tmp[a d; b f] := Hl.strength * El.A[a b c] * Al.A[c d f]
+	s = Hl.strength[]
+	@tensor allocator = ManualAllocator() tmp[a d; b f] := s * El.A[a b c] * Al.A[c d f]
 	return tmp
 end
 function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{4}, Hl::LocalOperator{2, 1})
-	@tensor allocator = ManualAllocator() tmp[a g e; f] := Hl.strength * (El.A[a b c] * Al.A[c d e f]) * Hl.A[b g d]
+	s = Hl.strength[]
+	@tensor allocator = ManualAllocator() tmp[a g e; f] := s * (El.A[a b c] * Al.A[c d e f]) * Hl.A[b g d]
 	return tmp
 end
 function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{3}, Hl::LocalOperator{2, 1})
-	@tensor allocator = ManualAllocator() tmp[a g; f] := Hl.strength * (El.A[a b c] * Al.A[c d f]) * Hl.A[b g d]
+	s = Hl.strength[]
+	@tensor allocator = ManualAllocator() tmp[a g; f] := s * (El.A[a b c] * Al.A[c d f]) * Hl.A[b g d]
 	return tmp
 end
 function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{4}, Hl::LocalOperator{1, 1})
-	@tensor allocator = ManualAllocator() tmp[a g e; b f] := Hl.strength * El.A[a b c] * (Hl.A[g d] * Al.A[c d e f])
+	s = Hl.strength[]
+	@tensor allocator = ManualAllocator() tmp[a g e; b f] := s * El.A[a b c] * (Hl.A[g d] * Al.A[c d e f])
 	return tmp
 end
 function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{3}, Hl::LocalOperator{1, 1})
-	@tensor allocator = ManualAllocator() tmp[a g; b f] := Hl.strength * El.A[a b c] * (Hl.A[g d] * Al.A[c d f])
+	s = Hl.strength[]
+	@tensor allocator = ManualAllocator() tmp[a g; b f] := s * El.A[a b c] * (Hl.A[g d] * Al.A[c d f])
 	return tmp
 end
 function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{4}, Hl::LocalOperator{2, 2})
-	@tensor allocator = ManualAllocator() tmp[a g e; h f] := Hl.strength * (El.A[a b c] * Al.A[c d e f]) * Hl.A[b g d h]
+	s = Hl.strength[]
+	@tensor allocator = ManualAllocator() tmp[a g e; h f] := s * (El.A[a b c] * Al.A[c d e f]) * Hl.A[b g d h]
 	return tmp
 end
 function _initialize_Al_single(El::LocalLeftTensor{3}, Al::MPSTensor{3}, Hl::LocalOperator{2, 2})
-	@tensor allocator = ManualAllocator() tmp[a g; h f] := Hl.strength * (El.A[a b c] * Al.A[c d f]) * Hl.A[b g d h]
+	s = Hl.strength[]
+	@tensor allocator = ManualAllocator() tmp[a g; h f] := s * (El.A[a b c] * Al.A[c d f]) * Hl.A[b g d h]
 	return tmp
 end
 # ------------------------------------------------------
@@ -251,54 +263,66 @@ end
 #              h(5) ---
 function _initialize_Ar_single(Er::LocalRightTensor{2}, Ar::MPSTensor{R}, Hr::IdentityOperator) where R
      Ar_f = permute(Ar.A, (Tuple(1:R-1), (R,))) * Er.A
-	return rmul!(permute(Ar_f, ((1,), Tuple(2:R))), Hr.strength)
+	return rmul!(permute(Ar_f, ((1,), Tuple(2:R))), Hr.strength[])
 end
 function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{4}, Hr::IdentityOperator)
-	@tensor allocator = ManualAllocator() tmp[g a; b c h] := Hr.strength * Ar.A[a b c d] * Er.A[d g h]
+	s = Hr.strength[]
+	@tensor allocator = ManualAllocator() tmp[g a; b c h] := s * Ar.A[a b c d] * Er.A[d g h]
 	return tmp
 end
 function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{3}, Hr::IdentityOperator)
-	@tensor allocator = ManualAllocator() tmp[g a; b h] := Hr.strength * Ar.A[a b d] * Er.A[d g h]
+	s = Hr.strength[]
+	@tensor allocator = ManualAllocator() tmp[g a; b h] := s * Ar.A[a b d] * Er.A[d g h]
 	return tmp
 end
 function _initialize_Ar_single(Er::LocalRightTensor{2}, Ar::MPSTensor{4}, Hr::LocalOperator{1, 1})
-	@tensor allocator = ManualAllocator() tmp[a; f c h] := Hr.strength * (Ar.A[a b c d] * Er.A[d h]) * Hr.A[f b]
+	s = Hr.strength[]
+	@tensor allocator = ManualAllocator() tmp[a; f c h] := s * (Ar.A[a b c d] * Er.A[d h]) * Hr.A[f b]
 	return tmp
 end
 function _initialize_Ar_single(Er::LocalRightTensor{2}, Ar::MPSTensor{3}, Hr::LocalOperator{1, 1})
-	@tensor allocator = ManualAllocator() tmp[a; f h] := Hr.strength * (Ar.A[a b d] * Er.A[d h]) * Hr.A[f b]
+	s = Hr.strength[]
+	@tensor allocator = ManualAllocator() tmp[a; f h] := s * (Ar.A[a b d] * Er.A[d h]) * Hr.A[f b]
 	return tmp
 end
 function _initialize_Ar_single(Er::LocalRightTensor{2}, Ar::MPSTensor{4}, Hr::LocalOperator{2, 1})
-	@tensor allocator = ManualAllocator() tmp[e a; f c h] := Hr.strength * (Ar.A[a b c d] * Er.A[d h]) * Hr.A[e f b]
+	s = Hr.strength[]
+	@tensor allocator = ManualAllocator() tmp[e a; f c h] := s * (Ar.A[a b c d] * Er.A[d h]) * Hr.A[e f b]
 	return tmp
 end
 function _initialize_Ar_single(Er::LocalRightTensor{2}, Ar::MPSTensor{3}, Hr::LocalOperator{2, 1})
-	@tensor allocator = ManualAllocator() tmp[e a; f h] := Hr.strength * (Ar.A[a b d] * Er.A[d h]) * Hr.A[e f b]
+	s = Hr.strength[]
+	@tensor allocator = ManualAllocator() tmp[e a; f h] := s * (Ar.A[a b d] * Er.A[d h]) * Hr.A[e f b]
 	return tmp
 end
 function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{4}, Hr::LocalOperator{1, 1})
-	@tensor allocator = ManualAllocator() tmp[g a; f c h] := Hr.strength * (Hr.A[f b] * Ar.A[a b c d]) * Er.A[d g h]
+	s = Hr.strength[]
+	@tensor allocator = ManualAllocator() tmp[g a; f c h] := s * (Hr.A[f b] * Ar.A[a b c d]) * Er.A[d g h]
 	return tmp
 end
 function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{3}, Hr::LocalOperator{1, 1})
-	@tensor allocator = ManualAllocator() tmp[g a; f h] := Hr.strength * (Hr.A[f b] * Ar.A[a b d]) * Er.A[d g h]
+	s = Hr.strength[]
+	@tensor allocator = ManualAllocator() tmp[g a; f h] := s * (Hr.A[f b] * Ar.A[a b d]) * Er.A[d g h]
 	return tmp
 end
 function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{4}, Hr::LocalOperator{1, 2})
-	@tensor allocator = ManualAllocator() tmp[a; f c h] := Hr.strength * (Hr.A[f b g] * Ar.A[a b c d]) * Er.A[d g h]
+	s = Hr.strength[]
+	@tensor allocator = ManualAllocator() tmp[a; f c h] := s * (Hr.A[f b g] * Ar.A[a b c d]) * Er.A[d g h]
 	return tmp
 end
 function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{3}, Hr::LocalOperator{1, 2})::MPSTensor
-	@tensor allocator = ManualAllocator() tmp[a; f h] := Hr.strength * (Hr.A[f b g] * Ar.A[a b d]) * Er.A[d g h]
+	s = Hr.strength[]
+	@tensor allocator = ManualAllocator() tmp[a; f h] := s * (Hr.A[f b g] * Ar.A[a b d]) * Er.A[d g h]
 	return tmp
 end
 function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{4}, Hr::LocalOperator{2, 2})
-	@tensor allocator = ManualAllocator() tmp[e a; f c h] := Hr.strength * (Ar.A[a b c d] * Er.A[d g h]) * Hr.A[e f b g]
+	s = Hr.strength[]
+	@tensor allocator = ManualAllocator() tmp[e a; f c h] := s * (Ar.A[a b c d] * Er.A[d g h]) * Hr.A[e f b g]
 	return tmp
 end
 function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{3}, Hr::LocalOperator{2, 2})
-	@tensor allocator = ManualAllocator() tmp[e a; f h] := Hr.strength * (Ar.A[a b d] * Er.A[d g h]) * Hr.A[e f b g]
+	s = Hr.strength[]
+	@tensor allocator = ManualAllocator() tmp[e a; f h] := s * (Ar.A[a b d] * Er.A[d g h]) * Hr.A[e f b g]
 	return tmp
 end
 # # =================== contract Al and Al_i ====================

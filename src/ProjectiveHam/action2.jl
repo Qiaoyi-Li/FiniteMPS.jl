@@ -180,14 +180,14 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
 
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a e; h i] := (El.A[a c] * x.A[c e h k]) * Er.A[k i]
 
-     return Hl.strength * Hr.strength * _permute2(Hx, x.A)
+     return Hl.strength[] * Hr.strength[] * _permute2(Hx, x.A)
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      Hl::IdentityOperator, Hr::IdentityOperator,
      Er::LocalRightTensor{3}; kwargs...) where {T<:NTuple{2,MPSTensor{3}}}
 
-     coef = Hl.strength * Hr.strength
+     coef = Hl.strength[] * Hr.strength[]
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a e; h i] := coef * (El.A[a b c] * x.A[c e h k]) * Er.A[k b i]
      return _permute2(Hx, x.A)
 end
@@ -196,7 +196,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      Hl::IdentityOperator, Hr::LocalOperator{2,1},
      Er::LocalRightTensor{2}; kwargs...) where {T<:NTuple{2,MPSTensor{3}}}
 
-     coef = Hl.strength * Hr.strength
+     coef = Hl.strength[] * Hr.strength[]
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a e; g i] := coef * (El.A[a b c] * (x.A[c e h k] * Er.A[k i])) * Hr.A[b g h]
      return _permute2(Hx, x.A)
 end
@@ -209,7 +209,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a d; h i] := ((El.A[a b c] * x.A[c e h k]) * Hl.A[b d e]) * Er.A[k i] #1.9s/10(D=8192)
      # @tensor allocator = TensorOperations.ManualAllocator() Hx[a d; h i] := El.A[a b c] * (Hl.A[b d e]* (x.A[c e h k] * Er.A[k i])) #2.5s/10(D=8192)
 
-     return Hl.strength * Hr.strength * _permute2(Hx, x.A)
+     return Hl.strength[] * Hr.strength[] * _permute2(Hx, x.A)
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
@@ -220,7 +220,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a d; g i] := (((El.A[a b c] * x.A[c e h k]) * Hl.A[d e]) * Hr.A[b g h]) * Er.A[k i] # 2.1s/10(D = 8192)
      # @tensor allocator = TensorOperations.ManualAllocator() Hx[a d; g i] := ((El.A[a b c] * (x.A[c e h k] * Hl.A[d e])) * Hr.A[b g h]) * Er.A[k i] # 2.2s/10(D = 8192)
 
-     return Hl.strength * Hr.strength * _permute2(Hx, x.A)
+     return Hl.strength[] * Hr.strength[] * _permute2(Hx, x.A)
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
@@ -232,7 +232,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      # @tensor allocator = TensorOperations.ManualAllocator() Hx[a d; g i] := El.A[a b c] * (Hl.A[d e] * x.A[c e h k] * Hr.A[g h]) * Er.A[k b i] # 2.6s/10(D = 8192)
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a d; g i] := (((El.A[a b c] * x.A[c e h k]) * Hl.A[d e]) * Hr.A[g h]) * Er.A[k b i] # 2.6s/10(D = 8192)
 
-     return Hl.strength * Hr.strength * _permute2(Hx, x.A)
+     return Hl.strength[] * Hr.strength[] * _permute2(Hx, x.A)
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
@@ -243,7 +243,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
      # @tensor allocator = TensorOperations.ManualAllocator() Hx[a d; h i] := El.A[a c] * (Hl.A[d e] * x.A[c e h k]) * Er.A[k i] # 1.8s/10(D=8192)
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a d; h i] := ((El.A[a c] * x.A[c e h k]) * Hl.A[d e]) * Er.A[k i] # 1.5s/10(D=8192)
 
-     return Hl.strength * Hr.strength * _permute2(Hx, x.A)
+     return Hl.strength[] * Hr.strength[] * _permute2(Hx, x.A)
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
@@ -252,13 +252,13 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
 
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a d; g i] := (((El.A[a c] * x.A[c e h k]) * Hl.A[d e]) * Hr.A[g h]) * Er.A[k i]
 
-     return Hl.strength * Hr.strength * _permute2(Hx, x.A)
+     return Hl.strength[] * Hr.strength[] * _permute2(Hx, x.A)
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
      Hl::LocalOperator{1,2}, Hr::IdentityOperator,
      Er::LocalRightTensor{3}; kwargs...) where {T<:NTuple{2,MPSTensor{3}}}
-     coef = Hl.strength * Hr.strength
+     coef = Hl.strength[] * Hr.strength[]
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a d; h i] := coef * ((El.A[a c] * x.A[c e h k]) * Hl.A[d e f]) * Er.A[k f i]
      return _permute2(Hx, x.A)
 end
@@ -270,7 +270,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
      # @tensor allocator = TensorOperations.ManualAllocator() Hx[a d; g i] := (El.A[a c] * x.A[c e h k] * Hr.A[g h]) * (Hl.A[d e f] * Er.A[k f i]) # 2.9s/10(D = 8192)
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a d; g i] := ((El.A[a c] * x.A[c e h k] * Hr.A[g h]) * Hl.A[d e f]) * Er.A[k f i] # 2.1s/10(D=8192)
 
-     return Hl.strength * Hr.strength * _permute2(Hx, x.A)
+     return Hl.strength[] * Hr.strength[] * _permute2(Hx, x.A)
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
@@ -279,7 +279,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
 
      @tensor Hx[a d; g i] := ((El.A[a c] * x.A[c e h k] * Hl.A[d e f]) * Hr.A[f g h j]) * Er.A[k j i] 
 
-     return Hl.strength * Hr.strength * _permute2(Hx, x.A)
+     return Hl.strength[] * Hr.strength[] * _permute2(Hx, x.A)
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
@@ -290,7 +290,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a e; g i] := ((El.A[a c] * x.A[c e h k]) * Hr.A[g h]) * Er.A[k i] # 1.6s/10(D=8192)
      # @tensor allocator = TensorOperations.ManualAllocator() Hx[a e; g i] := El.A[a c] * (Hr.A[g h] * (x.A[c e h k] * Er.A[k i])) #1.7s/10(D=8192)
 
-     return Hl.strength * Hr.strength * _permute2(Hx, x.A)
+     return Hl.strength[] * Hr.strength[] * _permute2(Hx, x.A)
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
@@ -300,7 +300,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
      # @tensor allocator = TensorOperations.ManualAllocator() Hx[a e; g i] := (El.A[a c] * x.A[c e h k]) * (Hr.A[g h j] * Er.A[k j i]) # 2.6s/10(D=8192)
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a e; g i] := ((El.A[a c] * x.A[c e h k]) * Hr.A[g h j]) * Er.A[k j i] # 2s/10(D=8192)
 
-     return Hl.strength * Hr.strength * _permute2(Hx, x.A)
+     return Hl.strength[] * Hr.strength[] * _permute2(Hx, x.A)
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
@@ -308,7 +308,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      Er::LocalRightTensor{2}; kwargs...) where {T<:NTuple{2,MPSTensor{3}}}
      @tensor Hx[a d; g i] := (El.A[a b c] * x.A[c e h k]) * (Hl.A[b d e f] * Hr.A[f g h]) * Er.A[k i]
 
-     return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
+     return rmul!(_permute2(Hx, x.A), Hl.strength[] * Hr.strength[])
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
@@ -316,7 +316,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      Er::LocalRightTensor{3}; kwargs...) where {T<:NTuple{2,MPSTensor{3}}}
      @tensor Hx[a d; h i] := (El.A[a b c] * x.A[c e h k]) * Hl.A[b d e f] * Er.A[k f i]
 
-     return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
+     return rmul!(_permute2(Hx, x.A), Hl.strength[] * Hr.strength[])
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
@@ -324,7 +324,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      Er::LocalRightTensor{3}; kwargs...) where {T<:NTuple{2,MPSTensor{3}}}
      @tensor Hx[a e; g i] := El.A[a f c] * ((x.A[c e h k] * Er.A[k j i]) * Hr.A[f g h j]) 
 
-     return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
+     return rmul!(_permute2(Hx, x.A), Hl.strength[] * Hr.strength[])
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
@@ -333,7 +333,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
 
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a d; g i] := (El.A[a c] * x.A[c e h k]) * (Hl.A[d e f] * Hr.A[f g h]) * Er.A[k i] # 1.5s/10(D=8192)
      # @tensor allocator = TensorOperations.ManualAllocator() Hx[a d; g i] := (((El.A[a c] * x.A[c e h k]) * Hl.A[d e f]) * Hr.A[f g h]) * Er.A[k i] # 1.8s/10(D=8192)
-     return Hl.strength * Hr.strength * _permute2(Hx, x.A)
+     return Hl.strength[] * Hr.strength[] * _permute2(Hx, x.A)
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
@@ -342,7 +342,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
 
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a d; g i] := ((El.A[a b c] * (x.A[c e h k] * Hr.A[g h])) * Hl.A[b d e]) * Er.A[k i] 
 
-     return Hl.strength * Hr.strength * _permute2(Hx, x.A)
+     return Hl.strength[] * Hr.strength[] * _permute2(Hx, x.A)
 end
 
 # -----------------------------------------------------------------------
@@ -365,7 +365,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
 
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a d l; h m i] := ((El.A[a c] * x.A[c e l h m k]) * Hl.A[d e]) * Er.A[k i]
 
-     return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
+     return rmul!(_permute2(Hx, x.A), Hl.strength[] * Hr.strength[])
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
@@ -373,7 +373,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
      Er::LocalRightTensor{2}; kwargs...) where {T<:NTuple{2,MPSTensor{4}}}
 
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a d l; g m i] := (El.A[a c] * x.A[c e l h m k]) * (Hl.A[d e f] * Hr.A[f g h]) * Er.A[k i]
-     return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
+     return rmul!(_permute2(Hx, x.A), Hl.strength[] * Hr.strength[])
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
@@ -381,7 +381,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
      Er::LocalRightTensor{3}; kwargs...) where {T<:NTuple{2,MPSTensor{4}}}
 
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a d l; g m i] := ((El.A[a c] * x.A[c e l h m k] * Hr.A[g h]) * Hl.A[d e f]) * Er.A[k f i]
-     return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
+     return rmul!(_permute2(Hx, x.A), Hl.strength[] * Hr.strength[])
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
@@ -390,7 +390,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
 
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a e l; g m i] := ((El.A[a c] * x.A[c e l h m k]) * Hr.A[g h]) * Er.A[k i]
 
-     return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
+     return rmul!(_permute2(Hx, x.A), Hl.strength[] * Hr.strength[])
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
@@ -399,7 +399,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
 
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a e l; g m i] := ((El.A[a c] * x.A[c e l h m k]) * Hr.A[g h j]) * Er.A[k j i]
 
-     return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
+     return rmul!(_permute2(Hx, x.A), Hl.strength[] * Hr.strength[])
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
@@ -408,7 +408,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
 
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a e l; h m i] := (El.A[a c] * x.A[c e l h m k]) * Er.A[k i]
 
-     return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
+     return rmul!(_permute2(Hx, x.A), Hl.strength[] * Hr.strength[])
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
@@ -417,12 +417,12 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
 
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a d l; h m i] := El.A[a b c] * ((x.A[c e l h m k] * Er.A[k i]) * Hl.A[b d e])
 
-     return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
+     return rmul!(_permute2(Hx, x.A), Hl.strength[] * Hr.strength[])
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2}, Hl::LocalOperator{1,1}, Hr::LocalOperator{1,1}, Er::LocalRightTensor{2}; kwargs...) where {T<:NTuple{2,MPSTensor{4}}}
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a d l; g m i] := (((El.A[a c] * x.A[c e l h m k]) * Hl.A[d e]) * Hr.A[g h]) * Er.A[k i]
-     return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
+     return rmul!(_permute2(Hx, x.A), Hl.strength[] * Hr.strength[])
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
@@ -432,7 +432,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      # @tensor allocator = TensorOperations.ManualAllocator() Hx[a d l; g m i] := (((El.A[a b c] * x.A[c e l h m k]) * Hl.A[d e]) * Hr.A[g h]) * Er.A[k b i]
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a d l; g m i] := El.A[a b c] * ((x.A[c e l h m k] * Hl.A[d e]) * Hr.A[g h]) * Er.A[k b i]
 
-     return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
+     return rmul!(_permute2(Hx, x.A), Hl.strength[] * Hr.strength[])
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
@@ -441,7 +441,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
 
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a d l; g m i] := (((El.A[a b c] * x.A[c e l h m k]) * Hl.A[d e]) * Hr.A[b g h]) * Er.A[k i]
 
-     return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
+     return rmul!(_permute2(Hx, x.A), Hl.strength[] * Hr.strength[])
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
@@ -449,7 +449,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      Er::LocalRightTensor{2}; kwargs...) where {T<:NTuple{2,MPSTensor{4}}}
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a d l; g m i] := (El.A[a b c] * x.A[c e l h m k]) * (Hl.A[b d e f] * Hr.A[f g h]) * Er.A[k i]
 
-     return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
+     return rmul!(_permute2(Hx, x.A), Hl.strength[] * Hr.strength[])
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
@@ -459,25 +459,25 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      # @tensor allocator = TensorOperations.ManualAllocator() Hx[a d l; g m i] := (((El.A[a b c] * x.A[c e l h m k]) * Hl.A[b d e f]) * Hr.A[g h]) * Er.A[k f i]
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a d l; g m i] := (El.A[a b c] * (x.A[c e l h m k] * Hr.A[g h])) * Hl.A[b d e f] * Er.A[k f i]
 
-     return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
+     return rmul!(_permute2(Hx, x.A), Hl.strength[] * Hr.strength[])
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      Hl::IdentityOperator, Hr::LocalOperator{2,2}, Er::LocalRightTensor{3}; kwargs...) where {T<:NTuple{2,MPSTensor{4}}}
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a e l; g m i] := ((El.A[a b c] * x.A[c e l h m k]) * Hr.A[b g h j]) * Er.A[k j i]
-     return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
+     return rmul!(_permute2(Hx, x.A), Hl.strength[] * Hr.strength[])
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      Hl::IdentityOperator, Hr::IdentityOperator, Er::LocalRightTensor{3}; kwargs...) where {T<:NTuple{2,MPSTensor{4}}}
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a e l; h m i] := (El.A[a b c] * x.A[c e l h m k]) * Er.A[k b i]
-     return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
+     return rmul!(_permute2(Hx, x.A), Hl.strength[] * Hr.strength[])
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
      Hl::LocalOperator{1,2}, Hr::IdentityOperator,
      Er::LocalRightTensor{3}; kwargs...) where {T<:NTuple{2,MPSTensor{4}}}
-     coef = Hl.strength * Hr.strength
+     coef = Hl.strength[] * Hr.strength[]
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a d l; h m i] := coef * ((El.A[a c] * x.A[c e l h m k]) * Hl.A[d e f]) * Er.A[k f i]
      return _permute2(Hx, x.A)
 end
@@ -486,7 +486,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      Hl::IdentityOperator, Hr::LocalOperator{2,1},
      Er::LocalRightTensor{2}; kwargs...) where {T<:NTuple{2,MPSTensor{4}}}
 
-     coef = Hl.strength * Hr.strength
+     coef = Hl.strength[] * Hr.strength[]
      @tensor allocator = TensorOperations.ManualAllocator() Hx[a e l; g m i] := coef * (El.A[a b c] * (x.A[c e l h m k] * Er.A[k i])) * Hr.A[b g h]
      return _permute2(Hx, x.A)
 end
@@ -497,7 +497,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{2},
 
      @tensor Hx[a d l; g m i] := ((El.A[a c] * x.A[c e l h m k] * Hl.A[d e f]) * Hr.A[f g h j]) * Er.A[k j i] 
 
-     return Hl.strength * Hr.strength * _permute2(Hx, x.A)
+     return Hl.strength[] * Hr.strength[] * _permute2(Hx, x.A)
 end
 
 function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
@@ -505,7 +505,7 @@ function _action2(x::CompositeMPSTensor{2,T}, El::LocalLeftTensor{3},
      Er::LocalRightTensor{3}; kwargs...) where {T<:NTuple{2,MPSTensor{4}}}
      @tensor Hx[a d l; h m i] := (El.A[a b c] * x.A[c e l h m k]) * Hl.A[b d e f] * Er.A[k f i]
 
-     return rmul!(_permute2(Hx, x.A), Hl.strength * Hr.strength)
+     return rmul!(_permute2(Hx, x.A), Hl.strength[] * Hr.strength[])
 end
 
 # -----------------------------------------------------------------------

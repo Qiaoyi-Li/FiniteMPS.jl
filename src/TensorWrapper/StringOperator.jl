@@ -64,7 +64,6 @@ mutable struct StringOperator
           
 end
 
-
 length(obj::StringOperator) = length(obj.Ops)
 for func in (:getindex, :lastindex, :setindex!, :iterate, :keys, :isassigned, :deleteat!)
      @eval Base.$func(obj::StringOperator, args...) = $func(obj.Ops, args...)
@@ -108,4 +107,58 @@ function reduce!(Ops::StringOperator)
           end
      end
      return Ops
+end
+
+# swap two operators to deal with horizontal bond
+_swap(A::LocalOperator{1, 1}, B::LocalOperator{1, 1}) = B, A
+_swap(A::LocalOperator{1, 1}, B::LocalOperator{1, 2}) = B, A
+_swap(A::LocalOperator{1, 2}, B::LocalOperator{1, 1}) = B, A
+_swap(A::LocalOperator{2, 1}, B::LocalOperator{1, 1}) = B, A
+_swap(A::LocalOperator{1, 1}, B::LocalOperator{2, 1}) = B, A
+function _swap(A::LocalOperator{1, 2}, B::LocalOperator{2, 1})
+	return _swapOp(B), _swapOp(A)
+end
+function _swap(A::LocalOperator{1, 2}, B::LocalOperator{2, 2})
+	#  |      |          |      |
+	#  A--  --B--va -->  B--  --A--va
+	#  |      |          |      |
+
+	@tensor AB[d e; a b f] := A.A[a b c] * B.A[c d e f]
+	# QR 
+	TA, TB = leftorth(AB)
+
+	return LocalOperator(permute(TA, (1,), (2, 3)), B.name, B.si, B.fermionic, B.strength), LocalOperator(permute(TB, (1, 2), (3, 4)), A.name, A.si, A.fermionic, A.strength)
+end
+function _swap(A::LocalOperator{2, 2}, B::LocalOperator{2, 1})
+	#     |     |         |     |
+	# va--A-- --B --> va--B-- --A 
+	#     |     |         |     |
+
+	@tensor AB[a e f; b c] := A.A[a b c d] * B.A[d e f]
+	# QR
+	TA, TB = rightorth(AB)
+
+	return LocalOperator(permute(TA, (1, 2), (3, 4)), B.name, B.si, B.fermionic, B.strength), LocalOperator(permute(TB, (1, 2), (3,)), A.name, A.si, A.fermionic, A.strength)
+end
+function _swap(A::LocalOperator{2, 2}, B::LocalOperator{2, 2})
+	#     |     |             |     |
+	# va--A-- --B--vb --> va--B-- --A--vb 
+	#     |     |             |     |
+
+	@tensor AB[a e f; b c g] := A.A[a b c d] * B.A[d e f g]
+	# QR
+	TA, TB = leftorth(AB)
+
+	return LocalOperator(permute(TA, (1, 2), (3, 4)), B.name, B.si, B.fermionic, B.strength), LocalOperator(permute(TB, (1, 2), (3, 4)), A.name, A.si, A.fermionic, A.strength)
+end
+function _swap(A::LocalOperator{2, 1}, B::LocalOperator{1, 2})
+	#     |   |             |     |
+	# va--A   B--vb --> va--B-- --A--vb 
+	#     |   |             |     |
+
+	@tensor AB[a e f; b c g] := A.A[a b c] * B.A[e f g]
+	# QR
+	TA, TB = leftorth(AB)
+
+	return LocalOperator(permute(TA, (1, 2), (3, 4)), B.name, B.si, B.fermionic, B.strength), LocalOperator(permute(TB, (1, 2), (3, 4)), A.name, A.si, A.fermionic, A.strength)
 end

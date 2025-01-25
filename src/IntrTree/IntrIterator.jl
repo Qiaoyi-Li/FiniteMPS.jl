@@ -186,22 +186,27 @@ function iterate(iter::TwoSiteInteractionIterator{L, <:AbstractTensorMap}, i::In
 end
 
 struct ArbitraryInteractionIterator{L} <: AbstractInteractionIterator{L}
-     Op::Vector{<:AbstractLocalOperator}
-     function ArbitraryInteractionIterator{L}(Op::Vector{<:AbstractLocalOperator}) where L
-          @assert length(Op) == L
-          return new{L}(Op)
-     end
-     function ArbitraryInteractionIterator(Op::Vector{<:AbstractTensorMap},
-          name::Union{String, Symbol})
-          @assert false "# TODO deal with the JW string"
-          L = length(Op)
-          Op = map(1:L) do i
-               LocalOperator(Op[i], name, i)
+     Ops::Vector{<:AbstractLocalOperator}
+     Z::Union{Nothing, AbstractTensorMap, AbstractVector{<:AbstractTensorMap}}
+     pspace::Union{Nothing, VectorSpace, Vector{<:VectorSpace}}
+end
+function iterate(iter::ArbitraryInteractionIterator{L}, st::Tuple{Int64, Int64, Bool} = (1, 1, false)) where {L}
+     i, idx, flag = st
+     i > L && return nothing
+
+     if idx > length(iter.Ops) || i < iter.Ops[idx].si
+          if flag 
+               return LocalOperator(_getZ(iter.Z, i), :Z, i, false), (i + 1, idx, flag)
+          else
+               return IdentityOperator(_getpspace(iter.pspace, i), i), (i + 1, idx, flag)
           end
-          return ArbitraryInteractionIterator{L}(Op)
+     else
+          Op_i = deepcopy(iter.Ops[idx])
+          # add Z if necessary 
+          flag && _addZ!(Op_i, _getZ(iter.Z, i))
+          return Op_i, (i + 1, idx + 1, xor(flag, isfermionic(Op_i)))
      end
 end
-iterate(iter::ArbitraryInteractionIterator, args...) = iterate(iter.Op, args...) 
 
 # make sure the additional horizontal bond is on the left, used in ITP
 function _rightOp(A::LocalOperator{R₁, R₂}, B::LocalOperator{R₂, 1}) where {R₁, R₂}
@@ -212,5 +217,52 @@ function _rightOp(A::LocalOperator{1, 2}, B::LocalOperator{2, 2})
      # QR
      TA, TB = leftorth(AB)
      return LocalOperator(permute(TA, ((1, 2), (3, 4))), A.name, A.si, A.fermionic, A.strength), LocalOperator(permute(TB, ((1, 2), (3, ))), B.name, B.si, B.fermionic, B.strength)
+end
+
+_getZ(::Nothing, ::Int64) = nothing
+_getZ(Z::AbstractTensorMap, ::Int64) = Z
+_getZ(Z::Vector{AbstractTensorMap}, i::Int64) = Z[i]
+_getpspace(::Nothing, ::Int64) = nothing
+_getpspace(pspace::VectorSpace, ::Int64) = pspace
+_getpspace(pspace::Vector{VectorSpace}, i::Int64) = pspace[i]
+
+_addZ!(O::LocalOperator, ::Nothing) = O
+function _addZ!(OR::LocalOperator{1, 1}, Z::AbstractTensorMap)
+	OR.A = Z * OR.A
+	if OR.name[1] == 'Z'
+		OR.name = OR.name[2:end]
+	else
+		OR.name = "Z" * OR.name
+	end
+	return OR
+end
+function _addZ!(OR::LocalOperator{1, R₂}, Z::AbstractTensorMap) where R₂
+	OR.A = Z * OR.A
+	if OR.name[1] == 'Z'
+		OR.name = OR.name[2:end]
+	else
+		OR.name = "Z" * OR.name
+	end
+	return OR
+end
+function _addZ!(OR::LocalOperator{R₁, 1}, Z::AbstractTensorMap) where R₁
+	# note ZA = - AZ
+	OR.A = -OR.A * Z
+	if OR.name[1] == 'Z'
+		OR.name = OR.name[2:end]
+	else
+		OR.name = "Z" * OR.name
+	end
+	return OR
+end
+
+function _addZ!(OR::LocalOperator{2, 2}, Z::AbstractTensorMap)
+	@tensor OR.A[a e; c d] := Z[e b] * OR.A[a b c d]
+	if OR.name[1] == 'Z'
+		OR.name = OR.name[2:end]
+	else
+		OR.name = "Z" * OR.name
+	end
+	return OR
 end
 
