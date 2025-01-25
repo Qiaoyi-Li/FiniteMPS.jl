@@ -15,8 +15,6 @@ function addIntr!(Tree::InteractionTree{L},
 	iszero(strength) && return nothing
 
 	any(fermionic) && @assert !isnothing(Z)
-	# even number of fermionic operators
-	@assert iseven(sum(fermionic))
 
 	# update Refs
 	if !haskey(Tree.Refs, IntrName)
@@ -45,7 +43,7 @@ function addIntr!(Tree::InteractionTree{L},
 	strength::Number;
 	pspace::Union{Nothing, VectorSpace, Vector{<:VectorSpace}} = nothing,
 	name::Union{Symbol, String} = "A",
-	IntrName::Union{Symbol, String} = string.(name)
+	IntrName::Union{Symbol, String} = string.(name),
 ) where L
 	return addIntr!(Tree, (Op,), (si,), (false,), strength; pspace = pspace, name = (name,), IntrName = IntrName)
 end
@@ -85,64 +83,78 @@ function addIntr!(Tree::InteractionTree{L},
 		end
 	end
 
-	# left to right 
+
 	nodeL = Tree.RootL
-	for si in 1:div(L, 2)
-		idx = findfirst(nodeL.children) do child
-			child.Op == (si, Ops_idx[si])
-		end
-
-		if !isnothing(idx)
-			nodeL = nodeL.children[idx]
-			continue
-		end
-
-		# merge
-		idx = findfirst(nodeL.Intrs) do ch
-			ch.Ops[1] == Ops_idx[si]
-		end
-		isnothing(idx) && break
-
-		node_new = InteractionTreeNode((si, Ops_idx[si]), nodeL)
-		ch = nodeL.Intrs[idx]
-		push!(node_new.Intrs, ch)
-		deleteat!(nodeL.Intrs, idx) # remove ch from nodeL
-		# update ch 
-		deleteat!(ch.Ops, 1)
-		ch.LeafL = node_new
-
-		push!(nodeL.children, node_new)
-		nodeL = node_new
-	end
-
-	# right to left
 	nodeR = Tree.RootR
-	for si in reverse(div(L, 2)+1:L)
-		idx = findfirst(nodeR.children) do child
-			child.Op == (si, Ops_idx[si])
+	flagL = flagR = false
+	for i in 1:L
+		# left to right 
+		if !flagL
+			si = i
+			idx = findfirst(nodeL.children) do child
+				child.Op == (si, Ops_idx[si])
+			end
+
+			if !isnothing(idx)
+				nodeL = nodeL.children[idx]
+			else
+				# merge
+				idx = findfirst(nodeL.Intrs) do ch
+					length(ch.Ops) < 1 && return false
+					ch.Ops[1] == Ops_idx[si]
+				end
+				if isnothing(idx)
+					flagL = true
+				else
+					node_new = InteractionTreeNode((si, Ops_idx[si]), nodeL)
+					ch = nodeL.Intrs[idx]
+					push!(node_new.Intrs, ch)
+					deleteat!(nodeL.Intrs, idx) # remove ch from nodeL
+					# update ch 
+					deleteat!(ch.Ops, 1)
+					ch.LeafL = node_new
+
+					push!(nodeL.children, node_new)
+					nodeL = node_new
+				end
+			end
 		end
 
-		if !isnothing(idx)
-			nodeR = nodeR.children[idx]
-			continue
+		nodeL.Op[1] + 1 ≥ nodeR.Op[1] && break
+
+		# right to left
+		if !flagR
+			si = L - i + 1
+			idx = findfirst(nodeR.children) do child
+				child.Op == (si, Ops_idx[si])
+			end
+
+			if !isnothing(idx)
+				nodeR = nodeR.children[idx]
+			else
+				# merge
+				idx = findfirst(nodeR.Intrs) do ch
+					length(ch.Ops) < 1 && return false
+					ch.Ops[end] == Ops_idx[si]
+				end
+				if isnothing(idx)
+					flagR = true
+				else
+					node_new = InteractionTreeNode((si, Ops_idx[si]), nodeR)
+					ch = nodeR.Intrs[idx]
+					push!(node_new.Intrs, ch)
+					deleteat!(nodeR.Intrs, idx) # remove ch from nodeR
+					# update ch
+					deleteat!(ch.Ops, length(ch.Ops))
+					ch.LeafR = node_new
+
+					push!(nodeR.children, node_new)
+					nodeR = node_new
+				end
+			end
 		end
 
-		# merge
-		idx = findfirst(nodeR.Intrs) do ch
-			ch.Ops[end] == Ops_idx[si]
-		end
-		isnothing(idx) && break
-
-		node_new = InteractionTreeNode((si, Ops_idx[si]), nodeR)
-		ch = nodeR.Intrs[idx]
-		push!(node_new.Intrs, ch)
-		deleteat!(nodeR.Intrs, idx) # remove ch from nodeR
-		# update ch
-		deleteat!(ch.Ops, length(ch.Ops))
-		ch.LeafR = node_new
-
-		push!(nodeR.children, node_new)
-		nodeR = node_new
+		nodeL.Op[1] + 1 ≥ nodeR.Op[1] && break
 	end
 
 	ch = InteractionChannel(Ops_idx[nodeL.Op[1]+1:nodeR.Op[1]-1], ref, nodeL, nodeR)

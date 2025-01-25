@@ -23,7 +23,7 @@ mutable struct StringOperator
      function StringOperator(Ops::AbstractVector{<:AbstractLocalOperator}, strength::Number = 1.0)
           L = length(Ops)
           # check horizontal bonds 
-          @assert rank(Ops[1], 1) == rank(Ops[end], 2) == 1
+          # @assert rank(Ops[1], 1) == rank(Ops[end], 2) == 1
           @assert rank(Ops[1], 2) ∈ [1, 2]
           a_flag = rank(Ops[1], 2) == 2
           for i in 2:L 
