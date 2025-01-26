@@ -77,10 +77,10 @@ function _pushleft(Er::LocalRightTensor{2}, A::AdjointMPSTensor{3}, H::IdentityO
      return _pushleft(Er, A, B) * H.strength[]
 end
 function _pushleft(Er::LocalRightTensor{3}, A::AdjointMPSTensor{3}, H::IdentityOperator, B::MPSTensor{3}; kwargs...)
-     @tensor allocator = ManualAllocator() tmp[e g; b] := H.strength[] * (B.A[e c d] * Er.A[d g a]) * A.A[a b c]
+     s = H.strength[]
+     @tensor allocator = ManualAllocator() tmp[e g; b] := s * (B.A[e c d] * Er.A[d g a]) * A.A[a b c]
      return LocalRightTensor(tmp , Er.tag)
 end
-
 
 function _pushleft(Er::LocalRightTensor{2}, A::AdjointMPSTensor{3}, H::LocalOperator{2,1}, B::MPSTensor{3}; kwargs...)
 

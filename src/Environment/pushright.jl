@@ -412,7 +412,8 @@ function _pushright(El::LocalLeftTensor{4}, A::AdjointMPSTensor{4}, H::LocalOper
 end
 
 function _pushright(El::LocalLeftTensor{4}, A::AdjointMPSTensor{4}, H::IdentityOperator, B::MPSTensor{4}; kwargs...)
-     @tensor allocator = ManualAllocator() tmp[a; d e h] := H.strength[] * (A.A[j a b c]  * El.A[b d e f]) * B.A[f c j h]
+     s = H.strength[]
+     @tensor allocator = ManualAllocator() tmp[a; d e h] := s * (A.A[j a b c]  * El.A[b d e f]) * B.A[f c j h]
      return LocalLeftTensor(tmp, El.tag)
 end
 
