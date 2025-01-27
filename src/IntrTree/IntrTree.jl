@@ -360,6 +360,6 @@ function merge!(Tree::InteractionTree{L}) where L
 
      end
 
-	return nothing
+	return Tree
 end
 

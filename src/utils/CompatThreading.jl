@@ -118,7 +118,16 @@ end
 using TensorKit: SectorDict, MatrixAlgebra
 function _compute_svddata_threads!(t::TensorMap, alg::Union{SVD, SDD})
 
-	I = sectortype(t)
+	# pre allocate
+	SVDData = SectorDict(map(blocks(t)) do (c, b)
+		sz = size(b)
+		U = similar(b, (sz[1], minimum(sz)))
+		Σ = similar(b, real(scalartype(b)), minimum(sz))
+		V = similar(b, (minimum(sz), sz[2]))
+		return c => (U, Σ, V)
+	end)
+	dims = SectorDict{sectortype(t), Int64}(c => minimum(size(b)) for (c, b) in blocks(t))
+
 	ntasks = get_num_threads_svd()
 	if ntasks == 1 || !isa(blocksectors(t), AbstractVector) || length(blocksectors(t)) == 1
 		for (c, b) in blocks(t)
@@ -127,16 +136,6 @@ function _compute_svddata_threads!(t::TensorMap, alg::Union{SVD, SDD})
 			dims[c] = length(Σ)
 		end
 	else
-		# pre allocate
-		SVDData = SectorDict(map(blocks(t)) do (c, b)
-			sz = size(b)
-			U = similar(b, (sz[1], minimum(sz)))
-			Σ = similar(b, real(scalartype(b)), minimum(sz))
-			V = similar(b, (minimum(sz), sz[2]))
-			return c => (U, Σ, V)
-		end)
-		dims = SectorDict{I, Int}(c => minimum(size(b)) for (c, b) in blocks(t))
-
 		# sort sectors by size
 		function blockcost(c)
 			b = block(t, c)

@@ -310,7 +310,7 @@ function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{4}, Hr::Lo
 	@tensor allocator = ManualAllocator() tmp[a; f c h] := s * (Hr.A[f b g] * Ar.A[a b c d]) * Er.A[d g h]
 	return tmp
 end
-function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{3}, Hr::LocalOperator{1, 2})::MPSTensor
+function _initialize_Ar_single(Er::LocalRightTensor{3}, Ar::MPSTensor{3}, Hr::LocalOperator{1, 2})
 	s = Hr.strength[]
 	@tensor allocator = ManualAllocator() tmp[a; f h] := s * (Hr.A[f b g] * Ar.A[a b d]) * Er.A[d g h]
 	return tmp
