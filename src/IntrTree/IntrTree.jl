@@ -5,7 +5,6 @@ mutable struct InteractionChannel{T}
 	LeafR::T
 	preserve::Bool
 	function InteractionChannel(Ops::Vector{Int64}, ref::Ref, LeafL::T, LeafR::T, preserve::Bool = false) where T
-		# TODO preserve from merging
 		return new{T}(Ops, ref, LeafL, LeafR, preserve)
 	end
 end
@@ -69,7 +68,6 @@ function show(io::IO, obj::InteractionTree{L}) where L
 end
 
 
-
 function merge!(Tree::InteractionTree{L}) where L
 
 	lsnode_L = InteractionTreeNode[Tree.RootL]
@@ -93,6 +91,7 @@ function merge!(Tree::InteractionTree{L}) where L
 					ids = findall(1:length(node.Intrs)) do j
 						j ≤ i && return false
 						ch_j = node.Intrs[j]
+						ch_i.preserve || ch_j.preserve && return false
 						length(ch_j.Ops) != 0 && return false
 						return ch_i.LeafR === ch_j.LeafR
 					end
@@ -167,6 +166,7 @@ function merge!(Tree::InteractionTree{L}) where L
 					ids = findall(1:length(node.Intrs)) do j
 						j ≤ i && return false
 						ch_j = node.Intrs[j]
+						ch_i.preserve || ch_j.preserve && return false
 						length(ch_j.Ops) != 0 && return false
 						return ch_i.LeafL === ch_j.LeafL
 					end
@@ -246,6 +246,7 @@ function merge!(Tree::InteractionTree{L}) where L
 			ids = findall(1:length(node.Intrs)) do j
 				j ≤ i && return false
 				ch_j = node.Intrs[j]
+				ch_i.preserve || ch_j.preserve && return false
 				length(ch_j.Ops) != 1 && return false
 				return ch_i.LeafR === ch_j.LeafR
 			end

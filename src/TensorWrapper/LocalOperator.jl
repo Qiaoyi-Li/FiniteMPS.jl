@@ -244,7 +244,7 @@ function *(O::LocalOperator{R₁, R₂}, A::MPSTensor{R₃}) where {R₁, R₂, 
 	pA = ((2,), Tuple(setdiff(1:R₃, 2)))
 	pOA = ((R₁ + R₂, 1:R₁...), (R₁+R₂+1:R₁+R₂+R₃-3..., R₁+1:R₁+R₂-1..., R₁ + R₂ + R₃ - 2))
 
-     OA = TensorOperations.tensorcontract(O.A, pO, false, A.A, pA, false, pOA, O.strength)
+     OA = TensorOperations.tensorcontract(O.A, pO, false, A.A, pA, false, pOA, O.strength[])
      return MPSTensor(OA)
 end
 

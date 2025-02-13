@@ -2,16 +2,16 @@ function LanczosExp(f::Function, x₀, t::NT, args...;
 	K::Int64 = 32,
 	tol::Real = 1e-8,
 	callback::Union{Nothing, Function} = nothing,
-     verbose::Bool = false) where NT
-     # Apply x -> exp^{At}x for hermitian map x -> f(x, args...) == Ax
-     # a in-placed callback function can be applied to x after each iteration
-     # required methods:
-     #    eltype(x)
-     #    normalize!(x)
-     #    norm(x)
-     #    inner(x, y)
-     #    add!(x, y, α): x -> x + αy
-     #    rmul!(x, α): x -> αx
+	verbose::Bool = false) where NT
+	# Apply x -> exp^{At}x for hermitian map x -> f(x, args...) == Ax
+	# a in-placed callback function can be applied to x after each iteration
+	# required methods:
+	#    eltype(x)
+	#    normalize!(x)
+	#    norm(x)
+	#    inner(x, y)
+	#    add!(x, y, α): x -> x + αy
+	#    rmul!(x, α): x -> αx
 
 
 	T = zeros(K + 1, K + 1)  # tridiagonal matrix
@@ -38,13 +38,11 @@ function LanczosExp(f::Function, x₀, t::NT, args...;
 		# normalize
 		rmul!(lsb[k+1], 1 / T[k, k+1])
 
-          # callback function here
-          !isnothing(callback) && callback(x)
+		# callback function here
+		!isnothing(callback) && callback(x)
 
 		# convergence check 
-		# T = V * diag(ϵ) * V'
 		ϵ, V = eigen(T[1:k, 1:k])
-		# expT = exp(T[1:k, 1:k] * t)
 		expT = V * diagm(exp.(ϵ * t)) * V'
 
 		if k ≤ 2
@@ -54,32 +52,33 @@ function LanczosExp(f::Function, x₀, t::NT, args...;
 		end
 		copyto!(Vt, expT[:, 1])
 		if err2 < tol^2 # converged eigen vector
-               verbose && println("eigen vector converged, err2 = $(err2), break at K = $(k)!")
-               break
-          end 
-          # T[k, k+1] = ⟨bₖ|A|bₖ₊₁⟩, scale by the estimated eigval so that A -> a*A give a similar cutoff
+			verbose && println("eigen vector converged, err2 = $(err2), break at K = $(k)!")
+			break
+		end
+		# T[k, k+1] = ⟨bₖ|A|bₖ₊₁⟩, scale by the estimated eigval so that A -> a*A give a similar cutoff
 		ϵmax = maximum(abs, ϵ)
 		if T[k, k+1] < tol * ϵmax
-               # closed subspace
+			# closed subspace
 			verbose && println("T[$k, $(k+1)]/max|ϵ| = $(T[k, k+1]/ϵmax), break at K = $(k)!")
 			break
 		end
+
 	end
 	rmul!(Vt, norm0)
-	
-     # linear combination
+
+	# linear combination
 	if eltype(x₀) != eltype(Vt)
 		expAx = Vt[1] * lsb[1]
 	else
 		# warning: if Lanczos basis is needed, use * here
 		expAx = rmul!(lsb[1], Vt[1])
 	end
-     K_cut = findlast(i -> isassigned(lsb, i), 1:K+1) - 1
+	K_cut = findlast(i -> isassigned(lsb, i), 1:K+1) - 1
 	for k in 2:K_cut
 		add!(expAx, lsb[k], Vt[k])
 	end
 
 	info = (V = Vt[1:K_cut], T = T[1:K_cut, 1:K_cut])
 
-     return expAx, info
+	return expAx, info
 end

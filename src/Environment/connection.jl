@@ -1,77 +1,89 @@
 """
-     connection!(obj::SparseEnvironment; 
-          kwargs...) -> ::Matrix 
+	 connection!(Env1::SparseEnvironment, Env2::SparseEnvironment, ...; 
+		  kwargs...) -> ::Matrix 
 
-Return the connection `⟨∇⟨Hᵢ⟩, ∇⟨Hⱼ⟩⟩` where `H₀`, `H₁`, ⋯, `Hₙ` are the components of the total Hamiltonian, decomposed according to the boundary left environment. 
+Return the connection `⟨∇⟨Hᵢ⟩, ∇⟨Hⱼ⟩⟩` where `H₀`, `H₁`, ⋯, `Hₙ` are the Hamiltonian corresponding to the given environments.
 
-Note the state `obj[3]` must be right canonicalized. After this funcation, the canonical center will move to the right boundary. 
+Note this function will move all the canonical centers to the right boundary. 
 
 # kwargs
-     moveback::Bool = false
+	 moveback::Bool = false
 Move the canonical center back to the left boundary if `true`.
 """
-function connection!(obj::SparseEnvironment{L,3,T}; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,DenseMPS}}
-     @assert Center(obj)[2] == 1
-     Ψ = obj[3]
-     @assert Center(Ψ)[2] == 1
+function connection!(lsEnv::SparseEnvironment{L, 3, T}...;
+	moveback::Bool = false) where {L, T <: Tuple{AdjointMPS, SparseMPO, DenseMPS}}
+	N = length(lsEnv)
+	NT = mapreduce(x -> typeof(coef(x[3])), promote_type, lsEnv)
 
+	conMat = zeros(NT, N, N)
+	lsHx = Vector{MPSTensor}(undef, N)
+	lsx1 = Vector{MPSTensor}(undef, N)
+	lsx0 = Vector{MPSTensor}(undef, N)
+	for si in 1:L
+		for n in 1:N
+			canonicalize!(lsEnv[n][3], si)
+			canonicalize!(lsEnv[n], si)
+			PH = CompositeProjectiveHamiltonian(lsEnv[n].El[si], lsEnv[n].Er[si], (lsEnv[n][2][si],))
+			if si == 1
+				lsx1[n] = lsEnv[n][3][si]
+			end
+			lsHx[n] = action(lsx1[n], PH)
+		end
 
-     N = length(obj.El[1])
-     lsEl = map(1:N) do i
-          El = copy(obj.El[1])
-          for idx in setdiff(1:N, i)
-               El[idx] = nothing
-          end
-          El
-     end
+		for i in 1:N, j in i:N
+			conMat[i, j] += (inner(lsHx[i], lsHx[j])
+							 -
+							 inner(lsHx[i], lsx1[i]) * inner(lsx1[i], lsHx[j])
+							 -
+							 inner(lsHx[i], lsx1[j]) * inner(lsx1[j], lsHx[j])
+							 +
+							 inner(lsHx[i], lsx1[i]) * inner(lsx1[i], lsx1[j]) * inner(lsx1[j], lsHx[j]))
+		end
 
-     conMat = zeros(typeof(coef(obj[3])), N, N)
-     lsHx = Vector{MPSTensor}(undef, N)
-     A::MPSTensor = Ψ[1]
-     for si in 1:L
-          for n in 1:N
-               PH = SparseProjectiveHamiltonian(lsEl[n], obj.Er[si], (obj[2][si],), [si, si])
-               lsHx[n] = action1(PH, A)
-          end
-          
-          for i in 1:N, j in i:N
-               conMat[i, j] += (inner(lsHx[i], lsHx[j]) - inner(lsHx[i], A) * inner(A, lsHx[j]))
-          end
+		# subtract the double counting due to gauge redundancy
+		if si < L
 
-          # subtract the double counting due to gauge redundancy
-          if si < L
-               Ψ[si], S::MPSTensor = leftorth(A)
-               for n in 1:N
-                    lsEl[n] = _pushright(lsEl[n], Ψ[si]', obj[2][si], Ψ[si])
-                    PH = SparseProjectiveHamiltonian(lsEl[n], obj.Er[si], (), [si+1, si])
-                    lsHx[n] = action0(PH, S)
-               end
+			for n in 1:N
+				lsEnv[n][3][si], lsx0[n] = leftorth(lsx1[n])
+				canonicalize!(lsEnv[n], si + 1, si)
+				PH = CompositeProjectiveHamiltonian(lsEnv[n].El[si+1], lsEnv[n].Er[si], ())
+				lsHx[n] = action(lsx0[n], PH)
 
-               for i in 1:N, j in i:N
-                    conMat[i, j] -= (inner(lsHx[i], lsHx[j]) - inner(lsHx[i], S) * inner(S, lsHx[j]))
-               end
+                    # update next site 
+                    lsx1[n] = lsx0[n] * lsEnv[n][3][si+1]
+			end
 
-               A = S * Ψ[si+1]
-          else
-               # remember to update the last local tensor
-               Ψ[si] = A
-               Center(Ψ)[:] = [si, si]
+			for n in 1:N
+				# warning: this for loop cannot be merged with the above one as the MPS of these environments may be the same object
+                    lsEnv[n][3][si+1] = lsx1[n]
+				Center(lsEnv[n][3])[:] = [si + 1, si + 1]
+			end
 
-               # note previous El and Er are no longer correct
-               Center(obj)[:] = [1, L]
-          end
+			for i in 1:N, j in i:N
+				conMat[i, j] -= (inner(lsHx[i], lsHx[j])
+								 -
+								 inner(lsHx[i], lsx0[i]) * inner(lsx0[i], lsHx[j])
+								 -
+								 inner(lsHx[i], lsx0[j]) * inner(lsx0[j], lsHx[j])
+								 +
+								 inner(lsHx[i], lsx0[i]) * inner(lsx0[i], lsx0[j]) * inner(lsx0[j], lsHx[j])
+				)
+			end
+		end
 
-     end
+	end
 
-     # fill i > j
-     for i in 1:N, j in 1: i-1
-          conMat[i, j] = conMat[j, i]'
-     end
+	# fill i > j
+	for i in 1:N, j in 1:i-1
+		conMat[i, j] = conMat[j, i]'
+	end
 
-     if get(kwargs, :moveback, false)
-          canonicalize!(Ψ, 1)
-          canonicalize!(obj, 1)
-     end
+	if moveback
+		for n in 1:N
+			canonicalize!(lsEnv[n][3], 1)
+			canonicalize!(lsEnv[n], 1)
+		end
+	end
 
-     return conMat
+	return conMat
 end
