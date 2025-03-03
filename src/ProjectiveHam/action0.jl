@@ -50,7 +50,7 @@ function action0(obj::SparseProjectiveHamiltonian{0}, x::MPSTensor{2}; kwargs...
 
 end
 function action0(obj::SparseProjectiveHamiltonian{0}, x::AbstractTensorMap; kwargs...)
-     @assert rank(x) == 2
+     @assert numind(x) == 2
      return action0(obj, MPSTensor(x); kwargs...)
 end
 

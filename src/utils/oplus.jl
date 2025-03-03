@@ -61,10 +61,10 @@ oplusEmbed(lsV::T...; kwargs...) where T <: Union{CartesianSpace,ComplexSpace} =
 
 function oplusEmbed(A::AbstractTensorMap, B::AbstractTensorMap, idx::Int64)
 
-     @assert rank(A) == rank(B)
+     @assert numind(A) == numind(B)
      T = promote_type(eltype(A), eltype(B))
 
-     rA = rank(A, 1)
+     rA = numout(A)
      if idx ≤ rA
           sumspace = codomain(A)[idx] ⊕ codomain(B)[idx]
           EmbA = isometry(T, sumspace, codomain(A)[idx])

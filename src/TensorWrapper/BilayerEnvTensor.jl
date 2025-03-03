@@ -22,12 +22,12 @@ Convention (' marks codomain):
 struct BilayerLeftTensor{R₁, R₂} <: AbstractEnvironmentTensor
      A::AbstractTensorMap
      function BilayerLeftTensor{R₁, R₂}(A::AbstractTensorMap) where {R₁, R₂}
-          @assert rank(A, 1) == R₁ && rank(A, 2) == R₂
+          @assert numout(A) == R₁ && numin(A) == R₂
           return new{R₁,R₂}(A)
      end
      function BilayerLeftTensor(A::AbstractTensorMap)
-          R₁ = rank(A, 1)
-          R₂ = rank(A, 2)
+          R₁ = numout(A)
+          R₂ = numin(A)
           return BilayerLeftTensor{R₁, R₂}(A)
      end
 end
@@ -56,12 +56,12 @@ Convention (' marks codomain):
 struct BilayerRightTensor{R₁, R₂} <: AbstractEnvironmentTensor
      A::AbstractTensorMap
      function BilayerRightTensor{R₁,R₂}(A::AbstractTensorMap) where {R₁, R₂}
-          @assert rank(A, 1) == R₁ && rank(A, 2) == R₂
+          @assert numout(A) == R₁ && numin(A) == R₂
           return new{R₁,R₂}(A)
      end
      function BilayerRightTensor(A::AbstractTensorMap)
-          R₁ = rank(A, 1)
-          R₂ = rank(A, 2)
+          R₁ = numout(A)
+          R₂ = numin(A)
           return BilayerRightTensor{R₁, R₂}(A)
      end
 end

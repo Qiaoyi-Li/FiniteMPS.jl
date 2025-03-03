@@ -275,7 +275,7 @@ end
 function _showDinfo(io::IO, obj::SparseProjectiveHamiltonian{N}) where {N}
 
 	idx = findfirst(i -> !isnothing(obj.El[i]), 1:length(obj.El))
-	D, DD = dim(obj.El[idx], rank(obj.El[idx]))
+	D, DD = dim(obj.El[idx], numind(obj.El[idx]))
 	println(io, "State[L]: $(domain(obj.El[idx])[end]), dim = $(D) -> $(DD)")
 	D, DD = dim(obj.Er[1], 1)
 	println(io, "State[R]: $(domain(obj.Er[idx])[end]), dim = $(D) -> $(DD)")
@@ -299,12 +299,12 @@ function _countIntr(obj::SparseProjectiveHamiltonian{2})
 		isnothing(obj.Er[k]) && continue
 		push!(validIdx, (i, j, k))
 
-		cost = rank(obj.El[i]) + rank(obj.Er[k])
+		cost = numind(obj.El[i]) + numind(obj.Er[k])
 		if !isa(obj.H[1][i, j], IdentityOperator)
-			cost += rank(obj.H[1][i, j]) - 2
+			cost += numind(obj.H[1][i, j]) - 2
 		end
 		if !isa(obj.H[2][j, k], IdentityOperator)
-			cost += rank(obj.H[2][j, k]) - 2
+			cost += numind(obj.H[2][j, k]) - 2
 		end
 		push!(lscost, cost)
 	end
@@ -322,9 +322,9 @@ function _countIntr(obj::SparseProjectiveHamiltonian{1})
 		isnothing(obj.Er[j]) && continue
 		push!(validIdx, (i, j))
 
-		cost = rank(obj.El[i]) + rank(obj.Er[j])
+		cost = numind(obj.El[i]) + numind(obj.Er[j])
 		if !isa(obj.H[1][i, j], IdentityOperator)
-			cost += rank(obj.H[1][i, j]) - 2
+			cost += numind(obj.H[1][i, j]) - 2
 		end
 		push!(lscost, cost)
 	end
@@ -340,7 +340,7 @@ function _countIntr(obj::SparseProjectiveHamiltonian{0})
 		isnothing(obj.El[i]) && continue
 		isnothing(obj.Er[i]) && continue
 		push!(validIdx, (i,))
-		cost = rank(obj.El[i]) + rank(obj.Er[i])
+		cost = numind(obj.El[i]) + numind(obj.Er[i])
 		push!(lscost, cost)
 	end
 	# sort
@@ -359,12 +359,12 @@ function _countIntr(El::SparseLeftTensor, Er::SparseRightTensor, H::NTuple{2, Sp
 		isnothing(Er[k]) && continue
 		push!(validIdx, (i, j, k))
 
-		cost = rank(El[i]) + rank(Er[k])
+		cost = numind(El[i]) + numind(Er[k])
 		if !isa(H[1][i, j], IdentityOperator)
-			cost += rank(H[1][i, j]) - 1
+			cost += numind(H[1][i, j]) - 1
 		end
 		if !isa(H[2][j, k], IdentityOperator)
-			cost += rank(H[2][j, k]) - 1
+			cost += numind(H[2][j, k]) - 1
 		end
 		push!(lscost, cost)
 	end
@@ -383,9 +383,9 @@ function _countIntr(El::SparseLeftTensor, Er::SparseRightTensor, H::NTuple{1, Sp
 		isnothing(Er[j]) && continue
 		push!(validIdx, (i, j))
 
-		cost = rank(El[i]) + rank(Er[j])
+		cost = numind(El[i]) + numind(Er[j])
 		if !isa(H[1][i, j], IdentityOperator)
-			cost += rank(H[1][i, j]) - 1
+			cost += numind(H[1][i, j]) - 1
 		end
 		push!(lscost, cost)
 	end
@@ -401,7 +401,7 @@ function _countIntr(El::SparseLeftTensor, Er::SparseRightTensor, ::NTuple{0, Spa
 		isnothing(El[i]) && continue
 		isnothing(Er[i]) && continue
 		push!(validIdx, (i,))
-		cost = rank(El[i]) + rank(Er[i])
+		cost = numind(El[i]) + numind(Er[i])
 		push!(lscost, cost)
 	end
 	# sort

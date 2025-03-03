@@ -23,11 +23,10 @@ mutable struct StringOperator
      function StringOperator(Ops::AbstractVector{<:AbstractLocalOperator}, strength::Number = 1.0)
           L = length(Ops)
           # check horizontal bonds 
-          # @assert rank(Ops[1], 1) == rank(Ops[end], 2) == 1
-          @assert rank(Ops[1], 2) ∈ [1, 2]
-          a_flag = rank(Ops[1], 2) == 2
+          @assert numin(Ops[1]) ∈ [1, 2]
+          a_flag = numin(Ops[1]) == 2
           for i in 2:L 
-               r1, r2 = rank(Ops[i],1), rank(Ops[i], 2)
+               r1, r2 = numout(Ops[i]), numin(Ops[i])
                @assert r1 ∈ [1, 2] && r2 ∈ [1, 2] 
                r1 == r2 == 1 && continue
                if a_flag

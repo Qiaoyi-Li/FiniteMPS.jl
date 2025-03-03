@@ -9,7 +9,7 @@ abstract type AbstractTensorWrapper end
 
 # some common functions for wrapper type
 convert(::Type{T}, A::AbstractTensorMap) where {T<:AbstractTensorWrapper} = T(A)
-for func in (:dim, :rank, :domain, :codomain, :eltype, :norm, :scalartype, :data)
+for func in (:dim, :rank, :domain, :codomain, :eltype, :norm, :scalartype, :data, :numin, :numout, :numind)
      # Tensor -> Number
      @eval $func(obj::AbstractTensorWrapper, args...) = $func(obj.A, args...)
 end

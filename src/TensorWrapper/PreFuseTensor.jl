@@ -16,14 +16,14 @@ Convention (' marks codomain):
 struct LeftPreFuseTensor{R} <: AbstractEnvironmentTensor
      A::AbstractTensorMap
      function LeftPreFuseTensor{R}(A::AbstractTensorMap) where {R}
-          @assert R == rank(A) ≥ 4
-          if rank(A, 2) != 2
+          @assert R == numind(A) ≥ 4
+          if numin(A) != 2
                A = permute(A, Tuple(1:R-2), (R - 1, R))
           end
           return new{R}(A)
      end
      function LeftPreFuseTensor(A::AbstractTensorMap)
-          R = rank(A)
+          R = numind(A)
           return LeftPreFuseTensor{R}(A)
      end
 end

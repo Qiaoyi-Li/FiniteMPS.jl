@@ -141,20 +141,20 @@ mutable struct LocalOperator{R₁, R₂} <: AbstractLocalOperator
 			perms = (((R₂+2:R₁+R₂)..., R₂), (R₂ + 1, (1:R₂-1)...))
 			O = permute(O, perms)
 		end
-		@assert rank(O, 1) == R₁ && rank(O, 2) == R₂
+		@assert numout(O) == R₁ && numin(O) == R₂
 		return new{R₁, R₂}(O, name, si, fermionic, strength, tag)
 	end
 	LocalOperator(O::AbstractTensorMap, name::String, si::Int64, fermionic::Bool, tag::tag2Tuple{R₁, R₂}; kwargs...) where {R₁, R₂} = LocalOperator(O, name, si, fermionic, Ref{Number}(NaN), tag; kwargs...) # default strength = NaN
 	function LocalOperator(O::AbstractTensorMap, name::String, si::Int64, fermionic::Bool, strength::Ref{<:Number} = Ref{Number}(NaN); swap::Bool = false)
 		# default tag, only for rank ≤ 4
 		if swap
-			@assert (R₁ = rank(O, 2)) ≤ 2
-			@assert (R₂ = rank(O, 1)) ≤ 2
+			@assert (R₁ = numin(O)) ≤ 2
+			@assert (R₂ = numout(O)) ≤ 2
 			perms = (((R₂+2:R₁+R₂)..., R₂), (R₂ + 1, (1:R₂-1)...))
 			O = permute(O, perms)
 		else
-			@assert (R₁ = rank(O, 1)) ≤ 2
-			@assert (R₂ = rank(O, 2)) ≤ 2
+			@assert (R₁ = numout(O)) ≤ 2
+			@assert (R₂ = numin(O)) ≤ 2
 		end
 		tag1 = R₁ == 1 ? ("phys",) : ("", "phys")
 		tag2 = R₂ == 1 ? ("phys",) : ("phys", "")

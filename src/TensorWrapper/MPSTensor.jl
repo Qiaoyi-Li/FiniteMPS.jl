@@ -29,14 +29,14 @@ In particular, R == 2 for bond tensor.
 struct MPSTensor{R} <: AbstractMPSTensor
      A::AbstractTensorMap
      function MPSTensor{R}(A::AbstractTensorMap) where {R}
-          @assert R == rank(A) ≥ 2
-          if R ≥ 3 && rank(A, 1) != 2
+          @assert R == numind(A) ≥ 2
+          if R ≥ 3 && numout(A) != 2
                A = permute(A, ((1, 2), Tuple(3:R)))
           end
           return new{R}(A)
      end
      function MPSTensor(A::AbstractTensorMap)
-          R = rank(A)
+          R = numind(A)
           return MPSTensor{R}(A)
      end
 end

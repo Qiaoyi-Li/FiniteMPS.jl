@@ -513,9 +513,9 @@ end
 function _permute2(A::AbstractTensorMap, B::AbstractTensorMap)
      # permute A s.t. A and B have the same Index2Tuple
 
-     r1 = rank(B, 1)
-     r2 = rank(B, 2)
-     if rank(A, 1) != r1
+     r1 = numout(B)
+     r2 = numin(B)
+     if numout(A) != r1
           return permute(A, Tuple(1:r1), Tuple(r1 .+ (1:r2)))
      else
           return A

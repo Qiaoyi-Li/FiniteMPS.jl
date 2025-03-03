@@ -50,10 +50,11 @@ function _defaultEl(obj::SparseEnvironment{L,3,T}) where {L,T<:Tuple{AdjointMPS,
           n = length(Er)
           El = SparseLeftTensor(undef, n)
           for i in 1:n
-               @assert rank(Er[i]) in [2, 3]
-               if rank(Er[i]) == 2
+               rank_Er = numin(Er[i]) + numout(Er[i])
+               @assert rank_Er  in [2, 3]
+               if rank_Er  == 2
                     El[i] = _simpleEl(obj[1][1], IdentityOperator(1), obj[3][1])
-               elseif rank(Er[i], 1) == 2
+               elseif rank_Er  == 2
                     El[i] = _simpleEl(obj[1][1], codomain(Er[i])[2], obj[3][1])
                else
                     El[i] = _simpleEl(obj[1][1], domain(Er[i])[1]', obj[3][1])

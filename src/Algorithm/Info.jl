@@ -83,7 +83,7 @@ function BondInfo(s::AbstractTensorMap{<:Union{Float64, ComplexF64}, T}, ϵ::Flo
 end
 function BondInfo(A::AbstractTensorMap, direction::Symbol)
      @assert direction in (:L, :R)
-     idx = direction == :L ? 1 : rank(A)
+     idx = direction == :L ? 1 : numin(A) + numout(A)
      return BondInfo(dim(A, idx)..., 0.0, NaN)
 end
 BondInfo(A::MPSTensor, direction::Symbol) = BondInfo(A.A, direction)

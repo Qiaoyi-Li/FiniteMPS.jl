@@ -6,7 +6,7 @@ Return the dimension of a given index of tensor `A`.
 `D` is the number of multiplets, `DD` is the number of equivalent no symmetry states. Note `D == DD` for abelian groups.
 """
 function dim(A::AbstractTensorMap{<:Union{Float64, ComplexF64}, F}, idx::Int64) where F<:GradedSpace
-     rcod = rank(A, 1)
+     rcod = numout(A)
      if idx ≤ rcod[1]
           D = mapreduce(i -> codomain(A).spaces[idx].dims[i], +, eachindex(codomain(A).spaces[idx].dims))
           DD = dim(codomain(A).spaces[idx])
@@ -21,21 +21,9 @@ function dim(A::AbstractTensorMap{<:Union{Float64, ComplexF64} ,F}, idx::Int64) 
      return dim(space(A, idx)), dim(space(A, idx))
 end
 
-"""
-     rank(A::AbstractTensorMap) -> ::Int64
-
-Return the rank of a given tensor.
-
-     rank(A::AbstractTensorMap, idx::Int64) -> ::Int64
-Return the rank corresponding to codomain (`idx = 1`) or domain (`idx = 2`).
-"""
-function rank(A::AbstractTensorMap, idx::Int64)
-     @assert idx ∈ [1, 2]
-     idx == 1 && return typeof(codomain(A)).parameters[2]
-     idx == 2 && return typeof(domain(A)).parameters[2]
-end
-rank(A::AbstractTensorMap) = rank(A, 1) + rank(A, 2)
-rank(::Nothing, args...) = 0
+numin(::Nothing) = 0
+numout(::Nothing) = 0
+numind(::Nothing) = 0
 
 # implement usage A.dom[end] ...
 Base.lastindex(V::ProductSpace) = typeof(V).parameters[2]

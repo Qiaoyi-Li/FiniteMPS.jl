@@ -35,17 +35,17 @@ struct LocalLeftTensor{R} <: AbstractEnvironmentTensor
 	A::AbstractTensorMap
 	tag::NTuple{R, String}
 	function LocalLeftTensor(A::AbstractTensorMap, tag::NTuple{R, String}) where R
-		@assert rank(A) == R
+		@assert numind(A) == R
 		return new{R}(A, tag)
 	end
 	function LocalLeftTensor{R}(A::AbstractTensorMap) where R
 		# empty tag
-		@assert rank(A) == R
+		@assert numind(A) == R
 		tag = Tuple(repeat([""], R))
 		return new{R}(A, tag)
 	end
 	function LocalLeftTensor(A::AbstractTensorMap)
-		R = rank(A)
+		R = numind(A)
 		return LocalLeftTensor{R}(A)
 	end
 end
@@ -79,17 +79,17 @@ struct LocalRightTensor{R} <: AbstractEnvironmentTensor
 	A::AbstractTensorMap
 	tag::NTuple{R, String}
 	function LocalRightTensor(A::AbstractTensorMap, tag::NTuple{R, String}) where R
-		@assert rank(A) == R
+		@assert numind(A) == R
 		return new{R}(A, tag)
 	end
 	function LocalRightTensor{R}(A::AbstractTensorMap) where R
 		# empty tag
-		@assert rank(A) == R
+		@assert numind(A) == R
 		tag = Tuple(repeat([""], R))
 		return new{R}(A, tag)
 	end
 	function LocalRightTensor(A::AbstractTensorMap)
-		R = rank(A)
+		R = numind(A)
 		return LocalRightTensor{R}(A)
 	end
 end
@@ -191,7 +191,7 @@ function fuse(El::LocalLeftTensor{2})
 	return isometry(domain(El)[end], domain(El)[end])
 end
 function fuse(El::LocalLeftTensor{3})
-	if rank(El, 1) == 1
+	if numout(El) == 1
 		aspace = fuse(domain(El)[1], domain(El)[2])
 		return isometry(domain(El)[1] ⊗ domain(El)[2], aspace)
 	else
@@ -203,7 +203,7 @@ function fuse(Er::LocalRightTensor{2})
 	return isometry(codomain(Er)[1], codomain(Er)[1])
 end
 function fuse(Er::LocalRightTensor{3})
-	if rank(Er, 1) == 1
+	if numout(Er) == 1
 		aspace = fuse(codomain(Er)[1], domain(Er)[1]')
 		return isometry(aspace, codomain(Er)[1] ⊗ domain(Er)[1]')
 	else

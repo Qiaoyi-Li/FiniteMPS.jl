@@ -69,7 +69,7 @@ function _pushright(El::SparseLeftTensor, A::AdjointMPSTensor, H::SparseMPOTenso
 end
 
 function _pushright(El::LocalLeftTensor{2}, A::AdjointMPSTensor{3}, B::MPSTensor{3}; kwargs...)
-     if rank(A, 1) == 1
+     if numout(A) == 1
           @tensor allocator = ManualAllocator() tmp[d; e] := (El.A[a b] * A.A[d a c]) * B.A[b c e]
      else
           @tensor allocator = ManualAllocator() tmp[d; e] := (El.A[a b] * A.A[c d a]) * B.A[b c e]
@@ -82,7 +82,7 @@ function _pushright(El::LocalLeftTensor{2}, A::AdjointMPSTensor{3}, H::IdentityO
 end
 
 function _pushright(El::LocalLeftTensor{2}, A::AdjointMPSTensor{3}, H::LocalOperator{1,1}, B::MPSTensor{3}; kwargs...)
-     if rank(A, 1) == 1
+     if numout(A) == 1
           @tensor allocator = ManualAllocator() tmp[a; f] := ((A.A[a b c] * H.A[c e]) * El.A[b d]) * B.A[d e f]
      else
           @tensor allocator = ManualAllocator() tmp[a; f] := ((A.A[c a b] * H.A[c e]) * El.A[b d]) * B.A[d e f]
@@ -94,14 +94,14 @@ function _pushright(El::LocalLeftTensor{2}, A::AdjointMPSTensor{3}, H::LocalOper
      # χ < d in most sparse cases
      if get(kwargs, :sparse, true)
           # D^3d + D^2d^2χ + D^3dχ
-          if rank(A, 1) == 1
+          if numout(A) == 1
                @tensor allocator = ManualAllocator() tmp[a; f g] := ((A.A[a b c] * El.A[b d]) * H.A[c e f]) * B.A[d e g]
           else
                @tensor allocator = ManualAllocator() tmp[a; f g] := ((A.A[c a b] * El.A[b d]) * H.A[c e f]) * B.A[d e g]
           end
      else
           # D^3d + D^3d^2 + D^2d^2χ
-          if rank(A, 1) == 1
+          if numout(A) == 1
                @tensor allocator = ManualAllocator() tmp[a; f g] := ((A.A[a b c] * El.A[b d]) * B.A[d e g]) * H.A[c e f]
           else
                @tensor allocator = ManualAllocator() tmp[a; f g] := ((A.A[c a b] * El.A[b d]) * B.A[d e g]) * H.A[c e f]
@@ -113,7 +113,7 @@ end
 function _pushright(El::LocalLeftTensor{3}, A::AdjointMPSTensor{3}, H::LocalOperator{2,1}, B::MPSTensor{3}; kwargs...)
      # contraction order of El and H does not affect complexity
      # D^3dχ + D^2d^2χ + D^3d
-     if rank(A, 1) == 1
+     if numout(A) == 1
           @tensor allocator = ManualAllocator() tmp[a; g] := ((A.A[a b c] * El.A[b d e]) * H.A[d c f]) * B.A[e f g]
      else
           @tensor allocator = ManualAllocator() tmp[a; g] := ((A.A[c a b] * El.A[b d e]) * H.A[d c f]) * B.A[e f g]
@@ -123,7 +123,7 @@ end
 
 function _pushright(El::LocalLeftTensor{3}, A::AdjointMPSTensor{3}, H::LocalOperator{1,1}, B::MPSTensor{3}; kwargs...)
      # D^2d^2 + D^3dχ + D^3dχ
-     if rank(A, 1) == 1
+     if numout(A) == 1
           @tensor allocator = ManualAllocator() tmp[a; d g] := ((A.A[a b c] * H.A[c f]) * El.A[b d e]) * B.A[e f g]
      else
           @tensor allocator = ManualAllocator() tmp[a; d g] := ((A.A[c a b] * H.A[c f]) * El.A[b d e]) * B.A[e f g]
@@ -133,7 +133,7 @@ end
 
 function _pushright(El::LocalLeftTensor{3}, A::AdjointMPSTensor{3}, H::IdentityOperator, B::MPSTensor{3}; kwargs...)
      # D^2d^2 + D^3dχ + D^3dχ
-     if rank(A, 1) == 1
+     if numout(A) == 1
           @tensor allocator = ManualAllocator() tmp[a; d g] := (A.A[a b f] * El.A[b d e]) * B.A[e f g]
      else
           @tensor allocator = ManualAllocator() tmp[a; d g] := (A.A[f a b] * El.A[b d e]) * B.A[e f g]
@@ -142,7 +142,7 @@ function _pushright(El::LocalLeftTensor{3}, A::AdjointMPSTensor{3}, H::IdentityO
 end
 
 function _pushright(El::LocalLeftTensor{3}, A::AdjointMPSTensor{3}, H::LocalOperator{2,2}, B::MPSTensor{3}; kwargs...)
-     if rank(A, 1) == 1
+     if numout(A) == 1
           @tensor allocator = ManualAllocator() tmp[d; g h] := ((A.A[d a e] * El.A[a b c]) * H.A[b e f g]) * B.A[c f h]
      else
           @tensor allocator = ManualAllocator() tmp[d; g h] := ((A.A[e d a] * El.A[a b c]) * H.A[b e f g]) * B.A[c f h]
@@ -151,7 +151,7 @@ function _pushright(El::LocalLeftTensor{3}, A::AdjointMPSTensor{3}, H::LocalOper
 end
 
 function _pushright(El::LocalLeftTensor{3}, A::AdjointMPSTensor{3}, H::LocalOperator{1,3}, B::MPSTensor{3}; kwargs...)
-     if rank(A, 1) == 1
+     if numout(A) == 1
           @tensor allocator = ManualAllocator() tmp[d; b g i h] := ((A.A[d a e] * El.A[a b c]) * H.A[e f g i]) * B.A[c f h]
      else
           @tensor allocator = ManualAllocator() tmp[d; b g i h] := ((A.A[e d a] * El.A[a b c]) * H.A[e f g i]) * B.A[c f h]
@@ -162,28 +162,28 @@ end
 function _pushright(El::LocalLeftTensor{5}, A::AdjointMPSTensor{3}, H::LocalOperator{3,1}, B::MPSTensor{3}; kwargs...)
      # match tags
      if El.tag[2:3] == H.tag[1][1:2]
-          if rank(A, 1) == 1
+          if numout(A) == 1
                @tensor allocator = ManualAllocator() tmp[a; f i] := ((A.A[a b c] * H.A[d e c h]) * El.A[b d e f g]) * B.A[g h i]
           else
                @tensor allocator = ManualAllocator() tmp[a; f i] := ((A.A[c a b] * H.A[d e c h]) * El.A[b d e f g]) * B.A[g h i]
           end
           return LocalLeftTensor(tmp * H.strength[], (El.tag[1], El.tag[4], El.tag[5]))
      elseif El.tag[2:3] == reverse(H.tag[1][1:2])
-          if rank(A, 1) == 1
+          if numout(A) == 1
                @tensor allocator = ManualAllocator() tmp[a; f i] := ((A.A[a b c] * H.A[e d c h]) * El.A[b d e f g]) * B.A[g h i]
           else
                @tensor allocator = ManualAllocator() tmp[a; f i] := ((A.A[c a b] * H.A[e d c h]) * El.A[b d e f g]) * B.A[g h i]
           end
           return LocalLeftTensor(tmp * H.strength[], (El.tag[1], El.tag[4], El.tag[5]))
      elseif El.tag[[2, 4]] == H.tag[1][1:2]
-          if rank(A, 1) == 1
+          if numout(A) == 1
                @tensor allocator = ManualAllocator() tmp[a; e i] := ((A.A[a b c] * H.A[d f c h]) * El.A[b d e f g]) * B.A[g h i]
           else
                @tensor allocator = ManualAllocator() tmp[a; e i] := ((A.A[c a b] * H.A[d f c h]) * El.A[b d e f g]) * B.A[g h i]
           end
           return LocalLeftTensor(tmp * H.strength[], (El.tag[1], El.tag[3], El.tag[5]))
      elseif El.tag[[2, 4]] == reverse(H.tag[1][1:2])
-          if rank(A, 1) == 1
+          if numout(A) == 1
                @tensor allocator = ManualAllocator() tmp[a; e i] := ((A.A[a b c] * H.A[f d c h]) * El.A[b d e f g]) * B.A[g h i]
           else
                @tensor allocator = ManualAllocator() tmp[a; e i] := ((A.A[c a b] * H.A[f d c h]) * El.A[b d e f g]) * B.A[g h i]
@@ -198,7 +198,7 @@ function _pushright(El::LocalLeftTensor{5}, A::AdjointMPSTensor{3}, H::LocalOper
 end
 
 function _pushright(El::LocalLeftTensor{2}, A::AdjointMPSTensor{3}, H::LocalOperator{1,3}, B::MPSTensor{3}; kwargs...)
-     if rank(A, 1) == 1
+     if numout(A) == 1
           @tensor allocator = ManualAllocator() tmp[a; f g h] := ((A.A[a b c] * El.A[b d]) * H.A[c e f g]) * B.A[d e h]
      else
           @tensor allocator = ManualAllocator() tmp[a; f g h] := ((A.A[c a b] * El.A[b d]) * H.A[c e f g]) * B.A[d e h]
@@ -207,7 +207,7 @@ function _pushright(El::LocalLeftTensor{2}, A::AdjointMPSTensor{3}, H::LocalOper
 end
 
 function _pushright(El::LocalLeftTensor{4}, A::AdjointMPSTensor{3}, H::LocalOperator{1,2}, B::MPSTensor{3}; kwargs...)
-     if rank(A, 1) == 1
+     if numout(A) == 1
           @tensor allocator = ManualAllocator() tmp[a; d e h i] := ((A.A[a b c] * H.A[c g h]) * El.A[b d e f]) * B.A[f g i]
      else
           @tensor allocator = ManualAllocator() tmp[a; d e h i] := ((A.A[c a b] * H.A[c g h]) * El.A[b d e f]) * B.A[f g i]
@@ -218,21 +218,21 @@ end
 function _pushright(El::LocalLeftTensor{5}, A::AdjointMPSTensor{3}, H::LocalOperator{2,1}, B::MPSTensor{3}; kwargs...)
 
      if El.tag[2] == H.tag[1][1]
-          if rank(A, 1) == 1
+          if numout(A) == 1
                @tensor allocator = ManualAllocator() tmp[a; e f i] := ((A.A[a b c] * H.A[d c h]) * El.A[b d e f g]) * B.A[g h i]
           else
                @tensor allocator = ManualAllocator() tmp[a; e f i] := ((A.A[c a b] * H.A[d c h]) * El.A[b d e f g]) * B.A[g h i]
           end
           return LocalLeftTensor(tmp * H.strength[], (El.tag[1], El.tag[3:5]...))
      elseif El.tag[3] == H.tag[1][1]
-          if rank(A, 1) == 1
+          if numout(A) == 1
                @tensor allocator = ManualAllocator() tmp[a; d f i] := ((A.A[a b c] * H.A[e c h]) * El.A[b d e f g]) * B.A[g h i]
           else
                @tensor allocator = ManualAllocator() tmp[a; d f i] := ((A.A[c a b] * H.A[e c h]) * El.A[b d e f g]) * B.A[g h i]
           end
           return LocalLeftTensor(tmp * H.strength[], (El.tag[1:2]..., El.tag[4:5]...))
      elseif El.tag[4] == H.tag[1][1]
-          if rank(A, 1) == 1
+          if numout(A) == 1
                @tensor allocator = ManualAllocator() tmp[a; d e i] := ((A.A[a b c] * H.A[f c h]) * El.A[b d e f g]) * B.A[g h i]
           else
                @tensor allocator = ManualAllocator() tmp[a; d e i] := ((A.A[c a b] * H.A[f c h]) * El.A[b d e f g]) * B.A[g h i]
@@ -247,14 +247,14 @@ end
 
 function _pushright(El::LocalLeftTensor{4}, A::AdjointMPSTensor{3}, H::LocalOperator{3,1}, B::MPSTensor{3}; kwargs...)
      if El.tag[2:3] == H.tag[1][1:2]
-          if rank(A, 1) == 1
+          if numout(A) == 1
                @tensor allocator = ManualAllocator() tmp[a; h] := ((A.A[a b c] * El.A[b d e f]) * H.A[d e c g]) * B.A[f g h]
           else
                @tensor allocator = ManualAllocator() tmp[a; h] := ((A.A[c a b] * El.A[b d e f]) * H.A[d e c g]) * B.A[f g h]
           end
           return LocalLeftTensor(tmp * H.strength[], (El.tag[1], El.tag[4]))
      elseif El.tag[2:3] == reverse(H.tag[1][1:2])
-          if rank(A, 1) == 1
+          if numout(A) == 1
                @tensor allocator = ManualAllocator() tmp[a; h] := ((A.A[a b c] * El.A[b d e f]) * H.A[e d c g]) * B.A[f g h]
           else
                @tensor allocator = ManualAllocator() tmp[a; h] := ((A.A[c a b] * El.A[b d e f]) * H.A[e d c g]) * B.A[f g h]
@@ -270,14 +270,14 @@ end
 
 function _pushright(El::LocalLeftTensor{4}, A::AdjointMPSTensor{3}, H::LocalOperator{2,1}, B::MPSTensor{3}; kwargs...)
      if El.tag[2] == H.tag[1][1]
-          if rank(A, 1) == 1
+          if numout(A) == 1
                @tensor allocator = ManualAllocator() tmp[a; e i] := ((A.A[a b c] * H.A[d c h]) * El.A[b d e g]) * B.A[g h i]
           else
                @tensor allocator = ManualAllocator() tmp[a; e i] := ((A.A[c a b] * H.A[d c h]) * El.A[b d e g]) * B.A[g h i]
           end
           return LocalLeftTensor(tmp * H.strength[], (El.tag[1], El.tag[3:4]...))
      elseif El.tag[3] == H.tag[1][1]
-          if rank(A, 1) == 1
+          if numout(A) == 1
                @tensor allocator = ManualAllocator() tmp[a; d i] := ((A.A[a b c] * H.A[e c h]) * El.A[b d e g]) * B.A[g h i]
           else
                @tensor allocator = ManualAllocator() tmp[a; d i] := ((A.A[c a b] * H.A[e c h]) * El.A[b d e g]) * B.A[g h i]
@@ -291,7 +291,7 @@ function _pushright(El::LocalLeftTensor{4}, A::AdjointMPSTensor{3}, H::LocalOper
 end
 
 function _pushright(El::LocalLeftTensor{3}, A::AdjointMPSTensor{3}, H::LocalOperator{1,2}, B::MPSTensor{3}; kwargs...)
-     if rank(A, 1) == 1
+     if numout(A) == 1
           @tensor allocator = ManualAllocator() tmp[a; d g h] := ((A.A[a b c] * El.A[b d e]) * H.A[c f g]) * B.A[e f h]
      else
           @tensor allocator = ManualAllocator() tmp[a; d g h] := ((A.A[c a b] * El.A[b d e]) * H.A[c f g]) * B.A[e f h]
@@ -300,7 +300,7 @@ function _pushright(El::LocalLeftTensor{3}, A::AdjointMPSTensor{3}, H::LocalOper
 end
 
 function _pushright(El::LocalLeftTensor{4}, A::AdjointMPSTensor{3}, H::LocalOperator{1,1}, B::MPSTensor{3}; kwargs...)
-     if rank(A, 1) == 1
+     if numout(A) == 1
           @tensor allocator = ManualAllocator() tmp[a; d e h] := ((A.A[a b c] * H.A[c g]) * El.A[b d e f]) * B.A[f g h]
      else
           @tensor allocator = ManualAllocator() tmp[a; d e h] := ((A.A[c a b] * H.A[c g]) * El.A[b d e f]) * B.A[f g h]
@@ -309,7 +309,7 @@ function _pushright(El::LocalLeftTensor{4}, A::AdjointMPSTensor{3}, H::LocalOper
 end
 
 function _pushright(El::LocalLeftTensor{4}, A::AdjointMPSTensor{3}, H::IdentityOperator, B::MPSTensor{3}; kwargs...)
-     if rank(A, 1) == 1
+     if numout(A) == 1
           @tensor allocator = ManualAllocator() tmp[a; d e h] := (A.A[a b c]  * El.A[b d e f]) * B.A[f c h]
      else
           @tensor allocator = ManualAllocator() tmp[a; d e h] := (A.A[c a b] * El.A[b d e f]) * B.A[f c h]
@@ -318,7 +318,7 @@ function _pushright(El::LocalLeftTensor{4}, A::AdjointMPSTensor{3}, H::IdentityO
 end
 
 function _pushright(El::LocalLeftTensor{5}, A::AdjointMPSTensor{3}, H::IdentityOperator, B::MPSTensor{3}; kwargs...)
-     if rank(A, 1) == 1
+     if numout(A) == 1
           @tensor allocator = ManualAllocator() tmp[a; d e f h] := (A.A[a b c] * El.A[b d e f g]) * B.A[g c h]
      else
           @tensor allocator = ManualAllocator() tmp[a; d e f h] := (A.A[c a b] * El.A[b d e f g]) * B.A[g c h]
