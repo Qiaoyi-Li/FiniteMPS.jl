@@ -1,7 +1,7 @@
 module FiniteMPS
 
 using Reexport
-using AbstractTrees, SerializedElementArrays, Serialization
+using AbstractTrees, SerializedElementArrays, Serialization, LRUCache
 using Base.Threads, Distributed
 using Graphs, MetaGraphs
 import SerializedElementArrays: SerializedElementArray, SerializedElementVector
@@ -132,8 +132,9 @@ include("IntrTree/Automata.jl")
 # include("Observables/calITP.jl")
 # include("Observables/pushleft.jl")
 # include("Observables/pushright.jl")
-export ObservableTree 
+export ObservableTree, addObs!
 include("Observables/ObsTree.jl")
+include("Observables/addObs.jl")
 
 # predefined local spaces
 export SU₂Spin, SU2Spin, U₁Spin, U1Spin, NoSymSpinOneHalf, U₁SU₂Fermion, U1SU2Fermion, ℤ₂SU₂Fermion, Z2SU2Fermion, U₁SpinlessFermion, U1SpinlessFermion, U₁SU₂tJFermion, U1SU2tJFermion, U₁U₁Fermion, U1U1Fermion, U₁U₁tJFermion, U1U1tJFermion, ℤ₂SU₂tJFermion, Z2SU2tJFermion

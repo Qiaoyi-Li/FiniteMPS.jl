@@ -42,31 +42,179 @@ function show(io::IO, obj::ObservableTree{L}) where L
 	return nothing
 end
 
-# """
-# 	 addObs!(Tree::ObservableTree,
-# 		  Op::NTuple{N,AbstractTensorMap},
-# 		  si::NTuple{N,Int64},
-# 		  fermionic::NTuple{N,Bool},
-# 		  n::Int64 = 1; 
-# 		  kwargs...)
+function merge!(Tree::ObservableTree{L}) where L
 
-# Add a term to the `n`-th root of `ObservableTree`. This function is a wrapper of `addIntr!` with `Obs = true`. Detailed usage please refer to `addIntr!`. 
-# """
-# function addObs!(Tree::ObservableTree{M},
-# 	Op::NTuple{N, AbstractTensorMap},
-# 	si::NTuple{N, Int64},
-# 	fermionic::NTuple{N, Bool},
-# 	n::Int64 = 1;
-# 	kwargs...) where {N, M}
-# 	@assert n ≤ M
-# 	return addIntr!(Tree.Root.children[n], Op, si, fermionic, 1; Obs = true, kwargs...)
-# end
-# function addObs!(Tree::ObservableTree,
-# 	Op::AbstractTensorMap,
-# 	si::Int64,
-# 	n::Int64 = 1;
-# 	kwargs...)
-# 	return addIntr!(Tree.Root.children[n], Op, si, 1; Obs = true, kwargs...)
-# end
+	lsnode_L = InteractionTreeNode[Tree.RootL]
+	lschild_L = InteractionTreeNode[]
+	lsnode_R = InteractionTreeNode[Tree.RootR]
+	lschild_R = InteractionTreeNode[]
+	for si_count in 0:L
+		# left to right
+		si = si_count
+		empty!(lschild_L)
+		for node in lsnode_L
+			if length(node.Intrs) < 2
+				continue
+			end
 
+			# search 
+			i = 1
+			while i < length(node.Intrs)
+				ch_i = node.Intrs[i]
+				if length(ch_i.Ops) == 0
+                         # do not merge equivalent terms in obs mode
+					i += 1
+				else
+					ids = findall(1:length(node.Intrs)) do j
+						j < i && return false
+						ch_j = node.Intrs[j]
+						length(ch_j.Ops) == 0 && return false
+						return ch_j.Ops[1] == ch_i.Ops[1]
+					end
+					if length(ids) < 2
+						i += 1
+						continue
+					end
+
+					# add child 
+					node_new = InteractionTreeNode((si + 1, ch_i.Ops[1]), node)
+					push!(node.children, node_new)
+					for j in ids
+						ch_j = node.Intrs[j]
+						# update ch_j 
+						deleteat!(ch_j.Ops, 1)
+						ch_j.LeafL = node_new
+
+						push!(node_new.Intrs, ch_j)
+					end
+
+					deleteat!(node.Intrs, ids)
+
+				end
+
+			end
+
+			append!(lschild_L, node.children)
+		end
+
+		# next layer
+		empty!(lsnode_L)
+		append!(lsnode_L, lschild_L)
+
+		# right to left
+		si = L - si_count + 1
+		empty!(lschild_R)
+		for node in lsnode_R
+			if length(node.Intrs) < 2
+				continue
+			end
+
+			# search
+			i = 1
+			while i < length(node.Intrs)
+				ch_i = node.Intrs[i]
+				if length(ch_i.Ops) == 0
+                         # do not merge equivalent terms in obs mode
+					i += 1
+
+				else
+					ids = findall(1:length(node.Intrs)) do j
+						j < i && return false
+						ch_j = node.Intrs[j]
+						length(ch_j.Ops) == 0 && return false
+						return ch_j.Ops[end] == ch_i.Ops[end]
+					end
+					if length(ids) < 2
+						i += 1
+						continue
+					end
+
+					# add child
+					node_new = InteractionTreeNode((si - 1, ch_i.Ops[end]), node)
+					push!(node.children, node_new)
+					for j in ids
+						ch_j = node.Intrs[j]
+						# update ch_j
+						deleteat!(ch_j.Ops, length(ch_j.Ops))
+						ch_j.LeafR = node_new
+
+						push!(node_new.Intrs, ch_j)
+					end
+
+					deleteat!(node.Intrs, ids)
+
+				end
+
+			end
+
+			append!(lschild_R, node.children)
+		end
+
+		# next layer
+		empty!(lsnode_R)
+		append!(lsnode_R, lschild_R)
+	end
+
+     # add nodes  
+     lsnode_L = InteractionTreeNode[Tree.RootL]
+	lschild_L = InteractionTreeNode[]
+	lsnode_R = InteractionTreeNode[Tree.RootR]
+	lschild_R = InteractionTreeNode[]
+	for si_count in 0:L
+		# left to right
+          si = si_count
+          empty!(lschild_L)
+          for node in lsnode_L 
+               ids = findall(node.Intrs) do ch
+                    length(ch.Ops) ≥ 1
+               end
+
+               for i in ids 
+                    ch = node.Intrs[i]
+                    node_new = InteractionTreeNode((si + 1, ch.Ops[1]), node)
+                    push!(node.children, node_new)
+
+                    # update ch
+                    deleteat!(ch.Ops, 1)
+                    ch.LeafL = node_new
+
+                    push!(node_new.Intrs, ch)
+               end
+               deleteat!(node.Intrs, ids)
+
+               append!(lschild_L, node.children)
+          end
+
+          append!(empty!(lsnode_L), lschild_L)
+
+          # right to left
+          si = L - si_count + 1
+          empty!(lschild_R)
+          for node in lsnode_R
+               ids = findall(node.Intrs) do ch
+                    length(ch.Ops) ≥ 1
+               end
+
+               for i in ids
+                    ch = node.Intrs[i]
+                    node_new = InteractionTreeNode((si - 1, ch.Ops[end]), node)
+                    push!(node.children, node_new)
+
+                    # update ch
+                    deleteat!(ch.Ops, length(ch.Ops))
+                    ch.LeafR = node_new
+
+                    push!(node_new.Intrs, ch)
+               end
+               deleteat!(node.Intrs, ids)
+
+               append!(lschild_R, node.children)
+          end
+
+          append!(empty!(lsnode_R), lschild_R)
+
+     end
+
+	return Tree
+end
 
