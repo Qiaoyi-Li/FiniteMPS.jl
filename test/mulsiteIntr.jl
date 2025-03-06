@@ -13,15 +13,16 @@ Tij += Tij'
 ϵ, V = EigenModes(Tij)
 
 # =============== DMRG ===============
-Root = InteractionTreeNode()
+Tree = InteractionTree(L)
 for i in 1:L, j in 1:L
 	if i == j
-		addIntr1!(Root, U1SpinlessFermion.n, i, -Tij[i, i]; name = :n)
+		addIntr!(Tree, U1SpinlessFermion.n, i, -Tij[i, i]; name = :n)
 	else
-		addIntr2!(Root, U1SpinlessFermion.FdagF, (i, j), -Tij[i, j]; name = (:Fdag, :F), Z = U1SpinlessFermion.Z)
+		addIntr!(Tree, U1SpinlessFermion.FdagF, (i, j), (true, true), 
+			-Tij[i, j]; name = (:Fdag, :F), Z = U1SpinlessFermion.Z)
 	end
 end
-H = AutomataMPO(InteractionTree(Root))
+H = AutomataMPO(Tree)
 Ψ = randMPS(ComplexF64, L, U1SpinlessFermion.pspace, Rep[U₁](c => 1 for c in -1:1/2:1))
 Env = Environment(Ψ', H, Ψ)
 lsEg = zeros(20)
@@ -35,7 +36,7 @@ errEg = Eg - sum(ϵ[1:div(L, 2)])
 
 
 # =============== calculate observables ===============
-Tree = ObservableTree()
+Tree = ObservableTree(L)
 # 4-site 
 for i in 1:L, j in 1:L, k in 1:L, l in 1:L
 	!duplicated && !allunique([i, j, k, l]) && continue

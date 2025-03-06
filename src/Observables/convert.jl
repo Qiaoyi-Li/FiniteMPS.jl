@@ -3,33 +3,12 @@
 
 Collect the observables from the tree and store them in a dictionary or a named tuple. Current valid types are `Dict` and `NamedTuple`.  
 """
-function convert(::Type{Dict}, Root::InteractionTreeNode; kwargs...)
+function convert(::Type{Dict}, Tree::ObservableTree; kwargs...)
 
-	T = Dict{Tuple{Vararg{Int64}}, Number}
-	Rslt = Dict{String, T}() # Tuple si => value
-
-	for node in PreOrderDFS(Root)
-		isnothing(node.Op) && continue
-		node.Op.si == 0 && continue
-		if !isnan(node.Op.strength)
-			for (sites, name) in node.value
-				if !haskey(Rslt, name)
-					Rslt[name] = T()
-				end
-				Rslt[name][sites] = node.Op.strength
-			end
-		end
-	end
-
-	return Rslt
+	return Dict{String, Dict}(k => Dict{typeof(d).parameters[1], Number}(si => v[] for (si, v) in d) for (k, d) in Tree.Refs)
 end
-function convert(::Type{NamedTuple}, Root::InteractionTreeNode; kwargs...)
-
-	Rslt = convert(Dict, Root; kwargs...)
+function convert(::Type{NamedTuple}, Tree::ObservableTree; kwargs...)
+	Rslt = convert(Dict, Tree; kwargs...)
 	k = keys(Rslt) .|> Symbol |> Tuple
 	return NamedTuple{k}(values(Rslt))
-end
-
-function convert(::Type{T}, Tree::ObservableTree; kwargs...) where T <: Union{NamedTuple, Dict}
-	return convert(T, Tree.Root; kwargs...)
 end

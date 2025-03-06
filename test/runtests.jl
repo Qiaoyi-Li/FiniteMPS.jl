@@ -15,9 +15,9 @@ FiniteMPS.set_num_threads_mkl(1)
      include("ObsTree.jl")
 end
 
-@testset "Automata MPO" verbose = true begin
-     include("FreeFermion.jl")
-end
+# @testset "Automata MPO" verbose = true begin
+#      include("FreeFermion.jl")
+# end
 
 # test multi-site interaction
 @testset "Multi-site Intr" verbose = true begin

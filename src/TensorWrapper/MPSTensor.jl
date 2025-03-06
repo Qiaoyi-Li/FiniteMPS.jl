@@ -67,10 +67,10 @@ If `trunc = notrunc()`, use `TensorKit.leftorth`, otherwise, use `TensorKit.tsvd
 """
 function leftorth(A::MPSTensor{R₁}; trunc=notrunc(), kwargs...) where {R₁}
      if trunc == notrunc()
-          Q, R = leftorth(A.A, Tuple(1:R₁-1), (R₁,); kwargs...)
+          Q, R = leftorth(A.A, (Tuple(1:R₁-1), (R₁,)); kwargs...)
           return Q, R, BondInfo(Q, :R)
      else
-          u, s, vd, info =  tsvd(A, Tuple(1:R₁-1), (R₁,); trunc=trunc, kwargs...)
+          u, s, vd, info =  tsvd(A, (Tuple(1:R₁-1), (R₁,)); trunc=trunc, kwargs...)
           return u, s * vd, info
      end
 
@@ -87,10 +87,10 @@ If `trunc = notrunc()`, use `TensorKit.rightorth`, otherwise, use `TensorKit.tsv
 """
 function rightorth(A::MPSTensor{R₂}; trunc=notrunc(), kwargs...) where {R₂}
      if trunc == notrunc()
-          L, Q = rightorth(A.A, (1,), Tuple(2:R₂); kwargs...)
+          L, Q = rightorth(A.A, ((1,), Tuple(2:R₂)); kwargs...)
           return L, Q, BondInfo(Q, :L)
      else
-          u, s, vd, info = tsvd(A, (1,), Tuple(2:R₂); trunc=trunc, kwargs...)
+          u, s, vd, info = tsvd(A, ((1,), Tuple(2:R₂)); trunc=trunc, kwargs...)
           return u * s, vd, info
      end
 end

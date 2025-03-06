@@ -16,15 +16,16 @@ Tij += Tij'
 ϵ, V = EigenModes(Tij)
 
 # =============== DMRG ===============
-Root = InteractionTreeNode()
+Tree = InteractionTree(L)
 for i in 1:L, j in 1:L
 	if i == j
-		addIntr1!(Root, U1SU2Fermion.n, i, -Tij[i, i]; name = :n)
+		addIntr!(Tree, U1SU2Fermion.n, i, -Tij[i, i]; name = :n)
 	else
-		addIntr2!(Root, U1SU2Fermion.FdagF, (i, j), -Tij[i, j]; name = (:Fdag, :F), Z = U1SU2Fermion.Z)
+		addIntr!(Tree, U1SU2Fermion.FdagF, (i, j), (true, true),
+        -Tij[i, j]; name = (:Fdag, :F), Z = U1SU2Fermion.Z)
 	end
 end
-H = AutomataMPO(InteractionTree(Root))
+H = AutomataMPO(Tree)
 
 aspace = vcat(Rep[U₁×SU₂]((0, 0) => 1), repeat([Rep[U₁×SU₂]((i, j) => 1 for i in -1:1 for j in 0:1//2:1),], L-1)) # half-filling and S=0
 Ψ = randMPS(ComplexF64, U1SU2Fermion.pspace, aspace)
@@ -42,7 +43,7 @@ errEg = Eg - 2*sum(ϵ[1:div(L, 2)])
 
 
 # =============== calculate observables ===============
-Tree = ObservableTree()
+Tree = ObservableTree(L)
 # 4-site
 for i in 1:L, j in 1:L, k in 1:L, l in 1:L
 	!duplicated && !allunique([i, j, k, l]) && continue

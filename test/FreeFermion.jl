@@ -7,27 +7,27 @@ function _free_fermion_U1DMRG(Tij::Matrix{T}, a::Int64) where {T<:Union{Float64,
      L = size(Tij, 1)
 
      # H = - T_{i,j} c_i^dag c_j
-     Root = InteractionTreeNode()
+     Tree = InteractionTree(L)
      if a == 1
           for i in 1:L, j in 1:L
                i == j && continue
-               addIntr2!(Root, U1SpinlessFermion.FdagF, (i, j),
+               addIntr!(Tree, U1SpinlessFermion.FdagF, (i, j), (true, true),
                     -Tij[i, j]; Z=U1SpinlessFermion.Z, name=(:Fdag, :F))
           end
      elseif a == 2
           for i in 1:L, j in i+1:L
-               addIntr2!(Root, U1SpinlessFermion.FdagF, (i, j),
+               addIntr!(Tree, U1SpinlessFermion.FdagF, (i, j), (true, true),
                     -Tij[i, j]; Z=U1SpinlessFermion.Z, name=(:Fdag, :F))
-               addIntr2!(Root, U1SpinlessFermion.FFdag, (i, j),
+               addIntr!(Tree, U1SpinlessFermion.FFdag, (i, j), (true, true),
                     Tij[i, j]'; Z=U1SpinlessFermion.Z, name=(:F, :Fdag))
           end
      end
 
      for i in 1:L
-          addIntr1!(Root, U1SpinlessFermion.n, i, -Tij[i, i]; name=:n)
+          addIntr!(Tree, U1SpinlessFermion.n, i, -Tij[i, i]; name=:n)
      end
 
-     H = AutomataMPO(Root)
+     H = AutomataMPO(Tree)
      Ψ = randMPS(T, L, U1SpinlessFermion.pspace, Rep[U₁](c => 1 for c in -1:1/2:1))
 
      Env = Environment(Ψ', H, Ψ)
@@ -47,36 +47,36 @@ function _free_fermion_U1U1DMRG(T₊::Matrix{T}, T₋::Matrix{T}, a::Int64) wher
      L = size(T₊, 1)
 
      # H = - T_{i,j} c_i^dag c_j
-     Root = InteractionTreeNode()
+     Tree = InteractionTree(L)
      if a == 1
           for i in 1:L, j in 1:L
                i == j && continue
-               addIntr2!(Root, U1U1Fermion.FdagF₊, (i, j),
+               addIntr!(Tree, U1U1Fermion.FdagF₊, (i, j), (true, true),
                     -T₊[i, j]; Z=U1U1Fermion.Z, name=(:Fdag₊, :F₊))
-               addIntr2!(Root, U1U1Fermion.FdagF₋, (i, j),
+               addIntr!(Tree, U1U1Fermion.FdagF₋, (i, j), (true, true),
                     -T₋[i, j]; Z=U1U1Fermion.Z, name=(:Fdag₋, :F₋))
           end
      elseif a == 2
           for i in 1:L, j in i+1:L
-               addIntr2!(Root, U1U1Fermion.FdagF₊, (i, j),
+               addIntr!(Tree, U1U1Fermion.FdagF₊, (i, j), (true, true),
                     -T₊[i, j]; Z=U1U1Fermion.Z, name=(:Fdag₊, :F₊))
-               addIntr2!(Root, U1U1Fermion.FdagF₋, (i, j),
+               addIntr!(Tree, U1U1Fermion.FdagF₋, (i, j), (true, true),
                     -T₋[i, j]; Z=U1U1Fermion.Z, name=(:Fdag₋, :F₋))
 
 
-               addIntr2!(Root, U1U1Fermion.FFdag₊, (i, j),
+               addIntr!(Tree, U1U1Fermion.FFdag₊, (i, j), (true, true),
                     T₊[i, j]'; Z=U1U1Fermion.Z, name=(:F₊, :Fdag₊))
-               addIntr2!(Root, U1U1Fermion.FFdag₋, (i, j),
+               addIntr!(Tree, U1U1Fermion.FFdag₋, (i, j), (true, true),
                     T₋[i, j]'; Z=U1U1Fermion.Z, name=(:F₋, :Fdag₋))
           end
      end
 
      for i in 1:L
           O = T₊[i, i] * U1U1Fermion.n₊ + T₋[i, i] * U1U1Fermion.n₋
-          addIntr1!(Root, O, i, -1.0; name=:O)
+          addIntr!(Tree, O, i, -1.0; name=:O)
      end
 
-     H = AutomataMPO(Root)
+     H = AutomataMPO(Tree)
      Ψ = randMPS(T, L, U1U1Fermion.pspace, Rep[U₁×U₁]((c, s) => 1 for c in -1:1:1 for s in -1:1/2:1))
 
      Env = Environment(Ψ', H, Ψ)

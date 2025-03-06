@@ -127,7 +127,7 @@ function _swap(A::LocalOperator{1, 2}, B::LocalOperator{2, 2})
      TA, s, vd = tsvd(AB; trunc = truncbelow(1e-15))
      TB = s * vd
 
-	return LocalOperator(permute(TA, (1,), (2, 3)), B.name, B.si, B.fermionic, B.strength), LocalOperator(permute(TB, (1, 2), (3, 4)), A.name, A.si, A.fermionic, A.strength)
+	return LocalOperator(permute(TA, ((1,), (2, 3))), B.name, B.si, B.fermionic, B.strength), LocalOperator(permute(TB, ((1, 2), (3, 4))), A.name, A.si, A.fermionic, A.strength)
 end
 function _swap(A::LocalOperator{2, 2}, B::LocalOperator{2, 1})
 	#     |     |         |     |
@@ -139,7 +139,7 @@ function _swap(A::LocalOperator{2, 2}, B::LocalOperator{2, 1})
      u, s, TB, _ = tsvd(AB; trunc = truncbelow(1e-15))
      TA = u * s
 
-	return LocalOperator(permute(TA, (1, 2), (3, 4)), B.name, B.si, B.fermionic, B.strength), LocalOperator(permute(TB, (1, 2), (3,)), A.name, A.si, A.fermionic, A.strength)
+	return LocalOperator(permute(TA, ((1, 2), (3, 4))), B.name, B.si, B.fermionic, B.strength), LocalOperator(permute(TB, ((1, 2), (3,))), A.name, A.si, A.fermionic, A.strength)
 end
 function _swap(A::LocalOperator{2, 2}, B::LocalOperator{2, 2})
 	#     |     |             |     |
@@ -151,7 +151,7 @@ function _swap(A::LocalOperator{2, 2}, B::LocalOperator{2, 2})
      TA, s, vd, _ = tsvd(AB; trunc = truncbelow(1e-15)) 
 	TB = s * vd
 
-	return LocalOperator(permute(TA, (1, 2), (3, 4)), B.name, B.si, B.fermionic, B.strength), LocalOperator(permute(TB, (1, 2), (3, 4)), A.name, A.si, A.fermionic, A.strength)
+	return LocalOperator(permute(TA, ((1, 2), (3, 4))), B.name, B.si, B.fermionic, B.strength), LocalOperator(permute(TB, ((1, 2), (3, 4))), A.name, A.si, A.fermionic, A.strength)
 end
 function _swap(A::LocalOperator{2, 1}, B::LocalOperator{1, 2})
 	#     |   |             |     |
@@ -163,5 +163,5 @@ function _swap(A::LocalOperator{2, 1}, B::LocalOperator{1, 2})
      TA, s, vd, _ = tsvd(AB; trunc = truncbelow(1e-15))
      TB = s * vd
 
-	return LocalOperator(permute(TA, (1, 2), (3, 4)), B.name, B.si, B.fermionic, B.strength), LocalOperator(permute(TB, (1, 2), (3, 4)), A.name, A.si, A.fermionic, A.strength)
+	return LocalOperator(permute(TA, ((1, 2), (3, 4))), B.name, B.si, B.fermionic, B.strength), LocalOperator(permute(TB, ((1, 2), (3, 4))), A.name, A.si, A.fermionic, A.strength)
 end

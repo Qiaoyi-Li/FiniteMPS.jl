@@ -12,7 +12,7 @@
 	canonicalize!(Ψ, 1)
 	OpSz = TensorMap([0.5 0.0; 0.0 -0.5], ℂ^2, ℂ^2)
 
-	Tree = ObservableTree()
+	Tree = ObservableTree(L)
 	for i in 1:L, j in 1:L, k in 1:L, l in 1:L
 		!allunique([i, j, k, l]) && continue
 		addObs!(Tree, Tuple(fill(OpSz, 4)), (i, j, k, l), (false, false, false, false); name = (:Sz, :Sz, :Sz, :Sz))
