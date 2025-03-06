@@ -47,3 +47,17 @@ axpy!(α::Number, A::AbstractTensorMap, B::Nothing) = α * A
 rmul!(::Nothing, ::Number) = nothing
 
 dim(::Nothing, ::Int64) = (0, 0)
+
+# fix error in construction of TensorMap with PtrArray
+function TensorMap{T, S, N₁, N₂, A}(::UndefInitializer,
+	space::TensorMapSpace{S, N₁, N₂}) where {T, S <: IndexSpace,
+	N₁, N₂,
+	A <: PtrArray{T, 1}}
+	d = fusionblockstructure(space).totaldim
+	# data = A(undef, d) # this line will lead to an error 
+	data = Array{T, 1}(undef, d)
+	if !isbitstype(T)
+		zerovector!(data)
+	end
+	return TensorMap{T, S, N₁, N₂, Array{T, 1}}(data, space)
+end

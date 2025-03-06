@@ -124,7 +124,8 @@ function _swap(A::LocalOperator{1, 2}, B::LocalOperator{2, 2})
 
 	@tensor AB[d e; a b f] := A.A[a b c] * B.A[c d e f]
 	# QR 
-	TA, TB = leftorth(AB)
+     TA, s, vd = tsvd(AB; trunc = truncbelow(1e-15))
+     TB = s * vd
 
 	return LocalOperator(permute(TA, (1,), (2, 3)), B.name, B.si, B.fermionic, B.strength), LocalOperator(permute(TB, (1, 2), (3, 4)), A.name, A.si, A.fermionic, A.strength)
 end
@@ -134,8 +135,9 @@ function _swap(A::LocalOperator{2, 2}, B::LocalOperator{2, 1})
 	#     |     |         |     |
 
 	@tensor AB[a e f; b c] := A.A[a b c d] * B.A[d e f]
-	# QR
-	TA, TB = rightorth(AB)
+	# QR, truncate zeros 
+     u, s, TB, _ = tsvd(AB; trunc = truncbelow(1e-15))
+     TA = u * s
 
 	return LocalOperator(permute(TA, (1, 2), (3, 4)), B.name, B.si, B.fermionic, B.strength), LocalOperator(permute(TB, (1, 2), (3,)), A.name, A.si, A.fermionic, A.strength)
 end
@@ -146,7 +148,8 @@ function _swap(A::LocalOperator{2, 2}, B::LocalOperator{2, 2})
 
 	@tensor AB[a e f; b c g] := A.A[a b c d] * B.A[d e f g]
 	# QR
-	TA, TB = leftorth(AB)
+     TA, s, vd, _ = tsvd(AB; trunc = truncbelow(1e-15)) 
+	TB = s * vd
 
 	return LocalOperator(permute(TA, (1, 2), (3, 4)), B.name, B.si, B.fermionic, B.strength), LocalOperator(permute(TB, (1, 2), (3, 4)), A.name, A.si, A.fermionic, A.strength)
 end
@@ -157,7 +160,8 @@ function _swap(A::LocalOperator{2, 1}, B::LocalOperator{1, 2})
 
 	@tensor AB[a e f; b c g] := A.A[a b c] * B.A[e f g]
 	# QR
-	TA, TB = leftorth(AB)
+     TA, s, vd, _ = tsvd(AB; trunc = truncbelow(1e-15))
+     TB = s * vd
 
 	return LocalOperator(permute(TA, (1, 2), (3, 4)), B.name, B.si, B.fermionic, B.strength), LocalOperator(permute(TB, (1, 2), (3, 4)), A.name, A.si, A.fermionic, A.strength)
 end

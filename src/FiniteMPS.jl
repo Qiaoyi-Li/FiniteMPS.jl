@@ -9,6 +9,7 @@ import SerializedElementArrays: SerializedElementArray, SerializedElementVector
 @reexport import Base: +, -, *, /, ==, promote_rule, convert, length, show, getindex, setindex!, lastindex, keys, similar, merge, merge!, iterate, complex, sort!
 @reexport import TensorKit: ×, one, zero, dim, inner, scalar, domain, codomain, eltype, scalartype, leftorth, rightorth, leftnull, rightnull, tsvd, adjoint, normalize!, norm, axpy!, axpby!, add!, add!!, dot, mul!, rmul!, NoTruncation, fuse, zerovector!, zerovector, scale, scale!, scale!!, fusionblockstructure, numin, numout, numind
 using TensorKit.TensorOperations: tensoralloc, tensoralloc_add, ManualAllocator, tensorcontract!, tensorcontract
+using FiniteMPS.TensorOperations.PtrArrays: PtrArray
 import TensorKit.TensorOperations: tensorfree!
 @reexport import LinearAlgebra: BLAS, rank, qr, diag, I, diagm
 import AbstractTrees: parent, isroot, children, ParentLinks, ChildIndexing, NodeType, nodetype
@@ -132,9 +133,10 @@ include("IntrTree/Automata.jl")
 # include("Observables/calITP.jl")
 # include("Observables/pushleft.jl")
 # include("Observables/pushright.jl")
-export ObservableTree, addObs!
+export ObservableTree, addObs!, calObs!
 include("Observables/ObsTree.jl")
 include("Observables/addObs.jl")
+include("Observables/calObs.jl")
 
 # predefined local spaces
 export SU₂Spin, SU2Spin, U₁Spin, U1Spin, NoSymSpinOneHalf, U₁SU₂Fermion, U1SU2Fermion, ℤ₂SU₂Fermion, Z2SU2Fermion, U₁SpinlessFermion, U1SpinlessFermion, U₁SU₂tJFermion, U1SU2tJFermion, U₁U₁Fermion, U1U1Fermion, U₁U₁tJFermion, U1U1tJFermion, ℤ₂SU₂tJFermion, Z2SU2tJFermion

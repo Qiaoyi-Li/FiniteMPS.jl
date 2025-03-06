@@ -363,4 +363,3 @@ function merge!(Tree::InteractionTree{L}) where L
 
 	return Tree
 end
-

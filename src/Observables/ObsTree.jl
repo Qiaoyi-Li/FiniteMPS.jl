@@ -62,7 +62,7 @@ function merge!(Tree::ObservableTree{L}) where L
 			while i < length(node.Intrs)
 				ch_i = node.Intrs[i]
 				if length(ch_i.Ops) == 0
-                         # do not merge equivalent terms in obs mode
+					# do not merge equivalent terms in obs mode
 					i += 1
 				else
 					ids = findall(1:length(node.Intrs)) do j
@@ -114,7 +114,7 @@ function merge!(Tree::ObservableTree{L}) where L
 			while i < length(node.Intrs)
 				ch_i = node.Intrs[i]
 				if length(ch_i.Ops) == 0
-                         # do not merge equivalent terms in obs mode
+					# do not merge equivalent terms in obs mode
 					i += 1
 
 				else
@@ -155,66 +155,84 @@ function merge!(Tree::ObservableTree{L}) where L
 		append!(lsnode_R, lschild_R)
 	end
 
-     # add nodes  
-     lsnode_L = InteractionTreeNode[Tree.RootL]
+	# add nodes  
+	lsnode_L = InteractionTreeNode[Tree.RootL]
 	lschild_L = InteractionTreeNode[]
 	lsnode_R = InteractionTreeNode[Tree.RootR]
 	lschild_R = InteractionTreeNode[]
 	for si_count in 0:L
 		# left to right
-          si = si_count
-          empty!(lschild_L)
-          for node in lsnode_L 
-               ids = findall(node.Intrs) do ch
-                    length(ch.Ops) ≥ 1
-               end
+		si = si_count
+		empty!(lschild_L)
+		for node in lsnode_L
+			ids = findall(node.Intrs) do ch
+				length(ch.Ops) ≥ 1
+			end
 
-               for i in ids 
-                    ch = node.Intrs[i]
-                    node_new = InteractionTreeNode((si + 1, ch.Ops[1]), node)
-                    push!(node.children, node_new)
+			for i in ids
+				ch = node.Intrs[i]
+				node_new = InteractionTreeNode((si + 1, ch.Ops[1]), node)
+				push!(node.children, node_new)
 
-                    # update ch
-                    deleteat!(ch.Ops, 1)
-                    ch.LeafL = node_new
+				# update ch
+				deleteat!(ch.Ops, 1)
+				ch.LeafL = node_new
 
-                    push!(node_new.Intrs, ch)
-               end
-               deleteat!(node.Intrs, ids)
+				push!(node_new.Intrs, ch)
+			end
+			deleteat!(node.Intrs, ids)
 
-               append!(lschild_L, node.children)
-          end
+			append!(lschild_L, node.children)
+		end
 
-          append!(empty!(lsnode_L), lschild_L)
+		append!(empty!(lsnode_L), lschild_L)
 
-          # right to left
-          si = L - si_count + 1
-          empty!(lschild_R)
-          for node in lsnode_R
-               ids = findall(node.Intrs) do ch
-                    length(ch.Ops) ≥ 1
-               end
+		# right to left
+		si = L - si_count + 1
+		empty!(lschild_R)
+		for node in lsnode_R
+			ids = findall(node.Intrs) do ch
+				length(ch.Ops) ≥ 1
+			end
 
-               for i in ids
-                    ch = node.Intrs[i]
-                    node_new = InteractionTreeNode((si - 1, ch.Ops[end]), node)
-                    push!(node.children, node_new)
+			for i in ids
+				ch = node.Intrs[i]
+				node_new = InteractionTreeNode((si - 1, ch.Ops[end]), node)
+				push!(node.children, node_new)
 
-                    # update ch
-                    deleteat!(ch.Ops, length(ch.Ops))
-                    ch.LeafR = node_new
+				# update ch
+				deleteat!(ch.Ops, length(ch.Ops))
+				ch.LeafR = node_new
 
-                    push!(node_new.Intrs, ch)
-               end
-               deleteat!(node.Intrs, ids)
+				push!(node_new.Intrs, ch)
+			end
+			deleteat!(node.Intrs, ids)
 
-               append!(lschild_R, node.children)
-          end
+			append!(lschild_R, node.children)
+		end
 
-          append!(empty!(lsnode_R), lschild_R)
+		append!(empty!(lsnode_R), lschild_R)
 
-     end
+	end
 
 	return Tree
 end
 
+function treewidth(Tree::ObservableTree)
+	return map([Tree.RootL, Tree.RootR]) do R
+		si_last = 0
+		n = 1
+		width = 1
+		for node in StatelessBFS(R)
+			si = node.Op[1]
+			if si != si_last
+				width = max(width, n)
+				n = 1
+			else
+				n += 1
+			end
+			si_last = si
+		end
+		return max(width, n)
+	end |> Tuple
+end
