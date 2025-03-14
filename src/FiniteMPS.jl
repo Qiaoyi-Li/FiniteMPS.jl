@@ -128,7 +128,6 @@ export ObservableTree, addObs!, calObs!
 include("Observables/ObsTree.jl")
 include("Observables/addObs.jl")
 include("Observables/calObs.jl")
-include("Observables/convert.jl")
 
 # TODO: use tree instead of graph for ITP 
 export ImagTimeProxyGraph, addITP2!, addITP4!, calITP!
@@ -137,6 +136,7 @@ include("Observables/addITP.jl")
 include("Observables/calITP.jl")
 include("Observables/pushleft.jl")
 include("Observables/pushright.jl")
+include("Observables/convert.jl")
 
 # predefined local spaces
 export SU₂Spin, SU2Spin, U₁Spin, U1Spin, NoSymSpinOneHalf, U₁SU₂Fermion, U1SU2Fermion, ℤ₂SU₂Fermion, Z2SU2Fermion, U₁SpinlessFermion, U1SpinlessFermion, U₁SU₂tJFermion, U1SU2tJFermion, U₁U₁Fermion, U1U1Fermion, U₁U₁tJFermion, U1U1tJFermion, ℤ₂SU₂tJFermion, Z2SU2tJFermion
