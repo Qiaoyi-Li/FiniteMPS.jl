@@ -54,6 +54,7 @@ function merge!(Tree::ObservableTree{L}) where L
 		empty!(lschild_L)
 		for node in lsnode_L
 			if length(node.Intrs) < 2
+				append!(lschild_L, node.children)
 				continue
 			end
 
@@ -106,6 +107,7 @@ function merge!(Tree::ObservableTree{L}) where L
 		empty!(lschild_R)
 		for node in lsnode_R
 			if length(node.Intrs) < 2
+				append!(lschild_R, node.children)
 				continue
 			end
 
