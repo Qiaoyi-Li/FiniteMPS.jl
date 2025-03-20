@@ -57,7 +57,7 @@ function LanczosExp(f::Function, x₀, t::NT, args...;
 		end
 		# T[k, k+1] = ⟨bₖ|A|bₖ₊₁⟩, scale by the estimated eigval so that A -> a*A give a similar cutoff
 		ϵmax = maximum(abs, ϵ)
-		if T[k, k+1] < tol * ϵmax
+		if T[k, k+1] ≤ tol * ϵmax # "=" cannot be skipped!  
 			# closed subspace
 			verbose && println("T[$k, $(k+1)]/max|ϵ| = $(T[k, k+1]/ϵmax), break at K = $(k)!")
 			break
