@@ -159,18 +159,22 @@ struct TwoSiteInteractionIterator{L, T} <: AbstractInteractionIterator{L}
           return TwoSiteInteractionIterator{L}(O₁, O₂, Z)
      end
 end
-function iterate(iter::TwoSiteInteractionIterator{L, Nothing}, i::Int64 = 1) where {L} 
+function iterate(iter::TwoSiteInteractionIterator{L, Nothing}, st::Tuple{Int64, VectorSpace} = (1, getLeftSpace(iter.O₁))) where {L} 
+     i, aspace = st
      i > L && return nothing
      if i == iter.O₁.si
           Op_wrap = iter.O₁
      elseif i == iter.O₂.si
           Op_wrap = iter.O₂
      else
-          Op_wrap = IdentityOperator(i)
+          # deduce pspace 
+          pspace = domain(iter.O₁)[1]
+          Op_wrap = IdentityOperator(pspace, aspace, i)
      end
-     return Op_wrap, i + 1
+     return Op_wrap, (i + 1, getRightSpace(Op_wrap))
 end
-function iterate(iter::TwoSiteInteractionIterator{L, <:AbstractTensorMap}, i::Int64 = 1) where {L} 
+function iterate(iter::TwoSiteInteractionIterator{L, <:AbstractTensorMap}, st::Tuple{Int64, VectorSpace} = (1, getLeftSpace(iter.O₁))) where {L} 
+     i, aspace = st
      i > L && return nothing
      if i == iter.O₁.si
           Op_wrap = iter.O₁
@@ -178,11 +182,13 @@ function iterate(iter::TwoSiteInteractionIterator{L, <:AbstractTensorMap}, i::In
           # add Z here 
           Op_wrap = _addZ!(iter.O₂, iter.Z) 
      elseif i > iter.O₁.si && i < iter.O₂.si
-          Op_wrap = LocalOperator(iter.Z, :Z, i, false)
+          Op_wrap = LocalOperator(iter.Z, :Z, i, false; aspace = (aspace, aspace))
      else
-          Op_wrap = IdentityOperator(i)
+          pspace = domain(iter.Z)[1]
+          Op_wrap = IdentityOperator(pspace, aspace, i)
      end
-     return Op_wrap, i + 1
+
+     return Op_wrap, (i + 1, getRightSpace(Op_wrap))
 end
 
 struct ArbitraryInteractionIterator{L} <: AbstractInteractionIterator{L}

@@ -100,9 +100,11 @@ function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}
      return CompositeMPSTensor{2,T}(Hx)
 end
 function action2(obj::IdentityProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}; kwargs...) where {T<:NTuple{2,MPSTensor}}
+     pspace = domain(x)[1]
+     aspace = numind(obj.El) == 2 ? trivial(pspace) : codomain(obj.El)[end]
      Hx = _action2(x, obj.El,
-          IdentityOperator(obj.si[1], 1),
-          IdentityOperator(obj.si[2], 1),
+          IdentityOperator(pspace, aspace, obj.si[1], 1),
+          IdentityOperator(pspace, aspace, obj.si[2], 1),
           obj.Er; kwargs...)
      return CompositeMPSTensor{2,T}(Hx)
 end
