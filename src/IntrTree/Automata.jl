@@ -1,244 +1,305 @@
-function AutomataMPO(Tree::InteractionTree{L}) where L 
-     
-     merge!(Tree)
+function AutomataMPO(Tree::InteractionTree{L}; tol::Float64 = 1e-12) where L
 
-     dict = Dict{InteractionTreeNode, Int64}() # node => (si, n)
-     lsn_count = zeros(Int64, L)
-     for node in PreOrderDFS(Tree.RootL)
-          si, _ = node.Op
-          if si == 0
-               dict[node] = 1
-               continue
-          end
+	merge!(Tree)
 
-          lsn_count[si] += 1
-          dict[node] = lsn_count[si]
-     end
-     for node in PreOrderDFS(Tree.RootR)
-          si, _ = node.Op
-          if si == L + 1
-               dict[node] = 1
-               continue
-          end
+	dict = Dict{InteractionTreeNode, Int64}() # node => (si, n)
+	lsn_count = zeros(Int64, L)
+	for node in PreOrderDFS(Tree.RootL)
+		si, _ = node.Op
+		if si == 0
+			dict[node] = 1
+			continue
+		end
 
-          lsn_count[si] += 1
-          dict[node] = lsn_count[si]
-     end
+		lsn_count[si] += 1
+		dict[node] = lsn_count[si]
+	end
+	for node in PreOrderDFS(Tree.RootR)
+		si, _ = node.Op
+		if si == L + 1
+			dict[node] = 1
+			continue
+		end
+
+		lsn_count[si] += 1
+		dict[node] = lsn_count[si]
+	end
 
 
-     H = Vector{SparseMPOTensor}(undef, L)
-     for si in 1:L 
-          if si == 1
-               sz = (1, lsn_count[1])
-          elseif si == L
-               sz = (lsn_count[L-1], 1)
-          else
-               sz = (lsn_count[si-1], lsn_count[si])
-          end
-          H[si] = SparseMPOTensor(nothing, sz[1], sz[2])
-     end
+	lsS = Vector{Matrix{Any}}(undef, L + 1)
+	for si in 1:L-1
+		lsS[si+1] = Matrix{Any}(nothing, lsn_count[si], lsn_count[si+1])
+	end
+	lsS[1] = ones(1, lsn_count[1])
+	lsS[L+1] = ones(lsn_count[L], 1)
 
-     for node in PreOrderDFS(Tree.RootL)
-          si, idx = node.Op
-          si == 0 && continue
-          j = dict[node]
-          i = dict[node.parent] 
-          Op = deepcopy(Tree.Ops[si][idx])
-          Op.strength[] = 1.0
-          H[si][i, j] = Op
+	# super MPS 
+	lsT = Vector{Array{Any, 3}}(undef, L)
+	for si in 1:L
+		lsT[si] = Array{Any, 3}(nothing, lsn_count[si], length(Tree.Ops[si]), lsn_count[si])
+	end
 
-          # Intr 
-          for ch in node.Intrs
-               node_R = ch.LeafR
-               if si == L - 1
-                    k = 1
-               else
-                    k = dict[node_R]
-               end
-               Op = deepcopy(Tree.Ops[si+1][node_R.Op[2]])
-               Op.strength = ch.ref[]
-               H[si+1][j, k] = Op
-          end
-     end
+	for node in PreOrderDFS(Tree.RootL)
+		si, idx = node.Op
+		si == 0 && continue
+		i = dict[node]
+		lsT[si][i, idx, i] = 1.0
 
-     for node in PreOrderDFS(Tree.RootR)
-          si, _ = node.Op
-          si ≥ L && continue
-          i = dict[node]
-          if si == L-1
-               j = 1
-          else
-               j = dict[node.parent]
-          end
-          idx = node.parent.Op[2]
-          Op = deepcopy(Tree.Ops[si+1][idx])
-          Op.strength[] = 1.0
-          H[si+1][i, j] = Op
-     end
+		for ch in node.children
+			j = dict[ch]
+			lsS[si+1][i, j] = 1.0
+		end
 
-     # right-to-left merge
-     # TODO preserve
-	for si in reverse(2:L)
-		i = 1
-		while i < size(H[si], 1)
-			j = findfirst(i+1:size(H[si], 1)) do j
-				# find same row
-				any(k -> H[si][i, k] != H[si][j, k], 1:size(H[si], 2)) && return false
-				lscoef = []
-				for k in 1:size(H[si], 2)
-					if !isnothing(H[si][i, k])
-						push!(lscoef, H[si][i, k].strength[] / H[si][j, k].strength[])
-					end
-				end
-				return all(c -> c == lscoef[1], lscoef)
-			end
-			if !isnothing(j)
-				j += i
-				strength_i = H[si][i, findfirst(!isnothing, H[si][i, :])].strength[]
-				strength_j = H[si][j, findfirst(!isnothing, H[si][j, :])].strength[]
-				for idx in 1:size(H[si-1], 1)
-					if !isnothing(H[si-1][idx, i])
-						H[si-1][idx, i].strength[] *= strength_i
-					end
-					if !isnothing(H[si-1][idx, j])
-						H[si-1][idx, j].strength[] *= strength_j
-					end
-				end
-				for idx in 1:size(H[si], 2)
-					if !isnothing(H[si][i, idx])
-						H[si][i, idx].strength[] = 1.0
-					end
-				end
-
-				# merge 
-				for idx in 1:size(H[si-1], 1)
-					H[si-1][idx, i] += H[si-1][idx, j]
-				end
-				# remove j 
-				H[si-1] = H[si-1][:, vcat(1:j-1, j+1:size(H[si-1], 2))]
-				H[si] = H[si][vcat(1:j-1, j+1:size(H[si], 1)), :]
-
-			else
-				i += 1
-			end
-
+		# Intr 
+		for ch in node.Intrs
+			node_R = ch.LeafR
+			j = dict[node_R]
+			lsS[si+1][i, j] = ch.ref[]
 		end
 	end
 
-     return SparseMPO(H)
+	for node in PreOrderDFS(Tree.RootR)
+		si, idx = node.Op
+		si > L && continue
+		i = dict[node]
+
+		lsT[si][i, idx, i] = 1.0
+
+		for ch in node.children
+			j = dict[ch]
+			lsS[si][j, i] = 1.0
+		end
+	end
+
+	for i in 1:L
+		# reshape T 
+		sz = size(lsT[i])
+		T = reshape(lsT[i], sz[1], sz[2] * sz[3])
+
+		T = _mulL(T, lsS[i])
+		# reshape to left canonicalize
+		T = reshape(T, size(T, 1) * sz[2], sz[3])
+
+		# decompose T 
+		T, Q = _decompose!(T; tol = tol)
+		# contract Q to the right
+		lsS[i+1] = _mulL(lsS[i+1], Q)
+
+		# reshape back 
+		lsT[i] = reshape(T, div(size(T, 1), sz[2]), sz[2], size(T, 2))
+	end
+
+	for i in reverse(1:L)
+		# reshape T 
+		sz = size(lsT[i])
+		T = reshape(lsT[i], sz[1] * sz[2], sz[3])
+
+		T = _mulR(T, lsS[i+1])
+		# reshape to right canonicalize
+		T = reshape(T, sz[1], sz[2] * size(T, 2))
+
+		# decompose T 
+		if i > 1
+			lsS[i], T = _decompose!(T; tol = tol)
+		end
+
+		# reshape back 
+		lsT[i] = reshape(T, size(T, 1), sz[2], div(size(T, 2), sz[2]))
+	end
+
+
+	lsH = Vector{SparseMPOTensor}(undef, L)
+	for si in 1:L
+		sz = size(lsT[si])
+		H = SparseMPOTensor(nothing, sz[1], sz[3])
+		for i in 1:sz[1], j in 1:sz[3]
+			for k in 1:sz[2]
+				isnothing(lsT[si][i, k, j]) && continue
+				Op = deepcopy(Tree.Ops[si][k])
+				Op.strength[] = lsT[si][i, k, j]
+				H[i, j] += Op
+			end
+		end
+
+          # check rank 
+          @assert all(x -> any(!isnothing, H[x, :]), 1:sz[1])
+          @assert all(x -> any(!isnothing, H[:, x]), 1:sz[3])
+
+		lsH[si] = H
+	end
+
+	return SparseMPO(lsH)
 end
 
+function _mulL(matH, matS)
+	sz = (size(matS, 1), size(matH, 2))
+	H_new = similar(matH, sz)
+	fill!(H_new, nothing)
+	for i in 1:sz[1], k in 1:sz[2]
+		for j in 1:size(matH, 1)
+			isnothing(matS[i, j]) && continue
+			isnothing(matH[j, k]) && continue
+			H_new[i, k] += matH[j, k] * matS[i, j]
+		end
 
-# """
-# 	 AutomataMPO(Tree::InteractionTree,
-# 		  L::Int64 = treeheight(Tree.Root) - 1)
-# 		  -> ::SparseMPO
+	end
+	return H_new
+end
+function _mulR(matH, matS)
+	sz = (size(matH, 1), size(matS, 2))
+	H_new = similar(matH, sz)
+	fill!(H_new, nothing)
+	for i in 1:sz[1], k in 1:sz[2]
+		for j in 1:size(matH, 2)
+			isnothing(matS[j, k]) && continue
+			isnothing(matH[i, j]) && continue
+			H_new[i, k] += matH[i, j] * matS[j, k]
+		end
+	end
+	return H_new
+end
+function _decompose!(S; tol::Float64 = 1e-12)
+	# S = P * I_r * Q, note S will be modified
+	T = mapreduce(typeof, promote_type, filter(!isnothing, S))
+	P = diagm(ones(T, size(S, 1)))
+	Q = diagm(ones(T, size(S, 2)))
 
-# Convert an interaction tree to a sparse MPO.
-# """
-# function AutomataMPO(Tree::InteractionTree, L::Int64 = treeheight(Tree.Root) - 1)
-# 	# convert an interaction tree to a sparse MPO
-# 	Root = Tree.Root
 
-# 	# count_size
-# 	D = zeros(Int64, L + 1) # D[i] denotes the bond dimension from i-1 to i
-# 	for node in PreOrderDFS(Root)
-# 		isnothing(node.Op) && continue
-# 		isempty(node.children) && continue
-# 		D[node.Op.si+1] += 1
-# 	end
+	row_first = 1
+	col_first = 1
+	while row_first ≤ size(S, 1)
+		# find blocks 
+		ids_row = [row_first]
+		ids_col = findall(!isnothing, S[row_first, :])
+		if isempty(ids_col)
+			row_first += 1
+			continue
+		end
+		while true
+			breakflag = true
+			# find new rows 
+			ids_row_add = mapreduce(union, ids_col; init = Int64[]) do j
+				findall(!isnothing, S[:, j])
+			end
+			setdiff!(ids_row_add, ids_row)
+			if !isempty(ids_row_add)
+				append!(ids_row, ids_row_add)
+				breakflag = false
+			end
+			# find new columns
+			ids_col_add = mapreduce(union, ids_row) do j
+				findall(!isnothing, S[j, :])
+			end
+			setdiff!(ids_col_add, ids_col)
+			if !isempty(ids_col_add)
+				append!(ids_col, ids_col_add)
+				breakflag = false
+			end
+			breakflag && break
+		end
+		sort!(ids_row)
+		sort!(ids_col)
 
-# 	# additional channel to store the accumulation
-# 	D[2:end] .+= 1
 
-# 	H = Vector{SparseMPOTensor}(undef, L)
-# 	for i ∈ 1:L
-# 		H[i] = SparseMPOTensor(nothing, D[i], D[i+1])
-# 	end
+		# permute columns 
+		col_dest = col_first .+ (0:length(ids_col)-1)
+		for (j, k) in zip(ids_col, col_dest)
+			S[:, [j, k]] = S[:, [k, j]]
+			Q[[j, k], :] = Q[[k, j], :]
+		end
+		# permute rows 
+		row_dest = row_first .+ (0:length(ids_row)-1)
+		for (j, k) in zip(ids_row, row_dest)
+			S[[j, k], :] = S[[k, j], :]
+			P[:, [j, k]] = P[:, [k, j]]
+		end
 
-# 	c = vcat(0, repeat([1], L))
-# 	for node in PreOrderDFS(Root)
-# 		isnothing(node.Op) && continue
-# 		si = node.Op.si
-# 		if si == 0
-# 			c[1] += 1
-# 			continue
-# 		end
+		# process this block
+		i = row_dest[1]
+		j = col_dest[1]
+		while i ≤ row_dest[end] && j ≤ col_dest[end]
+			# make sure the first element is nonzero
+               ids_nonzero = findall(1:size(S, 1)) do idx 
+                    idx < i && return false  
+                    idx > row_dest[end] && return false
+                    return !isnothing(S[idx, j])  
+               end
+			if isempty(ids_nonzero)
+				j += 1
+				continue
+			end
+               # find the largest one 
+               _, idx_max = findmax(abs, S[ids_nonzero, j])
+               idx = ids_nonzero[idx_max]
+			if idx != i
+				# permute row 
+				S[[i, idx], :] = S[[idx, i], :]
+				P[:, [i, idx]] = P[:, [idx, i]]
+			end
+			# scale to 1 
+			c = S[i, j]
+			S[i, :] *= inv(c)
+			P[:, i] *= c
+			# make other elements in the column zero
+			for k in i+1:row_dest[end]
+				isnothing(S[k, j]) && continue
+				c = S[k, j]
+				S[k, :] += (-c) * S[i, :]
+				# i |  1     |
+				#   |    1   |
+				# k |  c   1 |
+				P[:, i] += c * P[:, k]
 
-# 		# merge this channel to accumulation
-# 		if !isnan(node.Op.strength)
-# 			H[si][c[si], 1] += deepcopy(node.Op)
-# 		end
+				# make sure S[k, j] = nothing 
+				S[k, j] = nothing
 
-# 		# propagate
-# 		if !isempty(node.children)
-# 			c[si+1] += 1
-# 			H[si][c[si], c[si+1]] = _convertStrength(node.Op)
-# 		end
+				# change 0 to nothing 
+				for idx in 1:size(S, 2)
+					isnothing(S[k, idx]) && continue
+					abs(S[k, idx]) < tol && (S[k, idx] = nothing)
+				end
+			end
 
-# 	end
+			i += 1
+			j += 1
+		end
 
-# 	# remember the identity to propagate accumulation
-# 	for si ∈ 2:L
-# 		idx = findfirst(!isnothing, H[si])
-# 		pspace = isnothing(idx) ? nothing : getPhysSpace(H[si][idx])
-# 		H[si][1, 1] = IdentityOperator(pspace, si, 1)
-# 	end
+		# process columns 
+		for i in row_dest
+			j = findfirst(x -> x == one(T), S[i, :])
+			isnothing(j) && continue
+			for k in j+1:col_dest[end]
+				isnothing(S[i, k]) && continue
+				c = S[i, k]
+				S[i, k] = nothing
+				Q[j, :] += c * Q[k, :]
+			end
+		end
 
-# 	# right-to-left merge
-# 	for si in reverse(2:L)
-# 		i = 2
-# 		while i < size(H[si], 1)
-# 			j = findfirst(i+1:size(H[si], 1)) do j
-# 				# find same row
-# 				any(k -> H[si][i, k] != H[si][j, k], 1:size(H[si], 2)) && return false
-# 				lscoef = []
-# 				for k in 1:size(H[si], 2)
-# 					if !isnothing(H[si][i, k])
-# 						push!(lscoef, H[si][i, k].strength / H[si][j, k].strength)
-# 					end
-# 				end
-# 				return all(c -> c == lscoef[1], lscoef)
-# 			end
-# 			if !isnothing(j)
-# 				j += i
-# 				strength_i = H[si][i, findfirst(!isnothing, H[si][i, :])].strength
-# 				strength_j = H[si][j, findfirst(!isnothing, H[si][j, :])].strength
-# 				for idx in 1:size(H[si-1], 1)
-# 					if !isnothing(H[si-1][idx, i])
-# 						H[si-1][idx, i].strength *= strength_i
-# 					end
-# 					if !isnothing(H[si-1][idx, j])
-# 						H[si-1][idx, j].strength *= strength_j
-# 					end
-# 				end
-# 				for idx in 1:size(H[si], 2)
-# 					if !isnothing(H[si][i, idx])
-# 						H[si][i, idx].strength = 1.0
-# 					end
-# 				end
 
-# 				# merge 
-# 				for idx in 1:size(H[si-1], 1)
-# 					H[si-1][idx, i] += H[si-1][idx, j]
-# 				end
-# 				# remove j 
-# 				H[si-1] = H[si-1][:, vcat(1:j-1, j+1:size(H[si-1], 2))]
-# 				H[si] = H[si][vcat(1:j-1, j+1:size(H[si], 1)), :]
+		row_first += length(ids_row)
+		col_first += length(ids_col)
+	end
 
-# 			else
-# 				i += 1
-# 			end
+	# final permutations
+	ids_col = findall(j -> any(!isnothing, S[:, j]), 1:size(S, 2)) |> sort!
+	ids_row = findall(i -> any(!isnothing, S[i, :]), 1:size(S, 1)) |> sort!
+	# permute columns 
+	for (j, k) in zip(ids_col, 1:length(ids_col))
+		S[:, [j, k]] = S[:, [k, j]]
+		Q[[j, k], :] = Q[[k, j], :]
+	end
+	# permute rows 
+	for (j, k) in zip(ids_row, 1:length(ids_row))
+		S[[j, k], :] = S[[k, j], :]
+		P[:, [j, k]] = P[:, [k, j]]
+	end
 
-# 		end
-# 	end
+	r = length(ids_row)
 
-# 	return SparseMPO(H)
-# end
-# AutomataMPO(Root::InteractionTreeNode, args...; kwargs...) = AutomataMPO(InteractionTree(Root), args...; kwargs...)
+	Pr = [iszero(P[i, j]) ? nothing : P[i, j] for i in 1:size(P, 1), j in 1:r]
+	Qr = [iszero(Q[i, j]) ? nothing : Q[i, j] for i in 1:r, j in 1:size(Q, 2)]
 
-# function _convertStrength(A::AbstractLocalOperator)
-# 	B = deepcopy(A)
-# 	B.strength = 1
-# 	return B
-# end
+	return Pr, Qr
+
+end

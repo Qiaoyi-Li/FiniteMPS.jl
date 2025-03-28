@@ -21,8 +21,11 @@ function addObs!(Tree::ObservableTree{L},
      haskey(Tree.Refs[IntrName], si) && return nothing
 
 	# construct LocalOperators
+	aspace = trivial(codomain(Op[1])[1])
 	lsOp = map(Op, si, fermionic, name) do o, s, f, n
-		LocalOperator(o, n, s, f)
+		Oi = LocalOperator(o, n, s, f; aspace = (aspace, aspace)) 
+		aspace =  getRightSpace(Oi)
+		return Oi
 	end
 	S = StringOperator(lsOp..., 1.0) |> sort! |> reduce!
      # move the possible coefficient -1 to the last operator

@@ -22,8 +22,11 @@ function addIntr!(Tree::InteractionTree{L},
 	end
 
 	# construct LocalOperators
+	aspace = trivial(codomain(Op[1])[1])
 	lsOp = map(Op, si, fermionic, name) do o, s, f, n
-		LocalOperator(o, n, s, f)
+		Oi = LocalOperator(o, n, s, f; aspace = (aspace, aspace)) 
+		aspace = getRightSpace(Oi) # update the horizontal space for the next operator
+		return Oi
 	end
 	S = StringOperator(lsOp..., strength) |> sort! |> reduce!
 

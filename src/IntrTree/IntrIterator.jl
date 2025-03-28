@@ -190,21 +190,21 @@ struct ArbitraryInteractionIterator{L} <: AbstractInteractionIterator{L}
      Z::Union{Nothing, AbstractTensorMap, AbstractVector{<:AbstractTensorMap}}
      pspace::Union{Nothing, VectorSpace, Vector{<:VectorSpace}}
 end
-function iterate(iter::ArbitraryInteractionIterator{L}, st::Tuple{Int64, Int64, Bool} = (1, 1, false)) where {L}
-     i, idx, flag = st
+function iterate(iter::ArbitraryInteractionIterator{L}, st::Tuple{Int64, Int64, Bool, VectorSpace} = (1, 1, false, getLeftSpace(iter.Ops[1]))) where {L}
+     i, idx, flag, aspace = st
      i > L && return nothing
 
      if idx > length(iter.Ops) || i < iter.Ops[idx].si
           if flag 
-               return LocalOperator(_getZ(iter.Z, i), :Z, i, false), (i + 1, idx, flag)
+               return LocalOperator(_getZ(iter.Z, i), :Z, i, false; aspace = (aspace, aspace)), (i + 1, idx, flag, aspace)
           else
-               return IdentityOperator(_getpspace(iter.pspace, i), i), (i + 1, idx, flag)
+               return IdentityOperator(_getpspace(iter.pspace, i), aspace, i), (i + 1, idx, flag, aspace)
           end
      else
           Op_i = deepcopy(iter.Ops[idx])
           # add Z if necessary 
           flag && _addZ!(Op_i, _getZ(iter.Z, i))
-          return Op_i, (i + 1, idx + 1, xor(flag, isfermionic(Op_i)))
+          return Op_i, (i + 1, idx + 1, xor(flag, isfermionic(Op_i)), getRightSpace(Op_i))
      end
 end
 
