@@ -87,6 +87,7 @@ function AutomataMPO(Tree::InteractionTree{L}; tol::Float64 = 1e-12) where L
 
 		# reshape back 
 		lsT[i] = reshape(T, div(size(T, 1), sz[2]), sz[2], size(T, 2))
+
 	end
 
 	for i in reverse(1:L)
@@ -105,8 +106,17 @@ function AutomataMPO(Tree::InteractionTree{L}; tol::Float64 = 1e-12) where L
 
 		# reshape back 
 		lsT[i] = reshape(T, size(T, 1), sz[2], div(size(T, 2), sz[2]))
-	end
 
+		# check rank 
+		ids = findall(1:size(lsT[i], 3)) do j
+			all(isnothing, lsT[i][:, :, j])
+		end
+		if !isempty(ids)
+			ids_keep = setdiff(1:size(lsT[i], 3), ids)
+			lsT[i] = lsT[i][:, :, ids_keep]
+			lsT[i+1] = lsT[i+1][ids_keep, :, :]
+		end
+	end
 
 	lsH = Vector{SparseMPOTensor}(undef, L)
 	for si in 1:L
@@ -120,10 +130,6 @@ function AutomataMPO(Tree::InteractionTree{L}; tol::Float64 = 1e-12) where L
 				H[i, j] += Op
 			end
 		end
-
-          # check rank 
-          @assert all(x -> any(!isnothing, H[x, :]), 1:sz[1])
-          @assert all(x -> any(!isnothing, H[:, x]), 1:sz[3])
 
 		lsH[si] = H
 	end
@@ -219,18 +225,18 @@ function _decompose!(S; tol::Float64 = 1e-12)
 		j = col_dest[1]
 		while i ≤ row_dest[end] && j ≤ col_dest[end]
 			# make sure the first element is nonzero
-               ids_nonzero = findall(1:size(S, 1)) do idx 
-                    idx < i && return false  
-                    idx > row_dest[end] && return false
-                    return !isnothing(S[idx, j])  
-               end
+			ids_nonzero = findall(1:size(S, 1)) do idx
+				idx < i && return false
+				idx > row_dest[end] && return false
+				return !isnothing(S[idx, j])
+			end
 			if isempty(ids_nonzero)
 				j += 1
 				continue
 			end
-               # find the largest one 
-               _, idx_max = findmax(abs, S[ids_nonzero, j])
-               idx = ids_nonzero[idx_max]
+			# find the largest one 
+			_, idx_max = findmax(abs, S[ids_nonzero, j])
+			idx = ids_nonzero[idx_max]
 			if idx != i
 				# permute row 
 				S[[i, idx], :] = S[[idx, i], :]
@@ -266,7 +272,10 @@ function _decompose!(S; tol::Float64 = 1e-12)
 
 		# process columns 
 		for i in row_dest
-			j = findfirst(x -> x == one(T), S[i, :])
+			j = findfirst(S[i, :]) do x
+				isnothing(x) && return false
+				return isapprox(x, one(T))
+			end
 			isnothing(j) && continue
 			for k in j+1:col_dest[end]
 				isnothing(S[i, k]) && continue
