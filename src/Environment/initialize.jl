@@ -53,7 +53,9 @@ function _defaultEl(obj::SparseEnvironment{L,3,T}) where {L,T<:Tuple{AdjointMPS,
                rank_Er = numin(Er[i]) + numout(Er[i])
                @assert rank_Er  in [2, 3]
                if rank_Er  == 2
-                    El[i] = _simpleEl(obj[1][1], IdentityOperator(1), obj[3][1])
+                    pspace = codomain(obj[3][1])[end]
+                    aspace = trivial(pspace)
+                    El[i] = _simpleEl(obj[1][1], IdentityOperator(pspace, aspace, 1), obj[3][1])
                elseif rank_Er  == 2
                     El[i] = _simpleEl(obj[1][1], codomain(Er[i])[2], obj[3][1])
                else
