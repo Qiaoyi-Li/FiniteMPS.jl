@@ -71,7 +71,8 @@ function iterate(iter::OnSiteInteractionIterator{L, Nothing}, i::Int64 = 1) wher
      if i == iter.Op.si
           Op_wrap = iter.Op
      else
-          Op_wrap = IdentityOperator(i)
+          pspace = domain(iter.Op)[1]
+          Op_wrap = IdentityOperator(pspace, trivial(pspace), i)
      end
      return Op_wrap, i + 1
 end
@@ -82,7 +83,8 @@ function iterate(iter::OnSiteInteractionIterator{L, <:AbstractTensorMap}, i::Int
      elseif i > iter.Op.si
           Op_wrap = LocalOperator(iter.Z, :Z, i, false)
      else
-          Op_wrap = IdentityOperator(i)
+          pspace = domain(iter.Op)[1]
+          Op_wrap = IdentityOperator(pspace, trivial(pspace), i)
      end
      return Op_wrap, i + 1
 end
