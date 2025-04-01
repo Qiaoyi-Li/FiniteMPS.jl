@@ -4,6 +4,8 @@
           normres::Vector{Float64}
           numiter::Int64
           numops::Int64
+          a::Vector{Float64}
+          b::Vector{Float64}
      end
 
 Similar to `KrylovKit.ConvergenceInfo` but delete `residuals` to save memory.
@@ -13,6 +15,8 @@ struct LanczosInfo
      normres::Vector{Float64}
      numiter::Int64
      numops::Int64
+     a::Vector{Float64}
+     b::Vector{Float64}
 end
 # function convert(::Type{LanczosInfo}, Info::KrylovKit.ConvergenceInfo)
 #      if isa(Info.normres, Float64)
@@ -24,7 +28,7 @@ end
 # end
 function convert(::Type{LanczosInfo}, Info::NamedTuple)
      # my simple Lanczos 
-     return LanczosInfo(true, Float64[], 1, length(Info.V))
+     return LanczosInfo(true, Float64[], 1, length(Info.V), diag(Info.T), diag(Info.T, 1))
 end
 
 """
