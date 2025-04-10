@@ -1,4 +1,56 @@
-function AutomataMPO(Tree::InteractionTree{L}; tol::Float64 = 1e-12) where L
+"""
+	AutomataMPO(Tree::InteractionTree;
+		compress::Int64 = 1,
+		tol::Float64 = 1e-12
+	) -> H::SparseMPO
+
+Generate the Hamiltonian MPO `H::SparseMPO` according to the `InteractionTree`. 
+
+# Kwargs 
+	compress::Int64 = 1
+The compress level. `0`: without compression. `1(default)`: merge the same rows/columns. `2`: compress via lu decomposition. `3`: compress via svd. Note higher `compress` results in lower MPO bond dimension, however may lead to more operators in the sparse matrix at each site.
+
+	tol::Float64 = 1e-12
+Tolerance of the low-rank decompositions.
+"""
+function AutomataMPO(Tree::InteractionTree{L}; compress::Int64 = 1, tol::Float64 = 1e-12) where L
+
+	lsT, lsS = _superMPS(Tree)
+
+	lsT = _compress0!(lsT, lsS)
+
+	if compress == 1
+		lsT = _compress1!(lsT; tol = tol)
+	elseif compress == 2
+		lsT = _compress2!(lsT; tol = tol)
+	elseif compress == 3
+		lsT = _compress3!(lsT; tol = tol)
+	else
+		!iszero(compress) && @error "invalid compress level $(compress)!"
+	end
+
+	# write operators to MPO
+	lsH = Vector{SparseMPOTensor}(undef, L)
+	for si in 1:L
+		sz = size(lsT[si])
+		H = SparseMPOTensor(nothing, sz[1], sz[3])
+		for i in 1:sz[1], j in 1:sz[3]
+			for k in 1:sz[2]
+				iszero(lsT[si][i, k, j]) && continue
+				Op = deepcopy(Tree.Ops[si][k])
+				Op.strength[] = lsT[si][i, k, j]
+				H[i, j] += Op
+			end
+		end
+
+		lsH[si] = H
+	end
+
+	return SparseMPO(lsH)
+
+end
+
+function _superMPS(Tree::InteractionTree{L}) where L
 
 	merge!(Tree)
 
@@ -26,17 +78,17 @@ function AutomataMPO(Tree::InteractionTree{L}; tol::Float64 = 1e-12) where L
 	end
 
 
-	lsS = Vector{Matrix{Any}}(undef, L + 1)
+	lsS = Vector{SparseMatrixCSC}(undef, L + 1)
 	for si in 1:L-1
-		lsS[si+1] = Matrix{Any}(nothing, lsn_count[si], lsn_count[si+1])
+		lsS[si+1] = zeros(lsn_count[si], lsn_count[si+1])
 	end
 	lsS[1] = ones(1, lsn_count[1])
 	lsS[L+1] = ones(lsn_count[L], 1)
 
 	# super MPS 
-	lsT = Vector{Array{Any, 3}}(undef, L)
+	lsT = Vector{Array}(undef, L)
 	for si in 1:L
-		lsT[si] = Array{Any, 3}(nothing, lsn_count[si], length(Tree.Ops[si]), lsn_count[si])
+		lsT[si] = zeros(lsn_count[si], length(Tree.Ops[si]), lsn_count[si])
 	end
 
 	for node in PreOrderDFS(Tree.RootL)
@@ -71,112 +123,233 @@ function AutomataMPO(Tree::InteractionTree{L}; tol::Float64 = 1e-12) where L
 		end
 	end
 
-	for i in 1:L
-		# reshape T 
-		sz = size(lsT[i])
-		T = reshape(lsT[i], sz[1], sz[2] * sz[3])
+	return lsT, lsS
+end
 
-		T = _mulL(T, lsS[i])
-		# reshape to left canonicalize
-		T = reshape(T, size(T, 1) * sz[2], sz[3])
-
-		# decompose T 
-		T, Q = _decompose!(T; tol = tol)
-		# contract Q to the right
-		lsS[i+1] = _mulL(lsS[i+1], Q)
-
-		# reshape back 
-		lsT[i] = reshape(T, div(size(T, 1), sz[2]), sz[2], size(T, 2))
-
-	end
-
-	for i in reverse(1:L)
-		# reshape T 
-		sz = size(lsT[i])
-		T = reshape(lsT[i], sz[1] * sz[2], sz[3])
-
-		T = _mulR(T, lsS[i+1])
-		# reshape to right canonicalize
-		T = reshape(T, sz[1], sz[2] * size(T, 2))
-
-		# decompose T 
-		if i > 1
-			lsS[i], T = _decompose!(T; tol = tol)
-		end
-
-		# reshape back 
-		lsT[i] = reshape(T, size(T, 1), sz[2], div(size(T, 2), sz[2]))
-
-		# check rank 
-		ids = findall(1:size(lsT[i], 3)) do j
-			all(isnothing, lsT[i][:, :, j])
-		end
-		if !isempty(ids)
-			ids_keep = setdiff(1:size(lsT[i], 3), ids)
-			lsT[i] = lsT[i][:, :, ids_keep]
-			lsT[i+1] = lsT[i+1][ids_keep, :, :]
+function _compress0!(lsT::Vector{Array}, lsS::Vector{SparseMatrixCSC})
+	# directly contract S tensor to T tensor
+	L = length(lsT)
+	@tensor lsT[1][a c d] := lsS[1][a b] * lsT[1][b c d]
+	@tensor lsT[end][a b d] := lsT[end][a b c] * lsS[end][c d]
+	for i in 1:L-1
+		sz = size(lsS[i+1])
+		if sz[1] ≤ sz[2]
+			@tensor lsT[i+1][a c d] := lsS[i+1][a b] * lsT[i+1][b c d]
+		else
+			@tensor lsT[i][a b d] := lsT[i][a b c] * lsS[i+1][c d]
 		end
 	end
 
-	lsH = Vector{SparseMPOTensor}(undef, L)
-	for si in 1:L
-		sz = size(lsT[si])
-		H = SparseMPOTensor(nothing, sz[1], sz[3])
-		for i in 1:sz[1], j in 1:sz[3]
-			for k in 1:sz[2]
-				isnothing(lsT[si][i, k, j]) && continue
-				Op = deepcopy(Tree.Ops[si][k])
-				Op.strength[] = lsT[si][i, k, j]
-				H[i, j] += Op
+	return lsT
+end
+
+function _compress1!(lsT::Vector{Array}; tol::Float64 = 1e-12)
+	# allow scalar multiplication, merge same rows/columns
+	L = length(lsT)
+
+	# right-to-left sweep
+	for si in reverse(2:L)
+		T = reshape(lsT[si], size(lsT[si], 1), size(lsT[si], 2) * size(lsT[si], 3)) |> sparse
+
+		# find same rows 
+		P = zeros(size(T, 1), 0) |> sparse
+		ids_zero = Int64[]
+		for i in 1:size(T, 1)
+			in(i, ids_zero) && continue
+			norm_i = norm(T[i, :])
+			if norm_i < tol
+				push!(ids_zero, i)
+				continue
+			end
+			# add a column to P
+			P = hcat(P, zeros(size(P, 1), 1))
+			P[i, end] = 1.0
+
+			ids = findall(1:size(T, 1)) do k
+				k ≤ i && return false
+				norm_k = norm(T[k, :])
+				norm_k < tol && return false
+				# w == cv iff |⟨w,v⟩| = |w||v|
+				return abs(abs(dot(T[i, :], T[k, :]) / norm_i / norm_k) - 1.0) < tol
+			end
+
+			for k in ids
+				# w = cv => w = v ⟨v, w⟩ / |v|^2
+				P[k, end] = dot(T[i, :], T[k, :]) / norm_i^2
+				push!(ids_zero, k)
 			end
 		end
 
-		lsH[si] = H
-	end
-
-	return SparseMPO(lsH)
-end
-
-function _mulL(matH, matS)
-	sz = (size(matS, 1), size(matH, 2))
-	H_new = similar(matH, sz)
-	fill!(H_new, nothing)
-	for i in 1:sz[1], k in 1:sz[2]
-		for j in 1:size(matH, 1)
-			isnothing(matS[i, j]) && continue
-			isnothing(matH[j, k]) && continue
-			H_new[i, k] += matH[j, k] * matS[i, j]
+		# remove zero rows
+		if !isempty(ids_zero)
+			ids_keep = setdiff(1:size(T, 1), ids_zero)
+			T = T[ids_keep, :]
 		end
 
+		# update
+		lsT[si] = reshape(T, :, size(lsT[si], 2), size(lsT[si], 3))
+		@tensor lsT[si-1][a b d] := lsT[si-1][a b c] * P[c d]
 	end
-	return H_new
-end
-function _mulR(matH, matS)
-	sz = (size(matH, 1), size(matS, 2))
-	H_new = similar(matH, sz)
-	fill!(H_new, nothing)
-	for i in 1:sz[1], k in 1:sz[2]
-		for j in 1:size(matH, 2)
-			isnothing(matS[j, k]) && continue
-			isnothing(matH[i, j]) && continue
-			H_new[i, k] += matH[i, j] * matS[j, k]
-		end
-	end
-	return H_new
-end
-function _decompose!(S; tol::Float64 = 1e-12)
-	# S = P * I_r * Q, note S will be modified
-	T = mapreduce(typeof, promote_type, filter(!isnothing, S))
-	P = diagm(ones(T, size(S, 1)))
-	Q = diagm(ones(T, size(S, 2)))
 
+	# left-to-right sweep 
+	for si in 1:L-1
+		T = reshape(lsT[si], size(lsT[si], 1) * size(lsT[si], 2), size(lsT[si], 3)) |> sparse
+
+		# find same columns (up tp a scalar)
+		Q = zeros(0, size(T, 2)) |> sparse
+		ids_zero = Int64[]
+		for j in 1:size(T, 2)
+			in(j, ids_zero) && continue
+
+			norm_j = norm(T[:, j])
+			if norm_j < tol
+				push!(ids_zero, j)
+				continue
+			end
+			# add a row to Q 
+			Q = vcat(Q, zeros(1, size(Q, 2)))
+			Q[end, j] = 1.0
+			ids = findall(1:size(T, 2)) do k
+				k ≤ j && return false
+				norm_k = norm(T[:, k])
+				norm_k < tol && return false
+				# w == cv iff |⟨w,v⟩| = |w||v|
+				return abs(abs(dot(T[:, j], T[:, k]) / norm_j / norm_k) - 1.0) < tol
+			end
+
+			for k in ids
+				# w = cv => w = v ⟨v, w⟩ / |v|^2
+				Q[end, k] = dot(T[:, j], T[:, k]) / norm_j^2
+				push!(ids_zero, k)
+			end
+		end
+
+		# remove zero columns 
+		if !isempty(ids_zero)
+			ids_keep = setdiff(1:size(T, 2), ids_zero)
+			T = T[:, ids_keep]
+		end
+
+		# update 
+		lsT[si] = reshape(T, size(lsT[si], 1), size(lsT[si], 2), :)
+
+		@tensor lsT[si+1][a c d] := Q[a b] * lsT[si+1][b c d]
+	end
+
+	return lsT
+end
+
+function _compress2!(lsT::Vector{Array}; tol::Float64 = 1e-12)
+	# low-rank decomposition via sparse lu decomposition
+	L = length(lsT)
+
+	# right-to-left sweep
+	for si in reverse(2:L)
+		T = reshape(lsT[si], size(lsT[si], 1), :) |> sparse
+
+		l, u = _lu_wrap(T; tol = tol)
+
+		lsT[si] = reshape(u, :, size(lsT[si], 2), size(lsT[si], 3))
+		@tensor lsT[si-1][a b d] := lsT[si-1][a b c] * l[c d]
+	end
+
+	# left-to-right sweep
+	for si in 1:L-1
+		T = reshape(lsT[si], size(lsT[si], 1) * size(lsT[si], 2), :) |> sparse
+
+		# T' = lu => T = u'l'
+		l, u = _lu_wrap(T'; tol = tol)
+		l, u = u', l'
+
+		lsT[si] = reshape(l, size(lsT[si], 1), size(lsT[si], 2), size(l, 2))
+		@tensor lsT[si+1][a c d] := u[a b] * lsT[si+1][b c d]
+	end
+
+	return lsT
+end
+
+function _compress3!(lsT::Vector{Array}; tol::Float64 = 1e-12)
+	# compress via svd
+	L = length(lsT)
+	
+	# right-to-left sweep 
+	for si in reverse(2:L)
+		T = reshape(lsT[si], size(lsT[si], 1), :) 
+		u, s, vd = _svd_wrap!(T; tol = eps(Float64))
+		l = u*s
+
+		lsT[si] = reshape(vd, :, size(lsT[si], 2), size(lsT[si], 3))
+		@tensor lsT[si-1][a b d] := lsT[si-1][a b c] * l[c d]
+	end
+
+	# left-to-right sweep with compression
+	for si in 1:L-1
+		T = reshape(lsT[si], size(lsT[si], 1) * size(lsT[si], 2), :)
+
+		u, s, vd = _svd_wrap!(T; tol = tol)
+		r = s*vd
+
+		lsT[si] = reshape(u, size(lsT[si], 1), size(lsT[si], 2), size(u, 2))
+		@tensor lsT[si+1][a c d] := r[a b] * lsT[si+1][b c d]
+	end
+
+	return lsT
+end
+
+function _lu_wrap(A::AbstractMatrix; tol::Float64 = 1e-12)::NTuple{2, <:SparseMatrixCSC}
+
+	l, u = try
+		rslt = lu(A)
+		# L*U = (diagm(Rs) * A)[p, q]
+		p_inv = invperm(rslt.p)
+		q_inv = invperm(rslt.q)
+		Rs_inv = 1 ./ rslt.Rs
+		l = Rs_inv .* rslt.L[p_inv, :]
+		u = rslt.U[:, q_inv]
+		@assert norm(l * u - A) < tol * norm(A)
+		l, u
+	catch e
+		# not full rank, use dense lu with allowsingular = true
+		# l * u = A[p, :]
+		rslt = lu(Matrix(A); allowsingular = true)
+		p_inv = invperm(rslt.p)
+		l = rslt.L[p_inv, :]
+		u = rslt.U
+		@assert norm(l * u - A) < tol * norm(A)
+		l, u
+	end
+
+	# skip noise
+	norm_col = map(1:size(l, 2)) do j
+		norm(l[:, j])
+	end
+	norm_row = map(1:size(u, 1)) do i
+		norm(u[i, :])
+	end
+	ids_keep = filter(1:length(norm_col)) do i
+		norm_col[i] > tol && norm_row[i] > tol
+	end
+
+	return l[:, ids_keep], u[ids_keep, :]
+end
+
+
+function _svd_wrap!(A::AbstractMatrix; tol::Float64 = 1e-12)::NTuple{3, <:SparseMatrixCSC}
+	sz = size(A)
+	U = zeros(eltype(A), sz[1], minimum(sz))
+	S = zeros(eltype(A), minimum(sz))
+	Vd = zeros(eltype(A), minimum(sz), sz[2])
+
+	# block diagonal, A_f = A_i[p, q]
+	p = collect(1:sz[1])
+	q = collect(1:sz[2])
 
 	row_first = 1
 	col_first = 1
-	while row_first ≤ size(S, 1)
-		# find blocks 
+	idx_S = 0
+	while row_first ≤ size(A, 1)
 		ids_row = [row_first]
-		ids_col = findall(!isnothing, S[row_first, :])
+		ids_col = findall(!iszero, A[row_first, :])
 		if isempty(ids_col)
 			row_first += 1
 			continue
@@ -185,7 +358,7 @@ function _decompose!(S; tol::Float64 = 1e-12)
 			breakflag = true
 			# find new rows 
 			ids_row_add = mapreduce(union, ids_col; init = Int64[]) do j
-				findall(!isnothing, S[:, j])
+				findall(!iszero, A[:, j])
 			end
 			setdiff!(ids_row_add, ids_row)
 			if !isempty(ids_row_add)
@@ -194,7 +367,7 @@ function _decompose!(S; tol::Float64 = 1e-12)
 			end
 			# find new columns
 			ids_col_add = mapreduce(union, ids_row) do j
-				findall(!isnothing, S[j, :])
+				findall(!iszero, A[j, :])
 			end
 			setdiff!(ids_col_add, ids_col)
 			if !isempty(ids_col_add)
@@ -206,109 +379,42 @@ function _decompose!(S; tol::Float64 = 1e-12)
 		sort!(ids_row)
 		sort!(ids_col)
 
-
 		# permute columns 
 		col_dest = col_first .+ (0:length(ids_col)-1)
 		for (j, k) in zip(ids_col, col_dest)
-			S[:, [j, k]] = S[:, [k, j]]
-			Q[[j, k], :] = Q[[k, j], :]
+			A[:, [j, k]] = A[:, [k, j]]
+			q[[j, k]] = q[[k, j]]
 		end
 		# permute rows 
 		row_dest = row_first .+ (0:length(ids_row)-1)
 		for (j, k) in zip(ids_row, row_dest)
-			S[[j, k], :] = S[[k, j], :]
-			P[:, [j, k]] = P[:, [k, j]]
+			A[[j, k], :] = A[[k, j], :]
+			p[[j, k]] = p[[k, j]]
 		end
 
-		# process this block
-		i = row_dest[1]
-		j = col_dest[1]
-		while i ≤ row_dest[end] && j ≤ col_dest[end]
-			# make sure the first element is nonzero
-			ids_nonzero = findall(1:size(S, 1)) do idx
-				idx < i && return false
-				idx > row_dest[end] && return false
-				return !isnothing(S[idx, j])
-			end
-			if isempty(ids_nonzero)
-				j += 1
-				continue
-			end
-			# find the largest one 
-			_, idx_max = findmax(abs, S[ids_nonzero, j])
-			idx = ids_nonzero[idx_max]
-			if idx != i
-				# permute row 
-				S[[i, idx], :] = S[[idx, i], :]
-				P[:, [i, idx]] = P[:, [idx, i]]
-			end
-			# scale to 1 
-			c = S[i, j]
-			S[i, :] *= inv(c)
-			P[:, i] *= c
-			# make other elements in the column zero
-			for k in i+1:row_dest[end]
-				isnothing(S[k, j]) && continue
-				c = S[k, j]
-				S[k, :] += (-c) * S[i, :]
-				# i |  1     |
-				#   |    1   |
-				# k |  c   1 |
-				P[:, i] += c * P[:, k]
-
-				# make sure S[k, j] = nothing 
-				S[k, j] = nothing
-
-				# change 0 to nothing 
-				for idx in 1:size(S, 2)
-					isnothing(S[k, idx]) && continue
-					abs(S[k, idx]) < tol && (S[k, idx] = nothing)
-				end
-			end
-
-			i += 1
-			j += 1
-		end
-
-		# process columns 
-		for i in row_dest
-			j = findfirst(S[i, :]) do x
-				isnothing(x) && return false
-				return isapprox(x, one(T))
-			end
-			isnothing(j) && continue
-			for k in j+1:col_dest[end]
-				isnothing(S[i, k]) && continue
-				c = S[i, k]
-				S[i, k] = nothing
-				Q[j, :] += c * Q[k, :]
-			end
-		end
-
+		# svd 
+		u, s, v = svd(A[row_dest, col_dest])
+		S_dest = idx_S .+ (1:length(s))
+		copyto!(U, row_dest, S_dest, 'N',
+			u, 1:size(u, 1), 1:size(u, 2))
+		copyto!(S, S_dest, s, 1:length(s))
+		copyto!(Vd, S_dest, col_dest, 'C',
+			v, 1:size(v, 2), 1:size(v, 1)
+		)
 
 		row_first += length(ids_row)
 		col_first += length(ids_col)
+		idx_S += sz[1] < sz[2] ? length(ids_row) : length(ids_col)
 	end
 
-	# final permutations
-	ids_col = findall(j -> any(!isnothing, S[:, j]), 1:size(S, 2)) |> sort!
-	ids_row = findall(i -> any(!isnothing, S[i, :]), 1:size(S, 1)) |> sort!
-	# permute columns 
-	for (j, k) in zip(ids_col, 1:length(ids_col))
-		S[:, [j, k]] = S[:, [k, j]]
-		Q[[j, k], :] = Q[[k, j], :]
-	end
-	# permute rows 
-	for (j, k) in zip(ids_row, 1:length(ids_row))
-		S[[j, k], :] = S[[k, j], :]
-		P[:, [j, k]] = P[:, [k, j]]
-	end
+	# truncate 
+	norm_S = norm(S)
+	ids_keep = findall(x -> x > norm_S * tol, S)
 
-	r = length(ids_row)
+	# permute back 
+	U = U[invperm(p), ids_keep]
+	Vd = Vd[ids_keep, invperm(q)]
+	S = S[ids_keep]
 
-	Pr = [iszero(P[i, j]) ? nothing : P[i, j] for i in 1:size(P, 1), j in 1:r]
-	Qr = [iszero(Q[i, j]) ? nothing : Q[i, j] for i in 1:r, j in 1:size(Q, 2)]
-
-	return Pr, Qr
-
+	return U, diagm(S), Vd
 end
