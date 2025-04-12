@@ -165,7 +165,7 @@ function _compress1!(lsT::Vector{Array}; tol::Float64 = 1e-12)
 		T = reshape(lsT[si], size(lsT[si], 1), size(lsT[si], 2) * size(lsT[si], 3)) |> sparse
 
 		# find same rows 
-		P = zeros(size(T, 1), 0) |> sparse
+		P = zeros(eltype(T), size(T, 1), 0) |> sparse
 		ids_zero = Int64[]
 		for i in 1:size(T, 1)
 			in(i, ids_zero) && continue
@@ -209,7 +209,7 @@ function _compress1!(lsT::Vector{Array}; tol::Float64 = 1e-12)
 		T = reshape(lsT[si], size(lsT[si], 1) * size(lsT[si], 2), size(lsT[si], 3)) |> sparse
 
 		# find same columns (up tp a scalar)
-		Q = zeros(0, size(T, 2)) |> sparse
+		Q = zeros(eltype(T), 0, size(T, 2)) |> sparse
 		ids_zero = Int64[]
 		for j in 1:size(T, 2)
 			in(j, ids_zero) && continue
