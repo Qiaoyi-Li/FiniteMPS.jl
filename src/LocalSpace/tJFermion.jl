@@ -77,6 +77,19 @@ const ΔₛdagΔₛ = let
      A, B, C, D
 end
 
+# triplet pairing correlation
+const ΔₜdagΔₜ = let
+     A = FdagF[1]
+     aspace = Rep[U₁×SU₂]((1, 1 / 2) => 1)
+     aspace2 = Rep[U₁×SU₂]((2, 1) => 1)
+     iso = isometry(aspace ⊗ aspace, aspace2)
+     @tensor B[d a; b e] := A[a b c] * iso[c d e]
+     C = permute(B', ((2, 1), (4, 3)))
+     # -1 here as Δₜ is anti-symmetric with site indices
+     D = -permute(A', ((2, 1), (3,)))
+     A, B, C, D
+end
+
 # singlet pairing operator
 const Δₛ = (ΔₛdagΔₛ[3], ΔₛdagΔₛ[4])
 
