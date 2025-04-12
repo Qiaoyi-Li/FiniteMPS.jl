@@ -38,7 +38,12 @@ function AutomataMPO(Tree::InteractionTree{L}; compress::Int64 = 1, tol::Float64
 			for k in 1:sz[2]
 				iszero(lsT[si][i, k, j]) && continue
 				Op = deepcopy(Tree.Ops[si][k])
-				Op.strength[] = lsT[si][i, k, j]
+				s = lsT[si][i, k, j]
+				# try to use Float64 
+				if abs(imag(s)) < tol 
+					s = real(s)
+				end
+				Op.strength[] = s
 				H[i, j] += Op
 			end
 		end
@@ -77,13 +82,21 @@ function _superMPS(Tree::InteractionTree{L}) where L
 		dict[node] = lsn_count[si]
 	end
 
-
-	lsS = Vector{SparseMatrixCSC}(undef, L + 1)
-	for si in 1:L-1
-		lsS[si+1] = zeros(lsn_count[si], lsn_count[si+1])
+	FF = Float64
+	for d in values(Tree.Refs)
+		for (_, v) in d 
+			FF = promote_type(FF, typeof(v[]))
+			FF <: Complex && break
+		end
+		FF <: Complex && break
 	end
-	lsS[1] = ones(1, lsn_count[1])
-	lsS[L+1] = ones(lsn_count[L], 1)
+
+	lsS = Vector{SparseMatrixCSC{FF}}(undef, L + 1)
+	for si in 1:L-1
+		lsS[si+1] = zeros(FF, lsn_count[si], lsn_count[si+1])
+	end
+	lsS[1] = ones(FF, 1, lsn_count[1])
+	lsS[L+1] = ones(FF, lsn_count[L], 1)
 
 	# super MPS 
 	lsT = Vector{Array}(undef, L)
@@ -126,7 +139,7 @@ function _superMPS(Tree::InteractionTree{L}) where L
 	return lsT, lsS
 end
 
-function _compress0!(lsT::Vector{Array}, lsS::Vector{SparseMatrixCSC})
+function _compress0!(lsT::Vector{Array}, lsS::Vector{<:SparseMatrixCSC})
 	# directly contract S tensor to T tensor
 	L = length(lsT)
 	@tensor lsT[1][a c d] := lsS[1][a b] * lsT[1][b c d]
@@ -334,10 +347,10 @@ function _lu_wrap(A::AbstractMatrix; tol::Float64 = 1e-12)::NTuple{2, <:SparseMa
 end
 
 
-function _svd_wrap!(A::AbstractMatrix; tol::Float64 = 1e-12)::NTuple{3, <:SparseMatrixCSC}
+function _svd_wrap!(A::AbstractMatrix; tol::Float64 = 1e-12)
 	sz = size(A)
 	U = zeros(eltype(A), sz[1], minimum(sz))
-	S = zeros(eltype(A), minimum(sz))
+	S = zeros(Float64, minimum(sz))
 	Vd = zeros(eltype(A), minimum(sz), sz[2])
 
 	# block diagonal, A_f = A_i[p, q]
@@ -395,12 +408,16 @@ function _svd_wrap!(A::AbstractMatrix; tol::Float64 = 1e-12)::NTuple{3, <:Sparse
 		# svd 
 		u, s, v = svd(A[row_dest, col_dest])
 		S_dest = idx_S .+ (1:length(s))
-		copyto!(U, row_dest, S_dest, 'N',
-			u, 1:size(u, 1), 1:size(u, 2))
-		copyto!(S, S_dest, s, 1:length(s))
-		copyto!(Vd, S_dest, col_dest, 'C',
-			v, 1:size(v, 2), 1:size(v, 1)
-		)
+		U[row_dest, S_dest] .= u
+		S[S_dest] .= s 
+		Vd[S_dest, col_dest] .= v'
+
+		# copyto!(U, row_dest, S_dest, 'N',
+		# 	u, 1:size(u, 1), 1:size(u, 2))
+		# copyto!(S, S_dest, s, 1:length(s))
+		# copyto!(Vd, S_dest, col_dest, 'C',
+		# 	v, 1:size(v, 2), 1:size(v, 1)
+		# )
 
 		row_first += length(ids_row)
 		col_first += length(ids_col)
@@ -416,5 +433,5 @@ function _svd_wrap!(A::AbstractMatrix; tol::Float64 = 1e-12)::NTuple{3, <:Sparse
 	Vd = Vd[ids_keep, invperm(q)]
 	S = S[ids_keep]
 
-	return U, diagm(S), Vd
+	return sparse(U), sparse(diagm(S)), sparse(Vd)
 end
