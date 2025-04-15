@@ -76,7 +76,7 @@ function BondInfo(s::AbstractTensorMap{<:Union{Float64, ComplexF64}, T}, ϵ::Flo
     D = DD = 0
     Norm2 = SE = 0.0
 
-    λ = diag(data(s)[1])
+    λ = data(s)[1]
     D += length(λ)
     DD += length(λ)
     Norm2 += norm(λ)^2

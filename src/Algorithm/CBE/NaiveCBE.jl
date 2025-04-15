@@ -176,7 +176,7 @@ function _contractLR!(LO::LeftOrthComplement, RO::RightOrthComplement)
 	return x2
 end
 
-function _rsvd_trunc(V::ProductSpace, D::Int64)
+function _rsvd_trunc(V::ProductSpace{T}, D::Int64) where T <: GradedSpace
 	V_trunc = fuse(V)
 	ratio = D / dim(V_trunc)
 	for (c, d) in V_trunc.dims
@@ -184,6 +184,12 @@ function _rsvd_trunc(V::ProductSpace, D::Int64)
 		V_trunc.dims[c] = ceil(Int64, d * ratio)
 	end
 	return V_trunc
+end
+
+function _rsvd_trunc(V::ProductSpace{T}, D::Int64) where T <: ElementarySpace
+	V_trunc = fuse(V)
+	ratio = D / dim(V_trunc)
+	return T(ceil(Int64, V_trunc.d * ratio), V_trunc.dual)
 end
 
 function _apply_Ω(RO::RightOrthComplement{N}, Ω::AbstractTensorMap) where N
