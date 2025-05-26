@@ -23,7 +23,7 @@ function scalar!(obj::AbstractEnvironment{L}; kwargs...) where {L}
                obj.Center[1] = 1
                while obj.Center[2] > 1
                     pushleft!(obj)
-                    free!(obj; siR=obj.Center[2]+1:L)
+                    free!(obj; siR=obj.Center[2]+1:L-1)
                end
           else
                canonicalize!(obj, 1; free=false)
@@ -37,12 +37,12 @@ function scalar!(obj::AbstractEnvironment{L}; kwargs...) where {L}
           if get(kwargs, :tmp, false)
                while obj.Center[1] < si
                     pushright!(obj)
-                    free!(obj; siL=1:obj.Center[1]-1)
+                    free!(obj; siL=2:obj.Center[1]-1)
                end
 
                while obj.Center[2] > si - 1
                     pushleft!(obj)
-                    free!(obj; siR=obj.Center[2]+1:L)
+                    free!(obj; siR=obj.Center[2]+1:L-1)
                end
           else
                canonicalize!(obj, si, si - 1; free=false)
