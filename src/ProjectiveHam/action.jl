@@ -1,3 +1,16 @@
+"""
+	action!(x::AbstractMPSTensor,
+		PH::AbstractProjectiveHamiltonian,
+		TO::Union{TimerOutput, Nothing} = nothing) -> x
+
+In-place action of the projective Hamiltonian, write `PH * x` to `x`.
+
+	action!(y::AbstractMPSTensor,
+		x::AbstractMPSTensor,
+		PH::AbstractProjectiveHamiltonian,
+		TO::Union{TimerOutput, Nothing} = nothing) -> y
+In-place action of the projective Hamiltonian, write `PH * x` to `y` with `x` unmodified. 
+"""
 function action!(x::AbstractMPSTensor, PH::CompositeProjectiveHamiltonian, TO::Union{TimerOutput, Nothing} = nothing)
 
 	if get_num_workers() > 1 # multi-processing
@@ -51,17 +64,113 @@ function action!(x::AbstractMPSTensor, PH::CompositeProjectiveHamiltonian, TO::U
 	end
 	return x
 end
-action(x::AbstractMPSTensor, PH::CompositeProjectiveHamiltonian, TO::Union{TimerOutput, Nothing} = nothing) = action!(deepcopy(x), PH, TO)
+function action!(y::AbstractMPSTensor, x::AbstractMPSTensor, PH::CompositeProjectiveHamiltonian, TO::Union{TimerOutput, Nothing} = nothing)
+	# in-place (PH - E₀)*x -> y 
+
+	if !iszero(PH.E₀)
+		# x + y must be valid if PH.E₀ ≠ 0  
+		axpby!(-PH.E₀, x, 0.0, y)
+	else
+		rmul!(y, 0.0)
+	end
+
+	if get_num_workers() > 1 # multi-processing
+		@assert false "TODO: multi-processing action!"
+	elseif get_num_threads_action() == 1 # serial 
+
+		for PH_i in PH.PH
+			Hx_i = action(x, PH_i, TO)
+			add!(y, Hx_i)
+		end
+
+	else # multi-threading
+
+		TO_tot = TimerOutput()
+		TO_reduce = TimerOutput()
+		@timeit TO_tot "action" begin
+			Lock = ReentrantLock()
+			Threads.@threads :greedy for PH_i in PH.PH
+
+				if isnothing(TO)
+					Hx_i = action(x, PH_i, nothing)
+				else
+					str = _action_str(PH_i)
+					TO_i = TimerOutput()
+					@timeit TO_i str Hx_i = action(x, PH_i, TO_i)
+				end
+
+				# reduce 
+				lock(Lock)
+				try
+					add!(y, Hx_i)
+					if !isnothing(TO)
+						merge!(TO_reduce, TO_i)
+					end
+				catch e
+					rethrow(e)
+				finally
+					unlock(Lock)
+				end
+			end
+		end
+		if !isnothing(TO)
+			merge!(TO_tot, TO_reduce; tree_point = ["action"])
+			merge!(TO, TO_tot; tree_point = [TO.prev_timer_label])
+		end
+	end
+	return y
+end
+
+"""
+	action(x::AbstractMPSTensor,
+		PH::AbstractProjectiveHamiltonian,
+		TO::Union{TimerOutput, Nothing} = nothing) -> PH * x 
+
+Compute the action of the projective Hamiltonian on the MPS tensor `PH * x` with `x` unmodified. 
+"""
+function action(x::AbstractMPSTensor, PH::CompositeProjectiveHamiltonian, TO::Union{TimerOutput, Nothing} = nothing)
+	# the horizontal spaces may be different with those of x
+	y = _action_initialize(x, PH) 
+	return action!(y, x, PH, TO)
+end
+
+
 
 
 function action!(x::AbstractMPSTensor, PH::SimpleProjectiveHamiltonian, TO::Union{TimerOutput, Nothing} = nothing)
-	return _action!(x, PH.El, PH.H..., PH.Er, PH.cache, TO)
+	return _action!(x, x, PH.El, PH.H..., PH.Er, PH.cache, TO)
 end
-action(x::AbstractMPSTensor, PH::SimpleProjectiveHamiltonian, TO::Union{TimerOutput, Nothing} = nothing) = action!(deepcopy(x), PH, TO)
+function action!(y::AbstractMPSTensor, x::AbstractMPSTensor, PH::SimpleProjectiveHamiltonian, TO::Union{TimerOutput, Nothing} = nothing)
+	return _action!(y, x, PH.El, PH.H..., PH.Er, PH.cache, TO)
+end
+function action(x::AbstractMPSTensor, PH::SimpleProjectiveHamiltonian, TO::Union{TimerOutput, Nothing} = nothing)
+	# the horizontal spaces may be different with those of x
+	y = _action_initialize(x, PH) 
+	return action!(y, x, PH, TO)
+end
+function _action_initialize(x::MPSTensor, PH::SimpleProjectiveHamiltonian)::MPSTensor
+	lspace = codomain(PH.El)[1]
+	rspace = domain(PH.Er)[end]
+	cod = ProductSpace(lspace, codomain(x).spaces[2:end]...)
+	dom = ProductSpace(domain(x).spaces[1:end-1]..., rspace)
+	return zeros(eltype(x), cod, dom)
+end
+function _action_initialize(x::CompositeMPSTensor{N, T}, PH::SimpleProjectiveHamiltonian) where {N, T}
+	lspace = codomain(PH.El)[1]
+	rspace = domain(PH.Er)[end]
+	cod = ProductSpace(lspace, codomain(x).spaces[2:end]...)
+	dom = ProductSpace(domain(x).spaces[1:end-1]..., rspace)
+	return CompositeMPSTensor{N, T}(zeros(eltype(x), cod, dom))
+end
+_action_initialize(x::AbstractMPSTensor, PH::CompositeProjectiveHamiltonian) = _action_initialize(x, PH.PH[1])
+
+
+
+
 
 # ======================== 2-site MPS ========================
 # TODO: change to _action!(Hx, x, ..., cache, α, β) -> write α H * x + β Hx to Hx
-function _action!(x::CompositeMPSTensor{2, T},
+function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	El::LocalLeftTensor{3},
 	Hl::LocalOperator{2, 1},
 	Hr::IdentityOperator,
@@ -102,11 +211,11 @@ function _action!(x::CompositeMPSTensor{2, T},
 		_mul_TO!(cache[8], cache[7], Er.A, Hl.strength[] * Hr.strength[], 0.0, TO)
 	end
 
-	_permute_TO!(x.A, cache[8], ((1, 2), (3, 4)), TO)
+	_permute_TO!(y.A, cache[8], ((1, 2), (3, 4)), TO)
 	return x
 end
 
-function _action!(x::CompositeMPSTensor{2, T},
+function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	El::LocalLeftTensor{3},
 	Hl::LocalOperator{1, 1},
 	Hr::LocalOperator{2, 1},
@@ -152,11 +261,11 @@ function _action!(x::CompositeMPSTensor{2, T},
 		_mul_TO!(cache[8], El.A, cache[7], Hl.strength[] * Hr.strength[], 0.0, TO)
 	end
 
-	_permute_TO!(x.A, cache[8], ((1, 2), (3, 4)), TO)
-	return x
+	_permute_TO!(y.A, cache[8], ((1, 2), (3, 4)), TO)
+	return y
 end
 
-function _action!(x::CompositeMPSTensor{2, T},
+function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	El::LocalLeftTensor{3},
 	Hl::LocalOperator{1, 1},
 	Hr::LocalOperator{1, 1},
@@ -205,11 +314,11 @@ function _action!(x::CompositeMPSTensor{2, T},
 
 	end
 
-	_permute_TO!(x.A, cache[9], ((1, 2), (3, 4)), TO)
-	return x
+	_permute_TO!(y.A, cache[9], ((1, 2), (3, 4)), TO)
+	return y
 end
 
-function _action!(x::CompositeMPSTensor{2, T},
+function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	El::LocalLeftTensor{2},
 	Hl::LocalOperator{1, 2},
 	Hr::LocalOperator{1, 1},
@@ -258,11 +367,11 @@ function _action!(x::CompositeMPSTensor{2, T},
 
 	end
 
-	_permute_TO!(x.A, cache[9], ((1, 2), (3, 4)), TO)
-	return x
+	_permute_TO!(y.A, cache[9], ((1, 2), (3, 4)), TO)
+	return y
 end
 
-function _action!(x::CompositeMPSTensor{2, T},
+function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	El::LocalLeftTensor{2},
 	Hl::IdentityOperator,
 	Hr::LocalOperator{1, 2},
@@ -304,11 +413,11 @@ function _action!(x::CompositeMPSTensor{2, T},
 		_mul_TO!(cache[7], cache[6], Er.A, Hl.strength[] * Hr.strength[], 0.0, TO)
 	end
 
-	_permute_TO!(x.A, cache[7], ((1, 2), (3, 4)), TO)
-	return x
+	_permute_TO!(y.A, cache[7], ((1, 2), (3, 4)), TO)
+	return y
 end
 
-function _action!(x::CompositeMPSTensor{2, T},
+function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	El::LocalLeftTensor{2},
 	Hl::IdentityOperator,
 	Hr::IdentityOperator,
@@ -338,11 +447,11 @@ function _action!(x::CompositeMPSTensor{2, T},
 		_mul_TO!(cache[4], cache[3], Er.A, Hl.strength[] * Hr.strength[], 0.0, TO)
 	end
 
-	_permute_TO!(x.A, cache[4], ((1, 2), (3, 4)), TO)
-	return x
+	_permute_TO!(y.A, cache[4], ((1, 2), (3, 4)), TO)
+	return y
 end
 
-function _action!(x::CompositeMPSTensor{2, T},
+function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	El::LocalLeftTensor{2},
 	Hl::LocalOperator{1, 1},
 	Hr::IdentityOperator,
@@ -380,11 +489,11 @@ function _action!(x::CompositeMPSTensor{2, T},
 		_mul_TO!(cache[6], cache[5], Er.A, Hl.strength[] * Hr.strength[], 0.0, TO)
 	end
 
-	_permute_TO!(x.A, cache[6], ((1, 2), (3, 4)), TO)
-	return x
+	_permute_TO!(y.A, cache[6], ((1, 2), (3, 4)), TO)
+	return y
 end
 
-function _action!(x::CompositeMPSTensor{2, T},
+function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	El::LocalLeftTensor{2},
 	Hl::IdentityOperator,
 	Hr::LocalOperator{1, 1},
@@ -422,12 +531,12 @@ function _action!(x::CompositeMPSTensor{2, T},
 		_mul_TO!(cache[6], cache[5], Er.A, Hl.strength[] * Hr.strength[], 0.0, TO)
 	end
 
-	_permute_TO!(x.A, cache[6], ((1, 2), (3, 4)), TO)
-	return x
+	_permute_TO!(y.A, cache[6], ((1, 2), (3, 4)), TO)
+	return y
 
 end
 
-function _action!(x::CompositeMPSTensor{2, T},
+function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	El::LocalLeftTensor{2},
 	Hl::LocalOperator{1, 2},
 	Hr::LocalOperator{2, 1},
@@ -477,11 +586,11 @@ function _action!(x::CompositeMPSTensor{2, T},
 		_mul_TO!(cache[10], cache[9], Er.A, Hl.strength[] * Hr.strength[], 0.0, TO)
 	end
 
-	_permute_TO!(x.A, cache[10], ((1, 2), (3, 4)), TO)
-	return x
+	_permute_TO!(y.A, cache[10], ((1, 2), (3, 4)), TO)
+	return y
 end
 
-function _action!(x::CompositeMPSTensor{2, T},
+function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	El::LocalLeftTensor{2},
 	Hl::LocalOperator{1, 1},
 	Hr::LocalOperator{1, 1},
@@ -527,11 +636,11 @@ function _action!(x::CompositeMPSTensor{2, T},
 		_mul_TO!(cache[8], cache[7], Er.A, Hl.strength[] * Hr.strength[], 0.0, TO)
 
 	end
-	_permute_TO!(x.A, cache[8], ((1, 2), (3, 4)), TO)
-	return x
+	_permute_TO!(y.A, cache[8], ((1, 2), (3, 4)), TO)
+	return y
 end
 
-function _action!(x::CompositeMPSTensor{2, T},
+function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	El::LocalLeftTensor{2},
 	Hl::LocalOperator{1, 2},
 	Hr::IdentityOperator,
@@ -571,12 +680,12 @@ function _action!(x::CompositeMPSTensor{2, T},
 		_mul_TO!(cache[7], cache[6], Er.A, Hl.strength[] * Hr.strength[], 0.0, TO)
 	end
 
-	_permute_TO!(x.A, cache[7], ((1, 2), (3, 4)), TO)
-	return x
+	_permute_TO!(y.A, cache[7], ((1, 2), (3, 4)), TO)
+	return y
 
 end
 
-function _action!(x::CompositeMPSTensor{2, T},
+function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	El::LocalLeftTensor{3},
 	Hl::IdentityOperator,
 	Hr::IdentityOperator,
@@ -608,11 +717,11 @@ function _action!(x::CompositeMPSTensor{2, T},
 		_mul_TO!(cache[5], cache[4], Er.A, Hl.strength[] * Hr.strength[], 0.0, TO)
 	end
 
-	_permute_TO!(x.A, cache[5], ((1, 2), (3, 4)), TO)
-	return x
+	_permute_TO!(y.A, cache[5], ((1, 2), (3, 4)), TO)
+	return y
 end
 
-function _action!(x::CompositeMPSTensor{2, T},
+function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	El::LocalLeftTensor{3},
 	Hl::IdentityOperator,
 	Hr::LocalOperator{2, 1},
@@ -650,12 +759,12 @@ function _action!(x::CompositeMPSTensor{2, T},
 		_mul_TO!(cache[6], El.A, cache[5], Hl.strength[] * Hr.strength[], 0.0, TO)
 	end
 
-	_permute_TO!(x.A, cache[6], ((1, 2), (3, 4)), TO)
-	return x
+	_permute_TO!(y.A, cache[6], ((1, 2), (3, 4)), TO)
+	return y
 end
 
 # ======================== 1-site MPS ========================
-function _action!(x::MPSTensor{3},
+function _action!(y::MPSTensor{3}, x::MPSTensor{3},
 	El::LocalLeftTensor{2},
 	H::LocalOperator{1, 2},
 	Er::LocalRightTensor{3},
@@ -690,11 +799,11 @@ function _action!(x::MPSTensor{3},
 		_permute_TO!(cache[6], cache[5], ((3, 1), (4, 2)), TO)
 	end
 
-	_mul_TO!(x.A, cache[6], Er.A, H.strength[], 0.0, TO)
-	return x
+	_mul_TO!(y.A, cache[6], Er.A, H.strength[], 0.0, TO)
+	return y
 end
 
-function _action!(x::MPSTensor{3},
+function _action!(y::MPSTensor{3}, x::MPSTensor{3},
 	El::LocalLeftTensor{2},
 	H::IdentityOperator,
 	Er::LocalRightTensor{2},
@@ -719,12 +828,12 @@ function _action!(x::MPSTensor{3},
 		_permute_TO!(cache[3], cache[2], ((1, 2), (3,)), TO)
 	end
 
-	_mul_TO!(x.A, cache[3], Er.A, H.strength[], 0.0, TO)
+	_mul_TO!(y.A, cache[3], Er.A, H.strength[], 0.0, TO)
 
-	return x
+	return y
 end
 
-function _action!(x::MPSTensor{3},
+function _action!(y::MPSTensor{3}, x::MPSTensor{3},
 	El::LocalLeftTensor{2},
 	H::LocalOperator{1, 1},
 	Er::LocalRightTensor{2},
@@ -757,11 +866,11 @@ function _action!(x::MPSTensor{3},
 		_permute_TO!(cache[5], cache[4], ((1, 2), (3,)), TO)
 	end
 
-	_mul_TO!(x.A, cache[5], Er.A, H.strength[], 0.0, TO)
-	return x
+	_mul_TO!(y.A, cache[5], Er.A, H.strength[], 0.0, TO)
+	return y
 end
 
-function _action!(x::MPSTensor{3},
+function _action!(y::MPSTensor{3}, x::MPSTensor{3},
 	El::LocalLeftTensor{3},
 	H::LocalOperator{2, 1},
 	Er::LocalRightTensor{2},
@@ -794,11 +903,11 @@ function _action!(x::MPSTensor{3},
 		_mul_TO!(cache[5], El.A, cache[4], H.strength[], 0.0, TO)
 	end
 
-	_permute_TO!(x.A, cache[5], ((1, 2), (3,)), TO)
-	return x
+	_permute_TO!(y.A, cache[5], ((1, 2), (3,)), TO)
+	return y
 end
 
-function _action!(x::MPSTensor{3},
+function _action!(y::MPSTensor{3}, x::MPSTensor{3},
 	El::LocalLeftTensor{3},
 	H::LocalOperator{1, 1},
 	Er::LocalRightTensor{3},
@@ -833,11 +942,11 @@ function _action!(x::MPSTensor{3},
 		_permute_TO!(cache[6], cache[5], ((1, 3), (4, 2)), TO)
 	end
 
-	_mul_TO!(x.A, cache[6], Er.A, H.strength[], 0.0, TO)
-	return x
+	_mul_TO!(y.A, cache[6], Er.A, H.strength[], 0.0, TO)
+	return y
 end
 
-function _action!(x::MPSTensor{3},
+function _action!(y::MPSTensor{3}, x::MPSTensor{3},
 	El::LocalLeftTensor{3},
 	H::IdentityOperator,
 	Er::LocalRightTensor{3},
@@ -864,11 +973,11 @@ function _action!(x::MPSTensor{3},
 		_permute_TO!(cache[4], cache[3], ((1, 3), (4, 2)), TO)
 	end
 
-	_mul_TO!(x.A, cache[4], Er.A, H.strength[], 0.0, TO)
-	return x
+	_mul_TO!(y.A, cache[4], Er.A, H.strength[], 0.0, TO)
+	return y
 end
 
-function _action!(x::MPSTensor{3},
+function _action!(y::MPSTensor{3}, x::MPSTensor{3},
 	El::LocalLeftTensor{3},
 	H::LocalOperator{2, 2},
 	Er::LocalRightTensor{3},
@@ -903,12 +1012,12 @@ function _action!(x::MPSTensor{3},
 		_mul_TO!(cache[6], El.A, cache[5], H.strength[], 0.0, TO)
 	end
 
-	_permute_TO!(x.A, cache[6], ((1, 2), (3,)), TO)
-	return x
+	_permute_TO!(y.A, cache[6], ((1, 2), (3,)), TO)
+	return y
 end
 
 # ======================== 1-site MPO ========================
-function _action!(x::MPSTensor{4},
+function _action!(y::MPSTensor{4}, x::MPSTensor{4},
 	El::LocalLeftTensor{2},
 	H::LocalOperator{1, 2},
 	Er::LocalRightTensor{3},
@@ -947,11 +1056,11 @@ function _action!(x::MPSTensor{4},
 		_mul_TO!(cache[7], cache[6], Er.A, H.strength[], 0.0, TO)
 	end
 
-	_permute_TO!(x.A, cache[7], ((1, 2), (3, 4)), TO)
-	return x
+	_permute_TO!(y.A, cache[7], ((1, 2), (3, 4)), TO)
+	return y
 end
 
-function _action!(x::MPSTensor{4},
+function _action!(y::MPSTensor{4}, x::MPSTensor{4},
 	El::LocalLeftTensor{2},
 	H::IdentityOperator,
 	Er::LocalRightTensor{2},
@@ -980,11 +1089,11 @@ function _action!(x::MPSTensor{4},
 		_mul_TO!(cache[4], cache[3], Er.A, H.strength[], 0.0, TO)
 	end
 
-	_permute_TO!(x.A, cache[4], ((1, 2), (3, 4)), TO)
-	return x
+	_permute_TO!(y.A, cache[4], ((1, 2), (3, 4)), TO)
+	return y
 end
 
-function _action!(x::MPSTensor{4},
+function _action!(y::MPSTensor{4}, x::MPSTensor{4},
 	El::LocalLeftTensor{2},
 	H::LocalOperator{1, 1},
 	Er::LocalRightTensor{2},
@@ -1021,11 +1130,11 @@ function _action!(x::MPSTensor{4},
 		_mul_TO!(cache[6], cache[5], Er.A, H.strength[], 0.0, TO)
 	end
 
-	_permute_TO!(x.A, cache[6], ((1, 2), (3, 4)), TO)
-	return x
+	_permute_TO!(y.A, cache[6], ((1, 2), (3, 4)), TO)
+	return y
 end
 
-function _action!(x::MPSTensor{4},
+function _action!(y::MPSTensor{4}, x::MPSTensor{4},
 	El::LocalLeftTensor{3},
 	H::LocalOperator{2, 1},
 	Er::LocalRightTensor{2},
@@ -1062,11 +1171,11 @@ function _action!(x::MPSTensor{4},
 		_mul_TO!(cache[6], El.A, cache[5], H.strength[], 0.0, TO)
 	end
 
-	_permute_TO!(x.A, cache[6], ((1, 2), (3, 4)), TO)
-	return x
+	_permute_TO!(y.A, cache[6], ((1, 2), (3, 4)), TO)
+	return y
 end
 
-function _action!(x::MPSTensor{4},
+function _action!(y::MPSTensor{4}, x::MPSTensor{4},
 	El::LocalLeftTensor{3},
 	H::LocalOperator{1, 1},
 	Er::LocalRightTensor{3},
@@ -1105,11 +1214,11 @@ function _action!(x::MPSTensor{4},
 		_mul_TO!(cache[7], cache[6], Er.A, H.strength[], 0.0, TO)
 	end
 
-	_permute_TO!(x.A, cache[7], ((1, 2), (3, 4)), TO)
-	return x
+	_permute_TO!(y.A, cache[7], ((1, 2), (3, 4)), TO)
+	return y
 end
 
-function _action!(x::MPSTensor{4},
+function _action!(y::MPSTensor{4}, x::MPSTensor{4},
 	El::LocalLeftTensor{3},
 	H::IdentityOperator,
 	Er::LocalRightTensor{3},
@@ -1140,11 +1249,11 @@ function _action!(x::MPSTensor{4},
 		_mul_TO!(cache[5], cache[4], Er.A, H.strength[], 0.0, TO)
 	end
 
-	_permute_TO!(x.A, cache[5], ((1, 2), (3, 4)), TO)
-	return x
+	_permute_TO!(y.A, cache[5], ((1, 2), (3, 4)), TO)
+	return y
 end
 
-function _action!(x::MPSTensor{4}, El::LocalLeftTensor{3}, H::LocalOperator{2, 2}, Er::LocalRightTensor{3}, cache::Vector{<:AbstractTensorMap}, TO::Union{Nothing, TimerOutput})
+function _action!(y::MPSTensor{4}, x::MPSTensor{4}, El::LocalLeftTensor{3}, H::LocalOperator{2, 2}, Er::LocalRightTensor{3}, cache::Vector{<:AbstractTensorMap}, TO::Union{Nothing, TimerOutput})
 
 	TT = promote_type(eltype(x), eltype(El), eltype(H), eltype(Er))
 	# x, Er, H, El
@@ -1178,12 +1287,12 @@ function _action!(x::MPSTensor{4}, El::LocalLeftTensor{3}, H::LocalOperator{2, 2
 		_mul_TO!(cache[7], El.A, cache[6], H.strength[], 0.0, TO)
 	end
 
-	_permute_TO!(x.A, cache[7], ((1, 2), (3, 4)), TO)
-	return x
+	_permute_TO!(y.A, cache[7], ((1, 2), (3, 4)), TO)
+	return y
 end
 
 # ======================== bond ========================
-function _action!(x::MPSTensor{2},
+function _action!(y::MPSTensor{2}, x::MPSTensor{2},
 	El::LocalLeftTensor{3},
 	Er::LocalRightTensor{3},
 	cache::Vector{<:AbstractTensorMap},
@@ -1206,10 +1315,10 @@ function _action!(x::MPSTensor{2},
 	end
 
 	# El * x * Er
-	_mul_TO!(x.A, cache[3], Er.A, TO)
-	return x
+	_mul_TO!(y.A, cache[3], Er.A, TO)
+	return y
 end
-function _action!(x::MPSTensor{2},
+function _action!(y::MPSTensor{2}, x::MPSTensor{2},
 	El::LocalLeftTensor{2},
 	Er::LocalRightTensor{2},
 	cache::Vector{<:AbstractTensorMap},
@@ -1226,8 +1335,8 @@ function _action!(x::MPSTensor{2},
 	end
 
 	# El * x * Er
-	_mul_TO!(x.A, cache[1], Er.A, TO)
-	return x
+	_mul_TO!(y.A, cache[1], Er.A, TO)
+	return y
 end
 
 
