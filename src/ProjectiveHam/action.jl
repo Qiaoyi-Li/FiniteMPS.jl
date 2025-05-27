@@ -130,12 +130,9 @@ Compute the action of the projective Hamiltonian on the MPS tensor `PH * x` with
 """
 function action(x::AbstractMPSTensor, PH::CompositeProjectiveHamiltonian, TO::Union{TimerOutput, Nothing} = nothing)
 	# the horizontal spaces may be different with those of x
-	y = _action_initialize(x, PH) 
+	y = _action_initialize(x, PH)
 	return action!(y, x, PH, TO)
 end
-
-
-
 
 function action!(x::AbstractMPSTensor, PH::SimpleProjectiveHamiltonian, TO::Union{TimerOutput, Nothing} = nothing)
 	return _action!(x, x, PH.El, PH.H..., PH.Er, PH.cache, TO)
@@ -145,7 +142,7 @@ function action!(y::AbstractMPSTensor, x::AbstractMPSTensor, PH::SimpleProjectiv
 end
 function action(x::AbstractMPSTensor, PH::SimpleProjectiveHamiltonian, TO::Union{TimerOutput, Nothing} = nothing)
 	# the horizontal spaces may be different with those of x
-	y = _action_initialize(x, PH) 
+	y = _action_initialize(x, PH)
 	return action!(y, x, PH, TO)
 end
 function _action_initialize(x::MPSTensor, PH::SimpleProjectiveHamiltonian)::MPSTensor
@@ -178,7 +175,7 @@ function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing}) where T <: NTuple{2, MPSTensor{3}}
 
-	TT = promote_type(eltype(x), eltype(El), eltype(Hl), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(Hl), eltype(Er))
 	if isempty(cache)
 		# [1] permute El
 		push!(cache, _permute_malloc(TT, El.A, ((1, 2), (3,)), TO))
@@ -223,7 +220,7 @@ function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing}) where T <: NTuple{2, MPSTensor{3}}
 
-	TT = promote_type(eltype(x), eltype(El), eltype(Hl), eltype(Hr), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(Hl), eltype(Hr), eltype(Er))
 	# x, Er, Hl, Hr, El
 	if isempty(cache)
 		# [1] permute x 
@@ -273,7 +270,7 @@ function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing}) where T <: NTuple{2, MPSTensor{3}}
 
-	TT = promote_type(eltype(x), eltype(El), eltype(Hl), eltype(Hr), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(Hl), eltype(Hr), eltype(Er))
 	# x, Hl, Hr, El, Er 
 	if isempty(cache)
 		# [1] permute x
@@ -326,7 +323,7 @@ function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing}) where T <: NTuple{2, MPSTensor{3}}
 
-	TT = promote_type(eltype(x), eltype(El), eltype(Hl), eltype(Hr), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(Hl), eltype(Hr), eltype(Er))
 	# El, x, Hr, Hl, Er
 	if isempty(cache)
 		# [1] permute x 
@@ -379,7 +376,7 @@ function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing}) where T <: NTuple{2, MPSTensor{3}}
 
-	TT = promote_type(eltype(x), eltype(El), eltype(Hr), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(Hr), eltype(Er))
 	# El, x, Hr, Er
 	if isempty(cache)
 		# [1] permute x 
@@ -425,7 +422,7 @@ function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing}) where T <: NTuple{2, MPSTensor{3}}
 
-	TT = promote_type(eltype(x), eltype(El), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(Er))
 	# El, x, Er 
 	if isempty(cache)
 		# [1] permute x 
@@ -459,7 +456,7 @@ function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing}) where T <: NTuple{2, MPSTensor{3}}
 
-	TT = promote_type(eltype(x), eltype(El), eltype(Hl), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(Hl), eltype(Er))
 	# El, x, Hl, Er
 	if isempty(cache)
 		# [1] permute x 
@@ -501,7 +498,7 @@ function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing}) where T <: NTuple{2, MPSTensor{3}}
 
-	TT = promote_type(eltype(x), eltype(El), eltype(Hr), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(Hr), eltype(Er))
 	# El, x, Hr, Er
 	if isempty(cache)
 		# [1] permute x 
@@ -544,7 +541,7 @@ function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing}) where T <: NTuple{2, MPSTensor{3}}
 
-	TT = promote_type(eltype(x), eltype(El), eltype(Hl), eltype(Hr), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(Hl), eltype(Hr), eltype(Er))
 	# El x, Hl, Hr, Er
 	if isempty(cache)
 		# [1] permute x 
@@ -598,7 +595,7 @@ function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing}) where T <: NTuple{2, MPSTensor{3}}
 
-	TT = promote_type(eltype(x), eltype(El), eltype(Hl), eltype(Hr), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(Hl), eltype(Hr), eltype(Er))
 	# El x, Hl, Hr, Er
 	if isempty(cache)
 		# [1] permute x
@@ -648,7 +645,7 @@ function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing}) where T <: NTuple{2, MPSTensor{3}}
 
-	TT = promote_type(eltype(x), eltype(El), eltype(Hl), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(Hl), eltype(Er))
 	# El x, Hl, Er
 	if isempty(cache)
 		# [1] permute x
@@ -693,7 +690,7 @@ function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing}) where T <: NTuple{2, MPSTensor{3}}
 
-	TT = promote_type(eltype(x), eltype(El), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(Er))
 	# El x, Er
 	if isempty(cache)
 		# [1] permute x
@@ -729,7 +726,7 @@ function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing}) where T <: NTuple{2, MPSTensor{3}}
 
-	TT = promote_type(eltype(x), eltype(El), eltype(Hr), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(Hr), eltype(Er))
 	# x, Er, Hr, El
 	if isempty(cache)
 		# [1] permute x
@@ -771,7 +768,7 @@ function _action!(y::MPSTensor{3}, x::MPSTensor{3},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing})
 
-	TT = promote_type(eltype(x), eltype(El), eltype(H), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(H), eltype(Er))
 	# El, x, H, Er 
 	if isempty(cache)
 		# [1] permute x
@@ -810,7 +807,7 @@ function _action!(y::MPSTensor{3}, x::MPSTensor{3},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing})
 
-	TT = promote_type(eltype(x), eltype(El), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(Er))
 	# El, x, Er 
 	if isempty(cache)
 		# [1] permute x
@@ -840,7 +837,7 @@ function _action!(y::MPSTensor{3}, x::MPSTensor{3},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing})
 
-	TT = promote_type(eltype(x), eltype(El), eltype(H), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(H), eltype(Er))
 	# H, x, El, Er
 	if isempty(cache)
 		# [1] permute x
@@ -878,7 +875,7 @@ function _action!(y::MPSTensor{3}, x::MPSTensor{3},
 	TO::Union{TimerOutput, Nothing})
 
 	# x, Er, H, El
-	TT = promote_type(eltype(x), eltype(El), eltype(H), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(H), eltype(Er))
 	if isempty(cache)
 		# [1] x * Er
 		push!(cache, _mul_malloc(TT, x.A, Er.A, TO))
@@ -914,7 +911,7 @@ function _action!(y::MPSTensor{3}, x::MPSTensor{3},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing})
 
-	TT = promote_type(eltype(x), eltype(El), eltype(H), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(H), eltype(Er))
 	# H, x, El, Er
 	if isempty(cache)
 		# [1] permute x
@@ -953,7 +950,7 @@ function _action!(y::MPSTensor{3}, x::MPSTensor{3},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing})
 
-	TT = promote_type(eltype(x), eltype(El), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(Er))
 	# El, x, Er
 	if isempty(cache)
 		# [1] permute x
@@ -984,7 +981,7 @@ function _action!(y::MPSTensor{3}, x::MPSTensor{3},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{Nothing, TimerOutput})
 
-	TT = promote_type(eltype(x), eltype(El), eltype(H), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(H), eltype(Er))
 	# x, Er, H, El
 	if isempty(cache)
 		# [1] permute Er
@@ -1024,7 +1021,7 @@ function _action!(y::MPSTensor{4}, x::MPSTensor{4},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing})
 
-	TT = promote_type(eltype(x), eltype(El), eltype(H), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(H), eltype(Er))
 	# El, x, H, Er 
 	if isempty(cache)
 		# [1] permute x
@@ -1067,7 +1064,7 @@ function _action!(y::MPSTensor{4}, x::MPSTensor{4},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing})
 
-	TT = promote_type(eltype(x), eltype(El), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(Er))
 	# El, x, Er 
 	if isempty(cache)
 		# [1] permute x
@@ -1100,7 +1097,7 @@ function _action!(y::MPSTensor{4}, x::MPSTensor{4},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing})
 
-	TT = promote_type(eltype(x), eltype(El), eltype(H), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(H), eltype(Er))
 	# H, x, El, Er
 	if isempty(cache)
 		# [1] permute x
@@ -1142,7 +1139,7 @@ function _action!(y::MPSTensor{4}, x::MPSTensor{4},
 	TO::Union{TimerOutput, Nothing})
 
 	# x, Er, H, El
-	TT = promote_type(eltype(x), eltype(El), eltype(H), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(H), eltype(Er))
 	if isempty(cache)
 		# [1] permute x
 		push!(cache, _permute_malloc(TT, x.A, ((1, 2, 3), (4,)), TO))
@@ -1182,7 +1179,7 @@ function _action!(y::MPSTensor{4}, x::MPSTensor{4},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing})
 
-	TT = promote_type(eltype(x), eltype(El), eltype(H), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(H), eltype(Er))
 	# H, x, El, Er
 	if isempty(cache)
 		# [1] permute x
@@ -1225,7 +1222,7 @@ function _action!(y::MPSTensor{4}, x::MPSTensor{4},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing})
 
-	TT = promote_type(eltype(x), eltype(El), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(Er))
 	# El, x, Er
 	if isempty(cache)
 		# [1] permute x
@@ -1255,7 +1252,7 @@ end
 
 function _action!(y::MPSTensor{4}, x::MPSTensor{4}, El::LocalLeftTensor{3}, H::LocalOperator{2, 2}, Er::LocalRightTensor{3}, cache::Vector{<:AbstractTensorMap}, TO::Union{Nothing, TimerOutput})
 
-	TT = promote_type(eltype(x), eltype(El), eltype(H), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(H), eltype(Er))
 	# x, Er, H, El
 	if isempty(cache)
 		# [1] permute x
@@ -1299,7 +1296,7 @@ function _action!(y::MPSTensor{2}, x::MPSTensor{2},
 	TO::Union{TimerOutput, Nothing})
 
 	# El, x, Er
-	TT = promote_type(eltype(x), eltype(El), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(Er))
 	if isempty(cache)
 		# [1] permute El
 		push!(cache, _permute_malloc(TT, El.A, ((1, 2), (3,)), TO))
@@ -1324,7 +1321,7 @@ function _action!(y::MPSTensor{2}, x::MPSTensor{2},
 	cache::Vector{<:AbstractTensorMap},
 	TO::Union{TimerOutput, Nothing})
 
-	TT = promote_type(eltype(x), eltype(El), eltype(Er))
+	TT = promote_type(eltype(x), eltype(y), eltype(El), eltype(Er))
 	# El, x, Er
 	if isempty(cache)
 		# [1] El * x
