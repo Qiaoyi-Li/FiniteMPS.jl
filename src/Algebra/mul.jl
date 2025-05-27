@@ -163,9 +163,8 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
 
 				@timeit TimerStep "pushEnv_mul" canonicalize!(Env_mul, si)
 				PH = CompositeProjectiveHamiltonian(Env_mul.El[si], Env_mul.Er[si], (Env_mul[2][si],))
-				finalize(PH)
 				@timeit TimerStep "action_mul" ab = action(B[si], PH, TimerStep)
-
+				finalize(PH)
 
 				_α = α * coef(B) / coef(C)
 
@@ -175,6 +174,7 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
 					pspace = codomain(x₀)[2]
 					PH = SimpleProjectiveHamiltonian(Env_add.El[si], Env_add.Er[si], IdentityOperator(pspace, trivial(pspace), si, 1.0))
 					@timeit TimerStep "action_add" c = action(C₀[si], PH, TimerStep)
+					finalize(PH)
 					_β = β * coef(C₀) / coef(C)
 				else
 					c = nothing

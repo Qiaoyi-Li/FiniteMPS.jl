@@ -145,25 +145,48 @@ function action(x::AbstractMPSTensor, PH::SimpleProjectiveHamiltonian, TO::Union
 	y = _action_initialize(x, PH)
 	return action!(y, x, PH, TO)
 end
-function _action_initialize(x::MPSTensor, PH::SimpleProjectiveHamiltonian)::MPSTensor
+function _action_initialize(x::MPSTensor, PH::SimpleProjectiveHamiltonian)
 	lspace = codomain(PH.El)[1]
 	rspace = domain(PH.Er)[end]
 	cod = ProductSpace(lspace, codomain(x).spaces[2:end]...)
 	dom = ProductSpace(domain(x).spaces[1:end-1]..., rspace)
-	return zeros(eltype(x), cod, dom)
+	F = reduce(promote_type, vcat(eltype.([x, PH.El, PH.Er]),
+		map(x -> typeof(x.strength[]), PH.H)...)) 
+	return MPSTensor(zeros(F, cod, dom))
 end
 function _action_initialize(x::CompositeMPSTensor{N, T}, PH::SimpleProjectiveHamiltonian) where {N, T}
 	lspace = codomain(PH.El)[1]
 	rspace = domain(PH.Er)[end]
 	cod = ProductSpace(lspace, codomain(x).spaces[2:end]...)
 	dom = ProductSpace(domain(x).spaces[1:end-1]..., rspace)
-	return CompositeMPSTensor{N, T}(zeros(eltype(x), cod, dom))
+	F = reduce(promote_type, vcat(eltype.([x, PH.El, PH.Er]),
+		map(x -> typeof(x.strength[]), PH.H)...))
+	return CompositeMPSTensor{N, T}(zeros(F, cod, dom))
 end
-_action_initialize(x::AbstractMPSTensor, PH::CompositeProjectiveHamiltonian) = _action_initialize(x, PH.PH[1])
-
-
-
-
+function _action_initialize(x::MPSTensor, PH::CompositeProjectiveHamiltonian)
+	lspace = codomain(PH.PH[1].El)[1]
+	rspace = domain(PH.PH[1].Er)[end]
+	cod = ProductSpace(lspace, codomain(x).spaces[2:end]...)
+	dom = ProductSpace(domain(x).spaces[1:end-1]..., rspace)
+	F = mapreduce(promote_type, PH.PH) do H
+		reduce(promote_type, vcat(eltype.([H.El, H.Er]),
+		map(x -> typeof(x.strength[]), H.H)...))
+	end
+	F = promote_type(F, eltype(x))
+	return MPSTensor(zeros(F, cod, dom))
+end
+function _action_initialize(x::CompositeMPSTensor{N, T}, PH::CompositeProjectiveHamiltonian) where {N, T}
+	lspace = codomain(PH.PH[1].El)[1]
+	rspace = domain(PH.PH[1].Er)[end]
+	cod = ProductSpace(lspace, codomain(x).spaces[2:end]...)
+	dom = ProductSpace(domain(x).spaces[1:end-1]..., rspace)
+	F = mapreduce(promote_type, PH.PH) do H
+		reduce(promote_type, vcat(eltype.([H.El, H.Er]),
+		map(x -> typeof(x.strength[]), H.H)...))
+	end
+	F = promote_type(F, eltype(x))
+	return CompositeMPSTensor{N, T}(zeros(F, cod, dom))
+end
 
 # ======================== 2-site MPS ========================
 # TODO: change to _action!(Hx, x, ..., cache, α, β) -> write α H * x + β Hx to Hx

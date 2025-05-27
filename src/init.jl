@@ -11,6 +11,17 @@ function __init__()
      # default multi-threading initialization
      _init_multithreading()
 
+     # setup TensorKit caches
+     for C in [TensorKit.GLOBAL_FUSIONBLOCKSTRUCTURE_CACHE,
+          TensorKit.treetransposercache,
+          TensorKit.treebraidercache,
+          TensorKit.treepermutercache,
+          TensorKit.transposecache,
+          TensorKit.braidcache]
+
+          C.maxsize = 10^3
+     end
+
      return nothing
 end
 
