@@ -1,13 +1,17 @@
-function _CBE(Al::MPSTensor{R1}, Ar::MPSTensor{R2}, El::SparseLeftTensor, Er::SparseRightTensor, Hl::SparseMPOTensor, Hr::SparseMPOTensor, Alg::NaiveCBE{SweepR2L}, TO::TimerOutput) where {R1, R2}
+function _CBE(Al::MPSTensor{R1}, Ar::MPSTensor{R2}, El::SparseLeftTensor, Er::SparseRightTensor, Hl::SparseMPOTensor, Hr::SparseMPOTensor, Alg::NaiveCBE{SweepR2L}, TO::TimerOutput;
+	Bl::MPSTensor{R1} = Al,
+	Br::MPSTensor{R2} = Ar,
+	) where {R1, R2}
 	# Al is left canonical, Ar is canonical center
+	# Bl, Br are top layer tensors
 
 	# right canonical Ar 
 	Ar_perm = permute(Ar.A, ((1,), Tuple(2:R2)))
 	@timeit TO "qr" _, Ar_c::MPSTensor = rightorth(Ar_perm)
 
 	# construct L/R orth complement obj 
-	@timeit TO "construct LO" LO = LeftOrthComplement(El, Al, Hl) |> _orth!
-	@timeit TO "construct RO" RO = RightOrthComplement(Er, Ar_c, Hr, Ar) |> _orth!
+	@timeit TO "construct LO" LO = LeftOrthComplement(El, Al, Hl, Bl) |> _orth!
+	@timeit TO "construct RO" RO = RightOrthComplement(Er, Ar_c, Hr, Br) |> _orth!
 
 	# svd
 	D_add = Alg.D - dim(Al, R2)[2]
@@ -55,7 +59,10 @@ function _CBE(Al::MPSTensor{R1}, Ar::MPSTensor{R2}, El::SparseLeftTensor, Er::Sp
 	return Al_f, Ar_f, CBEInfo(Alg, (info,), dim(Ar, 1), dim(Ar_f, 1), ϵp, ϵ)
 end
 
-function _CBE(Al::MPSTensor{R1}, Ar::MPSTensor{R2}, El::SparseLeftTensor, Er::SparseRightTensor, Hl::SparseMPOTensor, Hr::SparseMPOTensor, Alg::NaiveCBE{SweepL2R}, TO::TimerOutput) where {R1, R2}
+function _CBE(Al::MPSTensor{R1}, Ar::MPSTensor{R2}, El::SparseLeftTensor, Er::SparseRightTensor, Hl::SparseMPOTensor, Hr::SparseMPOTensor, Alg::NaiveCBE{SweepL2R}, TO::TimerOutput;
+	Bl::MPSTensor{R1} = Al,
+	Br::MPSTensor{R2} = Ar,
+	) where {R1, R2}
 	# Al is canonical center, Ar is right canonical
 
 	# left canonical Al
@@ -63,8 +70,8 @@ function _CBE(Al::MPSTensor{R1}, Ar::MPSTensor{R2}, El::SparseLeftTensor, Er::Sp
 	@timeit TO "qr" Al_c::MPSTensor, _ = leftorth(Al_perm)
 
 	# construct L/R orth complement obj
-	@timeit TO "construct LO" LO = LeftOrthComplement(El, Al_c, Hl, Al) |> _orth!
-	@timeit TO "construct RO" RO = RightOrthComplement(Er, Ar, Hr) |> _orth!
+	@timeit TO "construct LO" LO = LeftOrthComplement(El, Al_c, Hl, Bl) |> _orth!
+	@timeit TO "construct RO" RO = RightOrthComplement(Er, Ar, Hr,  Br) |> _orth!
 
 	D_add = Alg.D - dim(Ar, 1)[2]
 	if Alg.rsvd

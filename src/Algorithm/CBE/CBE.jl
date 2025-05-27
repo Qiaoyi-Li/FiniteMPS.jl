@@ -10,7 +10,7 @@ Return the two expanded local tensors `Al_ex` and `Ar_ex` after CBE.
 function CBE(Al::MPSTensor, Ar::MPSTensor,
 	::SparseLeftTensor, ::SparseRightTensor,
 	::SparseMPOTensor, ::SparseMPOTensor,
-	Alg::NoCBE)
+	Alg::NoCBE; kwargs...)
 	D₀ = D = dim(Ar, 1)
 	return Al, Ar, CBEInfo(Alg, (), D₀, D, NaN, 0.0), TimerOutput()
 end
@@ -18,7 +18,7 @@ end
 function CBE(Al::MPSTensor{R₁}, Ar::MPSTensor{R₂},
 	El::SparseLeftTensor, Er::SparseRightTensor,
 	Hl::SparseMPOTensor, Hr::SparseMPOTensor,
-	Alg::NaiveCBE{S}) where {R₁, R₂, S <: Union{SweepL2R, SweepR2L}}
+	Alg::NaiveCBE{S}; kwargs...) where {R₁, R₂, S <: Union{SweepL2R, SweepR2L}}
 
      
      Dl = mapreduce(idx -> dim(Al, idx)[2], *, 1:R₁-1)
@@ -29,7 +29,7 @@ function CBE(Al::MPSTensor{R₁}, Ar::MPSTensor{R₂},
      end
 
 	TO = TimerOutput()
-	@timeit TO "NaiveCBE" Al_ex, Ar_ex, info = _CBE(Al, Ar, El, Er, Hl, Hr, Alg, TO)
+	@timeit TO "NaiveCBE" Al_ex::MPSTensor, Ar_ex::MPSTensor, info = _CBE(Al, Ar, El, Er, Hl, Hr, Alg, TO; kwargs...)
 
 	return Al_ex, Ar_ex, info, TO
 end
@@ -47,7 +47,7 @@ function CBE(Al::MPSTensor{R₁}, Ar::MPSTensor{R₂},
 	end
 
      TO = TimerOutput()
-	@timeit TO "FullCBE" Al_ex, Ar_ex, info = _CBE(Al, Ar, Alg, TO)
+	@timeit TO "FullCBE" Al_ex::MPSTensor, Ar_ex::MPSTensor, info = _CBE(Al, Ar, Alg, TO)
 
 	return Al_ex, Ar_ex, info, TO
 end
