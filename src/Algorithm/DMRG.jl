@@ -183,6 +183,9 @@ CBE algorithm for 1-DMRG.
 
      trunc::TruncationScheme = notrunc()
 Control the truncation after each update, only used together with CBE. Details see `tsvd`. 
+
+     noise::NTuple{2, Float64} = (0.1, 0.0)
+Add noise to the 1-site local tensor after each Lanczos update. The first element is the ratio of additional bond dimension `(≤ 1.0)`, the second element is the noise strength.
 """
 function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,MPS}}
 
@@ -193,6 +196,8 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
      verbose::Int64 = get(kwargs, :verbose, 0)
      CBEAlg::CBEAlgorithm{SweepL2R} = get(kwargs, :CBEAlg, NoCBE())
      trunc = get(kwargs, :trunc, notrunc())
+     noise::NTuple{2, Float64} = get(kwargs, :noise, (0.1, 0.0))
+     @assert noise[1] ≤ 1.0 && noise[2] ≥ 0.0
 
      TimerSweep = TimerOutput()
      info_dmrg = Vector{DMRGInfo}(undef, L)
@@ -222,9 +227,24 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
 
           eg += E₀
           if si < L
+               # add noise 
+               @timeit TimerStep "noise" if noise[2] > 0 
+                    De = ceil(Int64, noise[1]*dim(codomain(xg)))
+                    Ve = _rsvd_trunc(codomain(xg), De)
+                    A_noise = randn(eltype(xg), codomain(xg), Ve)
+                    rmul!(A_noise, noise[2] / norm(A_noise))
+                    xg = MPSTensor(catdomain(xg.A, A_noise))
+                    normalize!(xg)
+               
+                    Ar = permute(Ψ[si+1].A, ((1,), (2, 3)))
+                    Ar_0 = zeros(eltype(Ar), Ve, domain(Ar))
+                    Ψ[si + 1] = catcodomain(Ar, Ar_0)
+               end
+
                @timeit TimerStep "svd" Ψ[si], S::MPSTensor, info_svd = leftorth(xg; trunc=trunc)
                # next Al
                Al = S * Ψ[si+1]
+               (noise[2] > 0) && normalize!(Al)
                # remember to change Center of Ψ manually
                Center(Ψ)[:] = [si + 1, si + 1]
           else
@@ -254,6 +274,7 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
 
 end
 
+
 function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,MPS}}
 
      K = get(kwargs, :K, 16)
@@ -263,6 +284,8 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
      verbose::Int64 = get(kwargs, :verbose, 0)
      CBEAlg::CBEAlgorithm{SweepR2L} = get(kwargs, :CBEAlg, NoCBE())
      trunc = get(kwargs, :trunc, notrunc())
+     noise::NTuple{2, Float64} = get(kwargs, :noise, (0.1, 0.0))
+     @assert noise[1] ≤ 1.0 && noise[2] ≥ 0.0
 
      TimerSweep = TimerOutput()
      info_dmrg = Vector{DMRGInfo}(undef, L)
@@ -291,9 +314,27 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
           finalize(PH)
           eg += E₀
           if si > 1
+               # add noise 
+               @timeit TimerStep "noise" if noise[2] > 0 
+                    Ar_p = permute(xg.A, ((1,), (2, 3)))
+                    De = ceil(Int64, noise[1]*dim(domain(Ar_p)))
+                    Ve = _rsvd_trunc(domain(Ar_p), De)
+
+                    A_noise = randn(eltype(xg), Ve, domain(Ar_p))
+                    rmul!(A_noise, noise[2] / norm(A_noise))
+                    xg = MPSTensor(catcodomain(Ar_p, A_noise))
+                    normalize!(xg)
+               
+                    Al = Ψ[si - 1].A
+                    Al_0 = zeros(eltype(Al), codomain(Al), Ve)
+                    Ψ[si - 1] = catdomain(Al, Al_0)
+               end
+
+
                @timeit TimerStep "svd" S::MPSTensor, Ψ[si], info_svd = rightorth(xg; trunc=trunc)
                # next Ar
                Ar = Ψ[si-1] * S
+               (noise[2] > 0) && normalize!(Ar)
                # remember to change Center of Ψ manually
                Center(Ψ)[:] = [si - 1, si - 1]
           else
