@@ -71,6 +71,7 @@ function addIntr!(Root::InteractionTreeNode,
 	value::Union{Nothing, Pair{<:Tuple, String}} = nothing,
 ) 
      N = length(S)
+     isa(Z,Vector) && (NZ = length(Z))
 
 	if isa(pspace, Vector) && isa(Z, Vector)
 		@assert length(pspace) == length(Z)
@@ -93,16 +94,17 @@ function addIntr!(Root::InteractionTreeNode,
 	idx_Op = 1
 	f_flag = false
 	while idx_Op ≤ N
+        si′ = isa(Z, Vector) ? NZ-mod(-si,NZ) : si
 		if si < S[idx_Op].si
 			if f_flag
-				Op_i = LocalOperator(_getZ(Z, si), :Z, si, false)
+				Op_i = LocalOperator(_getZ(Z, si′), :Z, si, false)
 			else
-				Op_i = IdentityOperator(_getpspace(pspace, si), si)
+				Op_i = IdentityOperator(_getpspace(pspace, si′), si)
 			end
 		else
 			Op_i = S[idx_Op]
 			# add Z if necessary
-			f_flag && _addZ!(Op_i, _getZ(Z, si))
+			f_flag && _addZ!(Op_i, _getZ(Z, si′))
 			f_flag = xor(f_flag, isfermionic(Op_i))
 
 			idx_Op += 1
@@ -139,10 +141,10 @@ end
 
 _getZ(::Nothing, ::Int64) = nothing
 _getZ(Z::AbstractTensorMap, ::Int64) = Z
-_getZ(Z::Vector{AbstractTensorMap}, i::Int64) = Z[i]
+_getZ(Z::Vector{<:AbstractTensorMap}, i::Int64) = Z[i]
 _getpspace(::Nothing, ::Int64) = nothing
 _getpspace(pspace::VectorSpace, ::Int64) = pspace
-_getpspace(pspace::Vector{VectorSpace}, i::Int64) = pspace[i]
+_getpspace(pspace::Vector{<:VectorSpace}, i::Int64) = pspace[i]
 
 
 function _default_IntrName(N::Int64)
