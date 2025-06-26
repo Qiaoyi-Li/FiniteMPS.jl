@@ -2,12 +2,12 @@ using FiniteMPS, FiniteLattices
 
 FiniteMPS.set_num_threads_mkl(1)
 
-Sym::Symbol = :SU₂ # symmetry, :SU₂ or :U₁
+Sym::Symbol = :U₁ # symmetry, :SU₂ or :U₁
 include("model.jl")
 verbose = 1
 GCstep = true
-Latt = YCTria(9, 6) |> Snake! # Triangular lattice
-# Latt = YCSqua(8, 4) |> Snake! # Square lattice
+# Latt = YCTria(9, 6) |> Snake! # Triangular lattice
+Latt = YCSqua(8, 4) |> Snake! # Square lattice
 J′ = 0.0
 
 lsD = let
@@ -50,7 +50,7 @@ end
 
 # Observables
 Obs = let
-	Tree = ObservableTree()
+	Tree = ObservableTree(size(Latt))
 	for i in 1:size(Latt), j in i+1:size(Latt)
 		if Sym == :U₁
 			addObs!(Tree, (U₁Spin.Sz, U₁Spin.Sz), (i, j), (false, false); name = (:Sz, :Sz))

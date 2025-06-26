@@ -232,7 +232,7 @@ function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
 	end
 
 	_permute_TO!(y.A, cache[8], ((1, 2), (3, 4)), TO)
-	return x
+	return y
 end
 
 function _action!(y::CompositeMPSTensor{2, T}, x::CompositeMPSTensor{2, T},
