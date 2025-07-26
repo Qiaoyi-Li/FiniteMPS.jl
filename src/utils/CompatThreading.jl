@@ -1,28 +1,29 @@
 # some functions in TensorKit use multi-threading to parallelize the computation however seem to conflict with the high-level multi-threading implementations
-function _add_general_kernel_sequential!(tdst, tsrc, p, fusiontreetransform, α, β, backend...)
-	if iszero(β)
-		zerovector!(tdst)
-	elseif β != 1
-		scale!(tdst, β)
-	end
-	for (f₁, f₂) in fusiontrees(tsrc)
-		for ((f₁′, f₂′), coeff) in fusiontreetransform(f₁, f₂)
-			TensorOperations.tensoradd!(tdst[f₁′, f₂′], tsrc[f₁, f₂], p, false, α * coeff, One(), backend...)
-		end
-	end
-	return nothing
-end
-function _add_abelian_kernel_sequential!(tdst, tsrc, p, fusiontreetransform, α, β, backend...)
+# not required after TensorKit v0.14.7
+# function _add_general_kernel_sequential!(tdst, tsrc, p, fusiontreetransform, α, β, backend...)
+# 	if iszero(β)
+# 		zerovector!(tdst)
+# 	elseif β != 1
+# 		scale!(tdst, β)
+# 	end
+# 	for (f₁, f₂) in fusiontrees(tsrc)
+# 		for ((f₁′, f₂′), coeff) in fusiontreetransform(f₁, f₂)
+# 			TensorOperations.tensoradd!(tdst[f₁′, f₂′], tsrc[f₁, f₂], p, false, α * coeff, One(), backend...)
+# 		end
+# 	end
+# 	return nothing
+# end
+# function _add_abelian_kernel_sequential!(tdst, tsrc, p, fusiontreetransform, α, β, backend...)
 
-	for (f₁, f₂) in fusiontrees(tsrc)
-		TensorKit._add_abelian_block!(tdst, tsrc, p, fusiontreetransform, f₁, f₂, α, β, backend...)
-	end
-	return tdst
-end
+# 	for (f₁, f₂) in fusiontrees(tsrc)
+# 		TensorKit._add_abelian_block!(tdst, tsrc, p, fusiontreetransform, f₁, f₂, α, β, backend...)
+# 	end
+# 	return tdst
+# end
 
-TensorKit._add_abelian_kernel!(tdst::AbstractTensorMap, tsrc::AbstractTensorMap, p, fusiontreetransform, α, β, backend...) = _add_abelian_kernel_sequential!(tdst, tsrc, p, fusiontreetransform, α, β, backend...)
+# TensorKit._add_abelian_kernel!(tdst::AbstractTensorMap, tsrc::AbstractTensorMap, p, fusiontreetransform, α, β, backend...) = _add_abelian_kernel_sequential!(tdst, tsrc, p, fusiontreetransform, α, β, backend...)
 
-TensorKit._add_general_kernel!(tdst::AbstractTensorMap, tsrc::AbstractTensorMap, p, fusiontreetransform, α, β, backend...) = _add_general_kernel_sequential!(tdst, tsrc, p, fusiontreetransform, α, β, backend...)
+# TensorKit._add_general_kernel!(tdst::AbstractTensorMap, tsrc::AbstractTensorMap, p, fusiontreetransform, α, β, backend...) = _add_general_kernel_sequential!(tdst, tsrc, p, fusiontreetransform, α, β, backend...)
 
 # multi-threading mul
 using TensorKit: hasblock

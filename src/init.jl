@@ -12,15 +12,7 @@ function __init__()
      _init_multithreading()
 
      # setup TensorKit caches
-     for C in [TensorKit.GLOBAL_FUSIONBLOCKSTRUCTURE_CACHE,
-          TensorKit.treetransposercache,
-          TensorKit.treebraidercache,
-          TensorKit.treepermutercache,
-          TensorKit.transposecache,
-          TensorKit.braidcache]
-
-          C.maxsize = 10^3
-     end
+     TensorKit.DEFAULT_GLOBALCACHE_SIZE[] = 10^3
 
      return nothing
 end
@@ -45,6 +37,8 @@ function _init_multithreading()
 
      # close Strided in TensorKit
      TensorKit.Strided.set_num_threads(1)
+     # close multi-threaded transformer in TensorKit
+     TensorKit.set_num_transformer_threads(1)
 
      # initialize global variables
      global GlobalNumThreads_action = Threads.nthreads()
