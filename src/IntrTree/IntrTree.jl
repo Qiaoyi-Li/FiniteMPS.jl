@@ -1,3 +1,35 @@
+"""
+	mutable struct InteractionChannel{T}
+		Ops::Vector{Int64}
+		ref::Ref
+		LeafL::T
+		LeafR::T
+		preserve::Bool
+	end
+
+A concrete type for labeling an interaction channel in an `InteractionTree`.
+	
+# Fields
+	Ops::Vector{Int64}
+Stores the indices of local operators.
+
+	ref::Ref 
+`Ref` for the interaction strength.
+	
+	LeafL::T
+	LeafR::T
+The left and right leaf nodes. 
+
+	preserve::Bool
+If `true`, the channel will not be merged so that the interaction strength can be dynamical tuned via `Ref`.
+
+# Constructors
+	InteractionChannel(Ops::Vector{Int64},
+		ref::Ref,
+		LeafL::T,
+		LeafR::T,
+		preserve::Bool = false) -> InteractionChannel{T} 
+"""
 mutable struct InteractionChannel{T}
 	Ops::Vector{Int64}
 	ref::Ref
@@ -13,8 +45,36 @@ function show(io::IO, obj::InteractionChannel)
 	return nothing
 end
 
+"""
+	mutable struct InteractionTreeNode 
+		Op::NTuple{2, Int64}
+		parent::Union{Nothing, InteractionTreeNode}
+		children::Vector{InteractionTreeNode}
+		Intrs::Vector{InteractionChannel}
+	end
+
+Concrete type for a node of `InteractionTree`.
+	
+# Fields 
+	Op::NTuple{2, Int64}
+`(si, idx)` to label the `idx`-st operator at site `si`.
+
+	parent::Union{Nothing, InteractionTreeNode}
+	children::Vector{InteractionTreeNode}
+The parent node and children nodes.
+
+	Intrs::Vector{InteractionChannel}
+Stores all interaction channels linked to this node.
+
+# Constructors
+	InteractionTreeNode(Op::NTuple{2, Int64},
+		parent::Union{Nothing, InteractionTreeNode},
+		children::Vector{InteractionTreeNode} = InteractionTreeNode[],
+		Intrs::Vector{InteractionChannel} = InteractionChannel[]
+		) -> InteractionTreeNode
+"""
 mutable struct InteractionTreeNode
-	Op::NTuple{2, Int64} # si, idx
+	Op::NTuple{2, Int64}
 	parent::Union{Nothing, InteractionTreeNode}
 	children::Vector{InteractionTreeNode}
 	Intrs::Vector{InteractionChannel}
@@ -38,6 +98,31 @@ ChildIndexing(::Type{InteractionTreeNode}) = IndexedChildren()
 NodeType(::Type{InteractionTreeNode}) = HasNodeType()
 nodetype(::Type{InteractionTreeNode}) = InteractionTreeNode
 
+"""
+	mutable struct InteractionTree{L}
+		Ops::Vector{Vector{AbstractLocalOperator}}
+		Refs::Dict{String, Dict}
+		RootL::InteractionTreeNode
+		RootR::InteractionTreeNode
+	end
+
+Implementation of a bi-tree structure for storing all interactions in a `L`-site Hamiltonian.
+
+# Fields
+	Ops::Vector{Vector{AbstractLocalOperator}}
+Stores all concrete local operators used at each site, `Ops[si][idx]` is the `idx`-st operator at site `si`.
+
+	Refs::Dict{String, Dict}
+A dictionary to store all interactions strength. `Refs[name]` is a dictionary `(i, j, ...) => Ref`, where `Ref[]` is the strength of this interaction term with site indices `i, j, ...`.
+
+	RootL::InteractionTreeNode
+	RootR::InteractionTreeNode
+The root node of left (from the first site) or right (from the last site) tree. 
+
+# Constructors
+	InteractionTree(L::Int64) -> ::InteractionTree{L}
+Construct an empty `InteractionTree`.
+"""
 mutable struct InteractionTree{L}
 	Ops::Vector{Vector{AbstractLocalOperator}} # Ops[si][idx]
 	Refs::Dict{String, Dict}
@@ -67,7 +152,10 @@ function show(io::IO, obj::InteractionTree{L}) where L
 	return nothing
 end
 
-
+"""
+	merge!(Tree::InteractionTree) -> Tree::InteractionTree
+Merge interactions with same left or right environment tensor. Symmetrical merging from boundary to bulk is used here, which works well for most cases.
+"""
 function merge!(Tree::InteractionTree{L}) where L
 
 	lsnode_L = InteractionTreeNode[Tree.RootL]
@@ -289,7 +377,7 @@ function merge!(Tree::InteractionTree{L}) where L
 				# use temp ref 
 				ch = InteractionChannel([idx], Ref{Number}(1.0), node, ch_i.LeafR)
 				pushfirst!(node.Intrs, ch)
-                    push!(ch_i.LeafR.Intrs, ch)
+				push!(ch_i.LeafR.Intrs, ch)
 			end
 
 			i += 1
@@ -303,65 +391,65 @@ function merge!(Tree::InteractionTree{L}) where L
 		end
 	end
 
-     # add nodes  
-     lsnode_L = InteractionTreeNode[Tree.RootL]
+	# add nodes  
+	lsnode_L = InteractionTreeNode[Tree.RootL]
 	lschild_L = InteractionTreeNode[]
 	lsnode_R = InteractionTreeNode[Tree.RootR]
 	lschild_R = InteractionTreeNode[]
 	for si_count in 0:L
 		# left to right
-          si = si_count
-          empty!(lschild_L)
-          for node in lsnode_L 
-               ids = findall(node.Intrs) do ch
-                    length(ch.Ops) ≥ 1
-               end
+		si = si_count
+		empty!(lschild_L)
+		for node in lsnode_L
+			ids = findall(node.Intrs) do ch
+				length(ch.Ops) ≥ 1
+			end
 
-               for i in ids 
-                    ch = node.Intrs[i]
-                    node_new = InteractionTreeNode((si + 1, ch.Ops[1]), node)
-                    push!(node.children, node_new)
+			for i in ids
+				ch = node.Intrs[i]
+				node_new = InteractionTreeNode((si + 1, ch.Ops[1]), node)
+				push!(node.children, node_new)
 
-                    # update ch
-                    deleteat!(ch.Ops, 1)
-                    ch.LeafL = node_new
+				# update ch
+				deleteat!(ch.Ops, 1)
+				ch.LeafL = node_new
 
-                    push!(node_new.Intrs, ch)
-               end
-               deleteat!(node.Intrs, ids)
+				push!(node_new.Intrs, ch)
+			end
+			deleteat!(node.Intrs, ids)
 
-               append!(lschild_L, node.children)
-          end
+			append!(lschild_L, node.children)
+		end
 
-          append!(empty!(lsnode_L), lschild_L)
+		append!(empty!(lsnode_L), lschild_L)
 
-          # right to left
-          si = L - si_count + 1
-          empty!(lschild_R)
-          for node in lsnode_R
-               ids = findall(node.Intrs) do ch
-                    length(ch.Ops) ≥ 1
-               end
+		# right to left
+		si = L - si_count + 1
+		empty!(lschild_R)
+		for node in lsnode_R
+			ids = findall(node.Intrs) do ch
+				length(ch.Ops) ≥ 1
+			end
 
-               for i in ids
-                    ch = node.Intrs[i]
-                    node_new = InteractionTreeNode((si - 1, ch.Ops[end]), node)
-                    push!(node.children, node_new)
+			for i in ids
+				ch = node.Intrs[i]
+				node_new = InteractionTreeNode((si - 1, ch.Ops[end]), node)
+				push!(node.children, node_new)
 
-                    # update ch
-                    deleteat!(ch.Ops, length(ch.Ops))
-                    ch.LeafR = node_new
+				# update ch
+				deleteat!(ch.Ops, length(ch.Ops))
+				ch.LeafR = node_new
 
-                    push!(node_new.Intrs, ch)
-               end
-               deleteat!(node.Intrs, ids)
+				push!(node_new.Intrs, ch)
+			end
+			deleteat!(node.Intrs, ids)
 
-               append!(lschild_R, node.children)
-          end
+			append!(lschild_R, node.children)
+		end
 
-          append!(empty!(lsnode_R), lschild_R)
+		append!(empty!(lsnode_R), lschild_R)
 
-     end
+	end
 
 	return Tree
 end

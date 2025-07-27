@@ -7,7 +7,7 @@ Note this may change the `Center` of the environment `obj`.
 
 # Kwargs
      normalize::Bool = false
-If `true`, calculate `⟨Ψ₁|H|Ψ₂⟩/⟨Ψ₁|Ψ₂⟩` instead of `⟨Ψ₁|H|Ψ₂⟩` for example.
+If `true`, calculate `⟨Ψ₁|H|Ψ₂⟩/(|Ψ₁||Ψ₂|)` instead of `⟨Ψ₁|H|Ψ₂⟩`.
 
      split::Bool = false
 Split the value into each contribution of each left boundary environment if `true`. Thus, return a vector instead of a scalar in this case. 

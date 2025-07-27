@@ -1,0 +1,5 @@
+[deps]
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+FiniteLattices = "650210df-7c64-40ac-8e1f-94ea4f378b07"
+FiniteMPS = "6b572690-f317-4dad-a5fe-5fe73a0b7d42"
+NumericalIntegration = "e7bfaba1-d571-5449-8927-abc22e82249b"

@@ -21,12 +21,16 @@ function addObs!(Tree::ObservableTree{L},
      haskey(Tree.Refs[IntrName], si) && return nothing
 
 	# construct LocalOperators
-	aspace = trivial(codomain(Op[1])[1])
+	ref_aspace = Ref{VectorSpace}(trivial(codomain(Op[1])[1]))
 	lsOp = map(Op, si, fermionic, name) do o, s, f, n
-		Oi = LocalOperator(o, n, s, f; aspace = (aspace, aspace)) 
-		aspace =  getRightSpace(Oi)
+		Oi = LocalOperator(o, n, s, f; aspace = (ref_aspace[], ref_aspace[])) 
+		ref_aspace[] =  getRightSpace(Oi)
 		return Oi
 	end
+
+	# make sure the auxiliary bond is on the left 
+	lsOp = _rightOp(lsOp)
+
 	S = StringOperator(lsOp..., 1.0) |> sort! |> reduce!
      # move the possible coefficient -1 to the last operator
      S.Ops[end].A = S.strength * S.Ops[end].A

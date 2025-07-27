@@ -216,17 +216,6 @@ function iterate(iter::ArbitraryInteractionIterator{L}, st::Tuple{Int64, Int64, 
      end
 end
 
-# make sure the additional horizontal bond is on the left, used in ITP
-function _rightOp(A::LocalOperator{R₁, R₂}, B::LocalOperator{R₂, 1}) where {R₁, R₂}
-     return A, B     
-end
-function _rightOp(A::LocalOperator{1, 2}, B::LocalOperator{2, 2})
-     @tensor AB[f a b; d e] := A.A[a b c] * B.A[c d e f]  
-     # QR
-     TA, TB = leftorth(AB)
-     return LocalOperator(permute(TA, ((1, 2), (3, 4))), A.name, A.si, A.fermionic, A.strength), LocalOperator(permute(TB, ((1, 2), (3, ))), B.name, B.si, B.fermionic, B.strength)
-end
-
 _getZ(::Nothing, ::Int64) = nothing
 _getZ(Z::AbstractTensorMap, ::Int64) = Z
 _getZ(Z::Vector{AbstractTensorMap}, i::Int64) = Z[i]

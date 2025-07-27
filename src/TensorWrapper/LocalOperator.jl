@@ -24,9 +24,9 @@ end
 *(::Nothing, ::AbstractLocalOperator) = nothing
 *(::AbstractLocalOperator, ::Nothing) = nothing
 zero(::AbstractLocalOperator) = nothing
-+(::Nothing, a::Number) = a 
-+(a::Number, ::Nothing) = a 
-*(::Nothing, ::Number) = nothing 
++(::Nothing, a::Number) = a
++(a::Number, ::Nothing) = a
+*(::Nothing, ::Number) = nothing
 *(::Number, ::Nothing) = nothing
 
 """
@@ -47,7 +47,7 @@ mutable struct IdentityOperator <: AbstractLocalOperator
 	aspace::VectorSpace
 	si::Int64
 	strength::Ref{Number}
-	function IdentityOperator(pspace::VectorSpace, aspace::VectorSpace,  si::Int64, strength::Ref{<:Number} = Ref{Number}(NaN))
+	function IdentityOperator(pspace::VectorSpace, aspace::VectorSpace, si::Int64, strength::Ref{<:Number} = Ref{Number}(NaN))
 		return new(pspace, aspace, si, strength)
 	end
 	function IdentityOperator(pspace::VectorSpace, aspace::VectorSpace, si::Int64, strength::Number)
@@ -167,7 +167,7 @@ mutable struct LocalOperator{R₁, R₂} <: AbstractLocalOperator
 
 		# deduce aspace, use input only if R₁ == R₂ == 1
 		if (R₁, R₂) == (1, 2)
-			aspace = (trivial(codomain(O)[1]), domain(O)[2]) 
+			aspace = (trivial(codomain(O)[1]), domain(O)[2])
 		elseif (R₁, R₂) == (2, 1)
 			aspace = (codomain(O)[1], trivial(codomain(O)[1]))
 		elseif (R₁, R₂) == (2, 2)
@@ -226,7 +226,7 @@ Test if two LocalOperator objects are equal. Note we do not consider the field `
 ==(::AbstractLocalOperator, ::AbstractLocalOperator) = false
 function ==(A::IdentityOperator, B::IdentityOperator)
 	A.aspace ≠ B.aspace && return false
-	return A.si == B.si 
+	return A.si == B.si
 end
 function ==(A::LocalOperator{R₁, R₂}, B::LocalOperator{R₁, R₂}) where {R₁, R₂}
 	A.name ≠ B.name && return false
@@ -288,8 +288,8 @@ function *(O::LocalOperator{R₁, R₂}, A::MPSTensor{R₃}) where {R₁, R₂, 
 	pA = ((2,), Tuple(setdiff(1:R₃, 2)))
 	pOA = ((R₁ + R₂, 1:R₁...), (R₁+R₂+1:R₁+R₂+R₃-3..., R₁+1:R₁+R₂-1..., R₁ + R₂ + R₃ - 2))
 
-     OA = TensorOperations.tensorcontract(O.A, pO, false, A.A, pA, false, pOA, O.strength[])
-     return MPSTensor(OA)
+	OA = TensorOperations.tensorcontract(O.A, pO, false, A.A, pA, false, pOA, O.strength[])
+	return MPSTensor(OA)
 end
 
 # node we only apply * in addIntr..., hence we assert A.strength == B.strength == NaN 
@@ -308,7 +308,7 @@ function *(A::LocalOperator{1, 1}, B::LocalOperator{1, 1})
 	@assert A.si == B.si && isnan(A.strength[]) && isnan(B.strength[])
 	@tensor O[a; c] := A.A[a b] * B.A[b c]
 	fermionic = A.fermionic ⊻ B.fermionic
-	aspace = map(A.aspace, B.aspace) do va, vb 
+	aspace = map(A.aspace, B.aspace) do va, vb
 		fuse(va, vb)
 	end
 	return LocalOperator(O, A.name * B.name, A.si, fermionic; aspace = aspace)
@@ -318,7 +318,7 @@ function *(A::LocalOperator{1, 1}, B::LocalOperator{1, 2})
 	@tensor O[a; c d] := A.A[a b] * B.A[b c d]
 	tag = (A.tag[1], B.tag[2])
 	fermionic = A.fermionic ⊻ B.fermionic
-	aspace = map(A.aspace, B.aspace) do va, vb 
+	aspace = map(A.aspace, B.aspace) do va, vb
 		fuse(va, vb)
 	end
 	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag; aspace = aspace)
@@ -328,7 +328,7 @@ function *(A::LocalOperator{1, 1}, B::LocalOperator{2, 1})
 	@tensor O[c a; d] := A.A[a b] * B.A[c b d]
 	tag = ((B.tag[1][1], A.tag[1][1]), B.tag[2])
 	fermionic = A.fermionic ⊻ B.fermionic
-	aspace = map(A.aspace, B.aspace) do va, vb 
+	aspace = map(A.aspace, B.aspace) do va, vb
 		fuse(va, vb)
 	end
 	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag; aspace = aspace)
@@ -346,7 +346,7 @@ function *(A::LocalOperator{1, 2}, B::LocalOperator{1, 1})
 	@tensor O[a; d c] := A.A[a b c] * B.A[b d]
 	tag = (A.tag[1], (B.tag[2][1], A.tag[2][2]))
 	fermionic = A.fermionic ⊻ B.fermionic
-	aspace = map(A.aspace, B.aspace) do va, vb 
+	aspace = map(A.aspace, B.aspace) do va, vb
 		fuse(va, vb)
 	end
 	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag; aspace = aspace)
@@ -357,11 +357,11 @@ function *(A::LocalOperator{1, 2}, B::LocalOperator{2, 1})
 	if A.tag[2][2] == B.tag[1][1]
 		@tensor O[a; d] := A.A[a b c] * B.A[c b d]
 		tag = (A.tag[1], B.tag[2])
-		aspace = (getLeftSpace(A), getRightSpace(B)) 
+		aspace = (getLeftSpace(A), getRightSpace(B))
 	else
 		@tensor O[d a; e c] := A.A[a b c] * B.A[d b e]
 		tag = ((B.tag[1][1], A.tag[1][1]), (B.tag[2][1], A.tag[2][2]))
-		aspace = map(A.aspace, B.aspace) do va, vb 
+		aspace = map(A.aspace, B.aspace) do va, vb
 			fuse(va, vb)
 		end
 	end
@@ -381,9 +381,9 @@ function *(A::LocalOperator{1, 2}, B::LocalOperator{2, 2})
 
 	# match tags
 	# if A.tag[2][2] == B.tag[1][1]
-		@tensor O[a; e f] := A.A[a b c] * B.A[c b e f]
-		tag = (A.tag[1], B.tag[2])
-		aspace = (getLeftSpace(A), getRightSpace(B))
+	@tensor O[a; e f] := A.A[a b c] * B.A[c b e f]
+	tag = (A.tag[1], B.tag[2])
+	aspace = (getLeftSpace(A), getRightSpace(B))
 	# else
 	# 	@tensor O[d a; e c f] := A.A[a b c] * B.A[d b e f]
 	# 	tag = ((B.tag[1][1], A.tag[1][1]), (B.tag[2][1], A.tag[2][2], B.tag[2][2]))
@@ -396,7 +396,7 @@ function *(A::LocalOperator{2, 1}, B::LocalOperator{1, 1})
 	@tensor O[a b; d] := A.A[a b c] * B.A[c d]
 	tag = (A.tag[1], B.tag[2])
 	fermionic = A.fermionic ⊻ B.fermionic
-	aspace = map(A.aspace, B.aspace) do va, vb 
+	aspace = map(A.aspace, B.aspace) do va, vb
 		fuse(va, vb)
 	end
 	return LocalOperator(O, A.name * B.name, A.si, fermionic, tag; aspace = aspace)
@@ -414,9 +414,9 @@ function *(A::LocalOperator{2, 2}, B::LocalOperator{2, 1})
 
 	# match tags
 	# if A.tag[2][2] == B.tag[1][1]
-		@tensor O[a b; e] := A.A[a b c d] * B.A[d c e]
-		tag = (A.tag[1], B.tag[2])
-		aspace = (getLeftSpace(A), getRightSpace(B))
+	@tensor O[a b; e] := A.A[a b c d] * B.A[d c e]
+	tag = (A.tag[1], B.tag[2])
+	aspace = (getLeftSpace(A), getRightSpace(B))
 	# else
 	# 	@tensor O[a e b; f d] := A.A[a b c d] * B.A[e c f]
 	# 	tag = ((A.tag[1][1], B.tag[1][1], A.tag[1][2]), (B.tag[2][1], A.tag[2][2]))
@@ -429,9 +429,9 @@ function *(A::LocalOperator{2, 2}, B::LocalOperator{2, 2})
 
 	# match tags
 	# if A.tag[2][2] == B.tag[1][1]
-		@tensor O[a b; e f] := A.A[a b c d] * B.A[d c e f]
-		tag = (A.tag[1], B.tag[2])
-		aspace = (getLeftSpace(A), getRightSpace(B))
+	@tensor O[a b; e f] := A.A[a b c d] * B.A[d c e f]
+	tag = (A.tag[1], B.tag[2])
+	aspace = (getLeftSpace(A), getRightSpace(B))
 	# else
 	# 	@tensor O[a e b; f d g] := A.A[a b c d] * B.A[e c f g]
 	# 	tag = ((A.tag[1][1], B.tag[1][1], A.tag[1][2]), (B.tag[2][1], A.tag[2][2], B.tag[2][2]))
@@ -444,9 +444,9 @@ function _swapOp(obj::LocalOperator{R₁, R₂}) where {R₁, R₂}
 	perms = (((R₁+2:R₁+R₂)..., R₁), (R₁ + 1, (1:R₁-1)...))
 	O = permute(obj.A, perms)
 	tag = ((obj.tag[2][2:end]..., obj.tag[1][end]), (obj.tag[2][1], obj.tag[1][1:end-1]...))
-	if R₁ == R₂ == 1 
+	if R₁ == R₂ == 1
 		# propagate aspace
-		aspace = (getRightSpace(obj), getLeftSpace(obj)) 
+		aspace = (getRightSpace(obj), getLeftSpace(obj))
 		return LocalOperator(O, obj.name, obj.si, obj.fermionic, obj.strength, tag; aspace = aspace)
 	else
 		# deduce in constructor
@@ -464,6 +464,7 @@ function _leftOp(obj::LocalOperator{R₁, R₂}) where {R₁, R₂}
 end
 _leftOp(obj::LocalOperator{1, 1}) = obj
 
+# make sure the additional horizontal bond is on the left, used in ITP
 function _rightOp(obj::LocalOperator{R₁, R₂}) where {R₁, R₂}
 	# transform to a right operator, i.e. R₂ == 1
 	perms = (((1:R₁-1)..., (R₁+2:R₁+R₂)..., R₁), (R₁ + 1,))
@@ -473,6 +474,22 @@ function _rightOp(obj::LocalOperator{R₁, R₂}) where {R₁, R₂}
 end
 _rightOp(obj::LocalOperator{1, 1}) = obj
 
+function _rightOp(A::LocalOperator{R₁, R₂}, B::LocalOperator{R₂, 1}) where {R₁, R₂}
+	return A, B
+end
+function _rightOp(A::LocalOperator{1, 2}, B::LocalOperator{2, 2})
+	@tensor AB[f a b; d e] := A.A[a b c] * B.A[c d e f]
+	# QR
+	TA, TB = leftorth(AB)
+	return LocalOperator(permute(TA, ((1, 2), (3, 4))), A.name, A.si, A.fermionic, A.strength), LocalOperator(permute(TB, ((1, 2), (3,))), B.name, B.si, B.fermionic, B.strength)
+end
+function _rightOp(lsOp::NTuple{N, LocalOperator}) where N
+	if N == 1
+		return (_rightOp(lsOp...),)
+	else
+		return _rightOp(lsOp...)
+	end
+end
 
 # dimension of left/right auxiliary bond
 function _vdim(O::IdentityOperator, idx::Int64)
