@@ -5,16 +5,16 @@ using FiniteMPS, FiniteLattices, CairoMakie, Statistics, NumericalIntegration
 include("Model.jl")
 
 LocalSpace = U1Spin # NoSymSpinOneHalf, U1Spin, SU2Spin
-L = 64
+L = 32
 J′ = 0.0
-Δ = 1.0 # XXZ anisotropy: Sxx + Syy + ΔSzz
-D = 256
+Δ = 2.0 # XXZ anisotropy: Sxx + Syy + ΔSzz
+D = 128
 etol = 1e-8 # tolerance of per site energy
 LocalSpace == SU2Spin && @assert Δ == 1.0
 j_ref = div(L, 2) # reference site for S_j^-
 
-lst = 0:0.5:10 # time list
-lsω = 0:0.1:4 # frequency list
+lst = 0:1.0:10 # time list
+lsω = 0:0.1:5 # frequency list
 
 # generate a 1d chain lattice, as a special case of square lattice
 Latt = OpenSqua(L, 1)
