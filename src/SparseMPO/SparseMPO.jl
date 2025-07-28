@@ -8,7 +8,7 @@ Concrete type of sparse MPO.
 Note an instance of this type is usually a Hamiltonian,  which will not cost too much memory, therefore we always store the local tensors in memory.
 
 # Constructors
-	 SparseMPO(A::AbstractVector{SparseMPOTensor})
+	SparseMPO(A::AbstractVector{SparseMPOTensor})
 """
 struct SparseMPO{L} <: AbstractMPS{L}
 	A::Vector{SparseMPOTensor}

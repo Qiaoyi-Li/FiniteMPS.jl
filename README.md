@@ -1,6 +1,11 @@
 # FiniteMPS.jl
 
-This package provides the basic MPS operations and also some high-level algorithms. 
+A julia package for finite MPS/MPO-based computations of ground-state, finite-temperature and dynamical properties.
+
+[![][docs-latest-img]][docs-latest-url]
+
+[docs-latest-img]: https://img.shields.io/badge/docs-latest-blue.svg
+[docs-latest-url]: https://qiaoyi-li.github.io/FiniteMPS.jl/dev
 
 ## Features
 ### Performance

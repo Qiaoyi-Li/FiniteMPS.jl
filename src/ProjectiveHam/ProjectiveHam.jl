@@ -4,6 +4,31 @@ Abstract type of all projective Hamiltonian.
 """
 abstract type AbstractProjectiveHamiltonian end
 
+"""
+	mutable struct SimpleProjectiveHamiltonian{N} <: AbstractProjectiveHamiltonian
+		El::LocalLeftTensor
+	 	Er::LocalRightTensor
+	 	H::NTuple{N, AbstractLocalOperator}
+	 	cache::Vector{<:AbstractTensorMap}
+	end
+
+Concrete type of simple (i.e. `El`, `H` and `Er` define a single interaction term) `N`-site projective Hamiltonian.
+
+# Fields
+	El::LocalLeftTensor
+	Er::LocalRightTensor
+Left and right environment tensors.
+
+	H::NTuple{N, AbstractLocalOperator}
+The `N` local operators in Hamiltonian that define the interaction term.
+
+	cache::Vector{<:AbstractTensorMap}
+A cache to store the intermediate tensors when the projective Hamiltonian acts on a state, which will be freed when the object is finalized.
+
+# Constructors
+	SimpleProjectiveHamiltonian(El::LocalLeftTensor, Er::LocalRightTensor, H::AbstractLocalOperator...)
+Construct a simple projective Hamiltonian from `El`, `Er` and `H`, where `N` is automatically deduced from the length of `H`.
+"""
 mutable struct SimpleProjectiveHamiltonian{N} <: AbstractProjectiveHamiltonian
 	El::LocalLeftTensor
 	Er::LocalRightTensor
@@ -29,6 +54,25 @@ mutable struct SimpleProjectiveHamiltonian{N} <: AbstractProjectiveHamiltonian
 	end
 end
 
+"""
+	mutable struct CompositeProjectiveHamiltonian{L} <: AbstractProjectiveHamiltonian
+		PH::Vector{SimpleProjectiveHamiltonian{L}}
+		E₀::Float64
+	end
+
+Concrete type of composite projective Hamiltonian, which is a collection of simple projective Hamiltonians.
+
+# Fields
+	PH::Vector{SimpleProjectiveHamiltonian{L}}
+A vector that stores all contained simple projective Hamiltonians.
+
+	E₀::Float64
+The energy offset. The projective Hamiltonian actually acts on a state as `H - E₀`, usually used to avoid numerical unstableness in Krylov methods.
+
+# Constructors
+	CompositeProjectiveHamiltonian(El::SparseLeftTensor, Er::SparseRightTensor, H::NTuple{L, SparseMPOTensor}, E₀::Float64 = 0.0) 
+Construct a composite projective Hamiltonian from the sparse left and right tensors `El`, `Er` and `H`, which directly provided by a `SparseEnvironment`.
+"""
 mutable struct CompositeProjectiveHamiltonian{L} <: AbstractProjectiveHamiltonian
 	PH::Vector{SimpleProjectiveHamiltonian{L}}
 	E₀::Float64
@@ -63,134 +107,26 @@ mutable struct CompositeProjectiveHamiltonian{L} <: AbstractProjectiveHamiltonia
 	end
 end
 
-
-# mutable struct CompositeProjectiveHamiltonian{L, N} <: AbstractProjectiveHamiltonian
-# 	PH::Vector{SimpleProjectiveHamiltonian{L}}
-# 	CI::NTuple{N, Channel}
-# 	CO::NTuple{N, Channel}
-# 	tasks::NTuple{N, Task}
-# 	E₀::Float64
-# 	function CompositeProjectiveHamiltonian(
-# 		El::SparseLeftTensor,
-# 		Er::SparseRightTensor,
-# 		H::NTuple{L, SparseMPOTensor},
-# 		E₀::Float64 = 0.0) where L
-
-# 		validIdx = _countIntr(El, Er, H)
-# 		if get_num_workers() == 1 # multithreading
-# 			N = min(get_num_threads_action(), length(validIdx))
-# 		else
-# 			@assert false "TODO: multiprocessing!"
-# 		end
-
-# 		lsPH = map(validIdx) do idx
-# 			Hi = map(1:L) do i
-# 				H[i][idx[i], idx[i+1]]
-# 			end
-# 			SimpleProjectiveHamiltonian(El[idx[1]], Er[idx[end]], Hi...)
-# 		end
-
-# 		# static distributing
-# 		lsids = map(Tuple(1:N)) do i
-# 			Int64[]
-# 		end
-# 		i = idx_next = 1
-# 		d = 1
-# 		while i ≤ length(validIdx)
-# 			push!(lsids[idx_next], i)
-# 			# snake-like
-# 			if i % N == 0
-# 				d *= -1
-# 			else
-# 				idx_next += d
-# 			end
-# 			i += 1
-# 		end
-
-# 		# input channels 
-# 		CI = map(Tuple(1:N)) do _
-# 			Channel(0)
-# 		end
-# 		# output channels
-# 		CO = map(Tuple(1:N)) do _
-# 			Channel(0)
-# 		end
-
-# 		# tasks
-# 		tasks = map(lsids, CI, CO) do ids, c_in, c_out
-# 			t = Threads.@spawn begin
-# 				# # task local PH 
-# 				# local lsPH = map(validIdx[ids]) do idx
-# 				# 	Hi = map(1:L) do i
-# 				# 		H[i][idx[i], idx[i+1]]
-# 				# 	end
-# 				# 	SimpleProjectiveHamiltonian(El[idx[1]], Er[idx[end]], Hi...)
-# 				# end
-
-# 				while isopen(c_in)
-# 					# keep waiting state tensor
-# 					x = take!(c_in)
-# 					if isnothing(x)
-# 						# signal to kill the task
-# 						# for PH in lsPH
-# 						# 	finalize(PH)
-# 						# end
-# 						break
-# 					end
-
-# 					try
-# 						# apply the action one by one 
-# 						s = zero(x)
-# 						for PH in lsPH[ids]
-# 							add!(s, action(x, PH))
-# 						end
-# 						# put the result to c_out 
-# 						put!(c_out, s)
-# 					catch e
-# 						# for PH in lsPH
-# 						# 	finalize(PH)
-# 						# end
-# 						# put the error to c_out
-# 						put!(c_out, e)
-# 						rethrow(e)
-# 					end
-# 				end
-# 			end
-#                errormonitor(t)
-# 		end
-
-# 		obj = new{L, N}(lsPH, CI, CO, tasks, E₀)
-
-# 		# finalizer 
-# 		finalizer(obj) do o
-# 			# sent nothing to kill the task 
-# 			# note the channel will be closed automatically after the task finish
-# 			for c in o.CI
-# 				Threads.@spawn put!(c, nothing)
-# 			end
-# 			for c in o.CO
-# 				Threads.@spawn close(c)
-# 			end
-# 			for PH in o.PH
-# 				finalize(PH)
-# 			end
-# 			wait.(o.tasks)
-# 			return nothing
-# 		end
-
-# 		return obj
-
-# 	end
-# end
-
 """
-	 struct IdentityProjectiveHamiltonian{N} <: AbstractProjectiveHamiltonian
-		  El::SimpleLeftTensor
-		  Er::SimpleRightTensor
-		  si::Vector{Int64}
-	 end
+	struct IdentityProjectiveHamiltonian{N} <: AbstractProjectiveHamiltonian
+		El::SimpleLeftTensor
+		Er::SimpleRightTensor
+		si::Vector{Int64}
+	end
 
 Special type to deal with the cases which satisfy ⟨Ψ₁|Id|Ψ₂⟩ == ⟨Ψ₁|Ψ₂⟩, thus the environment is a 2-layer simple one.
+
+# Fields
+	El::SimpleLeftTensor
+	Er::SimpleRightTensor
+Left and right environment tensors.
+
+	si::Vector{Int64}
+A length-`2` vector to label the starting and ending sites of the projective Hamiltonian.
+
+# Constructors
+	IdentityProjectiveHamiltonian(El::SimpleLeftTensor, Er::SimpleRightTensor, si::Vector{Int64})
+Construct a projective Hamiltonian that corresponds to an identity operator, where the sites are deduced from `si`.
 """
 struct IdentityProjectiveHamiltonian{N} <: AbstractProjectiveHamiltonian
 	El::SimpleLeftTensor
