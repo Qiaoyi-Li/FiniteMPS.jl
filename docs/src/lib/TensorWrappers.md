@@ -1,4 +1,4 @@
-# Tensor wrappers
+# Tensor Wrappers
 
 Wrap pure `TensorMap` in TensorKit.jl for multiple dispatch. 
 

@@ -11,13 +11,13 @@ A julia package for finite MPS/MPO-based computations of ground-state, finite-te
 
 ## Features
 ### Versatility
-- FiniteMPS.jl integrates multiple algorithms for studying a quantum many-body system: DMRG for ground state, [tanTRG](https://doi.org/10.1103/PhysRevLett.130.226502) for finite-T and [TDVP](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.107.070601) for dynamics, see [Tutorial/Heisenberg](https://qiaoyi-li.github.io/FiniteMPS.jl/stable/tutorial/heisenberg).
-- Both spin and fermion systems are supported, see [Tutorial/Hubbard](https://qiaoyi-li.github.io/FiniteMPS.jl/stable/tutorial/hubbard).
+- FiniteMPS.jl integrates multiple algorithms for studying a quantum many-body system: DMRG for ground state, [tanTRG](https://doi.org/10.1103/PhysRevLett.130.226502) for finite-T and [TDVP](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.107.070601) for dynamics, see [Tutorial/Heisenberg](https://qiaoyi-li.github.io/FiniteMPS.jl/stable/tutorial/Heisenberg).
+- Both spin and fermion systems are supported, see [Tutorial/Hubbard](https://qiaoyi-li.github.io/FiniteMPS.jl/stable/tutorial/Hubbard).
 
 ### Convenience
 - The MPS-level operations are separated with the lower tensor-level operations so that modifying codes with different symmetries, lattices and models is quite simple.
-- We provide an interface to adding arbitrary multi-site interactions so that the Hamiltonian MPO can be generated in a simple and general way, see [Tutorial/Hamiltonian](https://qiaoyi-li.github.io/FiniteMPS.jl/stable/tutorial/hamiltonian).
-- We also provide a similar interface for calculating arbitrary observables (e.g. multi-site correlations), see [Tutorial/Observable](https://qiaoyi-li.github.io/FiniteMPS.jl/stable/tutorial/observable). 
+- We provide an interface to adding arbitrary multi-site interactions so that the Hamiltonian MPO can be generated in a simple and general way, see [Tutorial/Hamiltonian](https://qiaoyi-li.github.io/FiniteMPS.jl/stable/tutorial/Hamiltonian).
+- We also provide a similar interface for calculating arbitrary observables (e.g. multi-site correlations), see [Tutorial/Observable](https://qiaoyi-li.github.io/FiniteMPS.jl/stable/tutorial/Observable). 
 
 ### Performance
 - We use the state-of-the-art tensor library [TensorKit.jl](https://github.com/Jutho/TensorKit.jl) to perform the basic tensor operations, so that non-abelian symmetries can significantly accelerate computations.
