@@ -1,1 +1,0 @@
-# Heisenberg XXZ model

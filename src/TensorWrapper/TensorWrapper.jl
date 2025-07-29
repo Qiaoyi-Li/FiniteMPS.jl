@@ -69,7 +69,7 @@ function axpby!(α::Number, A::T, β::Number, B::T) where {T<:AbstractTensorWrap
 end
 axpby!(α::Number, ::Nothing, β::Number, A::AbstractTensorWrapper) = rmul!(A, β)
 axpby!(α::Number, A::AbstractTensorWrapper, β::Number, ::Nothing) = axpy!(α, A, nothing)
-add!(A::AbstractTensorWrapper, B::AbstractTensorWrapper) = axpy!(true, B, A)
+add!(A::AbstractTensorWrapper, B::AbstractTensorWrapper, α::Number = 1.0, β::Number = 1.0) = axpby!(α, B, β, A)
 add!(A::AbstractTensorWrapper, ::Nothing) = A
 add!(::Nothing, A::AbstractTensorWrapper) = A
 

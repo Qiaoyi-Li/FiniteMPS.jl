@@ -1,0 +1,1 @@
+# [Hubbard Model](@id Hubbard)

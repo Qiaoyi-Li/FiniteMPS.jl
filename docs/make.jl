@@ -1,7 +1,11 @@
 using Documenter, FiniteMPS
 
 pages = ["Home" => "index.md",
-	"Tutorial" => ["tutorial/HeisenbergXXZ.md"],
+	"Tutorial" => ["tutorial/Threading.md",
+		"tutorial/Hamiltonian.md",
+		"tutorial/Observable.md",
+		"tutorial/Heisenberg.md",
+		"tutorial/Hubbard.md"],
 	"Local Space" => ["localspace/Spin.md",
 		"localspace/Fermion.md",
 	],

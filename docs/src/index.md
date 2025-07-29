@@ -6,15 +6,18 @@
 CurrentModule = FiniteMPS
 ```
 
-## Package summary
-
 ## Tutorial
 ```@contents
-Pages = ["tutorial/HeisenbergXXZ.md"]
+Pages = ["tutorial/Threading.md",
+"tutorial/Hamiltonian.md",
+"tutorial/Observable.md",
+"tutorial/Heisenberg.md",
+"tutorial/Hubbard.md"
+]
 Depth = 2
 ```
 
-## Local Space
+## LocalSpace
 ```@contents
 Pages = ["localspace/Spin.md",
 	"localspace/Fermion.md"

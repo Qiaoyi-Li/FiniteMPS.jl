@@ -7,60 +7,31 @@ A julia package for finite MPS/MPO-based computations of ground-state, finite-te
 [docs-latest-img]: https://img.shields.io/badge/docs-latest-blue.svg
 [docs-latest-url]: https://qiaoyi-li.github.io/FiniteMPS.jl/dev
 
-## Features
-### Performance
-I write this package aim to study some heavy quantum many-body problems (e.g. high-$T_c$ superconductivity, typical bond dimension $D \sim 10^4$  ), therefore the performance is the the most important metric.
 
-- Non-abelian symmetries (e.g. $U_1\times SU_2$ symmetry for spin-1/2 fermions) can significantly accelerate the computation, therefore we choose [TensorKit.jl](https://github.com/Jutho/TensorKit.jl) as the backend to perform the basic tensor operations.
-- The hamiltonian MPO can be represented as a sparse one with abstract horizontal bonds so that the interaction terms can be distributed to different threads or workers, together with nested multi-threaded BLAS (with the help of [MKL.jl](https://github.com/JuliaLinearAlgebra/MKL.jl)).
-- The local operators are classified and wrapped as parametric types for further optimizations via multiple dispatch.
-- [Controlled bond expansion (CBE)](https://doi.org/10.1103/PhysRevLett.130.246402) techniques are implemented (modified for compatibility with parallelism) to reduce the complexity, e.g. $O(D^3d^2)$ to $O(D^3d)$ for DMRG and TDVP.
+## Features
+### Versatility
+- FiniteMPS.jl integrates multiple algorithms for studying a quantum many-body system: DMRG for ground state, [tanTRG](https://doi.org/10.1103/PhysRevLett.130.226502) for finite-T and [TDVP](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.107.070601) for dynamics, see [Tutorial/Heisenberg](https://qiaoyi-li.github.io/FiniteMPS.jl/dev/tutorial/heisenberg).
+- Both spin and fermion systems are supported, see [Tutorial/Hubbard](https://qiaoyi-li.github.io/FiniteMPS.jl/dev/tutorial/hubbard).
 
 ### Convenience
+- The MPS-level operations are separated with the lower tensor-level operations so that modifying codes with different symmetries, lattices and models is quite simple.
+- We provide an interface to adding arbitrary multi-site interactions so that the Hamiltonian MPO can be generated in a simple and general way, see [Tutorial/Hamiltonian](https://qiaoyi-li.github.io/FiniteMPS.jl/dev/tutorial/hamiltonian).
+- We also provide a similar interface for calculating arbitrary observables (e.g. multi-site correlations), see [Tutorial/Observable](https://qiaoyi-li.github.io/FiniteMPS.jl/dev/tutorial/observable). 
 
-- The MPS-level operations are separated with the lower tensor-level operations so modifying codes with different symmetries, lattices and models is quite simple.
-- We provide a hamiltonian generator via automata (like `OpSum` in [ITensors.jl](https://github.com/ITensor/ITensors.jl)) so that the interactions can be added in a simple and general way, details please see the tutorials.
-- We also provide some similar interfaces so that you can measure the  observales and correlations conveniently. Note these computations can also be multi-threaded.
-  
-### MPO supports
-[Our group](https://www.cqm2itp.com/) works on purification-based finite-temperature simulations therefore we provide more MPO supports than other MPS packages.
+### Performance
+- We use the state-of-the-art tensor library [TensorKit.jl](https://github.com/Jutho/TensorKit.jl) to perform the basic tensor operations, so that non-abelian symmetries can significantly accelerate computations.
+- The hamiltonian MPO can be represented as a sparse one with abstract horizontal bonds so that the interaction terms can be distributed to different threads or workers, together with nested multi-threaded BLAS (with the help of [MKL.jl](https://github.com/JuliaLinearAlgebra/MKL.jl)).
+- [Controlled bond expansion (CBE)](https://doi.org/10.1103/PhysRevLett.130.246402) techniques are implemented (modified for compatibility with parallelism) to reduce the complexity, e.g. $O(D^3d^2)$ to $O(D^3d)$ for DMRG and TDVP.
 
-- Almost all methods for MPS are also implemented for MPO.
-- Some finite-temperature algorithms such as series-expansion thermal tensor network ([SETTN](https://doi.org/10.1103/PhysRevB.95.161104)) and tangent space tensor renormalization group ([tanTRG](https://doi.org/10.1103/PhysRevLett.130.226502)) are provided.
-
-### Versatility
-Now this package contains
-
-- DMRG for searching ground states.
-- SETTN and tanTRG for finite-temperature simulations. Both thermal quantites and observables can be obtained.
-- Ground state and finite-temperature dynamics can be studied with real-time evolution based on TDVP. Note this is still under development.
-
-## Tutorial
-
-### Installation
-To install this package, you can press "]" in REPL and type
+## Quick start
+FiniteMPS.jl is a registered package. To install it, just press "]" in julia REPL and type
 ```julia
 pkg> add FiniteMPS
 ```
+ 
+A short tutorial to use this package is provided in [documentation](https://qiaoyi-li.github.io/FiniteMPS.jl/dev/), in where we give some demo scripts that solve ground-state, finite-T and dynamical properties of concrete models. 
 
-### Multi-threading settings
-- Only multi-threading is stable in current version, please make sure Julia is started with [multiple threads](https://docs.julialang.org/en/v1/manual/multi-threading/#man-multithreading). It will throw a warning to remind you when loading `FiniteMPS` with a single thread.
-  
-  TODO: I will add single-thread mode and try to support multi-processing in the future.
-
-- If the linear algebra backend is `OpenBlas`, nested multi-threading is forbidden (a related discussion [here](https://carstenbauer.github.io/ThreadPinning.jl/stable/explanations/blas/)). So just close the parallelism of BLAS via
-  ```julia
-  BLAS.set_num_threads(1)
-  ```
-
-- If using MKL as the linear algebra backend, you can set the number of blas threads similarly and nested multi-threading can be supported in this case. Note MKL is invalid for some cpus and you should also close the BLAS parallelism in such case. You can follow [MKL.jl](https://github.com/JuliaLinearAlgebra/MKL.jl) to check if MKL is loaded successfully or not.
-  
-   > [!WARNING] Warning: 
-     Please make sure the total threads number is not larger than the cpu cores (physical, without hyper-threading). Otherwise, the performance will become much worse due to confliction. You can estimate the total threads via    
-     ```julia
-     Threads.nthreads() * BLAS.get_num_threads()
-     ```   
-
+If you encounter any problem, please feel free to contact us (liqiaoyi@itp.ac.cn) or submit an issue.
 
 ### Local space
 The first step is to choose a local space, i.e. the local 1-site Hilbert space and some 1-site operators according to the model and symmetry used. We predefine some in folder `LocalSpace` and you can use the documentation to see which operators are provided in it, e.g 
@@ -152,18 +123,4 @@ Now you can obtain the spin correlation $\langle S_i^z S_j^z\rangle$ via `Obs.Sz
 > [!WARNING] Warning:
   There may exist undiscovered bugs, therefore, please use it at your own risk. Benchmark with exact diagonalization (ED) is strongly recommended before using it to simulate any new models.
 
-## Contributions
-### Authors
-- [Qiaoyi Li](https://github.com/Qiaoyi-Li) build the main architecture and the original version.
-- [Junsen Wang](https://github.com/phyjswang) will maintain the algorithms for spin systems.
-
-### How to contribute
-- If you benefit from this package, please star it.
-- If you find a bug, you can submit an issue or a PR if you have fixed it.
-- Add a new instance to LocalSpace folder and submit a PR. Note you should add some comments and document it so that others can easily use it.
-- If you are familiar with multi-processing parallelism in Julia and want to join us to improve the package, please contact us!  
-
-## Acknowledgments
-- This package uses [TensorKit.jl](https://github.com/Jutho/TensorKit.jl) to implement basic tensor operations.
-- This package uses [KrylovKit.jl](https://github.com/Jutho/KrylovKit.jl) as Lanczos solver in DMRG and TDVP.
-- I benefit a lot from reading the source code of [MPSKit.jl](https://github.com/maartenvd/MPSKit.jl) and [ITensors.jl](https://github.com/ITensor/ITensors.jl).
+## 
