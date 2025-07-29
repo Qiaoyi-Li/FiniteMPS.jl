@@ -1,4 +1,4 @@
-# Spin
+# Spin 
 
 Predefined local spaces for spin systems.
 

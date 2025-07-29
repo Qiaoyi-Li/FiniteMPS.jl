@@ -15,7 +15,7 @@ H = AutomataMPO(Tree)
 ```
 Here, we generate the Hamiltonian of a length-4 Ising chain. We first construct an empty `InteractionTree` object `Tree`, which is used to store all interactions with a bi-tree structure. 
 
-Then, we add the interaction terms one by one via a standard interface `addIntr!`, where a N-site interaction is characterized by three N-tuple of operators, sites, and fermion flags. For a Ising coupling, `N=2`. `U₁Spin.Sz` is the predefined spin operator with U(1) symmetry, more predefined operators are listed in [LocalSpace](https://qiaoyi-li.github.io/FiniteMPS.jl/dev/localspace/spin) section. `(i, i+1)` indicates the two operators are located in site `i` and `i+1`. `(false, false)` means both operators are bosonic.
+Then, we add the interaction terms one by one via a standard interface `addIntr!`, where a N-site interaction is characterized by three N-tuple of operators, sites, and fermion flags. For a Ising coupling, `N=2`. `U₁Spin.Sz` is the predefined spin operator with U(1) symmetry, more predefined operators are listed in [LocalSpace](@ref LocalSpace) section. `(i, i+1)` indicates the two operators are located in site `i` and `i+1`. `(false, false)` means both operators are bosonic.
 
 Finally, we use `AutomataMPO` to construct the Hamiltonian represented by a sparse MPO, whose local tensor is an abstract matrix (gives 2 bond indices) of local rank-2 operators (give 2 physical indices).
 ```@example Hamiltonian

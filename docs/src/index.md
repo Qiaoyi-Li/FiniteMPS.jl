@@ -17,7 +17,7 @@ Pages = ["tutorial/Threading.md",
 Depth = 2
 ```
 
-## LocalSpace
+## [LocalSpace](@id LocalSpace)
 ```@contents
 Pages = ["localspace/Spin.md",
 	"localspace/Fermion.md"

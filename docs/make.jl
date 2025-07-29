@@ -33,9 +33,20 @@ makedocs(;
 	pagesonly = true,
 )
 
-deploydocs(
-	repo = "github.com/Qiaoyi-Li/FiniteMPS.jl",
-	devbranch = "main",
-	devurl = "stable",
-	push_preview=true,
-)
+
+if haskey(ENV, "GITHUB_REF")
+	if ENV["GITHUB_REF"] == "main"
+		devbranch = "main"
+		devurl = "stable"
+	elseif ENV["GITHUB_REF"] == "dev"
+		devbranch = "dev"
+		devurl = "dev"
+
+	end
+	deploydocs(
+		repo = "github.com/Qiaoyi-Li/FiniteMPS.jl",
+		devbranch = devbranch,
+		devurl = devurl,
+		push_preview = true,
+	)
+end
