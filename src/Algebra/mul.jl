@@ -252,6 +252,11 @@ function mul!(C::DenseMPS, A::SparseMPO, B::DenseMPS; kwargs...)
 	return mul!(C, A, B, 1, 0; kwargs...)
 end
 
+"""
+	rmul!(A::DenseMPS, b::Number)
+
+In-place multiplication `A -> b*A` where `b` is a scalar.
+"""
 function rmul!(A::DenseMPS, b::Number)
 	# A -> b*A
 	A.c *= b

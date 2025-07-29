@@ -4,7 +4,7 @@
 		tol::Float64 = 1e-12
 	) -> H::SparseMPO
 
-Generate the Hamiltonian MPO `H::SparseMPO` according to the `InteractionTree`. 
+Generate the Hamiltonian MPO `H::SparseMPO` according to an `InteractionTree`. 
 
 # Kwargs 
 	compress::Int64 = 1

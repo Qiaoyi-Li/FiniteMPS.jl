@@ -42,6 +42,11 @@ function show(io::IO, obj::ObservableTree{L}) where L
 	return nothing
 end
 
+"""
+	merge!(Tree::ObservableTree) -> Tree::ObservableTree
+
+Merge observables in `Tree` that share the same parent node to reduce the computation cost of environment tensors. The behavior is similar to `merge!` for `InteractionTree`, but some detailed logic is different.
+"""
 function merge!(Tree::ObservableTree{L}) where L
 
 	lsnode_L = InteractionTreeNode[Tree.RootL]
@@ -220,6 +225,11 @@ function merge!(Tree::ObservableTree{L}) where L
 	return Tree
 end
 
+"""
+	treewidth(Tree::ObservableTree) -> Tuple{Int64, Int64}
+
+Return the tree width of the left and right trees. 
+"""
 function treewidth(Tree::ObservableTree)
 	return map([Tree.RootL, Tree.RootR]) do R
 		si_last = 0

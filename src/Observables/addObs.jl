@@ -1,3 +1,29 @@
+"""
+	addObs!(Tree::ObservableTree{L},
+		Op::NTuple{N, AbstractTensorMap},
+		si::NTuple{N, Int64},
+		fermionic::NTuple{N, Bool};
+		Z = nothing,
+		pspace = nothing,
+		name = _default_IntrName(N),
+		IntrName = prod(string.(name)),
+	) -> nothing 
+
+Add an `N`-site observable to `Tree`, where the observable is characterized by `N`-tuples `Op`, `si` and `fermionic`. The implementation and usage is similar to `addIntr!`, except for the logic to deal with same operator which is added twice.
+
+# Kwargs 
+	Z::Union{Nothing, AbstractTensorMap, Vector{<:AbstractTensorMap}}
+Provide the parity operator to deal with the fermionic anti-commutation relations.If `Z == nothing`, assume all operators are bosonic. Otherwise, a uniform (single operator) `Z::AbstractTensorMap` or site-dependent (length `L` vector) `Z::Vector{<:AbstractTensorMap}` should be given.
+
+	pspace::Union{Nothing, VectorSpace, Vector{<:VectorSpace}}
+Provide the local Hilbert space (`VectorSpace` in `TensorKit.jl`). This is not required in generating Hamiltonian, so the default value is set as `nothing`. But some processes like generating an identity MPO require this information. In such cases, a uniform or site-dependent (length `L` vector) `pspace` should be given.
+
+	name::NTuple{N, Union{Symbol, String}}
+Give a name of each operator.
+
+	IntrName::Union{Symbol, String}
+Give a name of the interaction, which is used as the key of `Tree.Refs::Dict` that stores interaction strengths. The default value is the product of each operator name.
+"""
 function addObs!(Tree::ObservableTree{L},
 	Op::NTuple{N, AbstractTensorMap},
 	si::NTuple{N, Int64},

@@ -85,14 +85,14 @@ include("ProjectiveHam/action1.jl")
 include("ProjectiveHam/action0.jl")
 
 # Interaction tree for generating Hamiltonian MPO 
-export InteractionTree, addIntr!, AutomataMPO
+export AbstractInteractionIterator, OnSiteInteractionIterator,TwoSiteInteractionIterator, ArbitraryInteractionIterator, InteractionChannel, InteractionTreeNode, InteractionTree, addIntr!, AutomataMPO
 include("IntrTree/IntrIterator.jl")
 include("IntrTree/IntrTree.jl")
 include("IntrTree/addIntr.jl")
 include("IntrTree/Automata.jl")
 
 # Observables
-export ObservableTree, addObs!, calObs!
+export ObservableTree, treewidth, addObs!, calObs!
 include("Observables/ObsTree.jl")
 include("Observables/addObs.jl")
 include("Observables/calObs.jl")
@@ -106,14 +106,15 @@ include("Observables/pushleft.jl")
 include("Observables/pushright.jl")
 include("Observables/convert.jl")
 
+
 # Algebra operations
 include("Algebra/inner.jl")
 include("Algebra/mul.jl")
 include("Algebra/axpby.jl")
 
 # Algorithm
-export LanczosInfo, BondInfo, DMRGInfo, TDVPInfo, DMRGSweep2!, DMRGSweep1!, SETTN, TDVPSweep2!, TDVPSweep1!, TDVPIntegrator, SymmetricIntegrator
-export CBEAlgorithm, NoCBE, FullCBE, NaiveCBE, CBE
+export LanczosGS, LanczosExp, LanczosInfo, BondInfo, DMRGInfo, TDVPInfo, DMRGSweep2!, DMRGSweep1!, SETTN, TDVPSweep2!, TDVPSweep1!, TDVPIntegrator, SymmetricIntegrator
+export CBEAlgorithm, NoCBE, FullCBE, NaiveCBE, CBE, CBEInfo, LeftOrthComplement, RightOrthComplement
 include("Algorithm/Lanczos/LanczosGS.jl")
 include("Algorithm/Lanczos/LanczosExp.jl")
 include("Algorithm/Info.jl")
@@ -123,13 +124,10 @@ include("Algorithm/TDVP/TDVP2.jl")
 include("Algorithm/TDVP/TDVP1.jl")
 include("Algorithm/TDVP/Integrator.jl")
 include("Algorithm/CBE/utils.jl")
-include("Algorithm/CBE/OrthComplement.jl")
-# include("Algorithm/CBE/preselect.jl")
-# include("Algorithm/CBE/finalselect.jl")
-# include("Algorithm/CBE/SparseSVD.jl")
 include("Algorithm/CBE/CBEAlgorithm.jl")
 include("Algorithm/CBE/CBE.jl")
 include("Algorithm/CBE/FullCBE.jl")
+include("Algorithm/CBE/OrthComplement.jl")
 include("Algorithm/CBE/NaiveCBE.jl")
 
 # predefined local spaces

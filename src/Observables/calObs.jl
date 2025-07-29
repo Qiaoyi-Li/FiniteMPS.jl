@@ -5,7 +5,7 @@
 		kwargs...
 	) -> TO::TimerOutput
 
-Calculate observables stored in `Tree`, using bra `⟨Ψ|` and ket `|Φ⟩`.
+Calculate `⟨Ψ|O|Φ⟩` of all observables `O` stored in `Tree`, using bra `⟨Ψ|` and ket `|Φ⟩`.
 
 # Kwargs 
 	El::AbstractTensorMap 

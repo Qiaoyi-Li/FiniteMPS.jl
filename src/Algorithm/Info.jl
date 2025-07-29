@@ -18,14 +18,6 @@ struct LanczosInfo
      a::Vector{Float64}
      b::Vector{Float64}
 end
-# function convert(::Type{LanczosInfo}, Info::KrylovKit.ConvergenceInfo)
-#      if isa(Info.normres, Float64)
-#           normres = [Info.normres,]
-#      else
-#           normres = Info.normres
-#      end
-#      return LanczosInfo(Info.converged > 0, normres, Info.numiter, Info.numops)
-# end
 function convert(::Type{LanczosInfo}, Info::NamedTuple)
      # my simple Lanczos 
      return LanczosInfo(true, Float64[], 1, length(Info.V), diag(Info.T), diag(Info.T, 1))

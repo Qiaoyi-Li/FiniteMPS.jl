@@ -1,4 +1,4 @@
-## MPS/MPO
+# MPS & MPO
 
 Wrap MPS and MPO as a vector of tensors together with some information.
 

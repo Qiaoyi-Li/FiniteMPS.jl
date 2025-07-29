@@ -233,7 +233,13 @@ end
 """
 const U1U1tJFermion = U₁U₁tJFermion
 
+"""
+     module ℤ₂SU₂tJFermion
 
+Prepare some commonly used objects for ℤ₂×SU₂ `tJ` fermions, i.e. local `d = 3` Hilbert space without double occupancy. 
+
+Behaviors of all operators are the same as `ℤ₂SU₂Fermion` up to the projection, details please see `ℤ₂SU₂Fermion`.
+"""
 module ℤ₂SU₂tJFermion
 
 using TensorKit

@@ -1,18 +1,52 @@
+"""
+	LanczosExp(f::Function, x₀, t::Number, args...;
+		K::Int64 = 32,
+		tol::Real = 1e-8,
+		callback::Union{Nothing, Function} = nothing,
+		verbose = false
+	) -> exp(At)*x, info::Dict{Symbol, Any}
+
+Compute `exp(At)x₀` for a hermitian map `A: x -> f(x, args...)` using the Lanczos algorithm. `f` can be any function as if it acts on `x` like an hermitian operator and preserves the type of `x`.
+	
+# Required methods	
+`x` can be any type as if it behaves like a vector in Hilbert space, i.e. the following methods are implemented:
+
+	eltype(x)
+Return the element type of `x`, e.g. `Float64` or `ComplexF64`.
+
+	normalize!(x)
+In-place normalize `x` according to the inner-induced norm.
+
+	norm(x)
+Return the inner-induced norm.
+
+	inner(x, y)
+Return the inner product `⟨x, y⟩`.
+
+	add!(y, x, α)
+In-place add `y -> y + αx`.
+
+	rmul!(x, α)
+In-place multiply `x -> αx`.
+
+# Kwargs 
+	K::Int64 = 32
+Krylov space dimension.
+
+	tol::Real = 1e-8
+Convergence tolerance.  
+
+	callback::Union{Nothing, Function} = nothing
+A in-placed callback function, applied to x after each iteration.
+
+	verbose::Bool = false
+If `true`, print convergence information.
+"""
 function LanczosExp(f::Function, x₀, t::NT, args...;
 	K::Int64 = 32,
 	tol::Real = 1e-8,
 	callback::Union{Nothing, Function} = nothing,
 	verbose::Bool = false) where NT
-	# Apply x -> exp^{At}x for hermitian map x -> f(x, args...) == Ax
-	# a in-placed callback function can be applied to x after each iteration
-	# required methods:
-	#    eltype(x)
-	#    normalize!(x)
-	#    norm(x)
-	#    inner(x, y)
-	#    add!(x, y, α): x -> x + αy
-	#    rmul!(x, α): x -> αx
-
 
 	T = zeros(K + 1, K + 1)  # tridiagonal matrix
 	lsb = Vector{Any}(undef, K + 1) # Lanczos vectors

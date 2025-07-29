@@ -193,6 +193,29 @@ function iterate(iter::TwoSiteInteractionIterator{L, <:AbstractTensorMap}, st::T
      return Op_wrap, (i + 1, getRightSpace(Op_wrap))
 end
 
+"""
+     ArbitraryInteractionIterator{L} <: AbstractInteractionIterator{L}
+          Ops::Vector{<:AbstractLocalOperator}
+          Z::Union{Nothing, AbstractTensorMap, AbstractVector{<:AbstractTensorMap}}
+          pspace::Union{Nothing, VectorSpace, Vector{<:VectorSpace}}
+     end
+
+The iterator for an arbitrary interaction term. 
+
+# Fields
+     Ops::Vector{<:AbstractLocalOperator}
+A vector to store the local operators, `length(Ops) == N` means a `N`-site interaction term.
+
+     Z::Union{Nothing, AbstractTensorMap, AbstractVector{<:AbstractTensorMap}}
+     pspace::Union{Nothing, VectorSpace, Vector{<:VectorSpace}}
+Provide the fermion parity operator `Z` and the local physical space `pspace`. Assume a site-independent `Z` or `pspace` if a single object is provided, otherwise, a length-`L` vector is expected to deal with the site-dependent cases.  
+
+# Constructors
+     ArbitraryInteractionIterator{L}(Ops::Vector{<:AbstractLocalOperator},
+          Z::Union{Nothing, AbstractTensorMap, AbstractVector{<:AbstractTensorMap}},
+          pspace::Union{Nothing, VectorSpace, Vector{<:VectorSpace}} = nothing)
+The direct constructor. 
+"""
 struct ArbitraryInteractionIterator{L} <: AbstractInteractionIterator{L}
      Ops::Vector{<:AbstractLocalOperator}
      Z::Union{Nothing, AbstractTensorMap, AbstractVector{<:AbstractTensorMap}}

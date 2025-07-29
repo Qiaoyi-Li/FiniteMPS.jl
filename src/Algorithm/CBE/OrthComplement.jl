@@ -1,3 +1,19 @@
+"""
+	struct LeftOrthComplement{N}
+		El::Vector{AbstractTensorMap}
+		Al::Vector{AbstractTensorMap}
+		Al_c::AbstractTensorMap
+	end
+
+A concrete type to deal with the left half of the orthogonal complement projector of 1-site tangent space in the 2-site variational space.
+
+# Constructors
+	LeftOrthComplement(El_i::SparseLeftTensor,
+		Al_c::MPSTensor{R},
+		Hl::SparseMPOTensor,
+		Al_i::MPSTensor = Al_c)
+Construct the object via providing the initial left environment tensor `El_i`, the left canonical MPS tensor `Al_c`, the Hamiltonian MPO tensor `Hl`, and the initial local tensor at the left site. The initialization process will automatically generate the temporary tensors `El` and `Al` that are used in the CBE algorithm.
+"""
 struct LeftOrthComplement{N}
 	El::Vector{AbstractTensorMap}
 	Al::Vector{AbstractTensorMap}
@@ -19,6 +35,22 @@ struct LeftOrthComplement{N}
 	end
 end
 
+"""
+	struct RightOrthComplement{N}
+		Er::Vector{AbstractTensorMap}
+		Ar::Vector{AbstractTensorMap}
+		Ar_c::AbstractTensorMap
+	end
+
+A concrete type to deal with the right half of the orthogonal complement projector of 1-site tangent space in the 2-site variational space.
+
+# Constructors
+	RightOrthComplement(Er_i::SparseRightTensor,
+		Ar_c::MPSTensor{R},
+		Hr::SparseMPOTensor,
+		Ar_i::MPSTensor{R} = Ar_c)
+Construct the object via providing the initial right environment tensor `Er_i`, the right canonical MPS tensor `Ar_c`, the Hamiltonian MPO tensor `Hr`, and the initial local tensor at the right site. The initialization process will automatically generate the temporary tensors `Er` and `Ar` that are used in the CBE algorithm.
+"""
 struct RightOrthComplement{N}
 	Er::Vector{AbstractTensorMap}
 	Ar::Vector{AbstractTensorMap}

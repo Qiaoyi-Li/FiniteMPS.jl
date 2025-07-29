@@ -1,16 +1,49 @@
+"""
+	LanczosGS(f::Function, x₀, args...;
+		K::Int64 = 32,
+		tol::Real = 1e-8,
+		callback::Union{Nothing, Function} = nothing,
+		verbose = false
+	) -> ϵg::Number, xg::AbstractVector, info::Dict{Symbol, Any}
+
+Solve the ground state problem for a hermitian map `x -> f(x, args...)` using the Lanczos algorithm. `f` can be any function as if it acts on `x` like an hermitian operator and preserves the type of `x`.
+	
+# Required methods	
+`x` can be any type as if it behaves like a vector in Hilbert space, i.e. the following methods are implemented:
+
+	normalize!(x)
+In-place normalize `x` according to the inner-induced norm.
+
+	norm(x)
+Return the inner-induced norm.
+
+	inner(x, y)
+Return the inner product `⟨x, y⟩`.
+
+	add!(y, x, α)
+In-place add `y -> y + αx`.
+
+	rmul!(x, α)
+In-place multiply `x -> αx`.
+
+# Kwargs 
+	K::Int64 = 32
+Krylov space dimension.
+
+	tol::Real = 1e-8
+Convergence tolerance.  
+
+	callback::Union{Nothing, Function} = nothing
+A in-placed callback function, applied to x after each iteration.
+
+	verbose::Bool = false
+If `true`, print convergence information.
+"""
 function LanczosGS(f::Function, x₀, args...;
 	K::Int64 = 32,
 	tol::Real = 1e-8,
 	callback::Union{Nothing, Function} = nothing,
-     verbose = false)
-     # Solve ground state problem for hermitian map x -> f(x, args...)
-     # a in-placed callback function can be applied to x after each iteration
-     # required methods:
-     #    normalize!(x)
-     #    norm(x)
-     #    inner(x, y)
-     #    add!(x, y, α): x -> x + αy
-     #    rmul!(x, α): x -> αx
+     verbose::Bool = false)
 
 	T = zeros(K + 1, K + 1)  # tridiagonal matrix
 	lsb = Vector{Any}(undef, K + 1) # Lanczos vectors

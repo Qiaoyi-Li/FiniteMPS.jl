@@ -24,7 +24,7 @@ Control the truncation in svd after each 2-site update. Details see `tsvd`.
 Print the `TimerOutput` after each sweep or each local update if `verbose = 1` or `2`, respectively.
 
      noise::Real = 0
-Add noise to the 2-site local tensor after each update. 
+Add noise to the 2-site local tensor after each update via applying a random gate to the physical indices. Note this is only a naive implementation, and may not work well for some cases. 
 """
 function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,MPS}}
      @assert Center(Env[3])[2] ≤ 2
@@ -185,7 +185,7 @@ CBE algorithm for 1-DMRG.
 Control the truncation after each update, only used together with CBE. Details see `tsvd`. 
 
      noise::NTuple{2, Float64} = (0.1, 0.0)
-Add noise to the 1-site local tensor after each Lanczos update. The first element is the ratio of additional bond dimension `(≤ 1.0)`, the second element is the noise strength.
+Add noise to the 1-site local tensor after each Lanczos update via expanding the bond and add a random tensor (normal distribution) to it. The first element is the ratio of additional bond dimension `(≤ 1.0)`, the second element is the noise strength.
 """
 function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,MPS}}
 
