@@ -36,19 +36,18 @@ makedocs(;
 
 if haskey(ENV, "GITHUB_REF")
 	@show ENV["GITHUB_REF"]
-	ref_devbranch = Ref{Any}()
-	ref_devurl = Ref{Any}()
-	if ENV["GITHUB_REF"] == "main"
-		ref_devbranch[] = "main"
-		ref_devurl[] = "stable"
-	else
-		ref_devbranch[] = "dev"
-		ref_devurl[] = "dev"
+	branch = splitpath(ENV["GITHUB_REF"])[end]
+	if branch == "main"
+		devbranch = "main"
+		devurl = "stable"
+	elseif branch == "dev"
+		devbranch = "dev"
+		devurl = "dev"
 	end
 	deploydocs(
 		repo = "github.com/Qiaoyi-Li/FiniteMPS.jl",
-		devbranch = ref_devbranch[],
-		devurl = ref_devurl[],
+		devbranch = devbranch,
+		devurl = devurl,
 		push_preview = true,
 	)
 end
