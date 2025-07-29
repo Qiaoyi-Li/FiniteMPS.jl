@@ -36,4 +36,6 @@ makedocs(;
 deploydocs(
 	repo = "github.com/Qiaoyi-Li/FiniteMPS.jl",
 	devbranch = "main",
+	devurl = "stable",
+	push_preview=true,
 )
