@@ -1,6 +1,6 @@
 # Observable
 
-We use a similar tree structure to calculating observables. For instance, we first generate a random product state. 
+We use a similar tree structure for calculating observables. For instance, we first generate a random product state. 
 ```@example Observable
 using FiniteMPS
 

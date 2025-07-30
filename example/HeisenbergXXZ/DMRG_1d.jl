@@ -16,7 +16,7 @@ Latt = OpenSqua(L, 1)
 # Hamiltonian MPO 
 H = AutomataMPO(HeisenbergXXZ(Latt; LocalSpace = LocalSpace, J′ = J′))
 
-# initial a random state
+# initialize a random state
 if LocalSpace == SU2Spin
 	aspace = Rep[SU₂](i => 1 for i in 0:1/2:1)
 elseif LocalSpace == U1Spin
