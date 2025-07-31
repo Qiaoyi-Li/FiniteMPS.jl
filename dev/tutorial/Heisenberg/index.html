@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Heisenberg Chain · FiniteMPS.jl</title><meta name="title" content="Heisenberg Chain · FiniteMPS.jl"/><meta property="og:title" content="Heisenberg Chain · FiniteMPS.jl"/><meta property="twitter:title" content="Heisenberg Chain · FiniteMPS.jl"/><meta name="description" content="Documentation for FiniteMPS.jl."/><meta property="og:description" content="Documentation for FiniteMPS.jl."/><meta property="twitter:description" content="Documentation for FiniteMPS.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">FiniteMPS.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Tutorial</span><ul><li><a class="tocitem" href="../Threading/">Multi-threading</a></li><li><a class="tocitem" href="../Hamiltonian/">Hamiltonian</a></li><li><a class="tocitem" href="../Observable/">Observable</a></li><li class="is-active"><a class="tocitem" href>Heisenberg Chain</a><ul class="internal"><li><a class="tocitem" href="#Ground-state"><span>Ground state</span></a></li><li><a class="tocitem" href="#Finite-temperature"><span>Finite temperature</span></a></li><li><a class="tocitem" href="#Spin-dynamics"><span>Spin dynamics</span></a></li></ul></li><li><a class="tocitem" href="../Hubbard/">Hubbard Model</a></li></ul></li><li><span class="tocitem">Local Space</span><ul><li><a class="tocitem" href="../../localspace/Spin/">Spin</a></li><li><a class="tocitem" href="../../localspace/Fermion/">Fermion</a></li></ul></li><li><span class="tocitem">Library</span><ul><li><a class="tocitem" href="../../lib/TensorWrappers/">Tensor Wrappers</a></li><li><a class="tocitem" href="../../lib/MPS/">MPS &amp; MPO</a></li><li><a class="tocitem" href="../../lib/Environment/">Environment</a></li><li><a class="tocitem" href="../../lib/ProjHam/">Projective Hamiltonian</a></li><li><a class="tocitem" href="../../lib/IntrTree/">Interaction Tree</a></li><li><a class="tocitem" href="../../lib/ObsTree/">Observable Tree</a></li><li><a class="tocitem" href="../../lib/ITP/">Imaginary Time Proxy</a></li><li><a class="tocitem" href="../../lib/Algebra/">MPS &amp; MPO Algebra</a></li><li><a class="tocitem" href="../../lib/Algorithm/">Algorithms</a></li><li><a class="tocitem" href="../../lib/Deprecate/">Deprecate</a></li></ul></li><li><span class="tocitem">Index</span><ul><li><a class="tocitem" href="../../index/">Index</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorial</a></li><li class="is-active"><a href>Heisenberg Chain</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Heisenberg Chain</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/Qiaoyi-Li/FiniteMPS.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/Qiaoyi-Li/FiniteMPS.jl/blob/main/docs/src/tutorial/Heisenberg.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Heisenberg-Chain"><a class="docs-heading-anchor" href="#Heisenberg-Chain">Heisenberg Chain</a><a id="Heisenberg-Chain-1"></a><a class="docs-heading-anchor-permalink" href="#Heisenberg-Chain" title="Permalink"></a></h1><h2 id="Ground-state"><a class="docs-heading-anchor" href="#Ground-state">Ground state</a><a id="Ground-state-1"></a><a class="docs-heading-anchor-permalink" href="#Ground-state" title="Permalink"></a></h2><p>In this section, we compute the ground-state, finite-T and dynamical properties of a Heisenberg chain, whose Hamiltonian reads $ H = J\sum<em>{i}S</em>{i}\cdot S_{i+1}. $ Here we set <span>$J=1$</span> as energy unit and use spin SU(2) symmetry.</p><pre><code class="language-julia hljs">using FiniteMPS
-using CairoMakie, Statistics, LsqFit # visualization
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Heisenberg Chain · FiniteMPS.jl</title><meta name="title" content="Heisenberg Chain · FiniteMPS.jl"/><meta property="og:title" content="Heisenberg Chain · FiniteMPS.jl"/><meta property="twitter:title" content="Heisenberg Chain · FiniteMPS.jl"/><meta name="description" content="Documentation for FiniteMPS.jl."/><meta property="og:description" content="Documentation for FiniteMPS.jl."/><meta property="twitter:description" content="Documentation for FiniteMPS.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">FiniteMPS.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Tutorial</span><ul><li><a class="tocitem" href="../Threading/">Multi-threading</a></li><li><a class="tocitem" href="../Hamiltonian/">Hamiltonian</a></li><li><a class="tocitem" href="../Observable/">Observable</a></li><li class="is-active"><a class="tocitem" href>Heisenberg Chain</a><ul class="internal"><li><a class="tocitem" href="#Ground-state"><span>Ground state</span></a></li><li><a class="tocitem" href="#Finite-temperature"><span>Finite temperature</span></a></li><li><a class="tocitem" href="#Spin-dynamics"><span>Spin dynamics</span></a></li></ul></li><li><a class="tocitem" href="../Hubbard/">Hubbard Model</a></li></ul></li><li><span class="tocitem">Local Space</span><ul><li><a class="tocitem" href="../../localspace/Spin/">Spin</a></li><li><a class="tocitem" href="../../localspace/Fermion/">Fermion</a></li></ul></li><li><span class="tocitem">Library</span><ul><li><a class="tocitem" href="../../lib/TensorWrappers/">Tensor Wrappers</a></li><li><a class="tocitem" href="../../lib/MPS/">MPS &amp; MPO</a></li><li><a class="tocitem" href="../../lib/Environment/">Environment</a></li><li><a class="tocitem" href="../../lib/ProjHam/">Projective Hamiltonian</a></li><li><a class="tocitem" href="../../lib/IntrTree/">Interaction Tree</a></li><li><a class="tocitem" href="../../lib/ObsTree/">Observable Tree</a></li><li><a class="tocitem" href="../../lib/ITP/">Imaginary Time Proxy</a></li><li><a class="tocitem" href="../../lib/Algebra/">MPS &amp; MPO Algebra</a></li><li><a class="tocitem" href="../../lib/Algorithm/">Algorithms</a></li><li><a class="tocitem" href="../../lib/Deprecate/">Deprecate</a></li></ul></li><li><span class="tocitem">Index</span><ul><li><a class="tocitem" href="../../index/">Index</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorial</a></li><li class="is-active"><a href>Heisenberg Chain</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Heisenberg Chain</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/Qiaoyi-Li/FiniteMPS.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/Qiaoyi-Li/FiniteMPS.jl/blob/main/docs/src/tutorial/Heisenberg.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Heisenberg-Chain"><a class="docs-heading-anchor" href="#Heisenberg-Chain">Heisenberg Chain</a><a id="Heisenberg-Chain-1"></a><a class="docs-heading-anchor-permalink" href="#Heisenberg-Chain" title="Permalink"></a></h1><h2 id="Ground-state"><a class="docs-heading-anchor" href="#Ground-state">Ground state</a><a id="Ground-state-1"></a><a class="docs-heading-anchor-permalink" href="#Ground-state" title="Permalink"></a></h2><p>In this section, we compute the ground-state, finite-T and dynamical properties of a Heisenberg chain, whose Hamiltonian reads<br/><span>$H = J\sum_{i}S_{i} S_{i+1}$</span>. Here we set <span>$J=1$</span> as energy unit and use spin SU(2) symmetry.</p><pre><code class="language-julia hljs">using FiniteMPS
+using CairoMakie, Statistics  # visualization
+using LsqFit: curve_fit
+using NumericalIntegration: integrate
 
 mkpath(&quot;figs_Heisenberg&quot;) # save figures
 
@@ -82,7 +84,7 @@ Bond 28-&gt;29: Rep[SU₂](0=&gt;1, 1=&gt;1), dim = 2 -&gt; 4
 Bond 29-&gt;30: Rep[SU₂](1/2=&gt;1), dim = 1 -&gt; 2
 Bond 30-&gt;31: Rep[SU₂](0=&gt;1, 1=&gt;1), dim = 2 -&gt; 4
 Bond 31-&gt;32: Rep[SU₂](1/2=&gt;1), dim = 1 -&gt; 2
-</code></pre><p>Here <code>bspace = Rep[SU₂](0 =&gt; 1)</code> is the space of left boundary bond, <code>0</code> is the SU(2) quantum number of the total MPS, and <code>1</code> is the multiplicity of the trivial representation, therefore this setup indicates the total MPS is a SU(2) scalar.</p><p><code>aspace</code> is the space of bulk bonds. Note the fusing of physical space and bond space leads to a constrain due to symmetry. For example, the SU(2) quantum numbers of the bonds  exhibit a integer/half integer oscillation, as the physical space exactly shifts the quantum number by 1/2. Here we use a larger (with redundancy) initial bond space so that contraction of bond indices gives a non-vanished result. </p><pre><code class="language-julia hljs"># DMRG
+</code></pre><p>Here <code>bspace = Rep[SU₂](0 =&gt; 1)</code> is the space of left boundary bond, <code>0</code> is the SU(2) quantum number of the total MPS, and <code>1</code> is the multiplicity of the trivial representation, therefore this setup indicates the total MPS is a SU(2) scalar.</p><p><code>aspace</code> is the space of bulk bonds. Note the fusion of physical space and bond space leads to a constrain due to symmetry. For example, the SU(2) quantum numbers of the bonds  exhibit a integer/half integer oscillation, as the physical space exactly shifts the bond quantum number by 1/2. Here we use a larger (with redundancy) initial bond space so that contraction of bond indices gives a non-vanished result. </p><pre><code class="language-julia hljs"># DMRG
 NSweeps = 5
 Env = Environment(Ψ&#39;, H, Ψ)
 lsE = [scalar!(Env)] # initial energy
@@ -90,7 +92,7 @@ for nsweep in 1:NSweeps
      info, TO = DMRGSweep2!(Env; K = 16, trunc = truncdim(D))
 	push!(lsE, info[2][1].Eg)
 end
-Eg = lsE[end]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">-13.997315618224956</code></pre><p>Here we first construct the tri-layer environment to store the environment tensors of the local 2-site projective Hamiltonian in MPS-based DMRG. <code>scalar!</code> method triggers full contraction of the total tri-layer tensor network thus gives the initial energy.</p><p>Then we perform <code>NSweep</code> times 2-DMRG sweeping via the key function <code>DMRGSweep2!</code>, where <code>K = 16</code> is the Krylov space dimension and <code>trunc = truncdim(D)</code> is a TensorKit.jl syntax that determines the truncation scheme, i.e. keep up to <code>D</code> bond dimension. Returned <code>info</code> stores the information of a DMRG sweep and <code>TO</code> is a <code>TimerOutput</code> object contains the time usage. Here we directly extract the energy from the output information, one can also use <code>scalar!</code> again.</p><pre><code class="language-julia hljs"># plot the energy vs nsweep
+Eg = lsE[end]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">-13.997315618224938</code></pre><p>Here we first construct the tri-layer environment to store the environment tensors of the local 2-site projective Hamiltonian in MPS-based DMRG. <code>scalar!</code> method triggers full contraction of the total tri-layer tensor network thus gives the initial energy.</p><p>Then we perform <code>NSweep</code> times 2-DMRG sweeping via the key function <code>DMRGSweep2!</code>, where <code>K = 16</code> is the Krylov space dimension and <code>trunc = truncdim(D)</code> is a TensorKit.jl syntax that determines the truncation scheme, i.e. keep up to <code>D</code> bond dimension. Returned <code>info</code> stores the information of a DMRG sweep and <code>TO</code> is a <code>TimerOutput</code> object contains the time usage. Here we directly extract the energy from the output information, one can also use <code>scalar!</code> again.</p><pre><code class="language-julia hljs"># plot the energy vs nsweep
 fig = Figure(size = (480, 240))
 ax = Axis(fig[1, 1];
      xlabel = &quot;nsweep&quot;,
@@ -138,7 +140,7 @@ lines!(ax, exp.(lsx), exp.(model(lsx, fit.param));
 )
 axislegend(ax; position = (0, 0))
 
-save(&quot;figs_Heisenberg/GS_Sr.png&quot;, fig)</code></pre><p><img src="../figs_Heisenberg/GS_Sr.png" alt/> We reproduce the algebraic decay behaver  $ (-1)^rS(r) \sim 1/r. $</p><h2 id="Finite-temperature"><a class="docs-heading-anchor" href="#Finite-temperature">Finite temperature</a><a id="Finite-temperature-1"></a><a class="docs-heading-anchor-permalink" href="#Finite-temperature" title="Permalink"></a></h2><p>Now we move to the finite-temperature properties via <a href="https://doi.org/10.1103/PhysRevLett.130.226502">tanTRG</a>, which belongs to an imaginary-time-evolution method based on MPO TDVP. Note we will use <a href="https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.133.026401">CBE-TDVP</a> to accelerate the computation.</p><pre><code class="language-julia hljs"># define a beta list
+save(&quot;figs_Heisenberg/GS_Sr.png&quot;, fig)</code></pre><p><img src="../figs_Heisenberg/GS_Sr.png" alt/> We reproduce the algebraic decay behaver  $ (-1)^rS(r) \sim 1/r. $</p><h2 id="Finite-temperature"><a class="docs-heading-anchor" href="#Finite-temperature">Finite temperature</a><a id="Finite-temperature-1"></a><a class="docs-heading-anchor-permalink" href="#Finite-temperature" title="Permalink"></a></h2><p>Now we move to the finite-temperature properties via <a href="https://doi.org/10.1103/PhysRevLett.130.226502">tanTRG</a>, which belongs to an imaginary-time-evolution method based on TDVP of MPO. Note we will use <a href="https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.133.026401">CBE-TDVP</a> to accelerate the computation.</p><pre><code class="language-julia hljs"># define a beta list
 lsβ = vcat(2.0 .^ (-15:0), 2:16)
 lslnZ = fill(NaN, length(lsβ))
 lsE = fill(NaN, length(lsβ))
@@ -169,7 +171,7 @@ Env = Environment(ρ&#39;, H, ρ)
 lsE[1] = scalar!(Env)
 calObs!(ObsTree, ρ)
 Obs = convert(Dict, ObsTree)
-lsSM[1] = calSM(Obs)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0.2500036955434818</code></pre><p>First we define a <span>$\beta$</span> list, which determines the step length of imaginary-time cooling. <a href="https://journals.aps.org/prb/abstract/10.1103/PhysRevB.95.161104">SETTN</a> is adopted to initializes a high-temperature MPO, where <code>CBEAlg</code> indicates the algorithm to implement CBE. Currently only <code>NaiveCBE</code> is valid, where we directly find the optimal subspace via a svd (use random svd to accelerate), and the expanded bond dimension is set as <code>D + div(D, 4)</code>. <code>lsnoise</code> set the noise applied in the first several sweeps of variational multiplication. Next we use TDVP to cool down the system.</p><pre><code class="language-julia hljs"># TDVP cooling
+lsSM[1] = calSM(Obs)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0.2500036955434818</code></pre><p>First we define a <span>$\beta$</span> list, which determines the step length of imaginary-time cooling. <a href="https://journals.aps.org/prb/abstract/10.1103/PhysRevB.95.161104">SETTN</a> is adopted to initialize a high-temperature MPO, where <code>CBEAlg</code> indicates the algorithm to implement CBE. Currently only <code>NaiveCBE</code> is valid, where we directly find the optimal subspace via a svd (use random svd to accelerate), and the expanded bond dimension is set as <code>D + div(D, 4)</code>. <code>lsnoise</code> sets the noise applied in the first several sweeps of variational multiplication. Next we use TDVP to cool down the system.</p><pre><code class="language-julia hljs"># TDVP cooling
 for idx in 2:length(lsβ)
 	dβ = lsβ[idx] - lsβ[idx-1]
 
@@ -185,15 +187,13 @@ for idx in 2:length(lsβ)
 
 	# update data stored in ObsTree
 	calObs!(ObsTree, ρ)
-     Obs = convert(Dict, ObsTree)
-	lsSM[idx] = calSM(Obs)
-end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">┌ Warning: Assignment to `Obs` in soft scope is ambiguous because a global variable by the same name exists: `Obs` will be treated as a new local. Disambiguate by using `local Obs` to suppress this warning or `global Obs` to assign to the existing global variable.
-└ @ Heisenberg.md:172</code></pre><p>The key function is this part is <code>TDVPSweep1!</code> that performs a single left-to-right and right-to-left 1-TDVP sweep. <code>GCsweep = true</code> indicates that a manual <code>GC.gc()</code> is called per sweep. If you suffer memory problem when using FiniteMPS.jl, the first thing to try is setting <code>CGsweep = true</code> and a stronger <code>GCstep = true</code> in the main sweeping function (e.g. <code>DMRGSweep1!</code> and <code>TDVPSweep1!</code>).</p><p>In each sweep, the normalization factor after an imaginary-time evolution is extracted to calculate the partition function <code>lnZ</code>. In order to calculate spin correlations, regenerating <code>ObsTree</code> is not needed, just use <code>calObs!</code> again to trigger the in-place update with the new MPO <code>rho</code>.</p><p>Below is a simple script for visualization, where the temperature dependence of energy <span>$e$</span>, specific heat <span>$c_V$</span> and AFM structure factor <span>$S(\pi, \pi)$</span> are shown. </p><pre><code class="language-julia hljs"># visualization
+	lsSM[idx] = calSM(convert(Dict, ObsTree))
+end</code></pre><p>The key function in this part is <code>TDVPSweep1!</code> that performs a single left-to-right and right-to-left 1-TDVP sweep. <code>GCsweep = true</code> indicates that a manual <code>GC.gc()</code> is called per sweep. If you suffer memory problem when using FiniteMPS.jl, the first thing to try is setting <code>CGsweep = true</code> and a stronger <code>GCstep = true</code> in the main sweeping function (e.g. <code>DMRGSweep1!</code> and <code>TDVPSweep1!</code>).</p><p>In each sweep, the normalization factor after an imaginary-time evolution is extracted to calculate the partition function <code>lnZ</code>. In order to calculate spin correlations, regenerating <code>ObsTree</code> is not necessary, just use <code>calObs!</code> again to trigger the in-place update with the new MPO <code>ρ</code>.</p><p>Below is a simple script for visualization, where the temperature dependence of energy <span>$e$</span>, specific heat <span>$c_V$</span> and AFM structure factor <span>$S(\pi, \pi)$</span> are shown. </p><pre><code class="language-julia hljs"># visualization
 
 # compute C = - ∂S / ∂lnβ
 lsS = lsβ .* lsE .+ lslnZ
 lslnβ = log.(lsβ)
-lsCe = - diff(lsS) ./ diff(lslnβ)
+lsCv = - diff(lsS) ./ diff(lslnβ)
 lsβ_c = exp.((lslnβ[1:end-1] + lslnβ[2:end])/2)
 
 fig = Figure(size = (480, 400))
@@ -213,8 +213,157 @@ end
 scatterlines!(ax1, 1 ./ lsβ, lsE ./ L)
 lines!(ax1, [0.05, 1], [Eg/L, Eg/L]; color = :red, label = &quot;DMRG&quot;)
 axislegend(ax1; position = (0, 0.5))
-scatterlines!(ax2, 1 ./ lsβ_c, lsCe ./ L)
+scatterlines!(ax2, 1 ./ lsβ_c, lsCv ./ L)
 scatterlines!(ax3, 1 ./ lsβ, lsSM)
 lines!(ax3, [0.05, 1], [SM_GS, SM_GS]; color = :red)
 
-save(&quot;figs_Heisenberg/FiniteT.png&quot;, fig)</code></pre><p><img src="../figs_Heisenberg/FiniteT.png" alt/> From this example we see that the low-temperature limit of tanTRG does shake hands with the ground state DMRG.</p><h2 id="Spin-dynamics"><a class="docs-heading-anchor" href="#Spin-dynamics">Spin dynamics</a><a id="Spin-dynamics-1"></a><a class="docs-heading-anchor-permalink" href="#Spin-dynamics" title="Permalink"></a></h2><p>TODO</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Observable/">« Observable</a><a class="docs-footer-nextpage" href="../Hubbard/">Hubbard Model »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Wednesday 30 July 2025 16:13">Wednesday 30 July 2025</span>. Using Julia version 1.11.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+save(&quot;figs_Heisenberg/FiniteT.png&quot;, fig)</code></pre><p><img src="../figs_Heisenberg/FiniteT.png" alt/> From this example we see that the low-temperature limit of tanTRG does shake hands with the ground state DMRG.</p><h2 id="Spin-dynamics"><a class="docs-heading-anchor" href="#Spin-dynamics">Spin dynamics</a><a id="Spin-dynamics-1"></a><a class="docs-heading-anchor-permalink" href="#Spin-dynamics" title="Permalink"></a></h2><p>In this section we will compute the ground-state dynamical spin structure factor (DSF) <span>$S(k,\omega) = \sum_{i = 1}^L e^{-ik(r_i-r_j)} \int_{-\infty}^\infty dt e^{i\omega t}\langle S_i^z(t)S_j^z\rangle$</span>, where <span>$j$</span> is chosen as a reference site. More specifically, we will use TDVP to compute <span>$\langle S_i^z(t)S_j^z\rangle = e^{iE_gt}\langle \Psi| S_i^z |\Phi(t)\rangle$</span> where <span>$|\Phi(t)\rangle = e^{-iHt}S_j^z|\Psi\rangle$</span>.</p><pre><code class="language-julia hljs">lst = 0:1.0:10 # time list
+matSijt = zeros(ComplexF64, L, length(lst)) # S_{i,j_ref}(t)
+
+# obtain |Φ(0)⟩ = S_j|Ψ⟩
+j_ref = div(L, 2)
+
+# fuse the additional bonds due to non-abelian symmetry
+aspace_S = codomain(SU2Spin.SS[2])[1]
+aspace_Ψ = codomain(Ψ[1])[1]
+aspace_Φ = fuse(aspace_S, aspace_Ψ)
+
+# wrap the operator S_j to a MPO
+Tree = InteractionTree(L)
+addIntr!(Tree, SU2Spin.SS[2], j_ref, 1.0; name = :S)
+S_MPO = AutomataMPO(Tree)
+
+# note Φ should be a complex MPS
+Φ = randMPS(ComplexF64, fill(SU2Spin.pspace, L), vcat(aspace_Φ, fill(aspace, L - 1)))
+
+# variationally find |Φ⟩ = S_j|Ψ⟩
+mul!(Φ, S_MPO, Ψ;
+	CBEAlg = NaiveCBE(D + div(D, 4), 1e-8; rsvd = true),
+	trunc = truncdim(D), GCsweep = true,
+     lsnoise = [0.1, 0.01, 0.001], tol = 1e-12,
+)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">MPS{32, ComplexF64, StoreMemory}: Center = [1, 1], Norm = 0.8660254035294421, total memory = 312.938 KiB
+Bond  0-&gt; 1: Rep[SU₂](1=&gt;1), dim = 1 -&gt; 3
+Bond  1-&gt; 2: Rep[SU₂](1/2=&gt;1, 3/2=&gt;1), dim = 2 -&gt; 6
+Bond  2-&gt; 3: Rep[SU₂](0=&gt;1, 1=&gt;2, 2=&gt;1), dim = 4 -&gt; 12
+Bond  3-&gt; 4: Rep[SU₂](1/2=&gt;3, 3/2=&gt;3, 5/2=&gt;1), dim = 7 -&gt; 24
+Bond  4-&gt; 5: Rep[SU₂](0=&gt;3, 1=&gt;6, 2=&gt;4, 3=&gt;1), dim = 14 -&gt; 48
+Bond  5-&gt; 6: Rep[SU₂](1/2=&gt;9, 3/2=&gt;10, 5/2=&gt;5, 7/2=&gt;1), dim = 25 -&gt; 96
+Bond  6-&gt; 7: Rep[SU₂](0=&gt;8, 1=&gt;14, 2=&gt;11, 3=&gt;3), dim = 36 -&gt; 126
+Bond  7-&gt; 8: Rep[SU₂](1/2=&gt;13, 3/2=&gt;13, 5/2=&gt;7, 7/2=&gt;1), dim = 34 -&gt; 128
+Bond  8-&gt; 9: Rep[SU₂](0=&gt;8, 1=&gt;15, 2=&gt;10, 3=&gt;3), dim = 36 -&gt; 124
+Bond  9-&gt;10: Rep[SU₂](1/2=&gt;13, 3/2=&gt;14, 5/2=&gt;6, 7/2=&gt;1), dim = 34 -&gt; 126
+Bond 10-&gt;11: Rep[SU₂](0=&gt;8, 1=&gt;15, 2=&gt;10, 3=&gt;3), dim = 36 -&gt; 124
+Bond 11-&gt;12: Rep[SU₂](1/2=&gt;13, 3/2=&gt;14, 5/2=&gt;6, 7/2=&gt;1), dim = 34 -&gt; 126
+Bond 12-&gt;13: Rep[SU₂](0=&gt;9, 1=&gt;15, 2=&gt;10, 3=&gt;3), dim = 37 -&gt; 125
+Bond 13-&gt;14: Rep[SU₂](1/2=&gt;14, 3/2=&gt;14, 5/2=&gt;6, 7/2=&gt;1), dim = 35 -&gt; 128
+Bond 14-&gt;15: Rep[SU₂](0=&gt;9, 1=&gt;17, 2=&gt;10, 3=&gt;2), dim = 38 -&gt; 124
+Bond 15-&gt;16: Rep[SU₂](1/2=&gt;16, 3/2=&gt;16, 5/2=&gt;5), dim = 37 -&gt; 126
+Bond 16-&gt;17: Rep[SU₂](0=&gt;11, 1=&gt;20, 2=&gt;10, 3=&gt;1), dim = 42 -&gt; 128
+Bond 17-&gt;18: Rep[SU₂](1/2=&gt;18, 3/2=&gt;17, 5/2=&gt;4), dim = 39 -&gt; 128
+Bond 18-&gt;19: Rep[SU₂](0=&gt;11, 1=&gt;20, 2=&gt;10, 3=&gt;1), dim = 42 -&gt; 128
+Bond 19-&gt;20: Rep[SU₂](1/2=&gt;18, 3/2=&gt;17, 5/2=&gt;4), dim = 39 -&gt; 128
+Bond 20-&gt;21: Rep[SU₂](0=&gt;11, 1=&gt;20, 2=&gt;10, 3=&gt;1), dim = 42 -&gt; 128
+Bond 21-&gt;22: Rep[SU₂](1/2=&gt;18, 3/2=&gt;17, 5/2=&gt;4), dim = 39 -&gt; 128
+Bond 22-&gt;23: Rep[SU₂](0=&gt;11, 1=&gt;20, 2=&gt;10, 3=&gt;1), dim = 42 -&gt; 128
+Bond 23-&gt;24: Rep[SU₂](1/2=&gt;17, 3/2=&gt;16, 5/2=&gt;5), dim = 38 -&gt; 128
+Bond 24-&gt;25: Rep[SU₂](0=&gt;10, 1=&gt;18, 2=&gt;10, 3=&gt;2), dim = 40 -&gt; 128
+Bond 25-&gt;26: Rep[SU₂](1/2=&gt;14, 3/2=&gt;14, 5/2=&gt;6, 7/2=&gt;1), dim = 35 -&gt; 128
+Bond 26-&gt;27: Rep[SU₂](0=&gt;5, 1=&gt;9, 2=&gt;5, 3=&gt;1), dim = 20 -&gt; 64
+Bond 27-&gt;28: Rep[SU₂](1/2=&gt;5, 3/2=&gt;4, 5/2=&gt;1), dim = 10 -&gt; 32
+Bond 28-&gt;29: Rep[SU₂](0=&gt;2, 1=&gt;3, 2=&gt;1), dim = 6 -&gt; 16
+Bond 29-&gt;30: Rep[SU₂](1/2=&gt;2, 3/2=&gt;1), dim = 3 -&gt; 8
+Bond 30-&gt;31: Rep[SU₂](0=&gt;1, 1=&gt;1), dim = 2 -&gt; 4
+Bond 31-&gt;32: Rep[SU₂](1/2=&gt;1), dim = 1 -&gt; 2
+</code></pre><p>Note we cannot directly compute <span>$\langle S_i^z(t)S_j^z\rangle$</span>, as the operator <span>$S^z$</span> breaks the SU(2) symmetry. Therefore, what we actually compute is <span>$\langle S_i(t) \cdot S_j\rangle / 3$</span>, where <span>$S_j$</span> operator is a SU(2) spinor with an additional index that labels the representation space. After preparing the initial <code>Φ</code> with correct symmetry index, we call <code>mul!</code> function to perform variational multiplication. </p><pre><code class="language-julia hljs"># define a new ObsTree to calculate each inner product ⟨Ψ|S_i|Φ⟩
+ObsTree = ObservableTree(L)
+for i in 1:L
+	addObs!(ObsTree, SU2Spin.SS[1], i; name = :S)
+end
+
+iso = isometry(aspace_Φ, aspace_S ⊗ aspace_Ψ)
+El = permute(iso&#39;, ((2, 1), (3,)))
+calObs!(ObsTree, Ψ, Φ; El = El)
+matSijt[:, 1] = [ObsTree.Refs[&quot;S&quot;][(i,)][] / 3 for i in 1:L]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">32-element Vector{ComplexF64}:
+ -0.011762564964431246 + 8.012344524238991e-18im
+   0.00767831742207881 - 4.757329561266902e-18im
+ -0.014729592522709589 + 1.0516202188063676e-17im
+  0.011018256873999495 - 3.0046291965896214e-18im
+ -0.017783160483632227 + 1.7026232114007857e-17im
+  0.014218471473971315 - 3.979519870971362e-18im
+  -0.02166743977946008 + 1.9399517871121396e-17im
+  0.018163377553368724 - 2.5115416215478967e-17im
+ -0.027384248689315462 + 5.2482096031083114e-18im
+   0.02397641826667778 - 1.0759069045934172e-17im
+                       ⋮
+  0.018959652598471866 + 1.2274556777672835e-17im
+ -0.013344102784460923 - 9.312848453412431e-18im
+  0.015429146429032396 + 1.0023146420443185e-17im
+ -0.010484575356458177 - 7.641751511356433e-18im
+  0.012873407653865722 + 8.046719215013622e-18im
+ -0.008132861965841861 - 5.557974349451197e-18im
+  0.010767614568084614 + 6.524846100278834e-18im
+ -0.005662695949330815 - 3.604815890722086e-18im
+   0.00864325119922684 + 5.180805319521193e-18im</code></pre><p>Emphasize that the isometry to fuse the space of <span>$S_j$</span> and <span>$|\Psi\rangle$</span> must be considered carefully. We exactly insert a pair of isometries without changing the contraction result. One is implicitly applied in <code>mul!</code> to fuse the two additonal indices to the new one of <code>Φ</code>, and the other becomes the left boundary environment tensor <code>El</code> sent to <code>calObs!</code>. </p><pre><code class="language-julia hljs"># time evolution
+
+# construct the trilayer environment for TDVP
+Env = Environment(Φ&#39;, H, Φ)
+# time evolution
+for idx in 2:length(lst)
+	dt = lst[idx] - lst[idx-1]
+
+	TDVPSweep1!(Env, -im * dt;
+		CBEAlg = NaiveCBE(D + div(D, 4), 1e-8; rsvd = true),
+		GCsweep = true, trunc = truncdim(D)
+	)
+
+	calObs!(ObsTree, Ψ, Φ; El = El)
+	# e^{iEgt}⟨Ψ|S_i^+|Φ⟩
+	matSijt[:, idx] = exp(im * Eg * lst[idx]) * map(1:L) do i
+		ObsTree.Refs[&quot;S&quot;][(i,)][] / 3
+	end
+end</code></pre><p>In this part we use CBE-TDVP to perform real-time evolution of <code>Φ</code> and calculate the time-dependent spin correlations as some inner products. </p><pre><code class="language-julia hljs"># spatial FT
+lsk = 0:2/L:2 # unit = π
+matcoef = map([(k, i) for k in lsk, i in 1:L]) do (k, i)
+	exp(-im * k * (i - j_ref) * π)
+end
+matSkt = matcoef * matSijt
+
+# time FT
+lsω = 0:0.1:4 # frequency list
+
+# use a Parzen window to suppress the non-physical oscillation
+function ParzenWindow(x::Float64)
+	if abs(x) &lt; 1 / 2
+		return 1 - 6 * x^2 + 6 * abs(x)^3
+	elseif abs(x) &lt; 1
+		return 2 * (1 - abs(x))^3
+	else
+		return 0.0
+	end
+end
+lsWt = ParzenWindow.(lst ./ maximum(lst))
+
+matSkω = zeros(length(lsk), length(lsω))
+for iω in 1:length(lsω)
+	lscoef = exp.(im * lsω[iω] .* lst) .* lsWt
+	for ik in 1:length(lsk)
+		matSkω[ik, iω] = 2 * integrate(lst, real.(matSkt[ik, :] .* lscoef))
+	end
+end</code></pre><p>After collecting all real-space time-dependent spin correlations, we perform FT to obtain the DSF. Note time-reversal symmetry is used in the numerical integration so that only <span>$t&gt;0$</span> data is required. Moreover, we multiply a parzen window function to the time domain to suppress the non-physical oscillation in frequency domain.</p><pre><code class="language-julia hljs"># visualization
+fig = Figure(size = (480, 240))
+ax = Axis(fig[1, 1];
+     xlabel = L&quot;k / \pi&quot;,
+     ylabel = L&quot;\omega&quot;,
+     limits = ((0, 2), extrema(lsω))
+)
+
+hm = heatmap!(ax, lsk, lsω, matSkω)
+Colorbar(fig[1, 2], hm; label = L&quot;S(k, \omega)&quot;)
+
+# upper and lower boundaries
+lsω_upper = π .* sin.(lsk .* (π/2))
+lsω_lower = (π/2) .* abs.(sin.(lsk .* π))
+lines!(ax, lsk, lsω_upper; color = :white, linestyle = :dash)
+lines!(ax, lsk, lsω_lower; color = :white, linestyle = :dash)
+
+save(&quot;figs_Heisenberg/Skomega.png&quot;, fig)</code></pre><p><img src="../figs_Heisenberg/Skomega.png" alt/> The exact (thermodynamical limit) upper and lower boundaries are also shown. Our numerial results align well with them, up to the frequency resolution (FWHM <span>$\approx 8 / t_\textrm{max}$</span>) due to the finite evolution time <span>$t_\textrm{max} = 10$</span>.   </p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Observable/">« Observable</a><a class="docs-footer-nextpage" href="../Hubbard/">Hubbard Model »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Thursday 31 July 2025 03:48">Thursday 31 July 2025</span>. Using Julia version 1.11.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
