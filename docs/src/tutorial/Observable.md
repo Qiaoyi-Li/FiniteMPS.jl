@@ -34,6 +34,6 @@ Here `Tree` is an `ObservableTree` object that contains all observables to be ca
 ```@example Observable
 Obs["SzSz"][(1, 2)]
 ```
-is the correlation `\langle S_1^z S_2^z\rangle`. One can perform a simple quantum mechanics calculation to check this result.
+is the correlation $\langle S_1^z S_2^z\rangle$. One can perform a simple quantum mechanics calculation to check this result.
 
 Here is just a simple example to show the basic usage, more complex examples that contain fermion correlations and multi-site correlations (e.g. pairing correlations) can be found in the concrete example for [Hubbard model](@ref Hubbard).
