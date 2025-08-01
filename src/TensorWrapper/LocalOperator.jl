@@ -486,10 +486,14 @@ end
 function _rightOp(lsOp::NTuple{N, LocalOperator}) where N
 	if N == 1
 		return (_rightOp(lsOp...),)
+	elseif isa(lsOp[end], LocalOperator{R, 1} where R)
+		# already a right operator
+		return lsOp
 	else
 		return _rightOp(lsOp...)
 	end
 end
+
 
 # dimension of left/right auxiliary bond
 function _vdim(O::IdentityOperator, idx::Int64)
