@@ -73,7 +73,7 @@ function LanczosExp(f::Function, x₀, t::NT, args...;
 		rmul!(lsb[k+1], 1 / T[k, k+1])
 
 		# callback function here
-		!isnothing(callback) && callback(x)
+		!isnothing(callback) && callback(lsb[k+1])
 
 		# convergence check 
 		ϵ, V = eigen(T[1:k, 1:k])
