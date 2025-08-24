@@ -43,7 +43,6 @@ function scalartype(obj::SparseMPO)
 	for M in obj.A
 		for T in M
 			isnothing(T) && continue
-			isa(T, IdentityOperator) && continue
 			scalartype(T) <: Complex && return ComplexF64
 		end
 	end

@@ -24,8 +24,8 @@ function SETTN(H::SparseMPO{L}, β::Number; kwargs...) where {L}
 
      # deduce pspace 
      lspspace = map(H) do M
-          idx = findfirst(x -> !isnothing(x) && !isa(x, IdentityOperator), M)
-          domain(M[idx])[1]
+          idx = findfirst(x -> !isnothing(x), M)
+          getPhysSpace(M[idx])
      end     
 
      ρ = get(kwargs, :ρ₀, identityMPO(scalartype(H), L, lspspace; kwargs...))
