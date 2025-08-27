@@ -88,6 +88,20 @@ function iterate(iter::OnSiteInteractionIterator{L, <:AbstractTensorMap}, i::Int
      end
      return Op_wrap, i + 1
 end
+function iterate(iter::OnSiteInteractionIterator{L, <:AbstractVector}, i::Int64 = 1) where {L}
+	i > L && return nothing
+	if i == iter.Op.si
+		Op_wrap = iter.Op
+	elseif (i > iter.Op.si) && !isnothing(_getZ(iter.Z, i))
+		Z = _getZ(iter.Z, i)
+		Op_wrap = LocalOperator(Z, :Z, i, false)
+	else
+          # TODO pspace is not correct but it will not be used for id operator
+		pspace = domain(iter.Op)[1] 
+		Op_wrap = IdentityOperator(pspace, trivial(pspace), i)
+	end
+	return Op_wrap, i + 1
+end
 
 """
      struct TwoSiteInteractionIterator{L, T} <: AbstractInteractionIterator{L}
@@ -192,6 +206,25 @@ function iterate(iter::TwoSiteInteractionIterator{L, <:AbstractTensorMap}, st::T
 
      return Op_wrap, (i + 1, getRightSpace(Op_wrap))
 end
+function iterate(iter::TwoSiteInteractionIterator{L, <:AbstractVector}, st::Tuple{Int64, VectorSpace} = (1, getLeftSpace(iter.O₁))) where {L}
+	i, aspace = st
+	i > L && return nothing
+	if i == iter.O₁.si
+		Op_wrap = iter.O₁
+	elseif i == iter.O₂.si
+		# add Z here 
+		Op_wrap = _addZ!(iter.O₂, _getZ(iter.Z, i))
+	elseif (iter.O₁.si < i < iter.O₂.si) && !isnothing(_getZ(iter.Z, i))
+		Op_wrap = LocalOperator(_getZ(iter.Z, i), :Z, i, false; aspace = (aspace, aspace))
+	else
+          # TODO pspace is not correct but it will not be used for id operator
+		pspace = domain(iter.O₁)[1]
+		Op_wrap = IdentityOperator(pspace, aspace, i)
+	end
+
+	return Op_wrap, (i + 1, getRightSpace(Op_wrap))
+end
+
 
 """
      ArbitraryInteractionIterator{L} <: AbstractInteractionIterator{L}
