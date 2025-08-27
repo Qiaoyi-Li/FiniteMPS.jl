@@ -136,7 +136,7 @@ SM_GS = calSM(Obs)
 # SETTN
 ρ, lsF_SETTN = SETTN(H, lsβ[1];
      CBEAlg = NaiveCBE(D + div(D, 4), 1e-8; rsvd = true),
-     lsnoise = [0.01, 0.001], tol = 1e-12,
+     lsnoise = [(1/4, x) for x in [0.01, 0.001]], tol = 1e-12,
 	trunc = truncdim(D) & truncbelow(1e-16),
 )
 lslnZ[1] = 2 * log(norm(ρ))
@@ -240,7 +240,7 @@ S_MPO = AutomataMPO(Tree)
 mul!(Φ, S_MPO, Ψ;
 	CBEAlg = NaiveCBE(D + div(D, 4), 1e-8; rsvd = true),
 	trunc = truncdim(D), GCsweep = true,
-     lsnoise = [0.1, 0.01, 0.001], tol = 1e-12,
+     lsnoise = [(1/4, x) for x in [0.1, 0.01, 0.001]], tol = 1e-12,
 )
 ```
 Note we cannot directly compute $\langle S_i^z(t)S_j^z\rangle$, as the operator $S^z$ breaks the SU(2) symmetry. Therefore, what we actually compute is $\langle S_i(t) \cdot S_j\rangle / 3$, where $S_j$ operator is a SU(2) spinor with an additional index that labels the representation space. After preparing the initial `Φ` with correct symmetry index, we call `mul!` function to perform variational multiplication. 

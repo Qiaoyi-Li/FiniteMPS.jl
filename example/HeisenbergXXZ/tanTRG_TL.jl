@@ -26,7 +26,7 @@ lsχ = fill(NaN, length(lsβ))
      CBEAlg = NaiveCBE(D + div(D, 4), 1e-8; rsvd = true),
 	trunc = truncdim(256) & truncbelow(1e-16),
 	maxorder = 4, verbose = 1, GCsweep = true,
-	maxiter = 6, lsnoise = [0.1, 0.01, 0.001],
+	maxiter = 6, lsnoise = [(1/4, x) for x in [0.1, 0.01, 0.001]],
 )
 lsF[1] = lsF_SETTN[end]
 lnZ = 2 * log(norm(ρ))
