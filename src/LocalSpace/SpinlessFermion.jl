@@ -18,6 +18,9 @@ Two rank-`3` operators of hopping `c^dag c`.
 
      FFdag::NTuple{2, TensorMap}
 Two rank-`3` operators of hopping `c c^dag`.
+
+     ΔdagΔ::NTuple{4, TensorMap}
+Four operators of pairing `Δ^dag Δ`, where `Δᵢⱼ = cᵢcⱼ` is the pairing operator.  Rank = `(3, 4, 4, 3)`. Sign convention: `(i,j,k,l)` gives `cᵢ^dag cⱼ^dag cₖ cₗ = - cⱼ^dag cᵢ^dag cₖ cₗ = - Δᵢⱼ^dag Δₖₗ`.
 """
 module U₁SpinlessFermion
 using TensorKit
@@ -53,6 +56,17 @@ const FFdag = let
      @tensor Fdag[d a; c] := FdagF[2]'[a, b, c] * iso[b, d]
 
      F, Fdag
+end
+
+const ΔdagΔ = let
+     A = FdagF[1]
+     aspace = Rep[U₁](1 => 1)
+     aspace2 = Rep[U₁](2 => 1)
+     iso = isometry(aspace ⊗ aspace, aspace2)
+     @tensor B[d a; b e] := A[a b c] * iso[c d e]
+     C = permute(B', ((2, 1), (4, 3)))
+     D = permute(A', ((2, 1), (3,)))
+     A, B, C, D
 end
 
 end
