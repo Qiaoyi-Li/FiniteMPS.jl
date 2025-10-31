@@ -78,11 +78,11 @@ const S₋₊ = let
 end
 
 const S₊₊₋₋ = let
-    aspace_A = Rep[U₁](1 // 2 => 1)
-    A = TensorMap(ones, pspace, pspace ⊗ aspace_A)
-    aspace_B = Rep[U₁](1 // 2 => 1)
-    B = TensorMap(ones, pspace, pspace ⊗ aspace_B)
-    aspace2 = Rep[U₁](1 => 1)
+    A = S₊₋[1]
+    B = S₊₋[1]
+    aspace_A = Rep[U₁](1 => 1)
+    aspace_B = Rep[U₁](1 => 1)
+    aspace2 = Rep[U₁](2 => 1)
     iso = isometry(aspace_A ⊗ aspace_B, aspace2)
     @tensor B[d a; b e] := B[a b c] * iso[d c e]
     C = permute(B', ((2, 1), (4, 3)))
