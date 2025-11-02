@@ -23,7 +23,7 @@ The number of tasks to be used in multi-threading mode.
 Store the environment tensors in disk if `true`.
 
      maxdegree::Int64 = 4
-This argument is only used if `disk=true`. The environment tensor in a vectex will be stored in disk only if its degree `< maxdegree`, otherwise it will be left in memory to avoid frequent disk I/O.
+This argument is only used if `disk=true`. The environment tensor in a vertex will be stored in disk only if its degree `< maxdegree`, otherwise it will be left in memory to avoid frequent disk I/O.
 """
 function calITP!(G::ImagTimeProxyGraph, ρ::MPO{L}; kwargs...) where {L}
 
