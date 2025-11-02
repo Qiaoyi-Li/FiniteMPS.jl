@@ -241,10 +241,10 @@ end
 
 _getZ(::Nothing, ::Int64) = nothing
 _getZ(Z::AbstractTensorMap, ::Int64) = Z
-_getZ(Z::Vector{T}, i::Int64) where {T<:AbstractTensorMap} = Z[i]
+_getZ(Z::Vector{<:AbstractTensorMap}, i::Int64) = Z[i]
 _getpspace(::Nothing, ::Int64) = nothing
 _getpspace(pspace::VectorSpace, ::Int64) = pspace
-_getpspace(pspace::Vector{T}, i::Int64) where {T<:VectorSpace} = pspace[i]
+_getpspace(pspace::Vector{<:VectorSpace}, i::Int64) = pspace[i]
 
 _addZ!(O::LocalOperator, ::Nothing) = O
 function _addZ!(OR::LocalOperator{1, 1}, Z::AbstractTensorMap)
