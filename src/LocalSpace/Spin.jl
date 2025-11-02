@@ -77,6 +77,19 @@ const S₋₊ = let
      S₋, S₊
 end
 
+const S₊₊₋₋ = let
+    A = S₊₋[1]
+    B = S₊₋[1]
+    aspace_A = Rep[U₁](1 => 1)
+    aspace_B = Rep[U₁](1 => 1)
+    aspace2 = Rep[U₁](2 => 1)
+    iso = isometry(aspace_A ⊗ aspace_B, aspace2)
+    @tensor B[d a; b e] := B[a b c] * iso[d c e]
+    C = permute(B', ((2, 1), (4, 3)))
+    D = permute(A', ((2, 1), (3,)))
+    A, B, C, D
+end
+
 end
 
 const U1Spin = U₁Spin
