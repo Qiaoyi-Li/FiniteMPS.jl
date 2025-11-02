@@ -77,6 +77,9 @@ function Base.show(io::IO, obj::IdentityOperator)
 	end
 end
 
+scalartype(O::IdentityOperator) = scalartype(O.strength[])
+
+
 """ 
 	getLeftSpace(O::AbstractLocalOperator) -> ::VectorSpace
 
@@ -210,6 +213,10 @@ isfermionic(O::LocalOperator) = O.fermionic
 
 getLeftSpace(O::LocalOperator) = O.aspace[1]
 getRightSpace(O::LocalOperator) = O.aspace[2]
+
+function scalartype(O::LocalOperator)
+	return promote_type(scalartype(O.A), scalartype(O.strength[]))
+end
 
 function Base.show(io::IO, obj::LocalOperator{R₁, R₂}) where {R₁, R₂}
 	print(io, "$(obj.name)$(String(collect("$(obj.si)") .+ 8272)){$R₁,$R₂}")

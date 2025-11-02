@@ -32,7 +32,7 @@ The local operator which tells both the operator and its site index.
 For bosonic operators.
      Z::AbstractTensorMap
 For fermionic operators. Assume all sites are fermionic therefore each site after `Op` will give `Z` operator.
-     Z::AbstractVector{<:AbstractTensorMap}
+     Z::AbstractVector
 Directly give the `Z` operator for each site to deal with the systems mixed with bosons and fermions.
 
 # Constructors
@@ -51,8 +51,8 @@ struct OnSiteInteractionIterator{L, T} <: AbstractInteractionIterator{L}
      Z::T
      function OnSiteInteractionIterator{L}(Op::AbstractLocalOperator,
           Z::T) where {L, T}
-          @assert T <: Union{Nothing, AbstractTensorMap, AbstractVector{<:AbstractTensorMap}}
-          if T <: AbstractVector{<:AbstractTensorMap}
+          @assert T <: Union{Nothing, AbstractTensorMap, AbstractVector}
+          if T <: AbstractVector
                @assert length(Z) == L
           end
           return new{L, T}(Op, Z)
@@ -88,6 +88,20 @@ function iterate(iter::OnSiteInteractionIterator{L, <:AbstractTensorMap}, i::Int
      end
      return Op_wrap, i + 1
 end
+function iterate(iter::OnSiteInteractionIterator{L, <:AbstractVector}, i::Int64 = 1) where {L}
+	i > L && return nothing
+	if i == iter.Op.si
+		Op_wrap = iter.Op
+	elseif (i > iter.Op.si) && !isnothing(_getZ(iter.Z, i))
+		Z = _getZ(iter.Z, i)
+		Op_wrap = LocalOperator(Z, :Z, i, false)
+	else
+          # TODO pspace is not correct but it will not be used for id operator
+		pspace = domain(iter.Op)[1] 
+		Op_wrap = IdentityOperator(pspace, trivial(pspace), i)
+	end
+	return Op_wrap, i + 1
+end
 
 """
      struct TwoSiteInteractionIterator{L, T} <: AbstractInteractionIterator{L}
@@ -109,7 +123,7 @@ The local operators.
 For bosonic operators.
      Z::AbstractTensorMap
 For fermionic operators. Note we assume both `O₁` and `O₂` are fermionic operators if `Z ≠ nothing`. 
-     Z::AbstractVector{<:AbstractTensorMap}
+     Z::AbstractVector
 Directly give the `Z` operator for each site to deal with the systems mixed with bosons and fermions.
 
 # Constructors
@@ -130,8 +144,8 @@ struct TwoSiteInteractionIterator{L, T} <: AbstractInteractionIterator{L}
      function TwoSiteInteractionIterator{L}(O₁::AbstractLocalOperator,
           O₂::AbstractLocalOperator,
           Z::T) where {L, T}
-          @assert T <: Union{Nothing, AbstractTensorMap, AbstractVector{<:AbstractTensorMap}}
-          if T <: AbstractVector{<:AbstractTensorMap}
+          @assert T <: Union{Nothing, AbstractTensorMap, AbstractVector}
+          if T <: AbstractVector
                @assert length(Z) == L
           end
           return new{L, T}(O₁, O₂, Z)
@@ -192,11 +206,30 @@ function iterate(iter::TwoSiteInteractionIterator{L, <:AbstractTensorMap}, st::T
 
      return Op_wrap, (i + 1, getRightSpace(Op_wrap))
 end
+function iterate(iter::TwoSiteInteractionIterator{L, <:AbstractVector}, st::Tuple{Int64, VectorSpace} = (1, getLeftSpace(iter.O₁))) where {L}
+	i, aspace = st
+	i > L && return nothing
+	if i == iter.O₁.si
+		Op_wrap = iter.O₁
+	elseif i == iter.O₂.si
+		# add Z here 
+		Op_wrap = _addZ!(iter.O₂, _getZ(iter.Z, i))
+	elseif (iter.O₁.si < i < iter.O₂.si) && !isnothing(_getZ(iter.Z, i))
+		Op_wrap = LocalOperator(_getZ(iter.Z, i), :Z, i, false; aspace = (aspace, aspace))
+	else
+          # TODO pspace is not correct but it will not be used for id operator
+		pspace = domain(iter.O₁)[1]
+		Op_wrap = IdentityOperator(pspace, aspace, i)
+	end
+
+	return Op_wrap, (i + 1, getRightSpace(Op_wrap))
+end
+
 
 """
      ArbitraryInteractionIterator{L} <: AbstractInteractionIterator{L}
           Ops::Vector{<:AbstractLocalOperator}
-          Z::Union{Nothing, AbstractTensorMap, AbstractVector{<:AbstractTensorMap}}
+          Z::Union{Nothing, AbstractTensorMap, AbstractVector}
           pspace::Union{Nothing, VectorSpace, Vector{<:VectorSpace}}
      end
 
@@ -206,19 +239,19 @@ The iterator for an arbitrary interaction term.
      Ops::Vector{<:AbstractLocalOperator}
 A vector to store the local operators, `length(Ops) == N` means a `N`-site interaction term.
 
-     Z::Union{Nothing, AbstractTensorMap, AbstractVector{<:AbstractTensorMap}}
+     Z::Union{Nothing, AbstractTensorMap, AbstractVector}
      pspace::Union{Nothing, VectorSpace, Vector{<:VectorSpace}}
 Provide the fermion parity operator `Z` and the local physical space `pspace`. Assume a site-independent `Z` or `pspace` if a single object is provided, otherwise, a length-`L` vector is expected to deal with the site-dependent cases.  
 
 # Constructors
      ArbitraryInteractionIterator{L}(Ops::Vector{<:AbstractLocalOperator},
-          Z::Union{Nothing, AbstractTensorMap, AbstractVector{<:AbstractTensorMap}},
+          Z::Union{Nothing, AbstractTensorMap, AbstractVector},
           pspace::Union{Nothing, VectorSpace, Vector{<:VectorSpace}} = nothing)
 The direct constructor. 
 """
 struct ArbitraryInteractionIterator{L} <: AbstractInteractionIterator{L}
      Ops::Vector{<:AbstractLocalOperator}
-     Z::Union{Nothing, AbstractTensorMap, AbstractVector{<:AbstractTensorMap}}
+     Z::Union{Nothing, AbstractTensorMap, AbstractVector}
      pspace::Union{Nothing, VectorSpace, Vector{<:VectorSpace}}
 end
 function iterate(iter::ArbitraryInteractionIterator{L}, st::Tuple{Int64, Int64, Bool, VectorSpace} = (1, 1, false, getLeftSpace(iter.Ops[1]))) where {L}
@@ -226,7 +259,7 @@ function iterate(iter::ArbitraryInteractionIterator{L}, st::Tuple{Int64, Int64, 
      i > L && return nothing
 
      if idx > length(iter.Ops) || i < iter.Ops[idx].si
-          if flag 
+          if flag && !isnothing(_getZ(iter.Z, i))
                return LocalOperator(_getZ(iter.Z, i), :Z, i, false; aspace = (aspace, aspace)), (i + 1, idx, flag, aspace)
           else
                return IdentityOperator(_getpspace(iter.pspace, i), aspace, i), (i + 1, idx, flag, aspace)
@@ -241,10 +274,10 @@ end
 
 _getZ(::Nothing, ::Int64) = nothing
 _getZ(Z::AbstractTensorMap, ::Int64) = Z
-_getZ(Z::Vector{AbstractTensorMap}, i::Int64) = Z[i]
+_getZ(Z::Vector, i::Int64) = Z[i]
 _getpspace(::Nothing, ::Int64) = nothing
 _getpspace(pspace::VectorSpace, ::Int64) = pspace
-_getpspace(pspace::Vector{VectorSpace}, i::Int64) = pspace[i]
+_getpspace(pspace::AbstractVector{<:VectorSpace}, i::Int64) = pspace[i]
 
 _addZ!(O::LocalOperator, ::Nothing) = O
 function _addZ!(OR::LocalOperator{1, 1}, Z::AbstractTensorMap)

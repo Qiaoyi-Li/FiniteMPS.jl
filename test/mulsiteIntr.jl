@@ -18,7 +18,7 @@ for i in 1:L, j in 1:L
 	if i == j
 		addIntr!(Tree, U1SpinlessFermion.n, i, -Tij[i, i]; name = :n)
 	else
-		addIntr!(Tree, U1SpinlessFermion.FdagF, (i, j), (true, true), 
+		addIntr!(Tree, U1SpinlessFermion.FdagF, (i, j), (true, true),
 			-Tij[i, j]; name = (:Fdag, :F), Z = U1SpinlessFermion.Z)
 	end
 end
@@ -42,6 +42,7 @@ for i in 1:L, j in 1:L, k in 1:L, l in 1:L
 	!duplicated && !allunique([i, j, k, l]) && continue
 	addObs!(Tree, (U1SpinlessFermion.FdagF..., U1SpinlessFermion.FdagF...), (i, j, k, l), (true, true, true, true); Z = U1SpinlessFermion.Z, name = (:Fdag, :F, :Fdag, :F))
 	addObs!(Tree, Tuple(fill(U1SpinlessFermion.n, 4)), (i, j, k, l), (false, false, false, false); name = (:n, :n, :n, :n))
+	addObs!(Tree, U1SpinlessFermion.ΔdagΔ, (i, j, k, l), (true, true, true, true); Z = U1SpinlessFermion.Z, name = (:Fdag, :Fdag, :F, :F))
 end
 # 3-site 
 for i in 1:L, j in 1:L, k in 1:L
@@ -124,7 +125,11 @@ end
 		!duplicated && !allunique([i, j, k, l]) && continue
 		O_ex = ExpectationValue(G, [i, j, k, l], [1, 3])
 		@test haskey(Obs.FdagFFdagF, (i, j, k, l)) && abs(Obs.FdagFFdagF[(i, j, k, l)] - O_ex) < tol
+
+		O_ex = ExpectationValue(G, [i, j, k, l], [1, 2])
+		@test haskey(Obs.FdagFdagFF, (i, j, k, l)) && abs(Obs.FdagFdagFF[(i, j, k, l)] - O_ex) < tol
 	end
+
 end
 
 

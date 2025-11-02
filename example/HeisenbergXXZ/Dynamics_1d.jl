@@ -95,7 +95,7 @@ aspace_Φ = fuse(aspace_S, aspace_Ψ) # auxiliary space of the target MPS |Φ⟩
 	mul!(Φ, S_MPO, Ψ;
 		CBEAlg = NaiveCBE(D + div(D, 4), 1e-8; rsvd = true),
 		trunc = truncdim(D) & truncbelow(1e-12), verbose = 1,
-		GCsweep = true, lsnoise = [0.1, 0.01, 0.001],
+		GCsweep = true, lsnoise = [(1/4, x) for x in [0.1, 0.01, 0.001]],
           tol = 1e-12,
 	)
 end

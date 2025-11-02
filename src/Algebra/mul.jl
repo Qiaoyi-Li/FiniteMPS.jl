@@ -16,7 +16,7 @@ Compute `C = A*B` by letting `α = 1` and `β = 0`.
 	 tol::Float64 = 1e-8
 	 verbose::Int64 = 0
 	 CBEAlg::CBEAlgorithm = NoCBE()
-	 lsnoise::AbstractVector{Float64} = Float64[]
+	 lsnoise::AbstractVector{Tuple{Float64, Float64}} = []
 
 Note CBE can only be used when `α ≠ 0`.
 """
@@ -30,7 +30,7 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
 	maxiter::Int64 = get(kwargs, :maxiter, 8)
 	tol::Float64 = get(kwargs, :tol, 1e-8)
 	verbose::Int64 = get(kwargs, :verbose, 0)
-	lsnoise::Vector{Float64} = get(kwargs, :lsnoise, Float64[])
+	lsnoise::Vector{Tuple{Float64, Float64}} = get(kwargs, :lsnoise, Tuple{Float64, Float64}[])
 	CBEAlg = get(kwargs, :CBEAlg, NoCBE())
 	!isa(CBEAlg, NoCBE) && @assert !iszero(α)
 
@@ -83,7 +83,7 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
 				C.c *= norm_x
 
 				# apply noise
-				iter ≤ length(lsnoise) && noise!(x, lsnoise[iter])
+				iter ≤ length(lsnoise) && noise!(x, lsnoise[iter][2])
 
 				# svd
 				if direction <: SweepL2R
@@ -187,15 +187,42 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
 				rmul!(x, 1 / norm_x)
 				C.c *= norm_x
 
-				# apply noise
-				if iter ≤ length(lsnoise)
-					axpby!(lsnoise[iter], randn(eltype(x.A), codomain(x.A), domain(x.A)), 1.0, x.A)
-					normalize!(x.A)
-				end
-
 				# check convergence before svd
 				@timeit TimerStep "convergence_check" begin
 					convergence = max(convergence, norm(x * coef(C) - x₀)^2 / abs2(coef(C)))
+				end
+
+				# apply noise
+				if iter ≤ length(lsnoise)
+					# axpby!(lsnoise[iter], randn(eltype(x.A), codomain(x.A), domain(x.A)), 1.0, x.A)
+					# normalize!(x.A)
+					noise = lsnoise[iter]
+					if direction <: SweepL2R
+						x_perm = permute(x.A, (Tuple(1:numind(x.A)-1), (numind(x.A),)))
+						De = ceil(Int64, noise[1] * dim(codomain(x_perm)))
+						Ve = _rsvd_trunc(codomain(x_perm), De)
+						A_noise = randn(eltype(x_perm), codomain(x_perm), Ve)
+						rmul!(A_noise, noise[2] / norm(A_noise))
+						x = MPSTensor(catdomain(x_perm, A_noise))
+						normalize!(x)
+
+						Ar = permute(C[si+1].A, ((1,), Tuple(2:numind(C[si+1].A))))
+						Ar_0 = zeros(eltype(Ar), Ve, domain(Ar))
+						C[si+1] = catcodomain(Ar, Ar_0)
+					elseif si > 1
+						x_perm = permute(x.A, ((1,), Tuple(2:numind(x.A))))
+						De = ceil(Int64, noise[1] * dim(domain(x_perm)))
+						Ve = _rsvd_trunc(domain(x_perm), De)
+
+						A_noise = randn(eltype(x_perm), Ve, domain(x_perm))
+						rmul!(A_noise, noise[2] / norm(A_noise))
+						x = MPSTensor(catcodomain(x_perm, A_noise))
+						normalize!(x)
+
+						Al = permute(C[si-1].A, (Tuple(1:numind(C[si-1].A)-1), (numind(C[si-1].A),)))
+						Al_0 = zeros(eltype(Al), codomain(Al), Ve)
+						C[si-1] = catdomain(Al, Al_0)
+					end
 				end
 
 				# svd

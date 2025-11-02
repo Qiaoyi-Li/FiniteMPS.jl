@@ -13,8 +13,8 @@
 Add an interaction characterized by `N` local operators at `si = (i, j, ...)` sites. `fermionic` indicates whether each operator is fermionic or not. 
 
 # Kwargs 
-	Z::Union{Nothing, AbstractTensorMap, Vector{<:AbstractTensorMap}}
-Provide the parity operator to deal with the fermionic anti-commutation relations.If `Z == nothing`, assume all operators are bosonic. Otherwise, a uniform (single operator) `Z::AbstractTensorMap` or site-dependent (length `L` vector) `Z::Vector{<:AbstractTensorMap}` should be given.
+	Z::Union{Nothing, AbstractTensorMap, AbstractVector}
+Provide the parity operator to deal with the fermionic anti-commutation relations.If `Z == nothing`, assume all operators are bosonic. Otherwise, a uniform (single operator) `Z::AbstractTensorMap` or site-dependent (length `L` vector) `Z::AbstractVector` should be given.
 
 	pspace::Union{Nothing, VectorSpace, Vector{<:VectorSpace}}
 Provide the local Hilbert space (`VectorSpace` in `TensorKit.jl`). This is not required in generating Hamiltonian, so the default value is set as `nothing`. But some processes like generating an identity MPO require this information. In such cases, a uniform or site-dependent (length `L` vector) `pspace` should be given.
@@ -30,7 +30,7 @@ function addIntr!(Tree::InteractionTree{L},
 	si::NTuple{N, Int64},
 	fermionic::NTuple{N, Bool},
 	strength::Number;
-	Z::Union{Nothing, AbstractTensorMap, Vector{<:AbstractTensorMap}} = nothing,
+	Z::Union{Nothing, AbstractTensorMap, AbstractVector} = nothing,
 	pspace::Union{Nothing, VectorSpace, Vector{<:VectorSpace}} = nothing,
 	name::NTuple{N, Union{Symbol, String}} = _default_IntrName(N),
 	IntrName::Union{Symbol, String} = prod(string.(name)),
@@ -93,7 +93,7 @@ end
 
 function addIntr!(Tree::InteractionTree{L},
 	S::StringOperator,
-	Z::Union{Nothing, AbstractTensorMap, Vector{<:AbstractTensorMap}},
+	Z::Union{Nothing, AbstractTensorMap, AbstractVector},
 	ref::Ref;
 	pspace::Union{Nothing, VectorSpace, Vector{<:VectorSpace}} = nothing,
 ) where L
