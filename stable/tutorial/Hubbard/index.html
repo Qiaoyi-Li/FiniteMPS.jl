@@ -1,2 +1,355 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Hubbard Model · FiniteMPS.jl</title><meta name="title" content="Hubbard Model · FiniteMPS.jl"/><meta property="og:title" content="Hubbard Model · FiniteMPS.jl"/><meta property="twitter:title" content="Hubbard Model · FiniteMPS.jl"/><meta name="description" content="Documentation for FiniteMPS.jl."/><meta property="og:description" content="Documentation for FiniteMPS.jl."/><meta property="twitter:description" content="Documentation for FiniteMPS.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">FiniteMPS.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Tutorial</span><ul><li><a class="tocitem" href="../Threading/">Multi-threading</a></li><li><a class="tocitem" href="../Hamiltonian/">Hamiltonian</a></li><li><a class="tocitem" href="../Observable/">Observable</a></li><li><a class="tocitem" href="../Heisenberg/">Heisenberg Chain</a></li><li class="is-active"><a class="tocitem" href>Hubbard Model</a></li></ul></li><li><span class="tocitem">Local Space</span><ul><li><a class="tocitem" href="../../localspace/Spin/">Spin</a></li><li><a class="tocitem" href="../../localspace/Fermion/">Fermion</a></li></ul></li><li><span class="tocitem">Library</span><ul><li><a class="tocitem" href="../../lib/TensorWrappers/">Tensor Wrappers</a></li><li><a class="tocitem" href="../../lib/MPS/">MPS &amp; MPO</a></li><li><a class="tocitem" href="../../lib/Environment/">Environment</a></li><li><a class="tocitem" href="../../lib/ProjHam/">Projective Hamiltonian</a></li><li><a class="tocitem" href="../../lib/IntrTree/">Interaction Tree</a></li><li><a class="tocitem" href="../../lib/ObsTree/">Observable Tree</a></li><li><a class="tocitem" href="../../lib/ITP/">Imaginary Time Proxy</a></li><li><a class="tocitem" href="../../lib/Algebra/">MPS &amp; MPO Algebra</a></li><li><a class="tocitem" href="../../lib/Algorithm/">Algorithms</a></li><li><a class="tocitem" href="../../lib/Deprecate/">Deprecate</a></li></ul></li><li><span class="tocitem">Index</span><ul><li><a class="tocitem" href="../../index/">Index</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorial</a></li><li class="is-active"><a href>Hubbard Model</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Hubbard Model</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/Qiaoyi-Li/FiniteMPS.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/Qiaoyi-Li/FiniteMPS.jl/blob/main/docs/src/tutorial/Hubbard.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Hubbard"><a class="docs-heading-anchor" href="#Hubbard">Hubbard Model</a><a id="Hubbard-1"></a><a class="docs-heading-anchor-permalink" href="#Hubbard" title="Permalink"></a></h1><p>TODO</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Heisenberg/">« Heisenberg Chain</a><a class="docs-footer-nextpage" href="../../localspace/Spin/">Spin »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.15.0 on <span class="colophon-date" title="Sunday 2 November 2025 09:53">Sunday 2 November 2025</span>. Using Julia version 1.12.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Hubbard Model · FiniteMPS.jl</title><meta name="title" content="Hubbard Model · FiniteMPS.jl"/><meta property="og:title" content="Hubbard Model · FiniteMPS.jl"/><meta property="twitter:title" content="Hubbard Model · FiniteMPS.jl"/><meta name="description" content="Documentation for FiniteMPS.jl."/><meta property="og:description" content="Documentation for FiniteMPS.jl."/><meta property="twitter:description" content="Documentation for FiniteMPS.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">FiniteMPS.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Tutorial</span><ul><li><a class="tocitem" href="../Threading/">Multi-threading</a></li><li><a class="tocitem" href="../Hamiltonian/">Hamiltonian</a></li><li><a class="tocitem" href="../Observable/">Observable</a></li><li><a class="tocitem" href="../Heisenberg/">Heisenberg Chain</a></li><li class="is-active"><a class="tocitem" href>Hubbard Model</a><ul class="internal"><li><a class="tocitem" href="#Ground-state"><span>Ground state</span></a></li><li><a class="tocitem" href="#Finite-temperature"><span>Finite temperature</span></a></li></ul></li></ul></li><li><span class="tocitem">Local Space</span><ul><li><a class="tocitem" href="../../localspace/Spin/">Spin</a></li><li><a class="tocitem" href="../../localspace/Fermion/">Fermion</a></li></ul></li><li><span class="tocitem">Library</span><ul><li><a class="tocitem" href="../../lib/TensorWrappers/">Tensor Wrappers</a></li><li><a class="tocitem" href="../../lib/MPS/">MPS &amp; MPO</a></li><li><a class="tocitem" href="../../lib/Environment/">Environment</a></li><li><a class="tocitem" href="../../lib/ProjHam/">Projective Hamiltonian</a></li><li><a class="tocitem" href="../../lib/IntrTree/">Interaction Tree</a></li><li><a class="tocitem" href="../../lib/ObsTree/">Observable Tree</a></li><li><a class="tocitem" href="../../lib/ITP/">Imaginary Time Proxy</a></li><li><a class="tocitem" href="../../lib/Algebra/">MPS &amp; MPO Algebra</a></li><li><a class="tocitem" href="../../lib/Algorithm/">Algorithms</a></li><li><a class="tocitem" href="../../lib/Deprecate/">Deprecate</a></li></ul></li><li><span class="tocitem">Index</span><ul><li><a class="tocitem" href="../../index/">Index</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorial</a></li><li class="is-active"><a href>Hubbard Model</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Hubbard Model</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/Qiaoyi-Li/FiniteMPS.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/Qiaoyi-Li/FiniteMPS.jl/blob/main/docs/src/tutorial/Hubbard.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Hubbard"><a class="docs-heading-anchor" href="#Hubbard">Hubbard Model</a><a id="Hubbard-1"></a><a class="docs-heading-anchor-permalink" href="#Hubbard" title="Permalink"></a></h1><h2 id="Ground-state"><a class="docs-heading-anchor" href="#Ground-state">Ground state</a><a id="Ground-state-1"></a><a class="docs-heading-anchor-permalink" href="#Ground-state" title="Permalink"></a></h2><p>In this section, we use Hubbard model as an example to demonstrate how to simulate fermionic systems and compute multi-site correlations. We consider the square-lattice Hubbard model on a <span>$W\times L$</span> cylinder. Note we use a relatively small bond dimension here to avoid too much online build time, which is not sufficient to obtain converged results.</p><p>The Hamiltonian of Hubbard model reads<br/><span>$H = -t\sum_{\langle i, j\rangle\sigma} c_{i\sigma}^\dagger c_{j\sigma} + U\sum_i n_{i\uparrow}n_{i\downarrow}$</span>. Here we set <span>$t = 1$</span> as energy unit and use charge U(1) and spin SU(2) symmetries. </p><pre><code class="language-julia hljs">using FiniteMPS
+using FiniteLattices
+using CairoMakie, Statistics
+
+
+mkpath(&quot;figs_Hubbard&quot;) # save figures
+
+# parameters
+L = 24
+W = 4
+U = 12.0
+Ntot = 88 # total particle number
+Dmin = 128 # min bond dimension
+Dmax = 1024 # max bond dimension
+
+# generate lattices with FiniteLattices.jl
+Latt = YCSqua(L, W) |&gt; Snake!
+
+# generate the Hamiltonian MPO
+Tree = InteractionTree(size(Latt))
+# hopping
+for (i, j) in neighbor(Latt; ordered = true)
+     addIntr!(Tree, U1SU2Fermion.FdagF, (i, j), (true, true), -1.0; name = (:Fdag, :F), Z = U1SU2Fermion.Z)
+end
+
+# U terms
+for i in 1:size(Latt)
+     addIntr!(Tree, U1SU2Fermion.nd, i, U; name = :nd)
+end
+H = AutomataMPO(Tree)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">SparseMPO{96}: total memory = 964.619 KiB
+Bond  0-&gt; 1: 1 -&gt; 1
+Bond  1-&gt; 2: 4 -&gt; 6
+Bond  2-&gt; 3: 6 -&gt; 10
+Bond  3-&gt; 4: 8 -&gt; 14
+Bond  4-&gt; 5: 10 -&gt; 18
+Bond  5-&gt; 6: 10 -&gt; 18
+Bond  6-&gt; 7: 10 -&gt; 18
+Bond  7-&gt; 8: 10 -&gt; 18
+Bond  8-&gt; 9: 10 -&gt; 18
+Bond  9-&gt;10: 10 -&gt; 18
+Bond 10-&gt;11: 10 -&gt; 18
+Bond 11-&gt;12: 10 -&gt; 18
+Bond 12-&gt;13: 10 -&gt; 18
+Bond 13-&gt;14: 10 -&gt; 18
+Bond 14-&gt;15: 10 -&gt; 18
+Bond 15-&gt;16: 10 -&gt; 18
+Bond 16-&gt;17: 10 -&gt; 18
+Bond 17-&gt;18: 10 -&gt; 18
+Bond 18-&gt;19: 10 -&gt; 18
+Bond 19-&gt;20: 10 -&gt; 18
+Bond 20-&gt;21: 10 -&gt; 18
+Bond 21-&gt;22: 10 -&gt; 18
+Bond 22-&gt;23: 10 -&gt; 18
+Bond 23-&gt;24: 10 -&gt; 18
+Bond 24-&gt;25: 10 -&gt; 18
+Bond 25-&gt;26: 10 -&gt; 18
+Bond 26-&gt;27: 10 -&gt; 18
+Bond 27-&gt;28: 10 -&gt; 18
+Bond 28-&gt;29: 10 -&gt; 18
+Bond 29-&gt;30: 10 -&gt; 18
+Bond 30-&gt;31: 10 -&gt; 18
+Bond 31-&gt;32: 10 -&gt; 18
+Bond 32-&gt;33: 10 -&gt; 18
+Bond 33-&gt;34: 10 -&gt; 18
+Bond 34-&gt;35: 10 -&gt; 18
+Bond 35-&gt;36: 10 -&gt; 18
+Bond 36-&gt;37: 10 -&gt; 18
+Bond 37-&gt;38: 10 -&gt; 18
+Bond 38-&gt;39: 10 -&gt; 18
+Bond 39-&gt;40: 10 -&gt; 18
+Bond 40-&gt;41: 10 -&gt; 18
+Bond 41-&gt;42: 10 -&gt; 18
+Bond 42-&gt;43: 10 -&gt; 18
+Bond 43-&gt;44: 10 -&gt; 18
+Bond 44-&gt;45: 10 -&gt; 18
+Bond 45-&gt;46: 10 -&gt; 18
+Bond 46-&gt;47: 10 -&gt; 18
+Bond 47-&gt;48: 10 -&gt; 18
+Bond 48-&gt;49: 10 -&gt; 18
+Bond 49-&gt;50: 10 -&gt; 18
+Bond 50-&gt;51: 10 -&gt; 18
+Bond 51-&gt;52: 10 -&gt; 18
+Bond 52-&gt;53: 10 -&gt; 18
+Bond 53-&gt;54: 10 -&gt; 18
+Bond 54-&gt;55: 10 -&gt; 18
+Bond 55-&gt;56: 10 -&gt; 18
+Bond 56-&gt;57: 10 -&gt; 18
+Bond 57-&gt;58: 10 -&gt; 18
+Bond 58-&gt;59: 10 -&gt; 18
+Bond 59-&gt;60: 10 -&gt; 18
+Bond 60-&gt;61: 10 -&gt; 18
+Bond 61-&gt;62: 10 -&gt; 18
+Bond 62-&gt;63: 10 -&gt; 18
+Bond 63-&gt;64: 10 -&gt; 18
+Bond 64-&gt;65: 10 -&gt; 18
+Bond 65-&gt;66: 10 -&gt; 18
+Bond 66-&gt;67: 10 -&gt; 18
+Bond 67-&gt;68: 10 -&gt; 18
+Bond 68-&gt;69: 10 -&gt; 18
+Bond 69-&gt;70: 10 -&gt; 18
+Bond 70-&gt;71: 10 -&gt; 18
+Bond 71-&gt;72: 10 -&gt; 18
+Bond 72-&gt;73: 10 -&gt; 18
+Bond 73-&gt;74: 10 -&gt; 18
+Bond 74-&gt;75: 10 -&gt; 18
+Bond 75-&gt;76: 10 -&gt; 18
+Bond 76-&gt;77: 10 -&gt; 18
+Bond 77-&gt;78: 10 -&gt; 18
+Bond 78-&gt;79: 10 -&gt; 18
+Bond 79-&gt;80: 10 -&gt; 18
+Bond 80-&gt;81: 10 -&gt; 18
+Bond 81-&gt;82: 10 -&gt; 18
+Bond 82-&gt;83: 10 -&gt; 18
+Bond 83-&gt;84: 10 -&gt; 18
+Bond 84-&gt;85: 10 -&gt; 18
+Bond 85-&gt;86: 10 -&gt; 18
+Bond 86-&gt;87: 10 -&gt; 18
+Bond 87-&gt;88: 10 -&gt; 18
+Bond 88-&gt;89: 10 -&gt; 18
+Bond 89-&gt;90: 10 -&gt; 18
+Bond 90-&gt;91: 10 -&gt; 18
+Bond 91-&gt;92: 10 -&gt; 18
+Bond 92-&gt;93: 10 -&gt; 18
+Bond 93-&gt;94: 8 -&gt; 14
+Bond 94-&gt;95: 6 -&gt; 10
+Bond 95-&gt;96: 4 -&gt; 6
+</code></pre><p>The above code generates the Hamiltonian MPO for the Hubbard model, the only new usage is setting <code>(true, true)</code> to indicate both operators are fermionic and passing the parity operator <code>Z</code> when adding hopping terms. Next we generate a random density distribution and obtain the corresponding MPS.</p><pre><code class="language-julia hljs"># random density distribution
+lsn = zeros(Int64, size(Latt))
+for _ in 1:Ntot
+     i = rand(findall(==(minimum(lsn)), lsn))
+     lsn[i] += 1
+end
+
+# charge quantum numbers of horizontal bonds
+lsqc = [0]
+for n in reverse(lsn) # from right to left
+     if n == 0
+          push!(lsqc, lsqc[end] + 1)
+     elseif n == 1
+          push!(lsqc, lsqc[end])
+     else
+          push!(lsqc, lsqc[end] - 1)
+     end
+end
+lsqc = reverse(lsqc[2:end])
+
+# spaces of horizontal bonds
+lsspaces = map(1:size(Latt)) do i
+     # the left boundary bond
+     i == 1 &amp;&amp; return Rep[U₁×SU₂]((lsqc[1], iseven(Ntot) ? 0 : 1/2) =&gt; 1)
+     return Rep[U₁×SU₂]((lsqc[i], s) =&gt; 1 for s in 0:1/2:1/2)
+end
+Ψ = randMPS(fill(U1SU2Fermion.pspace, size(Latt)), lsspaces)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">MPS{96, Float64, StoreMemory}: Center = [1, 1], Norm = 1.0, total memory = 28.164 KiB
+Bond  0-&gt; 1: Rep[U₁ × SU₂]((8, 0)=&gt;1), dim = 1 -&gt; 1
+Bond  1-&gt; 2: Rep[U₁ × SU₂]((8, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond  2-&gt; 3: Rep[U₁ × SU₂]((7, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond  3-&gt; 4: Rep[U₁ × SU₂]((6, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond  4-&gt; 5: Rep[U₁ × SU₂]((6, 0)=&gt;1), dim = 1 -&gt; 1
+Bond  5-&gt; 6: Rep[U₁ × SU₂]((6, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond  6-&gt; 7: Rep[U₁ × SU₂]((6, 0)=&gt;1), dim = 1 -&gt; 1
+Bond  7-&gt; 8: Rep[U₁ × SU₂]((6, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond  8-&gt; 9: Rep[U₁ × SU₂]((6, 0)=&gt;1), dim = 1 -&gt; 1
+Bond  9-&gt;10: Rep[U₁ × SU₂]((6, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 10-&gt;11: Rep[U₁ × SU₂]((6, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 11-&gt;12: Rep[U₁ × SU₂]((6, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 12-&gt;13: Rep[U₁ × SU₂]((6, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 13-&gt;14: Rep[U₁ × SU₂]((6, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 14-&gt;15: Rep[U₁ × SU₂]((6, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 15-&gt;16: Rep[U₁ × SU₂]((6, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 16-&gt;17: Rep[U₁ × SU₂]((6, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 17-&gt;18: Rep[U₁ × SU₂]((6, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 18-&gt;19: Rep[U₁ × SU₂]((6, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 19-&gt;20: Rep[U₁ × SU₂]((6, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 20-&gt;21: Rep[U₁ × SU₂]((6, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 21-&gt;22: Rep[U₁ × SU₂]((6, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 22-&gt;23: Rep[U₁ × SU₂]((6, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 23-&gt;24: Rep[U₁ × SU₂]((6, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 24-&gt;25: Rep[U₁ × SU₂]((6, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 25-&gt;26: Rep[U₁ × SU₂]((6, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 26-&gt;27: Rep[U₁ × SU₂]((6, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 27-&gt;28: Rep[U₁ × SU₂]((6, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 28-&gt;29: Rep[U₁ × SU₂]((6, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 29-&gt;30: Rep[U₁ × SU₂]((6, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 30-&gt;31: Rep[U₁ × SU₂]((6, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 31-&gt;32: Rep[U₁ × SU₂]((6, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 32-&gt;33: Rep[U₁ × SU₂]((5, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 33-&gt;34: Rep[U₁ × SU₂]((5, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 34-&gt;35: Rep[U₁ × SU₂]((5, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 35-&gt;36: Rep[U₁ × SU₂]((5, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 36-&gt;37: Rep[U₁ × SU₂]((5, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 37-&gt;38: Rep[U₁ × SU₂]((5, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 38-&gt;39: Rep[U₁ × SU₂]((5, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 39-&gt;40: Rep[U₁ × SU₂]((5, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 40-&gt;41: Rep[U₁ × SU₂]((5, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 41-&gt;42: Rep[U₁ × SU₂]((5, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 42-&gt;43: Rep[U₁ × SU₂]((5, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 43-&gt;44: Rep[U₁ × SU₂]((5, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 44-&gt;45: Rep[U₁ × SU₂]((4, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 45-&gt;46: Rep[U₁ × SU₂]((4, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 46-&gt;47: Rep[U₁ × SU₂]((4, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 47-&gt;48: Rep[U₁ × SU₂]((4, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 48-&gt;49: Rep[U₁ × SU₂]((4, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 49-&gt;50: Rep[U₁ × SU₂]((4, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 50-&gt;51: Rep[U₁ × SU₂]((4, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 51-&gt;52: Rep[U₁ × SU₂]((4, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 52-&gt;53: Rep[U₁ × SU₂]((4, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 53-&gt;54: Rep[U₁ × SU₂]((4, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 54-&gt;55: Rep[U₁ × SU₂]((4, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 55-&gt;56: Rep[U₁ × SU₂]((4, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 56-&gt;57: Rep[U₁ × SU₂]((4, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 57-&gt;58: Rep[U₁ × SU₂]((4, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 58-&gt;59: Rep[U₁ × SU₂]((4, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 59-&gt;60: Rep[U₁ × SU₂]((4, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 60-&gt;61: Rep[U₁ × SU₂]((4, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 61-&gt;62: Rep[U₁ × SU₂]((4, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 62-&gt;63: Rep[U₁ × SU₂]((4, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 63-&gt;64: Rep[U₁ × SU₂]((4, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 64-&gt;65: Rep[U₁ × SU₂]((4, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 65-&gt;66: Rep[U₁ × SU₂]((4, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 66-&gt;67: Rep[U₁ × SU₂]((4, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 67-&gt;68: Rep[U₁ × SU₂]((4, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 68-&gt;69: Rep[U₁ × SU₂]((4, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 69-&gt;70: Rep[U₁ × SU₂]((4, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 70-&gt;71: Rep[U₁ × SU₂]((4, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 71-&gt;72: Rep[U₁ × SU₂]((4, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 72-&gt;73: Rep[U₁ × SU₂]((4, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 73-&gt;74: Rep[U₁ × SU₂]((4, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 74-&gt;75: Rep[U₁ × SU₂]((4, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 75-&gt;76: Rep[U₁ × SU₂]((4, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 76-&gt;77: Rep[U₁ × SU₂]((4, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 77-&gt;78: Rep[U₁ × SU₂]((4, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 78-&gt;79: Rep[U₁ × SU₂]((4, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 79-&gt;80: Rep[U₁ × SU₂]((4, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 80-&gt;81: Rep[U₁ × SU₂]((4, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 81-&gt;82: Rep[U₁ × SU₂]((4, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 82-&gt;83: Rep[U₁ × SU₂]((3, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 83-&gt;84: Rep[U₁ × SU₂]((3, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 84-&gt;85: Rep[U₁ × SU₂]((3, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 85-&gt;86: Rep[U₁ × SU₂]((2, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 86-&gt;87: Rep[U₁ × SU₂]((2, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 87-&gt;88: Rep[U₁ × SU₂]((2, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 88-&gt;89: Rep[U₁ × SU₂]((2, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 89-&gt;90: Rep[U₁ × SU₂]((2, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 90-&gt;91: Rep[U₁ × SU₂]((2, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 91-&gt;92: Rep[U₁ × SU₂]((2, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 92-&gt;93: Rep[U₁ × SU₂]((1, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 93-&gt;94: Rep[U₁ × SU₂]((0, 1/2)=&gt;1), dim = 1 -&gt; 2
+Bond 94-&gt;95: Rep[U₁ × SU₂]((0, 0)=&gt;1), dim = 1 -&gt; 1
+Bond 95-&gt;96: Rep[U₁ × SU₂]((0, 1/2)=&gt;1), dim = 1 -&gt; 2
+</code></pre><p>Then we prepare the <code>ObservableTree</code> used to calculate observables.</p><pre><code class="language-julia hljs">ObsTree = ObservableTree(size(Latt))
+
+# on-site terms
+for i in 1:size(Latt)
+     addObs!(ObsTree, U1SU2Fermion.n, i; name = :n) # density
+     addObs!(ObsTree, U1SU2Fermion.nd, i; name = :nd) # double occupancy
+end
+
+# all-to all 2-site correlations
+for i in 1:size(Latt), j in i:size(Latt)
+     # spin correlation
+     addObs!(ObsTree, U1SU2Fermion.SS, (i, j), (false, false); name = (:S, :S))
+     # density correlation
+     addObs!(ObsTree, (U1SU2Fermion.n, U1SU2Fermion.n), (i, j), (false, false); name = (:n, :n))
+     # single particle correlation
+     addObs!(ObsTree, U1SU2Fermion.FdagF, (i, j), (true, true); name = (:Fdag, :F), Z = U1SU2Fermion.Z)
+end
+
+# singlet pairing correlations of y-bonds
+Pairs = [(Latt[x, y], Latt[x, y % W + 1]) for x in 1:L for y in 1:W]
+for idx1 in 1:length(Pairs), idx2 in idx1:length(Pairs)
+     addObs!(ObsTree, U1SU2Fermion.ΔₛdagΔₛ, (Pairs[idx1]..., Pairs[idx2]...), (true, true, true, true); name = (:Fdag, :Fdag, :F, :F), Z = U1SU2Fermion.Z)
+end
+
+# observables of the initial random state
+calObs!(ObsTree, Ψ)
+Obs = convert(Dict, ObsTree)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Dict{String, Dict} with 6 entries:
+  &quot;nd&quot;         =&gt; Dict{Tuple{Int64}, Number}((70,)=&gt;0.0, (21,)=&gt;0.0, (38,)=&gt;0.0…
+  &quot;FdagFdagFF&quot; =&gt; Dict{NTuple{4, Int64}, Number}((33, 34, 94, 93)=&gt;0.0, (66, 67…
+  &quot;SS&quot;         =&gt; Dict{Tuple{Int64, Int64}, Number}((19, 86)=&gt;0.0, (65, 69)=&gt;0.…
+  &quot;nn&quot;         =&gt; Dict{Tuple{Int64, Int64}, Number}((19, 86)=&gt;1.0, (65, 69)=&gt;1.…
+  &quot;FdagF&quot;      =&gt; Dict{Tuple{Int64, Int64}, Number}((19, 86)=&gt;0.0, (65, 69)=&gt;0.…
+  &quot;n&quot;          =&gt; Dict{Tuple{Int64}, Number}((70,)=&gt;1.0, (21,)=&gt;1.0, (38,)=&gt;1.0…</code></pre><p>We can verify that the initial density distribution matches the random configuration via</p><pre><code class="language-julia hljs"># check initial density distribution
+@assert all(i -&gt; Obs[&quot;n&quot;][(i,)] ≈ lsn[i], 1:length(lsn))</code></pre><p>Then, we perform the CBE-DMRG to obtain the ground state.</p><pre><code class="language-julia hljs">Env = Environment(Ψ&#39;, H, Ψ)
+lsD = [Dmin]
+lsE = Float64[]
+lsObs = Dict[]
+etol = 1e-5 # energy tolerance
+MaxSweeps = 100 # avoid dead loops
+
+for i in 1:MaxSweeps
+     D = lsD[end]
+     info, _ = DMRGSweep1!(Env; K = 16, trunc = truncdim(D),
+          CBEAlg = NaiveCBE(D + div(D, 4), 1e-8; rsvd = true),
+     )
+
+	push!(lsE, info[2].dmrg[1].Eg)
+     # @show D, lsE[end]
+
+     if i &gt; 1 &amp;&amp; (lsE[end-1] - lsE[end])/size(Latt) &lt; etol
+          calObs!(ObsTree, Ψ)
+          push!(lsObs, convert(Dict, ObsTree))
+
+          D *= 2  # increase bond dimension
+          D &gt; Dmax &amp;&amp; break # converged
+     end
+
+     push!(lsD, D)
+end
+
+# plot the energy vs nsweep
+fig = Figure(size = (480, 240))
+ax = Axis(fig[1, 1];
+     xlabel = &quot;nsweep&quot;,
+     ylabel = &quot;energy per site&quot;)
+scatterlines!(ax, lsE / size(Latt)) # per site
+save(&quot;figs_Hubbard/GS_energy.png&quot;, fig)</code></pre><p><img src="../figs_Hubbard/GS_energy.png" alt/> The parameters are chosen as <span>$U = 12$</span> and <span>$\delta = 1/12$</span>, where the ground state belongs to <a href="https://journals.aps.org/prresearch/abstract/10.1103/PhysRevResearch.2.033073">LE1</a> phase that exhibits half-filled charge density wave with <span>$\lambda_\textrm{CDW}= 1/(2\delta) = 6$</span> and power-law pairing correlation.</p><pre><code class="language-julia hljs"># illustrate CDW
+fig = Figure(size = (480, 500))
+ax = Axis(fig[1, 1];
+     xlabel = L&quot;x&quot;,
+     ylabel = L&quot;n(x)&quot;)
+map(lsObs, unique(lsD), range(0.2, 1.0;length = length(lsObs))) do Obs, D, α
+     lsnx = map(1:L) do x
+          return mean(1:W) do y
+               Obs[&quot;n&quot;][(Latt[x, y],)]
+          end
+     end
+     scatterlines!(ax, 1:L, lsnx;
+          color = (:blue, α),
+          label = L&quot;D = %$(D)&quot;
+     )
+end
+
+# pairing correlation in 1/4 to 3/4 bulk region
+ax2 = Axis(fig[2, 1];
+     xlabel = L&quot;r&quot;,
+     ylabel = L&quot;\Phi_{yy}(r)&quot;,
+     xscale = log10,
+     yscale = log10,
+)
+lsr = 1:div(L, 2) - 1
+map(lsObs, unique(lsD), range(0.2, 1.0;length = length(lsObs))) do Obs, D, α
+     lsΦyy = map(lsr) do r
+          mean([(x, y) for x in div(L, 4)+1 : div(3*L, 4)-r for y in 1:W]) do (x, y)
+               Obs[&quot;FdagFdagFF&quot;][(Latt[x, y], Latt[x, y % W + 1], Latt[x + r, y], Latt[x + r, y % W + 1])]
+          end
+     end
+     scatterlines!(ax2, lsr, lsΦyy;
+          color = (:blue, α),
+          label = L&quot;D = %$(D)&quot;
+     )
+end
+axislegend(ax2; position = (0, 0), rowgap = 0)
+
+save(&quot;figs_Hubbard/GS_Obs.png&quot;, fig)</code></pre><p><img src="../figs_Hubbard/GS_Obs.png" alt/> Finally, we illustrate the CDW and the pairing correlation. Emphasize again this is only a demonstrative example, a much larger bond dimension is required to reproduce the power-law pairing correlation.</p><h2 id="Finite-temperature"><a class="docs-heading-anchor" href="#Finite-temperature">Finite temperature</a><a id="Finite-temperature-1"></a><a class="docs-heading-anchor-permalink" href="#Finite-temperature" title="Permalink"></a></h2><p>TODO</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Heisenberg/">« Heisenberg Chain</a><a class="docs-footer-nextpage" href="../../localspace/Spin/">Spin »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.15.0 on <span class="colophon-date" title="Sunday 2 November 2025 10:39">Sunday 2 November 2025</span>. Using Julia version 1.12.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

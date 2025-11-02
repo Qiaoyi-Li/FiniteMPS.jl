@@ -92,7 +92,7 @@ for nsweep in 1:NSweeps
      info, TO = DMRGSweep2!(Env; K = 16, trunc = truncdim(D))
 	push!(lsE, info[2][1].Eg)
 end
-Eg = lsE[end]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">-13.997315618224984</code></pre><p>Here we first construct the tri-layer environment to store the environment tensors of the local 2-site projective Hamiltonian in MPS-based DMRG. <code>scalar!</code> method triggers full contraction of the total tri-layer tensor network thus gives the initial energy.</p><p>Then we perform <code>NSweep</code> times 2-DMRG sweeping via the key function <code>DMRGSweep2!</code>, where <code>K = 16</code> is the Krylov space dimension and <code>trunc = truncdim(D)</code> is a TensorKit.jl syntax that determines the truncation scheme, i.e. keep up to <code>D</code> bond dimension. Returned <code>info</code> stores the information of a DMRG sweep and <code>TO</code> is a <code>TimerOutput</code> object contains the time usage. Here we directly extract the energy from the output information, one can also use <code>scalar!</code> again.</p><pre><code class="language-julia hljs"># plot the energy vs nsweep
+Eg = lsE[end]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">-13.997315618224969</code></pre><p>Here we first construct the tri-layer environment to store the environment tensors of the local 2-site projective Hamiltonian in MPS-based DMRG. <code>scalar!</code> method triggers full contraction of the total tri-layer tensor network thus gives the initial energy.</p><p>Then we perform <code>NSweep</code> times 2-DMRG sweeping via the key function <code>DMRGSweep2!</code>, where <code>K = 16</code> is the Krylov space dimension and <code>trunc = truncdim(D)</code> is a TensorKit.jl syntax that determines the truncation scheme, i.e. keep up to <code>D</code> bond dimension. Returned <code>info</code> stores the information of a DMRG sweep and <code>TO</code> is a <code>TimerOutput</code> object contains the time usage. Here we directly extract the energy from the output information, one can also use <code>scalar!</code> again.</p><pre><code class="language-julia hljs"># plot the energy vs nsweep
 fig = Figure(size = (480, 240))
 ax = Axis(fig[1, 1];
      xlabel = &quot;nsweep&quot;,
@@ -160,7 +160,7 @@ SM_GS = calSM(Obs)
 # SETTN
 ρ, lsF_SETTN = SETTN(H, lsβ[1];
      CBEAlg = NaiveCBE(D + div(D, 4), 1e-8; rsvd = true),
-     lsnoise = [0.01, 0.001], tol = 1e-12,
+     lsnoise = [(1/4, x) for x in [0.01, 0.001]], tol = 1e-12,
 	trunc = truncdim(D) &amp; truncbelow(1e-16),
 )
 lslnZ[1] = 2 * log(norm(ρ))
@@ -240,8 +240,8 @@ S_MPO = AutomataMPO(Tree)
 mul!(Φ, S_MPO, Ψ;
 	CBEAlg = NaiveCBE(D + div(D, 4), 1e-8; rsvd = true),
 	trunc = truncdim(D), GCsweep = true,
-     lsnoise = [0.1, 0.01, 0.001], tol = 1e-12,
-)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">MPS{32, ComplexF64, StoreMemory}: Center = [1, 1], Norm = 0.866025403529442, total memory = 312.594 KiB
+     lsnoise = [(1/4, x) for x in [0.1, 0.01, 0.001]], tol = 1e-12,
+)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">MPS{32, ComplexF64, StoreMemory}: Center = [1, 1], Norm = 0.8660254035294416, total memory = 306.672 KiB
 Bond  0-&gt; 1: Rep[SU₂](1=&gt;1), dim = 1 -&gt; 3
 Bond  1-&gt; 2: Rep[SU₂](1/2=&gt;1, 3/2=&gt;1), dim = 2 -&gt; 6
 Bond  2-&gt; 3: Rep[SU₂](0=&gt;1, 1=&gt;2, 2=&gt;1), dim = 4 -&gt; 12
@@ -258,15 +258,15 @@ Bond 12-&gt;13: Rep[SU₂](0=&gt;9, 1=&gt;15, 2=&gt;10, 3=&gt;3), dim = 37 -&gt;
 Bond 13-&gt;14: Rep[SU₂](1/2=&gt;14, 3/2=&gt;14, 5/2=&gt;6, 7/2=&gt;1), dim = 35 -&gt; 128
 Bond 14-&gt;15: Rep[SU₂](0=&gt;9, 1=&gt;17, 2=&gt;10, 3=&gt;2), dim = 38 -&gt; 124
 Bond 15-&gt;16: Rep[SU₂](1/2=&gt;16, 3/2=&gt;16, 5/2=&gt;5), dim = 37 -&gt; 126
-Bond 16-&gt;17: Rep[SU₂](0=&gt;11, 1=&gt;20, 2=&gt;10, 3=&gt;1), dim = 42 -&gt; 128
+Bond 16-&gt;17: Rep[SU₂](0=&gt;11, 1=&gt;19, 2=&gt;9, 3=&gt;1), dim = 40 -&gt; 120
 Bond 17-&gt;18: Rep[SU₂](1/2=&gt;18, 3/2=&gt;17, 5/2=&gt;4), dim = 39 -&gt; 128
 Bond 18-&gt;19: Rep[SU₂](0=&gt;11, 1=&gt;20, 2=&gt;10, 3=&gt;1), dim = 42 -&gt; 128
 Bond 19-&gt;20: Rep[SU₂](1/2=&gt;18, 3/2=&gt;17, 5/2=&gt;4), dim = 39 -&gt; 128
-Bond 20-&gt;21: Rep[SU₂](0=&gt;11, 1=&gt;20, 2=&gt;10, 3=&gt;1), dim = 42 -&gt; 128
-Bond 21-&gt;22: Rep[SU₂](1/2=&gt;18, 3/2=&gt;17, 5/2=&gt;4), dim = 39 -&gt; 128
+Bond 20-&gt;21: Rep[SU₂](0=&gt;11, 1=&gt;19, 2=&gt;10, 3=&gt;1), dim = 41 -&gt; 125
+Bond 21-&gt;22: Rep[SU₂](1/2=&gt;18, 3/2=&gt;16, 5/2=&gt;4), dim = 38 -&gt; 124
 Bond 22-&gt;23: Rep[SU₂](0=&gt;11, 1=&gt;20, 2=&gt;10, 3=&gt;1), dim = 42 -&gt; 128
 Bond 23-&gt;24: Rep[SU₂](1/2=&gt;17, 3/2=&gt;16, 5/2=&gt;5), dim = 38 -&gt; 128
-Bond 24-&gt;25: Rep[SU₂](0=&gt;11, 1=&gt;20, 2=&gt;10, 3=&gt;1), dim = 42 -&gt; 128
+Bond 24-&gt;25: Rep[SU₂](0=&gt;10, 1=&gt;18, 2=&gt;10, 3=&gt;2), dim = 40 -&gt; 128
 Bond 25-&gt;26: Rep[SU₂](1/2=&gt;14, 3/2=&gt;14, 5/2=&gt;6, 7/2=&gt;1), dim = 35 -&gt; 128
 Bond 26-&gt;27: Rep[SU₂](0=&gt;5, 1=&gt;9, 2=&gt;5, 3=&gt;1), dim = 20 -&gt; 64
 Bond 27-&gt;28: Rep[SU₂](1/2=&gt;5, 3/2=&gt;4, 5/2=&gt;1), dim = 10 -&gt; 32
@@ -284,26 +284,26 @@ iso = isometry(aspace_Φ, aspace_S ⊗ aspace_Ψ)
 El = permute(iso&#39;, ((2, 1), (3,)))
 calObs!(ObsTree, Ψ, Φ; El = El)
 matSijt[:, 1] = [ObsTree.Refs[&quot;S&quot;][(i,)][] / 3 for i in 1:L]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">32-element Vector{ComplexF64}:
- -0.011762564964430506 - 1.4522374450183172e-17im
-  0.007678317422078374 + 1.0015430655298738e-17im
- -0.014729592522708885 - 1.3020059851888359e-17im
-   0.01101825687399894 + 1.101697372082861e-17im
-  -0.01778316048363141 - 2.0281247076979947e-17im
-  0.014218471473970705 + 2.4908737925405936e-17im
-  -0.02166743977945945 - 2.2050256483251128e-17im
-  0.018163377553368183 + 1.622383314770466e-17im
-  -0.02738424868931515 - 6.648135426535487e-18im
-  0.023976418266677447 + 1.050140888838971e-18im
+ -0.011762564964431224 - 8.888694706577625e-18im
+   0.00767831742207888 + 6.2596441595617084e-18im
+ -0.014729592522709943 - 9.82764133051188e-18im
+  0.011018256873999996 + 1.029711464247901e-17im
+ -0.017783160483633518 - 1.0015430655298733e-17im
+  0.014218471473972693 + 2.827254782678602e-18im
+   -0.0216674397794613 - 1.6790795933046963e-17im
+  0.018163377553370545 + 1.3090771213036527e-17im
+  -0.02738424868931511 - 2.6198770392641965e-17im
+  0.023976418266674862 + 1.376463810608778e-17im
                        ⋮
-   0.01895965259847125 - 8.80658863395175e-18im
- -0.013344102784460346 + 5.764103005736252e-18im
-   0.01542914642903436 - 2.9247099366020617e-18im
- -0.010484575356473333 + 1.4091524537407667e-18im
-  0.012873407653914063 - 1.2950455428584646e-18im
- -0.008132861965897924 + 6.540821304782157e-19im
-  0.010767614568035514 - 5.657346229285543e-19im
- -0.005662695949181495 + 2.4976206026448957e-19im
-  0.008643251199145984 - 2.518561697095809e-19im</code></pre><p>Emphasize that the isometry to fuse the space of <span>$S_j$</span> and <span>$|\Psi\rangle$</span> must be considered carefully. We exactly insert a pair of isometries without changing the contraction result. One is implicitly applied in <code>mul!</code> to fuse the two additonal indices to the new one of <code>Φ</code>, and the other becomes the left boundary environment tensor <code>El</code> sent to <code>calObs!</code>. </p><pre><code class="language-julia hljs"># time evolution
+  0.018959652586893735 + 8.976107662399532e-13im
+ -0.013344102759746694 - 2.6863143109831306e-12im
+  0.015429146349417085 + 6.7260594810035644e-12im
+ -0.010484575189911867 - 2.6200234620529383e-12im
+  0.012873407641016946 - 9.12303672478452e-12im
+ -0.008132862360651633 + 8.190606582938546e-12im
+  0.010767614937505497 - 5.403510044511435e-12im
+ -0.005662695781214981 + 7.583677680056278e-12im
+  0.008643250967266635 - 3.5037573382500336e-12im</code></pre><p>Emphasize that the isometry to fuse the space of <span>$S_j$</span> and <span>$|\Psi\rangle$</span> must be considered carefully. We exactly insert a pair of isometries without changing the contraction result. One is implicitly applied in <code>mul!</code> to fuse the two additonal indices to the new one of <code>Φ</code>, and the other becomes the left boundary environment tensor <code>El</code> sent to <code>calObs!</code>. </p><pre><code class="language-julia hljs"># time evolution
 
 # construct the trilayer environment for TDVP
 Env = Environment(Φ&#39;, H, Φ)
@@ -366,4 +366,4 @@ lsω_lower = (π/2) .* abs.(sin.(lsk .* π))
 lines!(ax, lsk, lsω_upper; color = :white, linestyle = :dash)
 lines!(ax, lsk, lsω_lower; color = :white, linestyle = :dash)
 
-save(&quot;figs_Heisenberg/Skomega.png&quot;, fig)</code></pre><p><img src="../figs_Heisenberg/Skomega.png" alt/> The exact (thermodynamical limit) upper and lower boundaries are also shown. Our numerial results align well with them, up to the frequency resolution (FWHM <span>$\approx 8 / t_\textrm{max}$</span>) due to the finite evolution time <span>$t_\textrm{max} = 10$</span>.   </p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Observable/">« Observable</a><a class="docs-footer-nextpage" href="../Hubbard/">Hubbard Model »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.15.0 on <span class="colophon-date" title="Sunday 2 November 2025 09:53">Sunday 2 November 2025</span>. Using Julia version 1.12.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+save(&quot;figs_Heisenberg/Skomega.png&quot;, fig)</code></pre><p><img src="../figs_Heisenberg/Skomega.png" alt/> The exact (thermodynamical limit) upper and lower boundaries are also shown. Our numerial results align well with them, up to the frequency resolution (FWHM <span>$\approx 8 / t_\textrm{max}$</span>) due to the finite evolution time <span>$t_\textrm{max} = 10$</span>.   </p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Observable/">« Observable</a><a class="docs-footer-nextpage" href="../Hubbard/">Hubbard Model »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.15.0 on <span class="colophon-date" title="Sunday 2 November 2025 10:39">Sunday 2 November 2025</span>. Using Julia version 1.12.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
