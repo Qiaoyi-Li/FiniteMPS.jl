@@ -209,9 +209,9 @@ end
 
 function _default_IntrName(N::Int64)
 	if N ≤ 26
-		return [string(Char(64 + i)) for i in 1:N] |> tuple
+		return [string(Char(64 + i)) for i in 1:N] |> Tuple
 	else
-		return ["O$i" for i in 1:N] |> tuple
+		return ["O$i" for i in 1:N] |> Tuple
 	end
 end
 
