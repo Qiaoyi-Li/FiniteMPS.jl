@@ -163,7 +163,7 @@ end
 # pairing correlation in 1/4 to 3/4 bulk region
 ax2 = Axis(fig[2, 1];
      xlabel = L"r",
-     ylabel = L"\Phi_{yy}(r)",
+     ylabel = L"|\Phi_{yy}(r)|",
      xscale = log10,
      yscale = log10,
 )
@@ -174,7 +174,7 @@ map(lsObs, unique(lsD), range(0.2, 1.0;length = length(lsObs))) do Obs, D, α
                Obs["FdagFdagFF"][(Latt[x, y], Latt[x, y % W + 1], Latt[x + r, y], Latt[x + r, y % W + 1])]
           end
      end
-     scatterlines!(ax2, lsr, lsΦyy;
+     scatterlines!(ax2, lsr, abs.(lsΦyy);
           color = (:blue, α),
           label = L"D = %$(D)"
      )
