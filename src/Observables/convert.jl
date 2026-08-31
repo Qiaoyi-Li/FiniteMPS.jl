@@ -15,7 +15,12 @@ Collect the observables from the graph `G` and store them in a dictionary or a n
 """
 function convert(::Type{Dict}, G::ImagTimeProxyGraph; kwargs...)
 
-	return Dict{String, Dict}(k => Dict{typeof(d).parameters[1], Number}(si => v[] for (si, v) in d) for (k, d) in G.Refs)
+	obs = Dict{String, Dict}()
+	for (k, d) in G.Refs
+		F = any(v -> isa(v[], Complex), values(d)) ? ComplexF64 : Float64
+		obs[k] = Dict{typeof(d).parameters[1], F}(si => v[] for (si, v) in d)
+	end
+	return obs
 end
 
 function convert(::Type{NamedTuple}, Tree::Union{ObservableTree,ImagTimeProxyGraph}; kwargs...)
