@@ -79,7 +79,7 @@ function _initialize_Al(El_i::SparseLeftTensor, Al_i::MPSTensor, Hl::SparseMPOTe
 	sz = size(Hl)
 	Al = Vector{AbstractTensorMap}(undef, sz[2])
 
-	validIdx = filter!(x -> !isnothing(El_i[x[1]]) && !isnothing(Hl[x[1], x[2]]), [(i, j) for i in 1:sz[1] for j in 1:sz[2]])
+	validIdx = filter!(x -> !_isabsent(El_i[x[1]]) && !_isabsent(Hl[x[1], x[2]]), [(i, j) for i in 1:sz[1] for j in 1:sz[2]])
 
 	if get_num_workers() > 1
 		lsAl = pmap(validIdx) do (i, j)
@@ -125,7 +125,7 @@ function _initialize_Ar(Er_i::SparseRightTensor, Ar_i::MPSTensor, Hr::SparseMPOT
 	sz = size(Hr)
 	Ar = Vector{AbstractTensorMap}(undef, sz[1])
 
-	validIdx = filter!(x -> !isnothing(Er_i[x[2]]) && !isnothing(Hr[x[1], x[2]]), [(i, j) for i in 1:sz[1] for j in 1:sz[2]])
+	validIdx = filter!(x -> !_isabsent(Er_i[x[2]]) && !_isabsent(Hr[x[1], x[2]]), [(i, j) for i in 1:sz[1] for j in 1:sz[2]])
 
 	if get_num_workers() > 1
 		lsAr = pmap(validIdx) do (i, j)

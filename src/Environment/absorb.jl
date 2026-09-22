@@ -1,12 +1,12 @@
 """
-	absorb!(El::SparseLeftTensor, x::MPSTensor{2}) -> nothing
-     absorb!(Er::SparseRightTensor, x::MPSTensor{2}) -> nothing
+	absorb_bond!(El::SparseLeftTensor, x::MPSTensor{2}) -> nothing
+     absorb_bond!(Er::SparseRightTensor, x::MPSTensor{2}) -> nothing
 
 Absorb a rank-2 bond tensor to a environment tensor.
 """
-function absorb!(El::SparseLeftTensor, S::MPSTensor{2})
+function absorb_bond!(El::SparseLeftTensor, S::MPSTensor{2})
 
-	validIdx = findall(x -> !isnothing(El[x]), 1:length(El))
+	validIdx = findall(x -> !_isabsent(El[x]), 1:length(El))
 	if get_num_workers() > 1
 		@assert false "not implemented"
 	elseif get_num_threads_julia() > 0 # multi-threading
@@ -21,9 +21,9 @@ function absorb!(El::SparseLeftTensor, S::MPSTensor{2})
      return nothing
 end
 
-function absorb!(Er::SparseRightTensor, S::MPSTensor{2})
+function absorb_bond!(Er::SparseRightTensor, S::MPSTensor{2})
 
-	validIdx = findall(x -> !isnothing(Er[x]), 1:length(Er))
+	validIdx = findall(x -> !_isabsent(Er[x]), 1:length(Er))
 	if get_num_workers() > 1
 		@assert false "not implemented"
 	elseif get_num_threads_julia() > 0 # multi-threading

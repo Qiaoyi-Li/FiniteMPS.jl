@@ -44,7 +44,7 @@ function AutomataMPO(Tree::InteractionTree{L}; compress::Int64 = 1, tol::Float64
 					s = real(s)
 				end
 				Op.strength[] = s
-				H[i, j] += Op
+				H[i, j] = _isabsent(H[i, j]) ? Op : H[i, j] + Op
 			end
 		end
 

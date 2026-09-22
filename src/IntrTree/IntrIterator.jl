@@ -72,7 +72,7 @@ function iterate(iter::OnSiteInteractionIterator{L, Nothing}, i::Int64 = 1) wher
           Op_wrap = iter.Op
      else
           pspace = domain(iter.Op)[1]
-          Op_wrap = IdentityOperator(pspace, trivial(pspace), i)
+          Op_wrap = IdentityOperator(pspace, unitspace(pspace), i)
      end
      return Op_wrap, i + 1
 end
@@ -84,7 +84,7 @@ function iterate(iter::OnSiteInteractionIterator{L, <:AbstractTensorMap}, i::Int
           Op_wrap = LocalOperator(iter.Z, :Z, i, false)
      else
           pspace = domain(iter.Op)[1]
-          Op_wrap = IdentityOperator(pspace, trivial(pspace), i)
+          Op_wrap = IdentityOperator(pspace, unitspace(pspace), i)
      end
      return Op_wrap, i + 1
 end
@@ -98,7 +98,7 @@ function iterate(iter::OnSiteInteractionIterator{L, <:AbstractVector}, i::Int64 
 	else
           # TODO pspace is not correct but it will not be used for id operator
 		pspace = domain(iter.Op)[1] 
-		Op_wrap = IdentityOperator(pspace, trivial(pspace), i)
+		Op_wrap = IdentityOperator(pspace, unitspace(pspace), i)
 	end
 	return Op_wrap, i + 1
 end
@@ -133,9 +133,8 @@ Direct constructor.
      TwoSiteInteractionIterator{L}(Op::NTuple{2, AbstractTensorMap},
           name::NTuple{2, Union{String, Symbol}},
           si::NTuple{2, Int64};
-          convertRight::Bool=false,
           Z=nothing)
-Generate the `LocalOperator` objects with 2-tuples `Op`, `name` and `si`. If `convertRight == true`, convert the the second operator (with larger site index, can be `O₁` or `O₂`) to a right one (i.e. only have left horizontal leg), which is used to uniquely determine the contraction when calculating ITP.
+Generate the `LocalOperator` objects with 2-tuples `Op`, `name` and `si`.
 """
 struct TwoSiteInteractionIterator{L, T} <: AbstractInteractionIterator{L}
      O₁::AbstractLocalOperator
@@ -153,7 +152,6 @@ struct TwoSiteInteractionIterator{L, T} <: AbstractInteractionIterator{L}
      function TwoSiteInteractionIterator{L}(Op::NTuple{2, AbstractTensorMap},
           name::NTuple{2, Union{String, Symbol}},
           si::NTuple{2, Int64};
-          convertRight::Bool = false,
           Z=nothing
           ) where {L}
           @assert 1 ≤ si[1] ≤ L && 1 ≤ si[2] ≤ L && si[1] ≠ si[2]
@@ -167,10 +165,6 @@ struct TwoSiteInteractionIterator{L, T} <: AbstractInteractionIterator{L}
               # swap if si is not in ascending order
               fac = isnothing(Z) ? 1 : -1
               O₁, O₂ = _swap(O₁, LocalOperator(fac * Op[2], name[2], si[2], Zflag))
-          end
-          if convertRight
-               # convert to right operator, i.e. the horizontal bond is on the left
-               O₁, O₂ = _rightOp(O₁, O₂)
           end
           return TwoSiteInteractionIterator{L}(O₁, O₂, Z)
      end
@@ -237,7 +231,7 @@ The iterator for an arbitrary interaction term.
 
 # Fields
      Ops::Vector{<:AbstractLocalOperator}
-A vector to store the local operators, `length(Ops) == N` means a `N`-site interaction term.
+A vector to store the local operators, `length(Ops) == N` means a `N`-site interaction term. The chain must have a closed right boundary before iteration.
 
      Z::Union{Nothing, AbstractTensorMap, AbstractVector}
      pspace::Union{Nothing, VectorSpace, Vector{<:VectorSpace}}
@@ -254,7 +248,12 @@ struct ArbitraryInteractionIterator{L} <: AbstractInteractionIterator{L}
      Z::Union{Nothing, AbstractTensorMap, AbstractVector}
      pspace::Union{Nothing, VectorSpace, Vector{<:VectorSpace}}
 end
-function iterate(iter::ArbitraryInteractionIterator{L}, st::Tuple{Int64, Int64, Bool, VectorSpace} = (1, 1, false, getLeftSpace(iter.Ops[1]))) where {L}
+function _iterator_start(iter::ArbitraryInteractionIterator)
+     boundary = _validate_string(iter.Ops; rightclosed = true)
+     aspace = something(boundary.left, unitspace(getPhysSpace(iter.Ops[1])))
+     return (1, 1, false, aspace)
+end
+function iterate(iter::ArbitraryInteractionIterator{L}, st::Tuple{Int64, Int64, Bool, VectorSpace} = _iterator_start(iter)) where {L}
      i, idx, flag, aspace = st
      i > L && return nothing
 
@@ -268,7 +267,8 @@ function iterate(iter::ArbitraryInteractionIterator{L}, st::Tuple{Int64, Int64, 
           Op_i = deepcopy(iter.Ops[idx])
           # add Z if necessary
           flag && _addZ!(Op_i, _getZ(iter.Z, i))
-          return Op_i, (i + 1, idx + 1, xor(flag, isfermionic(Op_i)), getRightSpace(Op_i))
+          nextspace = Op_i isa Union{LocalOperator{1,1},IdentityOperator} && isunitspace(getRightSpace(Op_i)) ? aspace : getRightSpace(Op_i)
+          return Op_i, (i + 1, idx + 1, xor(flag, isfermionic(Op_i)), nextspace)
      end
 end
 

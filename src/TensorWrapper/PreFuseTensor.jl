@@ -18,7 +18,7 @@ struct LeftPreFuseTensor{R} <: AbstractEnvironmentTensor
      function LeftPreFuseTensor{R}(A::AbstractTensorMap) where {R}
           @assert R == numind(A) ≥ 4
           if numin(A) != 2
-               A = permute(A, Tuple(1:R-2), (R - 1, R))
+               A = permute(A, (Tuple(1:R-2), (R - 1, R)))
           end
           return new{R}(A)
      end

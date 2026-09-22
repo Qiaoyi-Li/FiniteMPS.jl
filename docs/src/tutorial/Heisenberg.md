@@ -40,14 +40,14 @@ NSweeps = 5
 Env = Environment(Ψ', H, Ψ)
 lsE = [scalar!(Env)] # initial energy
 for nsweep in 1:NSweeps
-     info, TO = DMRGSweep2!(Env; K = 16, trunc = truncdim(D))
+     info, TO = DMRGSweep2!(Env; K = 16, trunc = truncrank(D))
 	push!(lsE, info[2][1].Eg)
 end
 Eg = lsE[end]
 ```
 Here we first construct the tri-layer environment to store the environment tensors of the local 2-site projective Hamiltonian in MPS-based DMRG. `scalar!` method triggers full contraction of the total tri-layer tensor network thus gives the initial energy.
 
-Then we perform `NSweep` times 2-DMRG sweeping via the key function `DMRGSweep2!`, where `K = 16` is the Krylov space dimension and `trunc = truncdim(D)` is a TensorKit.jl syntax that determines the truncation scheme, i.e. keep up to `D` bond dimension. Returned `info` stores the information of a DMRG sweep and `TO` is a `TimerOutput` object contains the time usage. Here we directly extract the energy from the output information, one can also use `scalar!` again.
+Then we perform `NSweep` times 2-DMRG sweeping via the key function `DMRGSweep2!`, where `K = 16` is the Krylov space dimension and `trunc = truncrank(D)` is a TensorKit.jl syntax that determines the truncation scheme, i.e. keep up to `D` bond dimension. Returned `info` stores the information of a DMRG sweep and `TO` is a `TimerOutput` object contains the time usage. Here we directly extract the energy from the output information, one can also use `scalar!` again.
 
 ```@example Heisenberg
 # plot the energy vs nsweep
@@ -137,7 +137,7 @@ SM_GS = calSM(Obs)
 ρ, lsF_SETTN = SETTN(H, lsβ[1];
      CBEAlg = NaiveCBE(D + div(D, 4), 1e-8; rsvd = true),
      lsnoise = [(1/4, x) for x in [0.01, 0.001]], tol = 1e-12,
-	trunc = truncdim(D) & truncbelow(1e-16),
+	trunc = truncrank(D) & trunctol(; atol=1e-16),
 )
 lslnZ[1] = 2 * log(norm(ρ))
 normalize!(ρ)
@@ -159,7 +159,7 @@ for idx in 2:length(lsβ)
 
 	TDVPSweep1!(Env, -dβ / 2;
 		CBEAlg = NaiveCBE(D + div(D, 4), 1e-8; rsvd = true),
-          trunc = truncdim(D), GCsweep = true,
+          trunc = truncrank(D), GCsweep = true,
 	)
 
 	lslnZ[idx] = lslnZ[idx-1] + 2 * log(norm(ρ))
@@ -239,7 +239,7 @@ S_MPO = AutomataMPO(Tree)
 # variationally find |Φ⟩ = S_j|Ψ⟩ 
 mul!(Φ, S_MPO, Ψ;
 	CBEAlg = NaiveCBE(D + div(D, 4), 1e-8; rsvd = true),
-	trunc = truncdim(D), GCsweep = true,
+	trunc = truncrank(D), GCsweep = true,
      lsnoise = [(1/4, x) for x in [0.1, 0.01, 0.001]], tol = 1e-12,
 )
 ```
@@ -270,7 +270,7 @@ for idx in 2:length(lst)
 
 	TDVPSweep1!(Env, -im * dt;
 		CBEAlg = NaiveCBE(D + div(D, 4), 1e-8; rsvd = true),
-		GCsweep = true, trunc = truncdim(D)
+		GCsweep = true, trunc = truncrank(D)
 	)
 
 	calObs!(ObsTree, Ψ, Φ; El = El)

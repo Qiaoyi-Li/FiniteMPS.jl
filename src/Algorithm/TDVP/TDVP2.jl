@@ -11,7 +11,7 @@ Wrap `TDVPSweep2!` with a symmetric integrator, i.e., sweeping from left to righ
 
 # Kwargs
      krylovalg::KrylovKit.KrylovAlgorithm = TDVPDefaultLanczos
-     trunc::TruncationType = truncbelow(MPSDefault.tol) & truncdim(MPSDefault.D)
+     trunc = trunctol(; atol=MPSDefault.tol) & truncrank(MPSDefault.D)
      GCstep::Bool = false
      GCsweep::Bool = false
      verbose::Int64 = 0
@@ -21,7 +21,7 @@ Apply `exp(dt(H - E_shift))` to avoid possible `Inf` in imaginary time evolution
 function TDVPSweep2!(Env::SparseEnvironment{L,3,T}, dt::Number, ::SweepL2R; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,DenseMPS}}
      # left to right sweep
      krylovalg = get(kwargs, :krylovalg, TDVPDefaultLanczos)
-     trunc = get(kwargs, :trunc, truncbelow(MPSDefault.tol) & truncdim(MPSDefault.D))
+     trunc = get(kwargs, :trunc, trunctol(; atol=MPSDefault.tol) & truncrank(MPSDefault.D))
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
      verbose::Int64 = get(kwargs, :verbose, 0)
@@ -95,7 +95,7 @@ end
 function TDVPSweep2!(Env::SparseEnvironment{L,3,T}, dt::Number, ::SweepR2L; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,DenseMPS}}
      # right to left sweep
      krylovalg = get(kwargs, :krylovalg, TDVPDefaultLanczos)
-     trunc = get(kwargs, :trunc, truncbelow(MPSDefault.tol) & truncdim(MPSDefault.D))
+     trunc = get(kwargs, :trunc, trunctol(; atol=MPSDefault.tol) & truncrank(MPSDefault.D))
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
      verbose::Int64 = get(kwargs, :verbose, 0)

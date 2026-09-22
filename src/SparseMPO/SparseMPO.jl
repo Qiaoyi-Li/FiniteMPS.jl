@@ -28,7 +28,7 @@ function show(io::IO, obj::SparseMPO{L}) where L
 	# bond dimenson
 	lsi = ceil(Int64, log10(L)) # length of si to be printed
 	for si in 1:L
-		D, DD = dim(obj[si], 1)
+		D, DD = bonddim(obj[si], 1)
 		print(io, "Bond ", lpad(si - 1, lsi), "->", lpad(si, lsi), ": ")
 		println(io, "$(sum(D)) -> $(sum(DD))")
 	end
@@ -42,7 +42,7 @@ Return the scalar type of given `SparseMPO`. Note return `Float64` iff all local
 function scalartype(obj::SparseMPO)
 	for M in obj.A
 		for T in M
-			isnothing(T) && continue
+			_isabsent(T) && continue
 			scalartype(T) <: Complex && return ComplexF64
 		end
 	end

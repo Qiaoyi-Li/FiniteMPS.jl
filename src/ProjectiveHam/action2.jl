@@ -12,7 +12,7 @@ function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}
      @timeit Timer_action2 "action2" begin
           if get_num_workers() > 1  # multi-processing
 
-               f = (x, y) -> (add!(x[1], y[1]), merge!(x[2], y[2]))
+               f = (x, y) -> (_accumulate_owned(x[1], y[1]), merge!(x[2], y[2]))
                Hx, Timer_acc = @distributed (f) for (i, j, k) in obj.validIdx
                     _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k], true; kwargs...)
                end
@@ -42,7 +42,7 @@ function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}
 
                #           lock(Lock)
                #           try
-               #                Hx = axpy!(true, tmp, Hx)
+               #                Hx = _accumulate_owned(Hx, tmp)
                #                merge!(Timer_acc, to)
                #           catch 
                #                unlock(Lock)
@@ -70,7 +70,7 @@ function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}
 
                          lock(Lock)
                          try
-                              Hx = axpy!(true, tmp, Hx)
+                              Hx = _accumulate_owned(Hx, tmp)
                               merge!(Timer_acc, to)
                          catch
                               rethrow()
@@ -84,7 +84,7 @@ function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}
                Timer_acc = TimerOutput()
                for (i, j, k) in obj.validIdx
                     tmp, to = _action2(x, obj.El[i], obj.H[1][i, j], obj.H[2][j, k], obj.Er[k], true; kwargs...)
-                    Hx = axpy!(true, tmp, Hx)
+                    Hx = _accumulate_owned(Hx, tmp)
                     merge!(Timer_acc, to)
                end
 
@@ -95,13 +95,15 @@ function action2(obj::SparseProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}
      merge!(Timer_action2, Timer_acc; tree_point=["action2"])
 
      # x -> (H - E₀)x
-     !iszero(obj.E₀) && axpy!(-obj.E₀, x.A, Hx)
+     if !iszero(obj.E₀)
+          Hx = _isabsent(Hx) ? scale(x.A, -obj.E₀) : add!!(Hx, x.A, -obj.E₀, true)
+     end
 
      return CompositeMPSTensor{2,T}(Hx)
 end
 function action2(obj::IdentityProjectiveHamiltonian{2}, x::CompositeMPSTensor{2,T}; kwargs...) where {T<:NTuple{2,MPSTensor}}
      pspace = domain(x)[1]
-     aspace = numind(obj.El) == 2 ? trivial(pspace) : codomain(obj.El)[end]
+     aspace = numind(obj.El) == 2 ? unitspace(pspace) : codomain(obj.El, numout(obj.El))
      Hx = _action2(x, obj.El,
           IdentityOperator(pspace, aspace, obj.si[1], 1),
           IdentityOperator(pspace, aspace, obj.si[2], 1),
@@ -518,7 +520,7 @@ function _permute2(A::AbstractTensorMap, B::AbstractTensorMap)
      r1 = numout(B)
      r2 = numin(B)
      if numout(A) != r1
-          return permute(A, Tuple(1:r1), Tuple(r1 .+ (1:r2)))
+          return permute(A, (Tuple(1:r1), Tuple(r1 .+ (1:r2))))
      else
           return A
      end

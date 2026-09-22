@@ -24,8 +24,8 @@ function _prod(A::SparseMPOTensor, B::SparseMPOTensor)
      for iA in 1:mA, iB in 1:mB 
           i = (iA - 1) * mB + iB
           for jA in 1:nA, jB in 1:nB
-               isnothing(A[iA, jA]) && continue
-               isnothing(B[iB, jB]) && continue
+               _isabsent(A[iA, jA]) && continue
+               _isabsent(B[iB, jB]) && continue
 
                j = (jA - 1) * nB + jB 
                AB[i, j] = _prod(A[iA, jA], B[iB, jB])
@@ -175,7 +175,7 @@ end
 function _prod(A::LocalOperator{2, 2}, B::LocalOperator{1, 1})
 	@assert A.si == B.si
 
-	if istrivial(getLeftSpace(B))
+	if isunitspace(getLeftSpace(B))
 		@tensor AB[b d; f g] := A.A[b d e g] * B.A[e f]
 		aspace = (getLeftSpace(A), getRightSpace(A))
 		tag = ((A.tag[1][1], A.tag[1][2]), (B.tag[2][1], A.tag[2][2]))
@@ -196,7 +196,7 @@ end
 function _prod(A::LocalOperator{1, 1}, B::LocalOperator{2, 2})
 	@assert A.si == B.si
 
-	if istrivial(getLeftSpace(A))
+	if isunitspace(getLeftSpace(A))
 		@tensor AB[c d; f h] := A.A[d e] * B.A[c e f h]
 		aspace = (getLeftSpace(B), getRightSpace(B))
 		tag = ((B.tag[1][1], A.tag[1][1]), (B.tag[2][1], B.tag[2][2]))
@@ -218,8 +218,8 @@ function _prod(A::LocalOperator{1, 1}, B::LocalOperator{1, 1})
 	@assert A.si == B.si
 
 	@tensor AB[d; f] := A.A[d e] * B.A[e f]
-	lineA = !istrivial(getLeftSpace(A))
-	lineB = !istrivial(getLeftSpace(B))
+	lineA = !isunitspace(getLeftSpace(A))
+	lineB = !isunitspace(getLeftSpace(B))
 	if lineA && lineB
 		aspace = (fuse(getLeftSpace(A), getLeftSpace(B)), fuse(getRightSpace(A), getRightSpace(B)))
 	elseif lineA
@@ -240,7 +240,7 @@ end
 function _prod(A::LocalOperator{1, 1}, B::LocalOperator{1, 2})
 	@assert A.si == B.si
 
-	if istrivial(getLeftSpace(A))
+	if isunitspace(getLeftSpace(A))
 		@tensor AB[d; f h] := A.A[d e] * B.A[e f h]
 		aspace = (getLeftSpace(A), getRightSpace(B))
 		tag = ((A.tag[1][1],), (B.tag[2][1], B.tag[2][2]))
@@ -260,7 +260,7 @@ end
 function _prod(A::LocalOperator{1, 2}, B::LocalOperator{1, 1})
 	@assert A.si == B.si
 
-	if istrivial(getLeftSpace(B))
+	if isunitspace(getLeftSpace(B))
 		@tensor AB[d; f g] := A.A[d e g] * B.A[e f]
 		aspace = (getLeftSpace(A), getRightSpace(A))
 		tag = ((A.tag[1][1],), (B.tag[2][1], A.tag[2][2]))
@@ -280,7 +280,7 @@ end
 function _prod(A::LocalOperator{1, 1}, B::LocalOperator{2, 1})
 	@assert A.si == B.si
 
-	if istrivial(getLeftSpace(A))
+	if isunitspace(getLeftSpace(A))
 		@tensor AB[c d; f] := A.A[d e] * B.A[c e f]
 		aspace = (getLeftSpace(B), getRightSpace(B))
 		tag = ((B.tag[1][1], A.tag[1][1]), (B.tag[2][1],))
@@ -300,7 +300,7 @@ end
 function _prod(A::LocalOperator{2, 1}, B::LocalOperator{1, 1})
 	@assert A.si == B.si
 
-	if istrivial(getLeftSpace(B))
+	if isunitspace(getLeftSpace(B))
 		@tensor AB[b d; f] := A.A[b d e] * B.A[e f]
 		aspace = (getLeftSpace(A), getRightSpace(A))
 		tag = ((A.tag[1][1], A.tag[1][2]), (B.tag[2][1],))
@@ -324,7 +324,7 @@ function _prod(A::LocalOperator{2, 2}, B::IdentityOperator)
      fermionic = A.fermionic 
      tag = A.tag
      strength = A.strength[] * B.strength[]
-     if istrivial(B.aspace)
+     if isunitspace(B.aspace)
           AB = A.A
           aspace = A.aspace
      else
@@ -344,7 +344,7 @@ function _prod(A::IdentityOperator, B::LocalOperator{2, 2})
      fermionic = B.fermionic
      tag = B.tag
      strength = A.strength[] * B.strength[]
-     if istrivial(A.aspace)
+     if isunitspace(A.aspace)
           AB = B.A
           aspace = B.aspace
      else
@@ -362,9 +362,9 @@ function _prod(A::LocalOperator{1, 1}, B::IdentityOperator)
 
      AB = A.A
      tag = A.tag
-     if istrivial(B.aspace)
+     if isunitspace(B.aspace)
           aspace = A.aspace
-     elseif istrivial(getLeftSpace(A))
+     elseif isunitspace(getLeftSpace(A))
           aspace = (B.aspace, B.aspace)
      else
           aspace = (fuse(getLeftSpace(A), B.aspace), fuse(getRightSpace(A), B.aspace))
@@ -381,9 +381,9 @@ function _prod(A::IdentityOperator, B::LocalOperator{1, 1})
 
      AB = B.A
      tag = B.tag
-     if istrivial(A.aspace)
+     if isunitspace(A.aspace)
           aspace = B.aspace
-     elseif istrivial(getLeftSpace(B))
+     elseif isunitspace(getLeftSpace(B))
           aspace = (A.aspace, A.aspace)
      else
           aspace = (fuse(A.aspace, getLeftSpace(B)), fuse(A.aspace, getRightSpace(B)))
@@ -398,9 +398,9 @@ end
 function _prod(A::IdentityOperator, B::IdentityOperator)
      @assert A.si == B.si
 
-     if istrivial(A.aspace)
+     if isunitspace(A.aspace)
           aspace = B.aspace
-     elseif istrivial(B.aspace)
+     elseif isunitspace(B.aspace)
           aspace = A.aspace
      else
           aspace = fuse(A.aspace, B.aspace)
@@ -413,7 +413,7 @@ function _prod(A::LocalOperator{1, 2}, B::IdentityOperator)
      @assert A.si == B.si
 
      fermionic = A.fermionic
-     if istrivial(B.aspace)
+     if isunitspace(B.aspace)
           AB = A.A
           tag = A.tag
      else
@@ -431,7 +431,7 @@ function _prod(A::IdentityOperator, B::LocalOperator{1, 2})
      @assert A.si == B.si
 
      fermionic = B.fermionic
-     if istrivial(A.aspace)
+     if isunitspace(A.aspace)
           AB = B.A
           tag = B.tag
      else
@@ -449,7 +449,7 @@ function _prod(A::LocalOperator{2, 1}, B::IdentityOperator)
      @assert A.si == B.si
 
      fermionic = A.fermionic
-     if istrivial(B.aspace)
+     if isunitspace(B.aspace)
           AB = A.A
           tag = A.tag
      else
@@ -467,7 +467,7 @@ function _prod(A::IdentityOperator, B::LocalOperator{2, 1})
      @assert A.si == B.si
 
      fermionic = B.fermionic
-     if istrivial(A.aspace)
+     if isunitspace(A.aspace)
           AB = B.A
           tag = B.tag
      else

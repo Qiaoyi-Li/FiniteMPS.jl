@@ -33,7 +33,7 @@ aspace = vcat(Rep[U₁×SU₂]((0, 0) => 1), repeat([Rep[U₁×SU₂]((i, j) => 
 Env = Environment(Ψ', H, Ψ)
 lsEg = zeros(20)
 for i in eachindex(lsEg)
-	info, _ = DMRGSweep2!(Env; trunc = truncdim(D))
+	info, _ = DMRGSweep2!(Env; trunc = truncrank(D))
 	lsEg[i] = info[2][1].Eg
 end
 Eg = lsEg[end]

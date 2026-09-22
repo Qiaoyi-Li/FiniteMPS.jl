@@ -1,7 +1,7 @@
 """
 	convert(T::Type, Tree::ObservableTree; kwargs...)
 
-Collect the observables from the tree and store them in a dictionary or a named tuple. Current valid types are `Dict` and `NamedTuple`.  
+Collect the observables from the tree and store them in a dictionary or a named tuple. Current valid types are `Dict` and `NamedTuple`.
 """
 function convert(::Type{Dict}, Tree::ObservableTree; kwargs...)
 
@@ -9,11 +9,11 @@ function convert(::Type{Dict}, Tree::ObservableTree; kwargs...)
 end
 
 """
-	convert(T::Type, G::ImagTimeProxyGraph; kwargs...)
+	convert(T::Type, G::ImagTimeProxyTree; kwargs...)
 
-Collect the observables from the graph `G` and store them in a dictionary or a named tuple. Current valid types are `Dict` and `NamedTuple`.  
+Collect the observables from the tree `G` and store them in a dictionary or a named tuple. Current valid types are `Dict` and `NamedTuple`.
 """
-function convert(::Type{Dict}, G::ImagTimeProxyGraph; kwargs...)
+function convert(::Type{Dict}, G::ImagTimeProxyTree; kwargs...)
 
 	obs = Dict{String, Dict}()
 	for (k, d) in G.Refs
@@ -23,7 +23,7 @@ function convert(::Type{Dict}, G::ImagTimeProxyGraph; kwargs...)
 	return obs
 end
 
-function convert(::Type{NamedTuple}, Tree::Union{ObservableTree,ImagTimeProxyGraph}; kwargs...)
+function convert(::Type{NamedTuple}, Tree::Union{ObservableTree,ImagTimeProxyTree}; kwargs...)
 	Rslt = convert(Dict, Tree; kwargs...)
 	k = keys(Rslt) .|> Symbol |> Tuple
 	return NamedTuple{k}(values(Rslt))

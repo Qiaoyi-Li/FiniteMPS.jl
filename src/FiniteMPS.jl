@@ -1,32 +1,29 @@
 module FiniteMPS
 
 using Reexport
-using AbstractTrees, SerializedElementArrays, Serialization, LRUCache, SparseArrays
+using AbstractTrees, SerializedElementArrays, Serialization, SparseArrays
 using Base.Threads, Distributed
-using Graphs, MetaGraphs
+using Random
+import LinearAlgebra, MatrixAlgebraKit
 using LinearAlgebra:svd, lu
 import SerializedElementArrays: SerializedElementArray, SerializedElementVector
 @reexport using TensorKit, TensorKit.TensorOperations, TimerOutputs, TensorKit.TensorOperations.VectorInterface
 @reexport import Base: +, -, *, /, ==, promote_rule, convert, length, show, getindex, setindex!, lastindex, keys, similar, merge, merge!, iterate, complex, sort!
-@reexport import TensorKit: ×, one, zero, dim, inner, scalar, domain, codomain, eltype, scalartype, leftorth, rightorth, leftnull, rightnull, tsvd, adjoint, normalize!, norm, axpy!, axpby!, add!, add!!, dot, mul!, rmul!, NoTruncation, fuse, zerovector!, zerovector, scale, scale!, scale!!, fusionblockstructure, numin, numout, numind, permute
+@reexport import TensorKit: ×, one, zero, dim, inner, scalar, domain, codomain, eltype, scalartype, adjoint, normalize!, norm, axpy!, axpby!, add!, add!!, dot, mul!, rmul!, fuse, zerovector!, zerovector, scale, scale!, scale!!, numin, numout, numind, permute
 using TensorKit.TensorOperations: tensoralloc, tensoralloc_add, ManualAllocator, tensorcontract!, tensorcontract
-using FiniteMPS.TensorOperations.PtrArrays: PtrArray
 import TensorKit.TensorOperations: tensorfree!
 @reexport import LinearAlgebra: BLAS, rank, qr, diag, I, diagm
 import AbstractTrees: parent, isroot, children, ParentLinks, ChildIndexing, NodeType, nodetype
-import Graphs: rem_vertices!
 
 # global settings
 include("Globals.jl")
 include("Defaults.jl")
 
 # Utils
-export trivial, istrivial, data, UniformDistribution, GaussianDistribution, NormalDistribution, randStiefel, randisometry, randisometry!, cleanup!, oplusEmbed, SweepDirection, SweepL2R, SweepR2L, AnyDirection
-include("utils/trivial.jl")
+export bonddim, tsvd, leftorth, rightorth, cleanup!, oplusEmbed, SweepDirection, SweepL2R, SweepR2L, AnyDirection
 include("utils/TensorMap.jl")
 include("utils/Random.jl")
 include("utils/SVD.jl")
-include("utils/CompatThreading.jl")
 include("utils/SerializedElementArrays.jl")
 include("utils/manualGC.jl")
 include("utils/cleanup.jl")
@@ -64,7 +61,7 @@ include("SparseMPO/SparseMPO.jl")
 include("SparseMPO/mul.jl")
 
 # Environment
-export AbstractEnvironment, SimpleEnvironment, SparseEnvironment, Environment, initialize!, pushleft!, pushright!, canonicalize!, free!, scalar!, connection!, absorb!
+export AbstractEnvironment, SimpleEnvironment, SparseEnvironment, Environment, initialize!, pushleft!, pushright!, canonicalize!, free!, scalar!, connection!, absorb_bond!
 include("Environment/Environment.jl")
 include("Environment/initialize.jl")
 include("Environment/pushleft.jl")
@@ -89,18 +86,19 @@ include("ProjectiveHam/action0.jl")
 export AbstractInteractionIterator, OnSiteInteractionIterator,TwoSiteInteractionIterator, ArbitraryInteractionIterator, InteractionChannel, InteractionTreeNode, InteractionTree, addIntr!, AutomataMPO
 include("IntrTree/IntrIterator.jl")
 include("IntrTree/IntrTree.jl")
+include("IntrTree/PairedTree.jl")
 include("IntrTree/addIntr.jl")
 include("IntrTree/Automata.jl")
 
 # Observables
-export ObservableTree, treewidth, addObs!, calObs!
+export ObservableTree, treewidth, addObs!, calObs!, TreeEvalAlgorithm, LayeredTreeEval
 include("Observables/ObsTree.jl")
 include("Observables/addObs.jl")
+include("Observables/TreeEval.jl")
 include("Observables/calObs.jl")
 
-# TODO: use tree instead of graph for ITP 
-export ImagTimeProxyGraph, addITP2!, addITP4!, calITP!
-include("Observables/ITPGraph.jl")
+export ImagTimeProxyTree, addITP!, calITP!
+include("Observables/ITPTree.jl")
 include("Observables/addITP.jl")
 include("Observables/calITP.jl")
 include("Observables/pushleft.jl")

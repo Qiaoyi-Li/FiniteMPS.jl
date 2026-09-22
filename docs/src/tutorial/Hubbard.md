@@ -113,7 +113,7 @@ MaxSweeps = 100 # avoid dead loops
 
 for i in 1:MaxSweeps
      D = lsD[end]
-     info, _ = DMRGSweep1!(Env; K = 16, trunc = truncdim(D),
+     info, _ = DMRGSweep1!(Env; K = 16, trunc = truncrank(D),
           CBEAlg = NaiveCBE(D + div(D, 4), 1e-8; rsvd = true),
      )
     

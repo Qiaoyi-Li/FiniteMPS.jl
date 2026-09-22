@@ -27,7 +27,7 @@ H = AutomataMPO(Tree)
 Env = Environment(Ψ', H, Ψ)
 lsEg = zeros(20)
 for i in 1:length(lsEg)
-	info, _ = DMRGSweep2!(Env; trunc = truncdim(D))
+	info, _ = DMRGSweep2!(Env; trunc = truncrank(D))
 	lsEg[i] = info[2][1].Eg
 end
 Eg = lsEg[end]

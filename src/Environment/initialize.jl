@@ -14,8 +14,8 @@ If `true`, call `free!(obj)` to free the local environment tensors which are no 
 """
 function initialize!(obj::AbstractEnvironment{L}; kwargs...) where {L}
      obj.Center[:] = [1, L]
-     obj.Er[end] = get(kwargs, :Er, _defaultEr(obj))
-     obj.El[1] = get(kwargs, :El, _defaultEl(obj))
+     obj.Er[end] = get(() -> _defaultEr(obj), kwargs, :Er)
+     obj.El[1] = get(() -> _defaultEl(obj), kwargs, :El)
      if get(kwargs, :free, false)
           free!(obj)
      end
@@ -27,7 +27,7 @@ function _defaultEl(obj::SimpleEnvironment{L,2,T}) where {L,T<:Tuple{AdjointMPS,
      return isometry(domain(obj[1][1])[1], codomain(obj[2][1])[1])
 end
 function _defaultEr(obj::SimpleEnvironment{L,2,T}) where {L,T<:Tuple{AdjointMPS,DenseMPS}}
-     return isometry(domain(obj[2][end])[end], codomain(obj[1][end])[end])
+     return isometry(domain(obj[2][end], numin(obj[2][end])), codomain(obj[1][end], numout(obj[1][end])))
 end
 
 # ================ ⟨Ψ₁, H, Ψ₂⟩, sparse case ==================
@@ -36,7 +36,7 @@ function _defaultEl(obj::SparseEnvironment{L,3,T}) where {L,T<:Tuple{AdjointMPS,
           n = size(obj[2][1], 1)
           El = SparseLeftTensor(undef, n)
           for i = 1:n
-               idx = findfirst(x -> !isnothing(x) && !isa(x, IdentityOperator), view(obj[2][1], i, :))
+               idx = findfirst(x -> !_isabsent(x) && !isa(x, IdentityOperator), view(obj[2][1], i, :))
                @assert !isnothing(idx)
                El[i] = _simpleEl(obj[1][1], obj[2][1][i, idx], obj[3][1])
           end
@@ -53,8 +53,8 @@ function _defaultEl(obj::SparseEnvironment{L,3,T}) where {L,T<:Tuple{AdjointMPS,
                rank_Er = numin(Er[i]) + numout(Er[i])
                @assert rank_Er  in [2, 3]
                if rank_Er  == 2
-                    pspace = codomain(obj[3][1])[end]
-                    aspace = trivial(pspace)
+                    pspace = codomain(obj[3][1], numout(obj[3][1]))
+                    aspace = unitspace(pspace)
                     El[i] = _simpleEl(obj[1][1], IdentityOperator(pspace, aspace, 1), obj[3][1])
                elseif rank_Er  == 3
                     El[i] = _simpleEl(obj[1][1], codomain(Er[i])[2], obj[3][1])
@@ -73,11 +73,10 @@ end
 
 function _simpleEl(A::AdjointMPSTensor, Vh::VectorSpace, B::MPSTensor)
      v = fuse(Vh, codomain(B)[1])
-     iso = isometry(v, Vh ⊗ codomain(B)[1])
-     for k in collect(keys(v.dims))
-          k ∉ keys(domain(A)[1].dims) && delete!(v.dims, k)
-     end
-     emb = isometry(domain(A)[1], v)
+     S = v isa GradedSpace ? Vect[sectortype(v)] : typeof(v)
+     v = S(((isdual(v) ? dual(c) : c) => dim(v, c) for c in sectors(v) if hassector(domain(A, 1), c)); dual=isdual(v))
+     iso = isometry(Vh ⊗ codomain(B, 1), v)'
+     emb = isometry(domain(A, 1), v)
      return emb * iso
 end
 
@@ -89,7 +88,7 @@ function _defaultEr(obj::SparseEnvironment{L,3,T}) where {L,T<:Tuple{AdjointMPS,
      n = size(obj[2][end], 2)
      Er = SparseRightTensor(undef, n)
      for i = 1:n
-          idx = findfirst(!isnothing, view(obj[2][end], :, i))
+          idx = findfirst(!_isabsent, view(obj[2][end], :, i))
           Er[i] = _simpleEr(obj[1][end], obj[2][end][idx, i], obj[3][end])
      end
      return Er
@@ -97,7 +96,7 @@ end
 
 function _simpleEr(A::AdjointMPSTensor, ::T, B::MPSTensor) where {T<:Union{IdentityOperator,LocalOperator{R₁,1} where R₁}}
      # no horizontal bond
-     return isometry(domain(B)[end], codomain(A)[end])
+     return isometry(domain(B, numin(B)), codomain(A, numout(A)))
 end
 # ========================================================
 

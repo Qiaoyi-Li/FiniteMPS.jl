@@ -34,7 +34,7 @@ end
 Type for storing the information of a bond.
 
 # Constructors
-     BondInfo(s::AbstractTensorMap, ϵ::Float64 = 0.0)
+     BondInfo(s::DiagonalTensorMap, ϵ::Real = 0.0)
 
 Outer constructor via giving the `s` tensor and `ϵ` form `tsvd`.
 
@@ -51,36 +51,23 @@ struct BondInfo
      BondInfo(D::Int64, DD::Int64, TrunErr::Float64, SE::Float64) = new(D, DD, TrunErr, SE)
 end
 
-function BondInfo(s::AbstractTensorMap{<:Union{Float64, ComplexF64} ,T}, ϵ::Float64=0.0) where T <: GradedSpace
+function BondInfo(s::DiagonalTensorMap, ϵ::Real=0.0)
      D = DD = 0
      Norm2 = SE = 0.0
      for (c, b) in blocks(s)
-          λ = diag(b)
+          λ = MatrixAlgebraKit.diagview(b)
           D += length(λ)
           DD += length(λ) * dim(c)
           Norm2 += norm(λ)^2 * dim(c)
-          SE += mapreduce(x -> x == 0 ? 0 : x^2 * log(x), +, λ) * dim(c)
+          SE += mapreduce(x -> x == 0 ? 0 : x^2 * log(x), +, λ; init = 0.0) * dim(c)
      end
      SE = -2SE / Norm2 + log(Norm2)
-     return BondInfo(D, DD, ϵ, SE)
-end
-function BondInfo(s::AbstractTensorMap{<:Union{Float64, ComplexF64}, T}, ϵ::Float64=0.0) where T <: Union{CartesianSpace, ComplexSpace}
-    D = DD = 0
-    Norm2 = SE = 0.0
-
-    λ = data(s)[1]
-    D += length(λ)
-    DD += length(λ)
-    Norm2 += norm(λ)^2
-    SE += mapreduce(x -> x == 0 ? 0 : x^2 * log(x), +, λ; init = 0.0)
-
-    SE = -2SE / Norm2 + log(Norm2)
-    return BondInfo(D, DD, ϵ, SE)
+     return BondInfo(D, DD, Float64(ϵ), Float64(SE))
 end
 function BondInfo(A::AbstractTensorMap, direction::Symbol)
      @assert direction in (:L, :R)
      idx = direction == :L ? 1 : numin(A) + numout(A)
-     return BondInfo(dim(A, idx)..., 0.0, NaN)
+     return BondInfo(bonddim(A, idx)..., 0.0, NaN)
 end
 BondInfo(A::MPSTensor, direction::Symbol) = BondInfo(A.A, direction)
 

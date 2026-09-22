@@ -33,7 +33,7 @@ function _free_fermion_U1DMRG(Tij::Matrix{T}, a::Int64) where {T<:Union{Float64,
      Env = Environment(Ψ', H, Ψ)
      Eg = 0.0
      for _ in 1:10
-          info, _ = DMRGSweep2!(Env; trunc=truncdim(32))
+          info, _ = DMRGSweep2!(Env; trunc=truncrank(32))
           Eg = info[2][1].Eg
      end
 
@@ -82,7 +82,7 @@ function _free_fermion_U1U1DMRG(T₊::Matrix{T}, T₋::Matrix{T}, a::Int64) wher
      Env = Environment(Ψ', H, Ψ)
      Eg = 0.0
      for _ in 1:10
-          info, _ = DMRGSweep2!(Env; trunc=truncdim(128))
+          info, _ = DMRGSweep2!(Env; trunc=truncrank(128))
           Eg = info[2][1].Eg
      end
 

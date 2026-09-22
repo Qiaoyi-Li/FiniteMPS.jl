@@ -9,7 +9,7 @@
 		IntrName = prod(string.(name)),
 	) -> nothing 
 
-Add an `N`-site observable to `Tree`, where the observable is characterized by `N`-tuples `Op`, `si` and `fermionic`. The implementation and usage is similar to `addIntr!`, except for the logic to deal with same operator which is added twice.
+Add an `N`-site observable to `Tree`, where the observable is characterized by `N`-tuples `Op`, `si` and `fermionic`. Registration and boundary normalization follow `addIntr!`, except for the logic to deal with the same observable added twice.
 
 # Kwargs 
 	Z::Union{Nothing, AbstractTensorMap, AbstractVector}
@@ -46,21 +46,7 @@ function addObs!(Tree::ObservableTree{L},
 	end
      haskey(Tree.Refs[IntrName], si) && return nothing
 
-	# construct LocalOperators
-	ref_aspace = Ref{VectorSpace}(trivial(codomain(Op[1])[1]))
-	lsOp = map(Op, si, fermionic, name) do o, s, f, n
-		Oi = LocalOperator(o, n, s, f; aspace = (ref_aspace[], ref_aspace[])) 
-		ref_aspace[] =  getRightSpace(Oi)
-		return Oi
-	end
-
-	# make sure the auxiliary bond is on the left 
-	lsOp = _rightOp(lsOp)
-
-	S = StringOperator(lsOp..., 1.0) |> sort! |> reduce!
-     # move the possible coefficient -1 to the last operator
-     S.Ops[end].A = S.strength * S.Ops[end].A
-     S.strength = 1.0
+	S = StringOperator(collect(_local_operator_chain(Op, si, fermionic, name))) |> sort! |> reduce!
 
 	Tree.Refs[IntrName][si] = Ref{Number}()
 	return addObs!(Tree, S, Z, Tree.Refs[IntrName][si]; pspace = pspace)
@@ -83,23 +69,8 @@ function addObs!(Tree::ObservableTree{L},
 	pspace::Union{Nothing, VectorSpace, Vector{<:VectorSpace}} = nothing,
 ) where L
 
-	isa(pspace, Vector) && @assert length(pspace) == L
-	isa(Z, Vector) && @assert length(Z) == L
 
-	# try to deduce the pspace
-	if isnothing(pspace)
-		if isa(Z, Vector)
-			pspace = map(Z) do Zi
-				codomain(Zi)[1]
-			end
-		elseif isa(Z, AbstractTensorMap)
-			pspace = codomain(Z)[1]
-		else
-			pspace = getPhysSpace(S[1])
-		end
-	end
-
-	Ops_idx = map(ArbitraryInteractionIterator{L}(S.Ops, Z, pspace)) do Op
+	Ops_idx = map(_chain_iterator(S, Z, pspace, Val(L))) do Op
 		# find existed Op 
 		si = Op.si
 		idx = findfirst(x -> x == Op, Tree.Ops[si])
@@ -112,82 +83,5 @@ function addObs!(Tree::ObservableTree{L},
 	end
 
 
-	nodeL = Tree.RootL
-	nodeR = Tree.RootR
-	flagL = flagR = false
-	for i in 1:L
-		# left to right 
-		if !flagL
-			si = i
-			idx = findfirst(nodeL.children) do child
-				child.Op == (si, Ops_idx[si])
-			end
-
-			if !isnothing(idx)
-				nodeL = nodeL.children[idx]
-			else
-				# merge
-				idx = findfirst(nodeL.Intrs) do ch
-					length(ch.Ops) < 1 && return false
-					ch.Ops[1] == Ops_idx[si]
-				end
-				if isnothing(idx)
-					flagL = true
-				else
-					node_new = InteractionTreeNode((si, Ops_idx[si]), nodeL)
-					ch = nodeL.Intrs[idx]
-					push!(node_new.Intrs, ch)
-					deleteat!(nodeL.Intrs, idx) # remove ch from nodeL
-					# update ch 
-					deleteat!(ch.Ops, 1)
-					ch.LeafL = node_new
-
-					push!(nodeL.children, node_new)
-					nodeL = node_new
-				end
-			end
-		end
-
-		nodeL.Op[1] + 1 ≥ nodeR.Op[1] && break
-
-		# right to left
-		if !flagR
-			si = L - i + 1
-			idx = findfirst(nodeR.children) do child
-				child.Op == (si, Ops_idx[si])
-			end
-
-			if !isnothing(idx)
-				nodeR = nodeR.children[idx]
-			else
-				# merge
-				idx = findfirst(nodeR.Intrs) do ch
-					length(ch.Ops) < 1 && return false
-					ch.Ops[end] == Ops_idx[si]
-				end
-				if isnothing(idx)
-					flagR = true
-				else
-					node_new = InteractionTreeNode((si, Ops_idx[si]), nodeR)
-					ch = nodeR.Intrs[idx]
-					push!(node_new.Intrs, ch)
-					deleteat!(nodeR.Intrs, idx) # remove ch from nodeR
-					# update ch
-					deleteat!(ch.Ops, length(ch.Ops))
-					ch.LeafR = node_new
-
-					push!(nodeR.children, node_new)
-					nodeR = node_new
-				end
-			end
-		end
-
-		nodeL.Op[1] + 1 ≥ nodeR.Op[1] && break
-	end
-
-	ch = InteractionChannel(Ops_idx[nodeL.Op[1]+1:nodeR.Op[1]-1], ref, nodeL, nodeR)
-	push!(nodeL.Intrs, ch)
-	push!(nodeR.Intrs, ch)
-
-	return nothing
+	return _insert_paired_channel!(Tree, Ops_idx, ref; phase = S.strength)
 end

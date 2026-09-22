@@ -18,7 +18,7 @@ const pspace = Rep[SU₂](1//2 => 1)
 # S⋅S interaction
 const SS = let
      aspace = Rep[SU₂](1 => 1)
-     SL = TensorMap(ones, Float64, pspace, pspace ⊗ aspace) * sqrt(3) / 2
+     SL = ones(Float64, pspace, pspace ⊗ aspace) * sqrt(3) / 2
 
      SR = permute(SL', ((2, 1), (3,)))
      SL, SR
@@ -54,7 +54,7 @@ using TensorKit
 const pspace = Rep[U₁](-1 // 2 => 1, 1 // 2 => 1)
 
 const Sz = let
-     Sz = TensorMap(ones, pspace, pspace)
+     Sz = ones(pspace, pspace)
      block(Sz, Irrep[U₁](1 // 2)) .= 1/2
      block(Sz, Irrep[U₁](-1 // 2)) .= -1/2
      Sz
@@ -64,8 +64,8 @@ end
 # convention: S⋅S = SzSz + (S₊₋ + S₋₊)/2
 const S₊₋ = let
      aspace = Rep[U₁](1 => 1)
-     S₊ = TensorMap(ones, pspace, pspace ⊗ aspace)
-     S₋ = TensorMap(ones, aspace ⊗ pspace, pspace)
+     S₊ = ones(pspace, pspace ⊗ aspace)
+     S₋ = ones(aspace ⊗ pspace, pspace)
      S₊, S₋
 end
 

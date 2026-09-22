@@ -7,14 +7,14 @@ function _CBE(Al::MPSTensor{R1}, Ar::MPSTensor{R2}, El::SparseLeftTensor, Er::Sp
 
 	# right canonical Ar 
 	Ar_perm = permute(Ar.A, ((1,), Tuple(2:R2)))
-	@timeit TO "qr" _, Ar_c::MPSTensor = rightorth(Ar_perm)
+	@timeit TO "qr" _, Ar_c::MPSTensor = right_orth(Ar_perm; positive=true)
 
 	# construct L/R orth complement obj 
 	@timeit TO "construct LO" LO = LeftOrthComplement(El, Al, Hl, Bl) |> _orth!
 	@timeit TO "construct RO" RO = RightOrthComplement(Er, Ar_c, Hr, Br) |> _orth!
 
 	# svd
-	D_add = Alg.D - dim(Al, R2)[2]
+	D_add = Alg.D - bonddim(Al, R2)[2]
 	if Alg.rsvd
 		# reduce the LO * RO complexity from O(D^3d^2) to O(D^3d), svd complexity form O(D^3d^3) to O(D^3d)
 		# 1. LO_trunc = Ω * LO, O(D^3dχ)
@@ -27,10 +27,10 @@ function _CBE(Al::MPSTensor{R1}, Ar::MPSTensor{R2}, El::SparseLeftTensor, Er::Sp
 		Ω = randn(eltype(LO.Al_c), V_trunc, codomain(LO.Al_c))
           @timeit TO "truncate LO" LO_trunc = _apply_Ω(LO, Ω)
           @timeit TO "LO_trunc * RO" x2_trunc = _contractLR!(LO_trunc, RO)
-          @timeit TO "qr" _, Q = rightorth!(x2_trunc)
+          @timeit TO "qr" _, Q = right_orth!(x2_trunc; positive=true)
           @timeit TO "truncate RO" RO_trunc = _apply_Ω(RO, Q')
           @timeit TO "LO * RO_trunc" x2 = _contractLR!(LO, RO_trunc)
-          @timeit TO "svd" Al_ex, s, _, ϵ = _tsvd_try(x2; trunc = truncdim(D_add) & truncbelow(Alg.tol))
+          @timeit TO "svd" Al_ex, s, _, ϵ = _raw_svd(x2; trunc = truncrank(D_add) & trunctol(; atol=Alg.tol))
           Ar_ex = zeros(eltype(Ar_perm), domain(Al_ex), domain(Ar_perm))
           ϵp = NaN
 	else
@@ -39,7 +39,7 @@ function _CBE(Al::MPSTensor{R1}, Ar::MPSTensor{R2}, El::SparseLeftTensor, Er::Sp
 		ϵp = norm(x2) # this can be an estimation of the projection error
 
 		# normal svd, O(D^3d^3)
-		@timeit TO "svd" Al_ex, s, Ar_ex, ϵ = _tsvd_try(x2; trunc = truncdim(D_add) & truncbelow(Alg.tol))
+		@timeit TO "svd" Al_ex, s, Ar_ex, ϵ = _raw_svd(x2; trunc = truncrank(D_add) & trunctol(; atol=Alg.tol))
 		rmul!(Ar_ex, 0.0)
 	end
 	info = BondInfo(s, ϵ)
@@ -51,12 +51,12 @@ function _CBE(Al::MPSTensor{R1}, Ar::MPSTensor{R2}, El::SparseLeftTensor, Er::Sp
 	end
 
 	if Alg.check
-		@timeit TO "check" ϵ = norm(Al_f * Ar_f - LO.Al_c * Ar_perm)
+		@timeit TO "check" ϵ = norm(add!!(Al_f * Ar_f, LO.Al_c * Ar_perm, -1))
 	else
 		ϵ = NaN
 	end
 
-	return Al_f, Ar_f, CBEInfo(Alg, (info,), dim(Ar, 1), dim(Ar_f, 1), ϵp, ϵ)
+	return Al_f, Ar_f, CBEInfo(Alg, (info,), bonddim(Ar, 1), bonddim(Ar_f, 1), ϵp, ϵ)
 end
 
 function _CBE(Al::MPSTensor{R1}, Ar::MPSTensor{R2}, El::SparseLeftTensor, Er::SparseRightTensor, Hl::SparseMPOTensor, Hr::SparseMPOTensor, Alg::NaiveCBE{SweepL2R}, TO::TimerOutput;
@@ -67,13 +67,13 @@ function _CBE(Al::MPSTensor{R1}, Ar::MPSTensor{R2}, El::SparseLeftTensor, Er::Sp
 
 	# left canonical Al
 	Al_perm = permute(Al.A, (Tuple(1:R1-1), (R1,)))
-	@timeit TO "qr" Al_c::MPSTensor, _ = leftorth(Al_perm)
+	@timeit TO "qr" Al_c::MPSTensor, _ = left_orth(Al_perm; positive=true)
 
 	# construct L/R orth complement obj
 	@timeit TO "construct LO" LO = LeftOrthComplement(El, Al_c, Hl, Bl) |> _orth!
 	@timeit TO "construct RO" RO = RightOrthComplement(Er, Ar, Hr,  Br) |> _orth!
 
-	D_add = Alg.D - dim(Ar, 1)[2]
+	D_add = Alg.D - bonddim(Ar, 1)[2]
 	if Alg.rsvd
 		# reduce the LO * RO complexity from O(D^3d^2) to O(D^3d), svd complexity form O(D^3d^3) to O(D^3d)
 		# 1. RO_trunc = RO * Ω, O(D^3dχ)
@@ -86,10 +86,10 @@ function _CBE(Al::MPSTensor{R1}, Ar::MPSTensor{R2}, El::SparseLeftTensor, Er::Sp
 		Ω = randn(eltype(RO.Ar_c), domain(RO.Ar_c), V_trunc)
 		@timeit TO "truncate RO" RO_trunc = _apply_Ω(RO, Ω)
 		@timeit TO "LO * RO_trunc" x2_trunc = _contractLR!(LO, RO_trunc)
-		@timeit TO "qr" Q, _ = leftorth!(x2_trunc)
+		@timeit TO "qr" Q, _ = left_orth!(x2_trunc; positive=true)
 		@timeit TO "truncate LO" LO_trunc = _apply_Ω(LO, Q')
 		@timeit TO "LO_trunc * RO" x2 = _contractLR!(LO_trunc, RO)
-		@timeit TO "svd" _, s, Ar_ex, ϵ = _tsvd_try(x2; trunc = truncdim(D_add) & truncbelow(Alg.tol))
+		@timeit TO "svd" _, s, Ar_ex, ϵ = _raw_svd(x2; trunc = truncrank(D_add) & trunctol(; atol=Alg.tol))
 		Al_ex = zeros(eltype(Al_perm), codomain(Al_perm), codomain(Ar_ex))
 		ϵp = NaN
 	else
@@ -98,7 +98,7 @@ function _CBE(Al::MPSTensor{R1}, Ar::MPSTensor{R2}, El::SparseLeftTensor, Er::Sp
 		ϵp = norm(x2) # this can be an estimation of the projection error
 
 		# normal svd, O(D^3d^3)
-		@timeit TO "svd" Al_ex, s, Ar_ex, ϵ = _tsvd_try(x2; trunc = truncdim(D_add) & truncbelow(Alg.tol))
+		@timeit TO "svd" Al_ex, s, Ar_ex, ϵ = _raw_svd(x2; trunc = truncrank(D_add) & trunctol(; atol=Alg.tol))
 		rmul!(Al_ex, 0.0)
 	end
 	info = BondInfo(s, ϵ)
@@ -110,12 +110,12 @@ function _CBE(Al::MPSTensor{R1}, Ar::MPSTensor{R2}, El::SparseLeftTensor, Er::Sp
 	end
 
 	if Alg.check
-		@timeit TO "check" ϵ = norm(Al_f * Ar_f - Al_perm * RO.Ar_c)
+		@timeit TO "check" ϵ = norm(add!!(Al_f * Ar_f, Al_perm * RO.Ar_c, -1))
 	else
 		ϵ = NaN
 	end
 
-	return Al_f, Ar_f, CBEInfo(Alg, (info,), dim(Ar, 1), dim(Ar_f, 1), ϵp, ϵ)
+	return Al_f, Ar_f, CBEInfo(Alg, (info,), bonddim(Ar, 1), bonddim(Ar_f, 1), ϵp, ϵ)
 
 end
 
@@ -186,17 +186,14 @@ end
 function _rsvd_trunc(V::ProductSpace{T}, D::Int64) where T <: GradedSpace
 	V_trunc = fuse(V)
 	ratio = D / dim(V_trunc)
-	for (c, d) in V_trunc.dims
-		# truncate dimensions
-		V_trunc.dims[c] = ceil(Int64, d * ratio)
-	end
-	return V_trunc
+	# truncate dimensions
+	return Vect[sectortype(V_trunc)](((isdual(V_trunc) ? dual(c) : c) => ceil(Int64, dim(V_trunc, c) * ratio) for c in sectors(V_trunc)); dual=isdual(V_trunc))
 end
 
 function _rsvd_trunc(V::ProductSpace{T}, D::Int64) where T <: ElementarySpace
 	V_trunc = fuse(V)
 	ratio = D / dim(V_trunc)
-	return T(ceil(Int64, V_trunc.d * ratio), V_trunc.dual)
+	return T(ceil(Int64, dim(V_trunc) * ratio); dual=isdual(V_trunc))
 end
 
 function _apply_Ω(RO::RightOrthComplement{N}, Ω::AbstractTensorMap) where N

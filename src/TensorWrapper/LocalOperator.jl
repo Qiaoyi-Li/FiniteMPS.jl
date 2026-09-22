@@ -21,13 +21,7 @@ function *(O::AbstractLocalOperator, α::Number)
 	return rmul!(deepcopy(O), α)
 end
 *(α::Number, O::AbstractLocalOperator) = O * α
-*(::Nothing, ::AbstractLocalOperator) = nothing
-*(::AbstractLocalOperator, ::Nothing) = nothing
 zero(::AbstractLocalOperator) = nothing
-+(::Nothing, a::Number) = a
-+(a::Number, ::Nothing) = a
-*(::Nothing, ::Number) = nothing
-*(::Number, ::Nothing) = nothing
 
 """
 	 mutable struct IdentityOperator <: AbstractLocalOperator
@@ -140,7 +134,7 @@ Convention (' marks codomain):
 		  [,strength::Ref{Number} = Ref{Number}(NaN)]
 		  [, tag::tag2Tuple{R₁,R₂}];
 		  swap::Bool=false,
-		  aspace::Tuple{VectorSpace, VectorSpace} = Tuple(fill(trivial(codomain(O)[1]), 2)))
+		  aspace::Tuple{VectorSpace, VectorSpace} = Tuple(fill(unitspace(codomain(O)[1]), 2)))
 
 Default tag: `"phys"` for physical indices and `name` for virtual indices.  
 
@@ -160,7 +154,7 @@ mutable struct LocalOperator{R₁, R₂} <: AbstractLocalOperator
 		fermionic::Bool,
 		strength::Ref{<:Number},
 		tag::tag2Tuple{R₁, R₂};
-		aspace::Tuple{VectorSpace, VectorSpace} = Tuple(fill(trivial(codomain(O)[1]), 2)),
+		aspace::Tuple{VectorSpace, VectorSpace} = Tuple(fill(unitspace(codomain(O)[1]), 2)),
 		swap::Bool = false) where {R₁, R₂}
 		if swap
 			perms = (((R₂+2:R₁+R₂)..., R₂), (R₂ + 1, (1:R₂-1)...))
@@ -170,9 +164,9 @@ mutable struct LocalOperator{R₁, R₂} <: AbstractLocalOperator
 
 		# deduce aspace, use input only if R₁ == R₂ == 1
 		if (R₁, R₂) == (1, 2)
-			aspace = (trivial(codomain(O)[1]), domain(O)[2])
+			aspace = (unitspace(codomain(O)[1]), domain(O)[2])
 		elseif (R₁, R₂) == (2, 1)
-			aspace = (codomain(O)[1], trivial(codomain(O)[1]))
+			aspace = (codomain(O)[1], unitspace(codomain(O)[1]))
 		elseif (R₁, R₂) == (2, 2)
 			aspace = (codomain(O)[1], domain(O)[2])
 		end
@@ -182,7 +176,7 @@ mutable struct LocalOperator{R₁, R₂} <: AbstractLocalOperator
 	LocalOperator(O::AbstractTensorMap, name::String, si::Int64, fermionic::Bool, tag::tag2Tuple{R₁, R₂}; kwargs...) where {R₁, R₂} = LocalOperator(O, name, si, fermionic, Ref{Number}(NaN), tag; kwargs...) # default strength = NaN
 	function LocalOperator(O::AbstractTensorMap, name::String, si::Int64, fermionic::Bool, strength::Ref{<:Number} = Ref{Number}(NaN);
 		swap::Bool = false,
-		aspace::Tuple{VectorSpace, VectorSpace} = Tuple(fill(trivial(codomain(O)[1]), 2)))
+		aspace::Tuple{VectorSpace, VectorSpace} = Tuple(fill(unitspace(codomain(O)[1]), 2)))
 		# default tag, only for rank ≤ 4
 		if swap
 			@assert (R₁ = numin(O)) ≤ 2
@@ -203,6 +197,8 @@ mutable struct LocalOperator{R₁, R₂} <: AbstractLocalOperator
 		return LocalOperator(O, name, si, fermionic, Ref{Number}(strength), args...; kwargs...)
 	end
 end
+
+_rewrap(O::LocalOperator, A::AbstractTensorMap) = LocalOperator(A, O.name, O.si, O.fermionic, Ref{Number}(O.strength[]), O.tag; aspace = O.aspace)
 
 hastag(::LocalOperator) = true
 getOpName(O::LocalOperator) = O.name
@@ -254,7 +250,8 @@ function +(A::LocalOperator{R₁, R₂}, B::LocalOperator{R₁, R₂}) where {R�
 	@assert A.si == B.si && !isnan(A.strength[]) && !isnan(B.strength[])
 	@assert A.fermionic == B.fermionic
 	@assert A.aspace == B.aspace
-	Op = A.A * A.strength[] + B.A * B.strength[]
+	Op = scale(A.A, A.strength[])
+	Op = add!!(Op, B.A, B.strength[])
 	name = "$(A.name)($(A.strength[])) + $(B.name)($(B.strength[]))"
 	return LocalOperator(Op, name, A.si, A.fermionic, Ref{Number}(1.0); aspace = A.aspace)
 end
@@ -489,42 +486,13 @@ function _leftOp(obj::LocalOperator{R₁, R₂}) where {R₁, R₂}
 end
 _leftOp(obj::LocalOperator{1, 1}) = obj
 
-# make sure the additional horizontal bond is on the left, used in ITP
-function _rightOp(obj::LocalOperator{R₁, R₂}) where {R₁, R₂}
-	# transform to a right operator, i.e. R₂ == 1
-	perms = (((1:R₁-1)..., (R₁+2:R₁+R₂)..., R₁), (R₁ + 1,))
-	O = permute(obj.A, perms)
-	tag = ((obj.tag[1][1:end-1]..., obj.tag[2][2:end]..., obj.tag[1][end]), (obj.tag[2][1],))
-	return LocalOperator(O, obj.name, obj.si, obj.fermionic, obj.strength, tag)
-end
-_rightOp(obj::LocalOperator{1, 1}) = obj
-
-function _rightOp(A::LocalOperator{R₁, R₂}, B::LocalOperator{R₂, 1}) where {R₁, R₂}
-	return A, B
-end
-function _rightOp(A::LocalOperator{1, 2}, B::LocalOperator{2, 2})
-	@tensor AB[f a b; d e] := A.A[a b c] * B.A[c d e f]
-	# QR
-	TA, TB = leftorth(AB)
-	return LocalOperator(permute(TA, ((1, 2), (3, 4))), A.name, A.si, A.fermionic, A.strength), LocalOperator(permute(TB, ((1, 2), (3,))), B.name, B.si, B.fermionic, B.strength)
-end
-function _rightOp(lsOp::NTuple{N, LocalOperator}) where N
-	if N == 1
-		return (_rightOp(lsOp...),)
-	elseif isa(lsOp[end], LocalOperator{R, 1} where R)
-		# already a right operator
-		return lsOp
-	else
-		return _rightOp(lsOp...)
-	end
-end
 
 
 # dimension of left/right auxiliary bond
 function _vdim(O::IdentityOperator, idx::Int64)
 	@assert idx == 1 || idx == 2
 	aspace = getLeftSpace(O)
-	return dim(isometry(aspace, aspace), 1)
+	return bonddim(aspace)
 end
 
 function _vdim(::LocalOperator{0, 0}, idx::Int64)
@@ -534,19 +502,19 @@ end
 function _vdim(O::LocalOperator{1, 1}, idx::Int64)
 	@assert idx == 1 || idx == 2
 	aspace = getLeftSpace(O)
-	return dim(isometry(aspace, aspace), 1)
+	return bonddim(aspace)
 end
 function _vdim(A::LocalOperator{2, 1}, idx::Int64)
 	@assert idx == 1 || idx == 2
-	return idx == 1 ? dim(A.A, 1) : (1, 1)
+	return idx == 1 ? bonddim(A.A, 1) : (1, 1)
 end
 
 function _vdim(A::LocalOperator{1, 2}, idx::Int64)
 	@assert idx == 1 || idx == 2
-	return idx == 1 ? (1, 1) : dim(A.A, 3)
+	return idx == 1 ? (1, 1) : bonddim(A.A, 3)
 end
 
 function _vdim(A::LocalOperator{2, 2}, idx::Int64)
 	@assert idx == 1 || idx == 2
-	return idx == 1 ? dim(A.A, 1) : dim(A.A, 4)
+	return idx == 1 ? bonddim(A.A, 1) : bonddim(A.A, 4)
 end

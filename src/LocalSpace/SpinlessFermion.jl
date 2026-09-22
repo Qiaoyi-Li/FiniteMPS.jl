@@ -41,8 +41,8 @@ end
 # hopping term, FdagF
 const FdagF = let
      aspace = Rep[U₁](1 => 1)
-     Fdag = TensorMap(ones, pspace, pspace ⊗ aspace)
-     F = TensorMap(ones, aspace ⊗ pspace, pspace)
+     Fdag = ones(pspace, pspace ⊗ aspace)
+     F = ones(aspace ⊗ pspace, pspace)
 
      Fdag, F
 end

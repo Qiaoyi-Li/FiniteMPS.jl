@@ -10,7 +10,7 @@ function action1(obj::SparseProjectiveHamiltonian{1}, x::MPSTensor; kwargs...)
 
      @timeit Timer_action1 "action1" begin
           if get_num_workers() > 1 # multi-processing
-               f = (x, y) -> (add!(x[1], y[1]), merge!(x[2], y[2]))
+               f = (x, y) -> (_accumulate_owned(x[1], y[1]), merge!(x[2], y[2]))
                Hx, Timer_acc = @distributed (f) for (i, j) in obj.validIdx
                     _action1(x, obj.El[i], obj.H[1][i, j], obj.Er[j], true; kwargs...)
                end
@@ -31,11 +31,7 @@ function action1(obj::SparseProjectiveHamiltonian{1}, x::MPSTensor; kwargs...)
 
                          lock(Lock)
                          try
-                              if isnothing(Hx)
-                                   Hx = tmp  
-                              else
-                                   axpy!(true, tmp, Hx)
-                              end
+                              Hx = _accumulate_owned(Hx, tmp)
                               merge!(Timer_acc, to)
                          catch
                               rethrow()
@@ -50,7 +46,7 @@ function action1(obj::SparseProjectiveHamiltonian{1}, x::MPSTensor; kwargs...)
                Timer_acc = TimerOutput()
                for (i, j) in obj.validIdx
                     tmp, to = _action1(x, obj.El[i], obj.H[1][i, j], obj.Er[j], true; kwargs...)
-                    Hx = axpy!(true, tmp, Hx)
+                    Hx = _accumulate_owned(Hx, tmp)
                     merge!(Timer_acc, to)
                end
           end
@@ -59,7 +55,9 @@ function action1(obj::SparseProjectiveHamiltonian{1}, x::MPSTensor; kwargs...)
      merge!(Timer_action1, Timer_acc; tree_point=["action1"])
 
      # x -> (H - E₀)x
-     !iszero(obj.E₀) && axpy!(-obj.E₀, x.A, Hx)
+     if !iszero(obj.E₀)
+          Hx = _isabsent(Hx) ? scale(x.A, -obj.E₀) : add!!(Hx, x.A, -obj.E₀, true)
+     end
 
      return MPSTensor(Hx)
 end
@@ -73,7 +71,7 @@ function action1(obj::PreFuseProjectiveHamiltonian{1}, x::MPSTensor; kwargs...)
      @timeit Timer_action1 "action1" begin
           if get_num_workers() > 1 # multi-processing
 
-               f = (x, y) -> axpy!(true, x, y)
+               f = _accumulate_owned
                Hx = @distributed (f) for j in 1:length(obj.El)
                     _action1(x, obj.El[j], obj.Er[j]; kwargs...)
                end
@@ -93,11 +91,7 @@ function action1(obj::PreFuseProjectiveHamiltonian{1}, x::MPSTensor; kwargs...)
 
                          lock(Lock)
                          try
-                              if isnothing(Hx)
-                                   Hx = tmp  
-                              else
-                                   axpy!(true, tmp, Hx)
-                              end
+                              Hx = _accumulate_owned(Hx, tmp)
                               merge!(Timer_acc, to)
                          catch
                               rethrow()
@@ -113,7 +107,9 @@ function action1(obj::PreFuseProjectiveHamiltonian{1}, x::MPSTensor; kwargs...)
      merge!(Timer_action1, Timer_acc; tree_point=["action1"])
 
      # x -> (H - E₀)x
-     !iszero(obj.E₀) && axpy!(-obj.E₀, x.A, Hx)
+     if !iszero(obj.E₀)
+          Hx = _isabsent(Hx) ? scale(x.A, -obj.E₀) : add!!(Hx, x.A, -obj.E₀, true)
+     end
 
      return MPSTensor(Hx)
 end
@@ -167,42 +163,47 @@ end
 #   --a(D)     f(D)--
 function _action1(x::MPSTensor{3}, El::LocalLeftTensor{2}, H::IdentityOperator, Er::LocalRightTensor{2}; kwargs...)
      # @tensor Hx[a e; f] := El.A[a c] * (x.A[c e h] * Er.A[h f])
-     @tensor Hx[a e; f] := H.strength * El.A[a c] * x.A[c e h] * Er.A[h f]
+     s = H.strength[]
+     @tensor Hx[a e; f] := s * El.A[a c] * x.A[c e h] * Er.A[h f]
      return Hx
 end
 
 function _action1(x::MPSTensor{3}, El::LocalLeftTensor{3}, H::IdentityOperator, Er::LocalRightTensor{3}; kwargs...)
-     @tensor Hx[a e; f] := H.strength * (El.A[a b c] * x.A[c e h]) * Er.A[h b f]
+     s = H.strength[]
+     @tensor Hx[a e; f] := s * (El.A[a b c] * x.A[c e h]) * Er.A[h b f]
      return Hx
 end
 
 function _action1(x::MPSTensor{3}, El::LocalLeftTensor{3}, H::LocalOperator{2,1}, Er::LocalRightTensor{2}; kwargs...)
      # @tensor Hx[a d; f] := (El.A[a b c] * (x.A[c e h] * Er.A[h f])) *  H.A[b d e]
-     @tensor Hx[a d; f] := H.strength * El.A[a b c] * (x.A[c e h] * Er.A[h f]) * H.A[b d e]
+     s = H.strength[]
+     @tensor Hx[a d; f] := s * El.A[a b c] * (x.A[c e h] * Er.A[h f]) * H.A[b d e]
      return Hx
 end
 
 function _action1(x::MPSTensor{3}, El::LocalLeftTensor{3}, H::LocalOperator{1,1}, Er::LocalRightTensor{3}; kwargs...)
      @tensor Hx[a d; f] := (El.A[a b c] * (H.A[d e] * x.A[c e h])) * Er.A[h b f]
      # @tensor Hx[a d; f] := El.A[a b c] * H.A[d e] * x.A[c e h] * Er.A[h b f]
-     return H.strength * Hx
+     return H.strength[] * Hx
 end
 
 function _action1(x::MPSTensor{3}, El::LocalLeftTensor{2}, H::LocalOperator{1,1}, Er::LocalRightTensor{2}; kwargs...)
      # @tensor Hx[a d; f] := El.A[a c] * (H.A[d e] * (x.A[c e h] * Er.A[h f]))
-     @tensor Hx[a d; f] := H.strength * El.A[a c] * x.A[c e h] * H.A[d e] * Er.A[h f]
+     s = H.strength[]
+     @tensor Hx[a d; f] := s * El.A[a c] * x.A[c e h] * H.A[d e] * Er.A[h f]
      return Hx
 end
 
 function _action1(x::MPSTensor{3}, El::LocalLeftTensor{2}, H::LocalOperator{1,2}, Er::LocalRightTensor{3}; kwargs...)
      # @tensor Hx[a d; f] := El.A[a c] * x.A[c e h] * H.A[d e g] * Er.A[h g f]
-     @tensor Hx[a d; f] := H.strength * El.A[a c] * x.A[c e h] * Er.A[h g f] * H.A[d e g]
+     s = H.strength[]
+     @tensor Hx[a d; f] := s * El.A[a c] * x.A[c e h] * Er.A[h g f] * H.A[d e g]
      return Hx
 end
 
 function _action1(x::MPSTensor{3}, El::LocalLeftTensor{3}, H::LocalOperator{2,2}, Er::LocalRightTensor{3}; kwargs...)
      @tensor Hx[a d; f] := El.A[a b c] * x.A[c e h] * H.A[b d e g] * Er.A[h g f]
-     return rmul!(Hx, H.strength)
+     return rmul!(Hx, H.strength[])
 end
 
 # ========================= rank-4 MPO tensor ========================
@@ -219,37 +220,37 @@ end
 #   --a(D)     f(D)--
 function _action1(x::MPSTensor{4}, El::LocalLeftTensor{2}, H::IdentityOperator, Er::LocalRightTensor{2}; kwargs...)
      @tensor Hx[a e; i f] := El.A[a c] * x.A[c e i h] * Er.A[h f]
-     return rmul!(Hx, H.strength)
+     return rmul!(Hx, H.strength[])
 end
 
 function _action1(x::MPSTensor{4}, El::LocalLeftTensor{3}, H::IdentityOperator, Er::LocalRightTensor{3}; kwargs...)
      @tensor Hx[a e; i f] := (El.A[a b c] * x.A[c e i h]) * Er.A[h b f]
-     return rmul!(Hx, H.strength)
+     return rmul!(Hx, H.strength[])
 end
 
 function _action1(x::MPSTensor{4}, El::LocalLeftTensor{3}, H::LocalOperator{2,1}, Er::LocalRightTensor{2}; kwargs...)
      @tensor Hx[a d; i f] := El.A[a b c] * (x.A[c e i h] * Er.A[h f]) * H.A[b d e]
-     return rmul!(Hx, H.strength)
+     return rmul!(Hx, H.strength[])
 end
 
 function _action1(x::MPSTensor{4}, El::LocalLeftTensor{3}, H::LocalOperator{1,1}, Er::LocalRightTensor{3}; kwargs...)
      @tensor Hx[a d; i f] := El.A[a b c] * (H.A[d e] * x.A[c e i h]) * Er.A[h b f]
-     return rmul!(Hx, H.strength)
+     return rmul!(Hx, H.strength[])
 end
 
 function _action1(x::MPSTensor{4}, El::LocalLeftTensor{2}, H::LocalOperator{1,1}, Er::LocalRightTensor{2}; kwargs...)
      @tensor Hx[a d; i f] := El.A[a c] * (H.A[d e] * x.A[c e i h]) * Er.A[h f]
-     return rmul!(Hx, H.strength)
+     return rmul!(Hx, H.strength[])
 end
 
 function _action1(x::MPSTensor{4}, El::LocalLeftTensor{2}, H::LocalOperator{1,2}, Er::LocalRightTensor{3}; kwargs...)
      @tensor Hx[a d; i f] := El.A[a c] * x.A[c e i h] * H.A[d e g] * Er.A[h g f]
-     return rmul!(Hx, H.strength)
+     return rmul!(Hx, H.strength[])
 end
 
 function _action1(x::MPSTensor{4}, El::LocalLeftTensor{3}, H::LocalOperator{2,2}, Er::LocalRightTensor{3}; kwargs...)
      @tensor Hx[a d; i f] := El.A[a b c] * x.A[c e i h] * H.A[b d e g] * Er.A[h g f]
-     return rmul!(Hx, H.strength)
+     return rmul!(Hx, H.strength[])
 end
 
 

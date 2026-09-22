@@ -44,14 +44,14 @@ function _prefuse(lsEl::SparseLeftTensor, Hl::SparseMPOTensor, validIdx::Vector{
                     idx_t = Threads.atomic_add!(idx, 1)
                     idx_t > length(validIdx) && break
                     (i, j) = validIdx[idx_t]
-                    El = _prefuse(lsEl[i], Hl[i, j])
+                    El = LeftPreFuseTensor(_prefuse(lsEl[i], Hl[i, j]))
 
                     lock(Lock)
                     try
                          if !isassigned(El_next, j)
                               El_next[j] = El
                          else
-                              axpy!(true, El, El_next[j])
+                              El_next[j] = add!!(El_next[j], El)
                          end
                     catch
                          rethrow()
@@ -69,22 +69,27 @@ end
 function _prefuse(El::LocalLeftTensor{2}, H::IdentityOperator)
      pspace = getPhysSpace(H)
      Id = isometry(pspace, pspace)
-     @tensor tmp[a d; c e] := H.strength * El.A[a c] * Id[d e]
+     s = H.strength[]
+     @tensor tmp[a d; c e] := s * El.A[a c] * Id[d e]
      return tmp
 end
 function _prefuse(El::LocalLeftTensor{2}, H::LocalOperator{1,1})
-     @tensor tmp[a d; c e] := H.strength * El.A[a c] * H.A[d e]
+     s = H.strength[]
+     @tensor tmp[a d; c e] := s * El.A[a c] * H.A[d e]
      return tmp
 end
 function _prefuse(El::LocalLeftTensor{2}, H::LocalOperator{1, 2})
-     @tensor tmp[a d f; c e] := H.strength * El.A[a c] * H.A[d e f]
+     s = H.strength[]
+     @tensor tmp[a d f; c e] := s * El.A[a c] * H.A[d e f]
      return tmp
 end
 function _prefuse(El::LocalLeftTensor{3}, H::LocalOperator{2, 1})
-     @tensor tmp[a d; c e] := H.strength * El.A[a b c] * H.A[b d e]
+     s = H.strength[]
+     @tensor tmp[a d; c e] := s * El.A[a b c] * H.A[b d e]
      return tmp
 end
 function _prefuse(El::LocalLeftTensor{3}, H::LocalOperator{1, 1})
-     @tensor tmp[a d b; c e] := H.strength * El.A[a b c] * H.A[d e]
+     s = H.strength[]
+     @tensor tmp[a d b; c e] := s * El.A[a b c] * H.A[d e]
      return tmp
 end

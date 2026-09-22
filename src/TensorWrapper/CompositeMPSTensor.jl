@@ -39,7 +39,7 @@ Split a 2-site local tensor s.t. the left one is canonical.
 """
 function leftorth(A::CompositeMPSTensor{2,Tuple{MPSTensor{R₁},MPSTensor{R₂}}}; trunc=notrunc(), kwargs...) where {R₁,R₂}
      if trunc == notrunc()
-          Q, R = leftorth(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)))
+          Q, R = TensorKit.left_orth!(permute(A.A, (Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1))); copy = true); positive = true, kwargs...)
           return Q, R, BondInfo(Q, :R)
      else
           u, s, vd, info = tsvd(A; trunc=trunc, kwargs...)
@@ -56,7 +56,7 @@ Split a 2-site local tensor s.t. the right one is canonical.
 """
 function rightorth(A::CompositeMPSTensor{2,Tuple{MPSTensor{R₁},MPSTensor{R₂}}}; trunc=notrunc(), kwargs...) where {R₁,R₂}
      if trunc == notrunc()
-          L, Q = rightorth(A.A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)))
+          L, Q = TensorKit.right_orth!(permute(A.A, (Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1))); copy = true); positive = true, kwargs...)
           return L, Q, BondInfo(Q, :L)
      else
           u, s, vd, info = tsvd(A; trunc=trunc, kwargs...)
@@ -68,7 +68,7 @@ end
      tsvd(::CompositeMPSTensor{2, ...}; kwargs...) 
           -> u::AbstractTensorMap, s::AbstractTensorMap, vd::AbstractTensorMap, info::BondInfo
 
-Use SVD to split a 2-site local tensor, details see TensorKit.tsvd.
+Use the compact or truncated SVD to split a 2-site local tensor.
 """
 function tsvd(A::CompositeMPSTensor{2,Tuple{MPSTensor{R₁},MPSTensor{R₂}}}; kwargs...) where {R₁,R₂}
      return tsvd(A, Tuple(1:R₁-1), Tuple(R₁ - 1 .+ (1:R₂-1)); kwargs...)
@@ -76,17 +76,17 @@ end
 
 
 """
-     noise!(A::CompositeMPSTensor{2}, σ::Real)
+     noise!([rng::Random.AbstractRNG,] A::CompositeMPSTensor{2}, σ::Real)
 
 Apply noise to a given 2-site local tensor by contracting a `d×d` random isometry to it. 
 """
-function noise!(A::CompositeMPSTensor{2,Tuple{MPSTensor{R₁},MPSTensor{R₂}}}, σ::Real) where {R₁,R₂}
+function noise!(rng::Random.AbstractRNG, A::CompositeMPSTensor{2,Tuple{MPSTensor{R₁},MPSTensor{R₂}}}, σ::Real) where {R₁,R₂}
      perms = vcat(2, R₁, setdiff(1:R₁+R₂-2, [2, R₁]))
      iperms = invperm(perms)
      RA = permute(A.A, (Tuple(perms[1:2]), Tuple(perms[3:end])))
 
-     Iso = randisometry(eltype(RA), codomain(RA); σ=σ)
+     Iso = _nearidentity(rng, eltype(RA), codomain(RA), σ)
      permute!(A.A, Iso * RA, (Tuple(iperms[1:R₁-1]), Tuple(iperms[R₁:end])))
      return A
 end
-
+noise!(A::CompositeMPSTensor{2}, σ::Real) = noise!(Random.default_rng(), A, σ)

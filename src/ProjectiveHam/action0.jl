@@ -8,7 +8,7 @@ function action0(obj::SparseProjectiveHamiltonian{0}, x::MPSTensor{2}; kwargs...
      Timer_action0 = get_timer("action0")
      @timeit Timer_action0 "action0" begin
           if get_num_workers() > 1
-               f = (x, y) -> (add!(x[1], y[1]), merge!(x[2], y[2]))
+               f = (x, y) -> (_accumulate_owned(x[1], y[1]), merge!(x[2], y[2]))
                Hx, Timer_acc = @distributed (f) for (i,) in obj.validIdx
                     _action0(x, obj.El[i], obj.Er[i], true; kwargs...)
                end
@@ -29,7 +29,7 @@ function action0(obj::SparseProjectiveHamiltonian{0}, x::MPSTensor{2}; kwargs...
 
                          lock(Lock)
                          try
-                              Hx = axpy!(true, tmp, Hx)
+                              Hx = _accumulate_owned(Hx, tmp)
                               merge!(Timer_acc, to)
                          catch
                               rethrow()
@@ -45,7 +45,9 @@ function action0(obj::SparseProjectiveHamiltonian{0}, x::MPSTensor{2}; kwargs...
      merge!(Timer_action0, Timer_acc; tree_point=["action0"])
 
      # x -> (H - E₀)x
-     !iszero(obj.E₀) && axpy!(-obj.E₀, x.A, Hx)
+     if !iszero(obj.E₀)
+          Hx = _isabsent(Hx) ? scale(x.A, -obj.E₀) : add!!(Hx, x.A, -obj.E₀, true)
+     end
      return MPSTensor(Hx)
 
 end

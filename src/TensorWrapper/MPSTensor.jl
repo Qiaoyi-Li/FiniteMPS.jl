@@ -63,11 +63,11 @@ promote_rule(::Type{<:MPSTensor}, ::Type{<:AbstractTensorMap}) = MPSTensor
 
 Left canonicalize a on-site MPS tensor. 
 
-If `trunc = notrunc()`, use `TensorKit.leftorth`, otherwise, use `TensorKit.tsvd`. Propagate `kwargs` to the TensorKit functions.
+If `trunc = notrunc()`, use `TensorKit.left_orth!`, otherwise, use `FiniteMPS.tsvd`. Propagate `kwargs` to the corresponding decomposition.
 """
 function leftorth(A::MPSTensor{R₁}; trunc=notrunc(), kwargs...) where {R₁}
      if trunc == notrunc()
-          Q, R = leftorth(A.A, (Tuple(1:R₁-1), (R₁,)); kwargs...)
+          Q, R = TensorKit.left_orth!(permute(A.A, (Tuple(1:R₁-1), (R₁,)); copy = true); positive = true, kwargs...)
           return Q, R, BondInfo(Q, :R)
      else
           u, s, vd, info =  tsvd(A, (Tuple(1:R₁-1), (R₁,)); trunc=trunc, kwargs...)
@@ -83,18 +83,17 @@ end
 
 Right canonicalize a on-site MPS tensor. 
 
-If `trunc = notrunc()`, use `TensorKit.rightorth`, otherwise, use `TensorKit.tsvd`. Propagate `kwargs` to the TensorKit functions.
+If `trunc = notrunc()`, use `TensorKit.right_orth!`, otherwise, use `FiniteMPS.tsvd`. Propagate `kwargs` to the corresponding decomposition.
 """
 function rightorth(A::MPSTensor{R₂}; trunc=notrunc(), kwargs...) where {R₂}
      if trunc == notrunc()
-          L, Q = rightorth(A.A, ((1,), Tuple(2:R₂)); kwargs...)
+          L, Q = TensorKit.right_orth!(permute(A.A, ((1,), Tuple(2:R₂)); copy = true); positive = true, kwargs...)
           return L, Q, BondInfo(Q, :L)
      else
           u, s, vd, info = tsvd(A, ((1,), Tuple(2:R₂)); trunc=trunc, kwargs...)
           return u * s, vd, info
      end
 end
-
 
 
 

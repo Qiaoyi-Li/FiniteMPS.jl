@@ -3,7 +3,7 @@
 """
 const SparseMPOTensor = Matrix{Union{Nothing, AbstractLocalOperator}} 
 
-function dim(M::SparseMPOTensor, idx::Int64)
+function bonddim(M::SparseMPOTensor, idx::Int64)
      @assert idx == 1 || idx == 2
      sz = size(M)
      D = zeros(Int64, sz[idx])

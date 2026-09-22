@@ -108,44 +108,39 @@ mutable struct MPS{L, T <:Union{Float64, ComplexF64}, C} <: DenseMPS{L, T}
 end
 
 """
-     randMPS([::Type{T},]  
+     randMPS([rng::AbstractRNG,] [::Type{T},]
           pspace::Vector{VectorSpace},
           aspace::Vector{VectorSpace};
-          kwargs...) -> MPS{L}
+          disk::Bool=false) -> MPS{L}
 
-Generate a length `L` random MPS with given length `L` vector `pspace` and `aspace`. `T = Float64`(default) or `ComplexF64` is the number type. Note the canonical center is initialized to the first site.
+Generate a length `L` random MPS with given length `L` vector `pspace` and `aspace`. `T = Float64`(default) or `ComplexF64` is the number type. The default RNG is `Random.default_rng()` and `disk` controls tensor storage. Note the canonical center is initialized to the first site.
 
-     randMPS([::Type{T},] L::Int64, pspace::VectorSpace, apsace::VectorSpace; kwargs...) -> MPS{L}
+     randMPS([rng::AbstractRNG,] [::Type{T},] L::Int64, pspace::VectorSpace, aspace::VectorSpace; disk::Bool=false) -> MPS{L}
 
 Assume the same `pspace` and `aspace`, except for the boundary bond, which is assumed to be trivial.  
 """
-function randMPS(::Type{T}, pspace::AbstractVector{<:VectorSpace}, aspace::AbstractVector{<:VectorSpace}; kwargs...) where T <: Union{Float64, ComplexF64}
+function randMPS(rng::Random.AbstractRNG, ::Type{T}, pspace::AbstractVector{<:VectorSpace}, aspace::AbstractVector{<:VectorSpace}; disk::Bool=false) where T <: Union{Float64, ComplexF64}
      
      @assert (L = length(pspace)) == length(aspace)
 
-     obj = MPS(L, T; kwargs...)
+     obj = MPS(L, T; disk=disk)
      for si = 1:L
-          if si == L
-               obj[si] = randisometry(T, aspace[si]⊗pspace[si], trivial(pspace[si]); kwargs...)
-          else
-               obj[si] = randisometry(T, aspace[si]⊗pspace[si], aspace[si+1]; kwargs...)
-          end
+          V = si == L ? unitspace(pspace[si]) : aspace[si+1]
+          obj[si] = TensorKit.randisometry(rng, T, aspace[si] ⊗ pspace[si], V)
      end
      canonicalize!(obj, L)
      canonicalize!(obj, 1)
      return normalize!(obj)
 end
-function randMPS(::Type{T}, L::Int64, pspace::VectorSpace, aspace::VectorSpace; kwargs...) where T <: Union{Float64, ComplexF64}
-     return randMPS(T, repeat([pspace,], L), vcat([trivial(pspace),], repeat([aspace,], L-1)); kwargs...)
+function randMPS(rng::Random.AbstractRNG, ::Type{T}, L::Int64, pspace::VectorSpace, aspace::VectorSpace; disk::Bool=false) where T <: Union{Float64, ComplexF64}
+     return randMPS(rng, T, repeat([pspace,], L), vcat([unitspace(pspace),], repeat([aspace,], L-1)); disk=disk)
 end
-function randMPS(::Type{T}, pspace::VectorSpace, aspace::AbstractVector{<:VectorSpace}; kwargs...) where T <: Union{Float64, ComplexF64}
-     L = length(aspace)
-     return randMPS(T, repeat([pspace,], L), aspace; kwargs...)
+function randMPS(rng::Random.AbstractRNG, ::Type{T}, pspace::VectorSpace, aspace::AbstractVector{<:VectorSpace}; disk::Bool=false) where T <: Union{Float64, ComplexF64}
+     return randMPS(rng, T, repeat([pspace,], length(aspace)), aspace; disk=disk)
 end
-function randMPS(A::Any, args...; kwargs...)
-     @assert !isa(A, DataType)
-     return randMPS(Float64, A, args...; kwargs...)
-end
+randMPS(rng::Random.AbstractRNG, pspace::Union{VectorSpace,AbstractVector{<:VectorSpace}}, aspace::AbstractVector{<:VectorSpace}; disk::Bool=false) = randMPS(rng, Float64, pspace, aspace; disk=disk)
+randMPS(rng::Random.AbstractRNG, L::Int64, pspace::VectorSpace, aspace::VectorSpace; disk::Bool=false) = randMPS(rng, Float64, L, pspace, aspace; disk=disk)
+randMPS(A::Union{Type,Int64,VectorSpace,AbstractVector}, args...; disk::Bool=false) = randMPS(Random.default_rng(), A, args...; disk=disk)
 
 similar(T_new::Type{<:Union{Float64, ComplexF64}}, A::MPS{L, T, StoreMemory}) where {L, T} = MPS{L, T_new}()
 similar(T_new::Type{<:Union{Float64, ComplexF64}}, A::MPS{L, T, StoreDisk}) where {L, T} = MPS{L, T_new}(;disk = true)

@@ -122,6 +122,9 @@ Type of right environment tensor of sparse MPO.
 """
 const SparseRightTensor = Vector{SimpleRightTensor}
 
+_rewrap(E::LocalLeftTensor, A::AbstractTensorMap) = LocalLeftTensor(A, E.tag)
+_rewrap(E::LocalRightTensor, A::AbstractTensorMap) = LocalRightTensor(A, E.tag)
+
 
 """
 	 *(A::LocalLeftTensor{R}, B::LocalRightTensor{R}) -> ::Number
@@ -188,7 +191,7 @@ function fuse(lsEr::SparseRightTensor)
 	end
 end
 function fuse(El::LocalLeftTensor{2})
-	return isometry(domain(El)[end], domain(El)[end])
+	return isometry(domain(El, numin(El)), domain(El, numin(El)))
 end
 function fuse(El::LocalLeftTensor{3})
 	if numout(El) == 1
@@ -211,4 +214,3 @@ function fuse(Er::LocalRightTensor{3})
 		return isometry(aspace, codomain(Er)[1] ⊗ codomain(Er)[2])
 	end
 end
-fuse(::Nothing) = nothing

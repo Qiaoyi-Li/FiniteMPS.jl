@@ -11,13 +11,13 @@ using TensorKit
 
 const pspace = Rep[U₁×SU₂]((-1, 0) => 1, (0, 1 // 2) => 1)
 const Z = let
-     Z = TensorMap(ones, pspace, pspace)
+     Z = ones(pspace, pspace)
      block(Z, Irrep[U₁×SU₂](0, 1 / 2)) .= -1
      Z
 end
 
 const n = let
-     n = TensorMap(ones, pspace, pspace)
+     n = ones(pspace, pspace)
      block(n, Irrep[U₁×SU₂](-1, 0)) .= 0
      n
 end
@@ -25,7 +25,7 @@ end
 # S⋅S interaction
 const SS = let
      aspace = Rep[U₁×SU₂]((0, 1) => 1)
-     SL = TensorMap(ones, Float64, pspace, pspace ⊗ aspace) * sqrt(3) / 2
+     SL = ones(Float64, pspace, pspace ⊗ aspace) * sqrt(3) / 2
 
      SR = permute(SL', ((2, 1), (3,)))
      SL, SR
@@ -35,11 +35,11 @@ end
 const SSS = let
     aspace = Rep[U₁×SU₂]((0, 1) => 1)
 
-    SL = TensorMap(ones, Float64, pspace, pspace ⊗ aspace)
-    SM = TensorMap(zeros, Float64, aspace ⊗ pspace, pspace ⊗ aspace)
+    SL = ones(Float64, pspace, pspace ⊗ aspace)
+    SM = zeros(Float64, aspace ⊗ pspace, pspace ⊗ aspace)
     block(SM, Irrep[U₁×SU₂](0, 1/2)) .= 3/4
     block(SM, Irrep[U₁×SU₂](0, 3/2)) .= 3/8
-    SR = TensorMap(ones, Float64, aspace ⊗ pspace, pspace)
+    SR = ones(Float64, aspace ⊗ pspace, pspace)
 
     SL, SM, SR
 end
@@ -47,8 +47,8 @@ end
 # hopping term, FdagF
 const FdagF = let
      aspace = Rep[U₁×SU₂]((1, 1 / 2) => 1)
-     Fdag = TensorMap(ones, pspace, pspace ⊗ aspace)
-     F = TensorMap(ones, aspace ⊗ pspace, pspace)
+     Fdag = ones(pspace, pspace ⊗ aspace)
+     F = ones(aspace ⊗ pspace, pspace)
 
      Fdag, F
 end
@@ -123,20 +123,20 @@ using TensorKit
 const pspace = Rep[U₁×U₁]((-1, 0) => 1, (0, -1 // 2) => 1, (0, 1 // 2) => 1)
 
 const Z = let
-     Z = TensorMap(ones, pspace, pspace)
+     Z = ones(pspace, pspace)
      block(Z, Irrep[U₁×U₁](0, 1 // 2)) .= -1
      block(Z, Irrep[U₁×U₁](0, -1 // 2)) .= -1
      Z
 end
 
 const n₊ = let
-     n₊ = TensorMap(zeros, pspace, pspace)
+     n₊ = zeros(pspace, pspace)
      block(n₊, Irrep[U₁×U₁](0, 1 / 2)) .= 1
      n₊
 end
 
 const n₋ = let
-     n₋ = TensorMap(zeros, pspace, pspace)
+     n₋ = zeros(pspace, pspace)
      block(n₋, Irrep[U₁×U₁](0, -1 / 2)) .= 1
      n₋
 end
@@ -149,8 +149,8 @@ const Sz = (n₊ - n₋) / 2
 # convention: S⋅S = SzSz + (S₊₋ + S₋₊)/2
 const S₊₋ = let
      aspace = Rep[U₁×U₁]((0, 1) => 1)
-     S₊ = TensorMap(ones, pspace, pspace ⊗ aspace)
-     S₋ = TensorMap(ones, aspace ⊗ pspace, pspace)
+     S₊ = ones(pspace, pspace ⊗ aspace)
+     S₋ = ones(aspace ⊗ pspace, pspace)
      S₊, S₋
 end
 
@@ -165,16 +165,16 @@ end
 # hopping term, FdagF₊ = c↑^dag c↑
 const FdagF₊ = let
      aspace = Rep[U₁×U₁]((1, 1 // 2) => 1)
-     Fdag₊ = TensorMap(ones, pspace, pspace ⊗ aspace)
-     F₊ = TensorMap(ones, aspace ⊗ pspace, pspace)
+     Fdag₊ = ones(pspace, pspace ⊗ aspace)
+     F₊ = ones(aspace ⊗ pspace, pspace)
      Fdag₊, F₊
 end
 const FdagF₋ = let
      # note c↓^dag|↑⟩ = -|↑↓⟩, c↓|↑↓⟩ = -|↑⟩  
      aspace = Rep[U₁×U₁]((1, -1 // 2) => 1)
-     Fdag₋ = TensorMap(ones, pspace, pspace ⊗ aspace)
+     Fdag₋ = ones(pspace, pspace ⊗ aspace)
      block(Fdag₋, Irrep[U₁×U₁](1, 0)) .= -1
-     F₋ = TensorMap(ones, aspace ⊗ pspace, pspace)
+     F₋ = ones(aspace ⊗ pspace, pspace)
      block(F₋, Irrep[U₁×U₁](1, 0)) .= -1
      Fdag₋, F₋
 end
@@ -261,7 +261,7 @@ end
 # S⋅S interaction
 const SS = let
      aspace = Rep[ℤ₂×SU₂]((0, 1) => 1)
-     SL = TensorMap(ones, Float64, pspace, pspace ⊗ aspace) * sqrt(3) / 2
+     SL = ones(Float64, pspace, pspace ⊗ aspace) * sqrt(3) / 2
      SR = permute(SL', ((2, 1), (3,)))
      SL, SR
 end
@@ -269,9 +269,9 @@ end
 # hopping term, FdagF
 const FdagF = let
      aspace = Rep[ℤ₂×SU₂]((1, 1 // 2) => 1)
-     Fdag = TensorMap(zeros, pspace, pspace ⊗ aspace)
+     Fdag = zeros(pspace, pspace ⊗ aspace)
      block(Fdag, Irrep[ℤ₂×SU₂](1, 1 // 2))[1, 1] = 1
-     F = TensorMap(zeros, aspace ⊗ pspace, pspace)
+     F = zeros(aspace ⊗ pspace, pspace)
      block(F, Irrep[ℤ₂×SU₂](1, 1 // 2))[1, 1] = 1
 
      Fdag, F

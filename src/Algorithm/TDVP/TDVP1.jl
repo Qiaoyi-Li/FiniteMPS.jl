@@ -14,7 +14,7 @@ Wrap `TDVPSweep1!` with a symmetric integrator, i.e., sweeping from left to righ
 	 tol::Float64 = 1e-8
 The maximum Krylov dimension and tolerance in Lanczos exponential method.
 
-	 trunc::TruncationType = notrunc()
+	 trunc = notrunc()
 	 GCstep::Bool = false
 	 GCsweep::Bool = false
 	 verbose::Int64 = 0
@@ -55,7 +55,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L, 3, T}, dt::Number, direction::Swe
 
 		@timeit TimerStep "pushEnv" canonicalize!(Env, si)
 		PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si], (Env[2][si],), E₀)
-		@timeit TimerStep "TDVPUpdate1" x1, info_Lanczos = LanczosExp(action, Al, dt, PH, TimerStep; K = K, tol = tol, verbose = false)
+		@timeit TimerStep "TDVPUpdate1" x1, info_Lanczos = LanczosExp(action, Al, dt, PH, TimerStep, ["TDVPUpdate1"]; K = K, tol = tol, verbose = false)
 		finalize(PH)
 		Norm = norm(x1)
 		rmul!(x1, 1 / Norm)
@@ -71,7 +71,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L, 3, T}, dt::Number, direction::Swe
 			# backward evolution
 			@timeit TimerStep "pushEnv" canonicalize!(Env, si + 1, si)
 			PH = CompositeProjectiveHamiltonian(Env.El[si+1], Env.Er[si], (), E₀)
-			@timeit TimerStep "TDVPUpdate0" S, info_Lanczos = LanczosExp(action, S, -dt, PH, TimerStep; K = K, tol = tol, verbose = false)
+			@timeit TimerStep "TDVPUpdate0" S, info_Lanczos = LanczosExp(action, S, -dt, PH, TimerStep, ["TDVPUpdate0"]; K = K, tol = tol, verbose = false)
 			finalize(PH)
 			Norm = norm(S)
 			rmul!(S, 1 / Norm)
@@ -154,7 +154,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L, 3, T}, dt::Number, direction::Swe
 		@timeit TimerStep "pushEnv" canonicalize!(Env, si)
 
 		PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si], (Env[2][si],), E₀)
-		@timeit TimerStep "TDVPUpdate1" x1, info_Lanczos = LanczosExp(action, Ar, dt, PH, TimerStep; K = K, tol = tol, verbose = false)
+		@timeit TimerStep "TDVPUpdate1" x1, info_Lanczos = LanczosExp(action, Ar, dt, PH, TimerStep, ["TDVPUpdate1"]; K = K, tol = tol, verbose = false)
 		finalize(PH)
 		Norm = norm(x1)
 		rmul!(x1, 1 / Norm)
@@ -171,7 +171,7 @@ function TDVPSweep1!(Env::SparseEnvironment{L, 3, T}, dt::Number, direction::Swe
 			@timeit TimerStep "pushEnv" canonicalize!(Env, si, si - 1)
 
 			PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si-1], (), E₀)
-			@timeit TimerStep "TDVPUpdate0" S, info_Lanczos = LanczosExp(action, S, -dt, PH, TimerStep; K = K, tol = tol, verbose = false)
+			@timeit TimerStep "TDVPUpdate0" S, info_Lanczos = LanczosExp(action, S, -dt, PH, TimerStep, ["TDVPUpdate0"]; K = K, tol = tol, verbose = false)
 			finalize(PH)
 			Norm = norm(S)
 			rmul!(S, 1 / Norm)
@@ -292,8 +292,8 @@ function TDVPSweep1!(Env::SparseEnvironment{L, 3, T},
 		PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si], (Env[2][si],), E₀[1])
 		PH2 = CompositeProjectiveHamiltonian(Env2.El[si], Env2.Er[si], (Env2[2][si],), E₀[2])
 		function f_action(x, TO)
-			x1 = action(x, PH, TO)
-			x2 = action(x, PH2, TO)
+			x1 = action(x, PH, TO, ["TDVPUpdate1"])
+			x2 = action(x, PH2, TO, ["TDVPUpdate1"])
 			add!(x1, x2, dt2 / dt)
 			return x1
 		end
@@ -318,8 +318,8 @@ function TDVPSweep1!(Env::SparseEnvironment{L, 3, T},
 			PH = CompositeProjectiveHamiltonian(Env.El[si+1], Env.Er[si], (), E₀[1])
 			PH2 = CompositeProjectiveHamiltonian(Env2.El[si+1], Env2.Er[si], (), E₀[2])
 			function f_action0(x, TO)
-				x1 = action(x, PH, TO)
-				x2 = action(x, PH2, TO)
+				x1 = action(x, PH, TO, ["TDVPUpdate0"])
+				x2 = action(x, PH2, TO, ["TDVPUpdate0"])
 				add!(x1, x2, dt2 / dt)
 				return x1
 			end
@@ -445,8 +445,8 @@ function TDVPSweep1!(Env::SparseEnvironment{L, 3, T},
 		PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si], (Env[2][si],), E₀[1])
 		PH2 = CompositeProjectiveHamiltonian(Env2.El[si], Env2.Er[si], (Env2[2][si],), E₀[2])
 		function f_action(x, TO)
-			x1 = action(x, PH, TO)
-			x2 = action(x, PH2, TO)
+			x1 = action(x, PH, TO, ["TDVPUpdate1"])
+			x2 = action(x, PH2, TO, ["TDVPUpdate1"])
 			add!(x1, x2, dt2 / dt)
 			return x1
 		end
@@ -471,8 +471,8 @@ function TDVPSweep1!(Env::SparseEnvironment{L, 3, T},
 			PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si-1], (), E₀[1])
 			PH2 = CompositeProjectiveHamiltonian(Env2.El[si], Env2.Er[si-1], (), E₀[2])
 			function f_action0(x, TO)
-				x1 = action(x, PH, TO)
-				x2 = action(x, PH2, TO)
+				x1 = action(x, PH, TO, ["TDVPUpdate0"])
+				x2 = action(x, PH2, TO, ["TDVPUpdate0"])
 				add!(x1, x2, dt2 / dt)
 				return x1
 			end

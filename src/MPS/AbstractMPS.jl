@@ -95,7 +95,7 @@ function Base.show(io::IO, obj::DenseMPS{L}) where L
      lsi = ceil(Int64, log10(L)) # length of si to be printed
      for si = 1:L
           local A = obj[si]
-          D, DD = dim(A, 1)
-          println(io, "Bond ", lpad(si-1, lsi), "->", lpad(si, lsi), ": $(codomain(A).spaces[1]), dim = $(D) -> $(DD)")
+          D, DD = bonddim(A, 1)
+          println(io, "Bond ", lpad(si-1, lsi), "->", lpad(si, lsi), ": $(codomain(A, 1)), dim = $(D) -> $(DD)")
      end
 end

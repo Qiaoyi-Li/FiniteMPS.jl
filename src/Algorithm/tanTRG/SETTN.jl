@@ -4,7 +4,7 @@
 Use series-expansion thermal tensor network (SETTN)`[https://doi.org/10.1103/PhysRevB.95.161104]` method to initialize a high-temperature MPO `ρ = e^(-βH/2)`. Note `ρ` is unnormalized. The list of free energy `F = -lnTr[ρρ^†]/β` with different expansion orders is also returned.
 
 # Kwargs
-     trunc::TruncationScheme = truncdim(D) (this keyword argument is necessary!) 
+     trunc = truncrank(D) (this keyword argument is necessary!)
      disk::Bool = false
      maxorder::Int64 = 4
      tol::Float64 = 1e-8
@@ -24,7 +24,7 @@ function SETTN(H::SparseMPO{L}, β::Number; kwargs...) where {L}
 
      # deduce pspace 
      lspspace = map(H) do M
-          idx = findfirst(x -> !isnothing(x), M)
+          idx = findfirst(x -> !_isabsent(x), M)
           getPhysSpace(M[idx])
      end     
 
@@ -39,8 +39,6 @@ function SETTN(H::SparseMPO{L}, β::Number; kwargs...) where {L}
           # ρ -> ρ + Hn * (-β/2)^n/ n!     
           axpy!((-β / 2)^n / factorial(n), Hn, ρ; kwargs...)
           lsF[n] = - 2*log(norm(ρ)) / β
-
-          manualGC()
 
           n > 1 && (δF = (lsF[n] - lsF[n-1]) / abs(lsF[n]))
           if verbose ≥ 1
@@ -61,7 +59,7 @@ function SETTN(H::SparseMPO{L}, β::Number; kwargs...) where {L}
 end
 
 function _finishSETTN!(ρ::MPO, compress::Float64)
-     canonicalize!(ρ, length(ρ); trunc = truncbelow(compress))
-     canonicalize!(ρ, 1; trunc = truncbelow(compress))
+     canonicalize!(ρ, length(ρ); trunc = trunctol(; atol=compress))
+     canonicalize!(ρ, 1; trunc = trunctol(; atol=compress))
      return ρ
 end

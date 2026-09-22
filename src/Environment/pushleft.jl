@@ -27,19 +27,19 @@ function _pushleft(Er::SparseRightTensor, A::AdjointMPSTensor, H::SparseMPOTenso
 
      if get_num_workers() > 1 # multi-processing
 
-          valid_idx = [(j, i) for j in 1:sz[1] for i in filter(x -> !isnothing(H[j, x]) && !isnothing(Er[x]), 1:sz[2])]
+          valid_idx = [(j, i) for j in 1:sz[1] for i in filter(x -> !_isabsent(H[j, x]) && !_isabsent(Er[x]), 1:sz[2])]
           lsEr = pmap(valid_idx) do (j, i)
                _pushleft(Er[i], A, H[j, i], B), j
           end
 
 
           for (Er, j) in lsEr
-               Er_next[j] = axpy!(true, Er, Er_next[j])
+               Er_next[j] = _accumulate_owned(Er_next[j], Er)
           end
 
      else
 
-          validIdx = [(j, i) for j in 1:sz[1] for i in filter(x -> !isnothing(H[j, x]) && !isnothing(Er[x]), 1:sz[2])]
+          validIdx = [(j, i) for j in 1:sz[1] for i in filter(x -> !_isabsent(H[j, x]) && !_isabsent(Er[x]), 1:sz[2])]
 
           Lock = Threads.ReentrantLock()
           idx = Threads.Atomic{Int64}(1)
@@ -53,7 +53,7 @@ function _pushleft(Er::SparseRightTensor, A::AdjointMPSTensor, H::SparseMPOTenso
 
                     lock(Lock)
                     try
-                         Er_next[j] = axpy!(true, Er_i, Er_next[j])
+                         Er_next[j] = _accumulate_owned(Er_next[j], Er_i)
                     catch
                          rethrow()
                     finally

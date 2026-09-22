@@ -27,7 +27,7 @@ end
 for i in 1:L, j in 1:L
      addObs!(Tree, (Sz, Sz), (i, j), (false, false); name = (:Sz, :Sz))
 end
-calObs!(Tree, Ψ)
+calObs!(Tree, Ψ; alg=LayeredTreeEval())
 Obs = convert(Dict, Tree)
 ```
 Here `Tree` is an `ObservableTree` object that contains all observables to be calculated, and `addObs!` is the standard interface to add terms to it, analog to `InteractionTree` and `addIntr!`. Then, we call `calObs!` to trigger the in-place calculation in the tree, with the given MPS `Ψ`. Finally, we use the `convert` method to extract the data from the tree to a dictionary `Obs`. For example, 

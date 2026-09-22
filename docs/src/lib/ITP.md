@@ -1,12 +1,11 @@
 # Imaginary Time Proxy
 
-For computing imaginary time proxies (ITP). Use a graph structure to store terms in the current version, which may be changed to a bi-tree structure in the future.
+For computing imaginary time proxies (ITP), paired local operators share prefix and suffix trees. `addITP!` accepts two nonempty operator tuples and flat tuples of sites, fermionic flags and names. Each operator chain is sorted and reduced independently; result keys keep the original site order. `calITP!` uses the same `LayeredTreeEval` execution and environment cache as `calObs!`.
 
 ```@docs
-ImagTimeProxyGraph
-merge!(::ImagTimeProxyGraph)
-addITP2!
-addITP4!
+ImagTimeProxyTree
+merge!(::ImagTimeProxyTree)
+addITP!
 calITP!
 convert
 ```

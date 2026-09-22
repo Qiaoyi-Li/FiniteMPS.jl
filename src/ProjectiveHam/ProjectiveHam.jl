@@ -211,13 +211,14 @@ end
 function _showDinfo(io::IO, obj::SparseProjectiveHamiltonian{N}) where {N}
 
 	idx = findfirst(i -> !isnothing(obj.El[i]), 1:length(obj.El))
-	D, DD = dim(obj.El[idx], numind(obj.El[idx]))
-	println(io, "State[L]: $(domain(obj.El[idx])[end]), dim = $(D) -> $(DD)")
-	D, DD = dim(obj.Er[1], 1)
-	println(io, "State[R]: $(domain(obj.Er[idx])[end]), dim = $(D) -> $(DD)")
+	D, DD = bonddim(obj.El[idx], numind(obj.El[idx]))
+	println(io, "State[L]: $(domain(obj.El[idx], numin(obj.El[idx]))), dim = $(D) -> $(DD)")
+	idx = findfirst(i -> !_isabsent(obj.Er[i]), eachindex(obj.Er))
+	D, DD = bonddim(obj.Er[idx], 1)
+	println(io, "State[R]: $(codomain(obj.Er[idx], 1)), dim = $(D) -> $(DD)")
 	for i in 1:N
-		DL, DDL = dim(obj.H[i], 1)
-		DR, DDR = dim(obj.H[i], 2)
+		DL, DDL = bonddim(obj.H[i], 1)
+		DR, DDR = bonddim(obj.H[i], 2)
 		println(io, "Ham[site = $(obj.si[1] + i - 1)]: $(sum(DL)) × $(sum(DR)) -> $(sum(DDL)) × $(sum(DDR)) ($DL × $DR -> $DDL × $DDR)")
 	end
 	return nothing

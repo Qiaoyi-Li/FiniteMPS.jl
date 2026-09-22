@@ -11,7 +11,7 @@ Krylov space dimension.
      tol::Real = 1e-8
 Tolerance for eagerly break in Lanczos iteration.
 
-     trunc::TruncationScheme = truncbelow(MPSDefault.tol) & truncdim(MPSDefault.D)
+     trunc = trunctol(; atol=MPSDefault.tol) & truncrank(MPSDefault.D)
 Control the truncation in svd after each 2-site update. Details see `tsvd`. 
 
      GCstep::Bool = false
@@ -31,7 +31,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
 
      K = get(kwargs, :K, 16)
      tol = get(kwargs, :tol, 1e-8)
-     trunc = get(kwargs, :trunc, truncbelow(MPSDefault.tol) & truncdim(MPSDefault.D))
+     trunc = get(kwargs, :trunc, trunctol(; atol=MPSDefault.tol) & truncrank(MPSDefault.D))
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
      verbose::Int64 = get(kwargs, :verbose, 0)
@@ -52,7 +52,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
           Ar = Ψ[si+1]
 
           PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si+1], (Env[2][si], Env[2][si+1]), E₀)
-          @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = LanczosGS(action, CompositeMPSTensor(Al, Ar), PH, TimerStep;
+          @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = LanczosGS(action, CompositeMPSTensor(Al, Ar), PH, TimerStep, ["DMRGUpdate2"];
                K = K, tol = tol, verbose = false)
           finalize(PH)
 
@@ -96,7 +96,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
 
      K = get(kwargs, :K, 16)
      tol = get(kwargs, :tol, 1e-8)
-     trunc = get(kwargs, :trunc, truncbelow(MPSDefault.tol) & truncdim(MPSDefault.D))
+     trunc = get(kwargs, :trunc, trunctol(; atol=MPSDefault.tol) & truncrank(MPSDefault.D))
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
      verbose::Int64 = get(kwargs, :verbose, 0)
@@ -116,7 +116,7 @@ function DMRGSweep2!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
           Al = Ψ[si-1]
 
           PH = CompositeProjectiveHamiltonian(Env.El[si-1], Env.Er[si], (Env[2][si-1], Env[2][si]), E₀)
-          @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = LanczosGS(action, CompositeMPSTensor(Al, Ar), PH, TimerStep;
+          @timeit TimerStep "DMRGUpdate2" eg, xg, info_Lanczos = LanczosGS(action, CompositeMPSTensor(Al, Ar), PH, TimerStep, ["DMRGUpdate2"];
                K = K, tol = tol, verbose = false)
           finalize(PH)
 
@@ -181,7 +181,7 @@ Print the `TimerOutput` after each sweep or each local update if `verbose = 1` o
      CBEAlg::CBEAlgorithm = NoCBE()
 CBE algorithm for 1-DMRG.
 
-     trunc::TruncationScheme = notrunc()
+     trunc = notrunc()
 Control the truncation after each update, only used together with CBE. Details see `tsvd`. 
 
      noise::NTuple{2, Float64} = (0.1, 0.0)
@@ -226,7 +226,7 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepL2R; kwargs...) where
 
           @timeit TimerStep "pushEnv" canonicalize!(Env, si)
           PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si], (Env[2][si],), E₀)
-          @timeit TimerStep "DMRGUpdate1" eg, xg, info_Lanczos = LanczosGS(action, Al, PH, TimerStep;
+          @timeit TimerStep "DMRGUpdate1" eg, xg, info_Lanczos = LanczosGS(action, Al, PH, TimerStep, ["DMRGUpdate1"];
                K = K, tol = tol, verbose = false, β = β)
           finalize(PH)
 
@@ -316,7 +316,7 @@ function DMRGSweep1!(Env::SparseEnvironment{L,3,T}, ::SweepR2L; kwargs...) where
 
           @timeit TimerStep "pushEnv" canonicalize!(Env, si)
           PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si], (Env[2][si],), E₀)
-          @timeit TimerStep "DMRGUpdate1" eg, xg, info_Lanczos = LanczosGS(action, Ar, PH, TimerStep;
+          @timeit TimerStep "DMRGUpdate1" eg, xg, info_Lanczos = LanczosGS(action, Ar, PH, TimerStep, ["DMRGUpdate1"];
                K = K, tol = tol, verbose = false, β = β)
           finalize(PH)
           eg += E₀

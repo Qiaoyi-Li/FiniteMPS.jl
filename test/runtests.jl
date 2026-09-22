@@ -1,10 +1,17 @@
 using Test
 using FiniteMPS
+using LinearAlgebra, Random
 
-FiniteMPS.set_num_threads_mkl(1)
+LinearAlgebra.BLAS.set_num_threads(1)
 
-@testset "replace TensorKit" verbose = true begin
-     include("replaced.jl")
+@testset "TensorKit interfaces" begin
+     include("tensorkit_interfaces.jl")
+     include("action_interfaces.jl")
+     include("upgrade_sweep.jl")
+end
+
+@testset "Tree evaluation" begin
+     include("TreeEval.jl")
 end
 
 @testset "ObsTree" verbose = true begin
@@ -21,4 +28,3 @@ end
      @testset "spinful" verbose = true include("mulsiteIntr2.jl")
      @testset "spinful2" verbose = true include("mulsiteIntr3.jl")
 end
-

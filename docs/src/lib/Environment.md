@@ -15,5 +15,5 @@ canonicalize!(::AbstractEnvironment)
 free!(::AbstractEnvironment)
 scalar!
 connection!
-absorb!
+absorb_bond!
 ```

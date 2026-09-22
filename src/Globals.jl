@@ -1,12 +1,9 @@
 # provide some unexported functions to control the parallel computing
-get_num_cpus() = Sys.CPU_THREADS
 get_num_threads_julia() = Threads.nthreads()
-get_num_threads_mkl() = BLAS.get_num_threads()
-set_num_threads_mkl(n::Int64) = BLAS.set_num_threads(n)
 get_num_workers() = Distributed.nworkers()
 
-global GlobalNumThreads_action::Int64
-function set_num_threads_action(n::Int64)
+global GlobalNumThreads_action::Int = 1
+function set_num_threads_action(n::Int)
      @assert n ≥ 1
      n > Threads.nthreads() && @warn "n > Threads.nthreads() = $(Threads.nthreads()), not suggested!"
      global GlobalNumThreads_action = n
@@ -14,34 +11,17 @@ function set_num_threads_action(n::Int64)
 end
 get_num_threads_action() = GlobalNumThreads_action
 
-global GlobalNumThreads_mul::Int64 = 1 # initialize it here since LocalSpace will use it before __init__
-function set_num_threads_mul(n::Int64)
-     @assert n ≥ 1
-     n > Threads.nthreads() && @warn "n > Threads.nthreads() = $(Threads.nthreads()), not suggested!"
-     global GlobalNumThreads_mul = n
+global GlobalNumThreads_svd_mkl::Union{Nothing,Int} = nothing
+function set_num_threads_svd_mkl(n::Union{Nothing,Int})
+     isnothing(n) || n > 0 || throw(ArgumentError("SVD MKL thread count must be positive or nothing"))
+     global GlobalNumThreads_svd_mkl = n
      return nothing
 end
-get_num_threads_mul() = GlobalNumThreads_mul
+get_num_threads_svd_mkl() = GlobalNumThreads_svd_mkl
 
-global GlobalNumThreads_svd::Int64
-function set_num_threads_svd(n::Int64)
-     @assert n ≥ 1
-     n > Threads.nthreads() && @warn "n > Threads.nthreads() = $(Threads.nthreads()), not suggested!"
-     global GlobalNumThreads_svd = n
-     return nothing
-end
-get_num_threads_svd() = GlobalNumThreads_svd
+_is_mkl_backend() = any(lib -> startswith(basename(lib.libname), "libmkl_rt"), BLAS.get_config().loaded_libs)
+_with_svd_threads(f) = _with_svd_threads(f, GlobalNumThreads_svd_mkl)
+_with_svd_threads(f, ::Union{Nothing,Integer}) = f()
 
-global GlobalNumThreads_eig::Int64
-function set_num_threads_eig(n::Int64)
-     @assert n ≥ 1
-     n > Threads.nthreads() && @warn "n > Threads.nthreads() = $(Threads.nthreads()), not suggested!"
-     global GlobalNumThreads_eig = n
-     return nothing
-end
-get_num_threads_eig() = GlobalNumThreads_eig
-
-
-
-
-
+_isabsent(x) = x === nothing
+_accumulate_owned(acc, term) = _isabsent(acc) ? term : add!!(acc, term)

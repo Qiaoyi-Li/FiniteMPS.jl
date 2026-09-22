@@ -8,7 +8,7 @@ Compute `C = α A*B + β C` variationally via 2-site update, where `A` is a spar
 Compute `C = A*B` by letting `α = 1` and `β = 0`.
 
 # Kwargs
-	 trunc::TruncationScheme = truncbelow(MPSDefault.tol) & truncdim(MPSDefault.D)
+	 trunc = trunctol(; atol=MPSDefault.tol) & truncrank(MPSDefault.D)
 	 GCstep::Bool = false
 	 GCsweep::Bool = false
 	 maxiter::Int64 = 8
@@ -24,7 +24,7 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
 	@assert α != 0 || β != 0
 	@assert !(B === C)
 
-	trunc::TruncationScheme = get(kwargs, :trunc, truncbelow(MPSDefault.tol) & truncdim(MPSDefault.D))
+	trunc = get(kwargs, :trunc, trunctol(; atol=MPSDefault.tol) & truncrank(MPSDefault.D))
 	GCstep::Bool = get(kwargs, :GCstep, false)
 	GCsweep::Bool = get(kwargs, :GCsweep, false)
 	maxiter::Int64 = get(kwargs, :maxiter, 8)
@@ -76,7 +76,7 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
 					_β = 0
 				end
 
-				x = axpby!(_α, ab, _β, c)
+				x = _combine_owned(ab, c, _α, _β)
 				# normalize
 				norm_x = norm(x)
 				rmul!(x, 1 / norm_x)
@@ -98,7 +98,7 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
 				# check convergence
 				@timeit TimerStep "convergence_check" begin
 					x = rmul!(CompositeMPSTensor(C[si], C[si+1]), coef(C))
-					convergence = max(convergence, norm(x - x₀)^2 / abs2(coef(C)))
+					convergence = max(convergence, norm(add!!(x, x₀, -1))^2 / abs2(coef(C)))
 				end
 				# GC manually
 				GCstep && manualGC(TimerStep)
@@ -163,7 +163,7 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
 
 				@timeit TimerStep "pushEnv_mul" canonicalize!(Env_mul, si)
 				PH = CompositeProjectiveHamiltonian(Env_mul.El[si], Env_mul.Er[si], (Env_mul[2][si],))
-				@timeit TimerStep "action_mul" ab = action(B[si], PH, TimerStep)
+				@timeit TimerStep "action_mul" ab = action(B[si], PH, TimerStep, ["action_mul"])
 				finalize(PH)
 
 				_α = α * coef(B) / coef(C)
@@ -172,8 +172,8 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
 					si_L > 0 && canonicalize!(Env_add, si_L, si_R) # Er[si] is incorrect after CBE
 					@timeit TimerStep "pushEnv_add" canonicalize!(Env_add, si)
 					pspace = codomain(x₀)[2]
-					PH = SimpleProjectiveHamiltonian(Env_add.El[si], Env_add.Er[si], IdentityOperator(pspace, trivial(pspace), si, 1.0))
-					@timeit TimerStep "action_add" c = action(C₀[si], PH, TimerStep)
+					PH = SimpleProjectiveHamiltonian(Env_add.El[si], Env_add.Er[si], IdentityOperator(pspace, unitspace(pspace), si, 1.0))
+					@timeit TimerStep "action_add" c = action(C₀[si], PH, TimerStep, ["action_add"])
 					finalize(PH)
 					_β = β * coef(C₀) / coef(C)
 				else
@@ -181,7 +181,7 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
 					_β = 0
 				end
 
-				x = axpby!(_α, ab, _β, c)
+				x = _combine_owned(ab, c, _α, _β)
 				# normalize
 				norm_x = norm(x)
 				rmul!(x, 1 / norm_x)
@@ -189,7 +189,7 @@ function mul!(C::DenseMPS{L}, A::SparseMPO, B::DenseMPS{L}, α::Number, β::Numb
 
 				# check convergence before svd
 				@timeit TimerStep "convergence_check" begin
-					convergence = max(convergence, norm(x * coef(C) - x₀)^2 / abs2(coef(C)))
+					convergence = max(convergence, norm(add!!(x₀, x, coef(C), -1))^2 / abs2(coef(C)))
 				end
 
 				# apply noise
@@ -288,4 +288,14 @@ function rmul!(A::DenseMPS, b::Number)
 	# A -> b*A
 	A.c *= b
 	return A
+end
+
+function _combine_owned(ab, c, α, β)
+	if _isabsent(ab)
+		_isabsent(c) && error("no local result to combine")
+		return scale!!(c, β)
+	elseif _isabsent(c)
+		return scale!!(ab, α)
+	end
+	return add!!(c, ab, α, β)
 end
