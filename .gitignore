@@ -6,3 +6,5 @@ docs/build
 Manifest.toml
 dev
 *.log
+!benchmark/Manifest.toml
+benchmark/output/

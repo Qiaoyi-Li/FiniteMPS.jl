@@ -1,0 +1,156 @@
+name: Performance
+
+on:
+  push:
+    branches: [dev]
+    tags: ['v*']
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Target branch, tag, or full SHA (archive-release requires a version tag)'
+        required: true
+        default: dev
+        type: string
+      mode:
+        description: 'Measure only, or add an immutable release archive'
+        required: true
+        default: run-only
+        type: choice
+        options: [run-only, archive-release]
+
+permissions:
+  contents: read
+
+env:
+  JULIA_NUM_THREADS: '2'
+  JULIA_NUM_GC_THREADS: '1'
+  OPENBLAS_NUM_THREADS: '1'
+  PERFORMANCE_RUNNER_LABEL: ubuntu-24.04
+
+# Do not cancel or combine dev measurements. Only site writes are serialized.
+jobs:
+  benchmark:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    permissions:
+      contents: read
+    outputs:
+      target_sha: ${{ steps.target.outputs.target_sha }}
+      tag: ${{ steps.target.outputs.tag }}
+      publish_mode: ${{ steps.target.outputs.publish_mode }}
+      measured: ${{ steps.result.outputs.measured }}
+      artifact_id: ${{ steps.artifact.outputs.artifact-id }}
+    steps:
+      - name: Checkout workflow control tools
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.workflow_sha }}
+          path: control
+          persist-credentials: false
+      - uses: julia-actions/setup-julia@v3
+        with:
+          version: '1.11.6'
+      - name: Cache measurement dependencies
+        uses: julia-actions/cache@v3
+        with:
+          cache-name: performance-benchmark-julia-1.11.6
+          delete-old-caches: 'false'
+      - name: Instantiate workflow control environment
+        run: julia --startup-file=no --threads=2 --gcthreads=1 --project=control/benchmark -e 'using Pkg; Pkg.instantiate()'
+      - name: Resolve immutable measurement target
+        id: target
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: julia --startup-file=no --threads=2 --gcthreads=1 --project=control/benchmark control/benchmark/ci/resolve_target.jl --repo control
+      - name: Checkout measured source and its benchmark suite
+        if: steps.target.outputs.should_run == 'true'
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ steps.target.outputs.target_sha }}
+          path: source
+          persist-credentials: false
+      - name: Check target supports the benchmark interface
+        if: steps.target.outputs.should_run == 'true'
+        run: |
+          for file in Project.toml Manifest.toml run.jl collect.jl collection_reports.jl build.jl benchmarks.jl \
+                      harness.jl metadata.jl reports.jl workload_labels.jl; do
+            if [ ! -f "source/benchmark/$file" ]; then
+              echo 'Selected target does not contain a supported benchmark harness. Historical suite backports are not automatic.' >&2
+              exit 1
+            fi
+          done
+      - name: Instantiate measured source environment
+        if: steps.target.outputs.should_run == 'true'
+        working-directory: source
+        run: julia --startup-file=no --threads=2 --gcthreads=1 --project=benchmark -e 'using Pkg; Pkg.instantiate()'
+      - name: Collect benchmark suite with Julia 1, 2, and 4 threads
+        if: steps.target.outputs.should_run == 'true'
+        working-directory: source
+        env:
+          TARGET_SHA: ${{ steps.target.outputs.target_sha }}
+          TARGET_TAG: ${{ steps.target.outputs.tag }}
+          TARGET_PRERELEASE: ${{ steps.target.outputs.prerelease }}
+        run: |
+          args=(--output ../result --expected-sha "$TARGET_SHA")
+          if [ -n "$TARGET_TAG" ]; then
+            args+=(--tag "$TARGET_TAG" --prerelease "$TARGET_PRERELEASE")
+          fi
+          julia --startup-file=no --threads=2 --gcthreads=1 --project=benchmark benchmark/collect.jl "${args[@]}" --samples 3 --seconds 300
+      - name: Validate result and write Actions summary
+        if: steps.target.outputs.should_run == 'true'
+        id: result
+        env:
+          PUBLISH_MODE: ${{ steps.target.outputs.publish_mode }}
+        run: julia --startup-file=no --threads=2 --gcthreads=1 --project=control/benchmark control/benchmark/ci/check_run.jl result --mode "$PUBLISH_MODE"
+      - name: Retain completed result (including an explicit empty-suite status)
+        id: artifact
+        if: steps.target.outputs.should_run == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: performance-result-${{ github.run_id }}-${{ github.run_attempt }}
+          path: result/
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    needs: benchmark
+    if: needs.benchmark.outputs.measured == 'true' && needs.benchmark.outputs.publish_mode != 'none'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    concurrency:
+      group: gh-pages-publish
+      queue: max
+      cancel-in-progress: false
+    steps:
+      # Never execute a publisher from a manually selected measurement ref with a
+      # deployment key. Use the exact commit that supplied this workflow instead.
+      - name: Checkout trusted workflow control tools
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.workflow_sha }}
+          path: control
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        with:
+          artifact-ids: ${{ needs.benchmark.outputs.artifact_id }}
+          path: result
+      - uses: julia-actions/setup-julia@v3
+        with:
+          version: '1.11.6'
+      - name: Instantiate trusted rendering environment
+        run: julia --startup-file=no --threads=2 --gcthreads=1 --project=control/benchmark -e 'using Pkg; Pkg.instantiate()'
+      - name: Read latest site, render, and push with existing Documenter credentials
+        env:
+          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+          TARGET_SHA: ${{ needs.benchmark.outputs.target_sha }}
+          TARGET_TAG: ${{ needs.benchmark.outputs.tag }}
+          PUBLISH_MODE: ${{ needs.benchmark.outputs.publish_mode }}
+        run: |
+          julia --startup-file=no --threads=2 --gcthreads=1 --project=control/benchmark control/benchmark/ci/publish_site.jl \
+            --collection result/collection.json --site site \
+            --publisher control/benchmark/publish.jl --project control/benchmark \
+            --mode "$PUBLISH_MODE" --expected-sha "$TARGET_SHA" --expected-tag "$TARGET_TAG"

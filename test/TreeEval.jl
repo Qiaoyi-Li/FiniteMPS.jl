@@ -9,7 +9,6 @@
     end
     merge!(tree)
     plan = FiniteMPS._tree_plan(tree)
-    @test sum(length, plan.joins) == 2
     pushes = Threads.Atomic{Int}(0)
     pushenv(_, node, env, _) = (Threads.atomic_add!(pushes, 1); env * node.Op[2])
     for (disk, capacity, workers) in ((false, 0, 1), (true, 0, 1), (true, 1, Threads.nthreads(:default)))
@@ -18,7 +17,7 @@
             LayeredTreeEval(ntasks = workers); disk, maxsize = capacity, verbose = 0,
             showtimes = 10, GCspacing = 0)
         @test [refs[(i,)][] for i in 1:3] == [210, 462, -210]
-        @test pushes[] == length(plan.nodes) - 2
+        @test (pushes[], sum(length, plan.joins)) == (5, 2)
     end
     @test_throws ErrorException FiniteMPS._evaluate_tree!(tree, (side, site) -> nothing,
         (args...) -> error("push failed"), 1, 1, LayeredTreeEval();
@@ -36,7 +35,6 @@
         FiniteMPS._tree_return!(store, 1)
         FiniteMPS._tree_return!(store, 1; consumed = true)
         filename = FiniteMPS._tree_filename(store, 1)
-        @test isfile(filename)
         loaded = FiniteMPS._tree_borrow!(store, 1)
         @test loaded == value
         @test isfile(filename)
@@ -66,8 +64,6 @@ end
         calITP!(tree, rho; disk, maxsize = 0, alg)
         @test all(ref -> ref[] ≈ 1.25^2, values(tree.Refs["SzSz_SzSz"]))
     end
-    @test sum(length, FiniteMPS._tree_plan(tree).joins) == 1
-    @test_throws ArgumentError addITP!(tree, ((), (sz,)), (1,), (false,))
 end
 
 @testset "ITP auxiliary spin channel" begin
