@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Performance history</title><style>body{font:16px/1.55 system-ui,sans-serif;color:#162235;background:#f7f9fc;margin:0}main{max-width:1150px;margin:auto;padding:32px 24px}h1,h2{line-height:1.2}a{color:#1757a4}table{border-collapse:collapse;width:100%;background:white;margin:16px 0;display:block;overflow:auto}th,td{padding:10px 14px;text-align:left;border-bottom:1px solid #dce3eb;vertical-align:top}th{background:#eaf0f8}code,pre{font:13px/1.5 ui-monospace,monospace;overflow-wrap:anywhere}pre{white-space:pre-wrap;background:#edf2f8;padding:16px}dl{display:grid;grid-template-columns:minmax(140px,240px) 1fr;gap:8px 20px;background:white;padding:20px;border:1px solid #dce3eb}dt{font-weight:600}dd{margin:0;overflow-wrap:anywhere}.muted{color:#56657a}.notice{padding:12px 16px;background:#eaf0f8;border-left:4px solid #3576b6}nav{display:flex;gap:20px;flex-wrap:wrap}select{font:inherit;max-width:100%;padding:6px;margin:8px}svg{width:100%;height:auto;background:white;border:1px solid #dce3eb}details{margin:16px 0}summary{cursor:pointer} @media(max-width:600px){main{padding:20px 12px}dl{grid-template-columns:1fr;gap:2px}dd{margin-bottom:12px}}
+</style></head><body><main><h1>Performance history</h1><nav><a href="../">Performance report home</a><a href="data.json">Download historical data</a></nav><p class="notice">Historical measurements are shown without adjustment for differences in the execution environment. Missing measurements appear as gaps; zero allocations are measured values. Each metric is presented separately, with no aggregate score.</p>
+<p>No successful release measurements have been archived yet.</p></main><script id="trend-data" type="application/json">{"releases":[],"schema_version":1,"cases":[]}</script><script>
+(() => {
+  const data = JSON.parse(document.getElementById('trend-data').textContent);
+  if (!data.cases.length) return;
+  const caseSelect = document.getElementById('case'), metricSelect = document.getElementById('metric');
+  const svg = document.getElementById('plot'), tbody = document.querySelector('#values tbody');
+  const ns = 'http://www.w3.org/2000/svg';
+  function node(name, attributes, text) {
+    const element = document.createElementNS(ns, name);
+    for (const [key, value] of Object.entries(attributes)) element.setAttribute(key, value);
+    if (text !== undefined) element.textContent = text;
+    return element;
+  }
+  function update() {
+    const series = data.cases[Number(caseSelect.value)], metric = metricSelect.value;
+    const values = series.points.filter(p => p !== null).map(p => p[metric]);
+    const ceiling = Math.max(1, ...values);
+    const x = i => series.points.length === 1 ? 460 : 75 + i * 770 / (series.points.length - 1);
+    const y = value => 265 - value / ceiling * 220;
+    svg.replaceChildren(node('title', {}, `${series.display_name}: ${metricSelect.selectedOptions[0].textContent}`));
+    svg.append(node('line', {x1:75,y1:265,x2:845,y2:265,stroke:'#72829a'}));
+    svg.append(node('text', {x:10,y:45,'font-size':13}, ceiling.toPrecision(4)));
+    svg.append(node('text', {x:35,y:270,'font-size':13}, '0'));
+    let previous = null;
+    series.points.forEach((point, i) => {
+      const release = data.releases[i];
+      if (point === null) previous = null;
+      else {
+        const current = [x(i), y(point[metric])];
+        if (previous !== null) svg.append(node('line', {x1:previous[0],y1:previous[1],x2:current[0],y2:current[1],stroke:'#1757a4','stroke-width':2}));
+        const link = node('a', {href:release.url});
+        const circle = node('circle', {cx:current[0],cy:current[1],r:5,fill:'#1757a4'});
+        circle.append(node('title', {}, `${release.tag}: ${metricSelect.selectedOptions[0].textContent} ${point[metric]}`));
+        link.append(circle); svg.append(link); previous = current;
+      }
+      // Keep labels readable for long histories; every release remains in the table.
+      const step = Math.max(1, Math.ceil(data.releases.length / 7));
+      if (i % step === 0 || i === data.releases.length - 1)
+        svg.append(node('text', {x:x(i),y:295,'text-anchor':'middle','font-size':12}, release.tag));
+    });
+    tbody.replaceChildren();
+    data.releases.forEach((release, i) => {
+      const row = document.createElement('tr'), linkCell = document.createElement('td'), link = document.createElement('a');
+      link.href = release.url; link.textContent = release.tag; linkCell.append(link); row.append(linkCell);
+      const point = series.points[i];
+      const cells = [release.prerelease ? 'Prerelease' : 'Stable release', ...['median_time_ns','allocated_bytes','allocations'].map(key => point === null ? 'No measurement' : String(point[key]))];
+      for (const value of cells) { const cell = document.createElement('td'); cell.textContent = value; row.append(cell); }
+      tbody.append(row);
+    });
+  }
+  caseSelect.addEventListener('change', update); metricSelect.addEventListener('change', update); update();
+})();
+</script>
+</body></html>
