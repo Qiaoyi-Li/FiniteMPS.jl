@@ -2,8 +2,8 @@ using MKL
 MKL.set_num_threads(2)
 using FiniteMPS
 
-_mkl_local(n) = ccall((:mkl_set_num_threads_local, MKL.libmkl_rt), Cint, (Cint,), n)
-_mkl_threads() = ccall((:mkl_get_max_threads, MKL.libmkl_rt), Cint, ())
+_mkl_local(n) = ccall((:MKL_Set_Num_Threads_Local, MKL.libmkl_rt), Cint, (Cint,), n)
+_mkl_threads() = ccall((:MKL_Get_Max_Threads, MKL.libmkl_rt), Cint, ())
 
 @testset "MKL local SVD threads" begin
     initialized = (BLAS.get_num_threads(), _mkl_threads())
