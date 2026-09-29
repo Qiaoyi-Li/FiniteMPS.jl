@@ -26,7 +26,7 @@ H = AutomataMPO(SpinlessFreeFermion(Latt; t = t, μ = μ))
 DSETTN = 256 
 ρ, _ = SETTN(H, β₀;
      CBEAlg = NaiveCBE(DSETTN + div(DSETTN, 4), 1e-8; rsvd = true),
-	trunc = truncdim(DSETTN) & truncbelow(1e-16),
+	trunc = truncrank(DSETTN) & trunctol(; atol = 1e-16),
 	maxorder = 4, verbose = 1, GCsweep = true,
 	maxiter = 6, lsnoise = [(1/4, x) for x in [0.1, 0.01, 0.001]],
 )
@@ -49,7 +49,7 @@ while lsβ[end] < βm
      info, _ = TDVPSweep1!(Env, -dβ / 2;
 		CBEAlg = NaiveCBE(D + div(D, 4), 1e-8; rsvd = true),
 		GCsweep = true, verbose = 1,
-		trunc = truncdim(D) & truncbelow(1e-12),
+		trunc = truncrank(D) & trunctol(; atol = 1e-12),
 	)
 
      # estimate spectral width of local effective Hamiltonian

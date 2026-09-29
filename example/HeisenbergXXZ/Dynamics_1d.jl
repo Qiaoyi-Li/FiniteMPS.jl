@@ -43,7 +43,7 @@ for nsweep in 1:20
 		noise = (0.5, noise), # (expand ratio, noise strength)
 		CBEAlg = NaiveCBE(D + div(D, 2), 1e-8; rsvd = true),
 		verbose = 1, GCsweep = true,
-		trunc = truncdim(D) & truncbelow(1e-12),
+		trunc = truncrank(D) & trunctol(; atol = 1e-12),
 		K = 16)
 	push!(lsE, info[2].dmrg[1].Eg)
 
@@ -94,7 +94,7 @@ aspace_Φ = fuse(aspace_S, aspace_Ψ) # auxiliary space of the target MPS |Φ⟩
 	# obtain S_MPO * Φ variationally 
 	mul!(Φ, S_MPO, Ψ;
 		CBEAlg = NaiveCBE(D + div(D, 4), 1e-8; rsvd = true),
-		trunc = truncdim(D) & truncbelow(1e-12), verbose = 1,
+		trunc = truncrank(D) & trunctol(; atol = 1e-12), verbose = 1,
 		GCsweep = true, lsnoise = [(1/4, x) for x in [0.1, 0.01, 0.001]],
           tol = 1e-12,
 	)
@@ -139,7 +139,7 @@ for idx in 2:length(lst)
 	TDVPSweep1!(Env, -im * dt;
 		CBEAlg = NaiveCBE(D + div(D, 4), 1e-8; rsvd = true),
 		GCsweep = true, verbose = 1,
-		trunc = truncdim(D) & truncbelow(1e-12),
+		trunc = truncrank(D) & trunctol(; atol = 1e-12),
 	)
 
 	calObs!(Obs, Ψ, Φ; El = El)

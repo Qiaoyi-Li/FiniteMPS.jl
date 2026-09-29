@@ -23,7 +23,7 @@ lsχ = fill(NaN, length(lsβ))
 # SETTN initialization 
 ρ, lsF_SETTN = SETTN(H, lsβ[1];
      CBEAlg = NaiveCBE(D + div(D, 4), 1e-8; rsvd = true),
-	trunc = truncdim(256) & truncbelow(1e-16),
+	trunc = truncrank(256) & trunctol(; atol = 1e-16),
 	maxorder = 4, verbose = 1, GCsweep = true,
 	maxiter = 6, lsnoise = [(1/4, x) for x in [0.1, 0.01, 0.001]],
 )
@@ -55,7 +55,7 @@ for idx in 2:length(lsβ)
 	TDVPSweep1!(Env, -dβ / 2;
 		CBEAlg = NaiveCBE(D + div(D, 4), 1e-8; rsvd = true),
 		GCsweep = true, verbose = 1,
-		trunc = truncdim(D) & truncbelow(1e-12),
+		trunc = truncrank(D) & trunctol(; atol = 1e-12),
 	)
 
 	lnZ += 2 * log(norm(ρ))

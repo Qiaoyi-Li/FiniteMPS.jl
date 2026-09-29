@@ -16,8 +16,10 @@ using Test, Random, FiniteMPS
         block(S, c)[1, 1] == -7
     end
     @test all(shared)
-    U, S, Vh, err = FiniteMPS._raw_svd(A; trunc = truncrank(1))
-    @test err ≈ sqrt(6) && norm(U * S * Vh - A) ≈ err
+    U, S, Vh, info = tsvd(MPSTensor(A), ((1,), (2,)); trunc = truncrank(1),
+        alg = FiniteMPS.MatrixAlgebraKit.QRIteration(fixgauge = false),
+        CBEAlg = NaiveCBE(2, 1e-8), tol = 1e-12)
+    @test info.TrunErr ≈ sqrt(6) && norm(U * S * Vh - A) ≈ info.TrunErr
 
     rng = MersenneTwister(37)
     V = ComplexSpace(2)

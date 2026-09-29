@@ -89,7 +89,9 @@ end
 Compute a compact or truncated SVD, returning `BondInfo` instead of the 2-norm truncation error.
 """
 function tsvd(A::AbstractTensorWrapper, p₁::NTuple{N₁,Int64}, p₂::NTuple{N₂,Int64}; kwargs...) where {N₁,N₂}
-     u, s, v, ϵ = _raw_svd(A.A, (p₁, p₂); kwargs...)
+     trunc = get(kwargs, :trunc, notrunc())
+     alg = get(kwargs, :alg, MatrixAlgebraKit.DivideAndConquer(fixgauge = false))
+     u, s, v, ϵ = _raw_svd(A.A, (p₁, p₂); trunc, alg)
      return u, s, v, BondInfo(s, ϵ)
 end
 tsvd(A::AbstractTensorWrapper, p::Index2Tuple; kwargs...) = tsvd(A, p[1], p[2]; kwargs...)

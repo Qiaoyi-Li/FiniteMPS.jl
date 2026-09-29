@@ -34,7 +34,7 @@ lsE = [scalar!(Env)] # initial energy
 for nsweep in 1:20
 	info, _ = DMRGSweep2!(Env;
 		verbose = 1, GCsweep = true,
-		trunc = truncdim(D) & truncbelow(1e-12),
+		trunc = truncrank(D) & trunctol(; atol = 1e-12),
 		K = 16)
 	push!(lsE, info[2][1].Eg)
 
