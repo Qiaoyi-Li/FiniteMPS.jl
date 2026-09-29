@@ -78,7 +78,7 @@ jobs:
         run: |
           for file in Project.toml Manifest.toml run.jl collect.jl collection_reports.jl build.jl benchmarks.jl \
                       harness.jl metadata.jl reports.jl workload_labels.jl models.jl fixtures.jl \
-                      presets/hubbard_u1u1_ground_D64.json; do
+                      presets/hubbard_u1u1_ground_D128.json; do
             if [ ! -f "source/benchmark/$file" ]; then
               echo 'Selected target does not contain a supported benchmark harness. Historical suite backports are not automatic.' >&2
               exit 1
@@ -100,7 +100,7 @@ jobs:
           if [ -n "$TARGET_TAG" ]; then
             args+=(--tag "$TARGET_TAG" --prerelease "$TARGET_PRERELEASE")
           fi
-          julia --startup-file=no --threads=2 --gcthreads=1 --project=benchmark benchmark/collect.jl "${args[@]}" --samples 3 --seconds 600
+          julia --startup-file=no --threads=2 --gcthreads=1 --project=benchmark benchmark/collect.jl "${args[@]}" --seconds 600
       - name: Validate result and write Actions summary
         if: steps.target.outputs.should_run == 'true'
         id: result

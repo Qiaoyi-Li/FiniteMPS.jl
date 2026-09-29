@@ -82,7 +82,7 @@ function BenchmarkCase(id::AbstractString, build;
     occursin(r"^[A-Za-z0-9][A-Za-z0-9_.:/=+-]*$", id) ||
         throw(ArgumentError("case_id must be a nonempty stable identifier without whitespace"))
     isfinite(seconds) && seconds > 0 || throw(ArgumentError("seconds must be positive and finite"))
-    samples >= 2 || throw(ArgumentError("samples must be at least 2"))
+    samples >= 1 || throw(ArgumentError("samples must be positive"))
     evals >= 1 || throw(ArgumentError("evals must be positive"))
     mutates && evals != 1 && throw(ArgumentError("mutating cases require evals=1"))
     seed >= 0 || throw(ArgumentError("seed must be nonnegative"))
@@ -190,7 +190,7 @@ end
 "Measure selected cases; errors propagate and no partial report is returned."
 function measure_suite(cases::AbstractVector; progress=stderr,
                        samples=nothing, seconds=nothing, timings=nothing)
-    isnothing(samples) || samples >= 2 || throw(ArgumentError("samples override must be at least 2"))
+    isnothing(samples) || samples >= 1 || throw(ArgumentError("samples override must be positive"))
     isnothing(seconds) || (isfinite(seconds) && seconds > 0) || throw(ArgumentError("seconds override must be positive and finite"))
     selected = validate_cases(cases)
     results = Dict{String,Any}[]
@@ -243,7 +243,6 @@ function measure_case(case; progress, samples, seconds, timing=Dict{String,Any}(
         end
         Random.seed!(case.seed)
         timing["sampling_seconds"] = @elapsed trial = Base.invokelatest(BenchmarkTools.run, b; warmup=false)
-        length(trial) >= 2 || error("$(case.case_id): fewer than two samples; increase seconds budget")
         estimate = BenchmarkTools.median(trial)
         return Dict(
             "case_id" => case.case_id,

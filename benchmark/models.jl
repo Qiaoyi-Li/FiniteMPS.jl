@@ -5,7 +5,7 @@ using FiniteMPS
 export MODELS, DIMENSIONS, SEED, local_space, hamiltonian, model_parameters
 
 const SEED = 20260929
-const DIMENSIONS = (64, 128, 256)
+const DIMENSIONS = (two_site=(128, 256, 512), cbe=(256, 512, 1024))
 const MODELS = (
     (id="hubbard_u1u1", name="Hubbard / U1U1", symmetry="U1U1", hubbard=true),
     (id="hubbard_u1su2", name="Hubbard / U1SU2", symmetry="U1SU2", hubbard=true),

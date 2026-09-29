@@ -162,7 +162,7 @@ function render_collection(bundle)
         println(io, "<a href=\"configurations/$id/index.html\">Detailed report: $threads ", threads == 1 ? "thread" : "threads", "</a>")
     end
     println(io, "</nav><p><label for=\"metric\">Display metric: </label><select id=\"metric\"><option value=\"time\">Median execution time</option><option value=\"speedup\">Speedup relative to one thread</option><option value=\"bytes\">Total allocated bytes</option><option value=\"allocations\">Memory allocation count</option></select></p>")
-    println(io, "<p class=\"muted\">Each table is one model and algorithm; rows are full bond dimension caps and columns are thread configurations. Each sample is a complete double sweep. The two-site algorithm runs first and its CBE partner continues the same state and environment; samples also continue without resets. Speedup compares against one thread. Allocated bytes measure cumulative allocation, not peak memory.</p>")
+    println(io, "<p class=\"muted\">Each table is one model and algorithm; rows are full bond dimension caps and columns are thread configurations. Each sample is a complete double sweep. Speedup compares against one thread. Allocated bytes measure cumulative allocation, not peak memory.</p>")
     cpu = first_report["environment"]["cpu"]
     println(io, "<p>Processor: ", html_escape(join(cpu["cpu_models"], ", ")),
         "; visible logical processors: ", cpu["logical_cpus_visible"], ".</p>")

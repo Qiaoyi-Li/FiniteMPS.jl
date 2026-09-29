@@ -46,7 +46,7 @@ function collect_reports(; output=joinpath(@__DIR__,"output"), suite=nothing,
         (ispath(path)||islink(path)) && rm(path;recursive=true,force=true)
     end
     try
-        isnothing(samples) || samples>=2 || error("samples override must be at least 2")
+        isnothing(samples) || samples>=1 || error("samples override must be positive")
         isnothing(seconds) || (isfinite(seconds)&&seconds>0) || error("seconds override must be positive and finite")
         reports=Dict{String,Any}[]
         configurations=Dict{String,Any}[]

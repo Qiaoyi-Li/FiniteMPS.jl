@@ -8,7 +8,7 @@ include("../ci/publish_site.jl")
 const TEST_ENVIRONMENT = PerformanceMetadata.collect_environment()
 test_sha(n) = string(n; base=16, pad=40)
 
-function test_report(n; tag=nothing, sha=test_sha(n))
+function test_report(n; tag=nothing, sha=test_sha(n), samples=1)
     Dict("schema_version"=>1,
         "source"=>Dict("repository"=>"Qiaoyi-Li/FiniteMPS.jl", "commit_sha"=>sha,
             "benchmark_source_sha"=>sha, "package_version"=>"0.0.0", "tag"=>tag, "prerelease"=>false),
@@ -17,7 +17,7 @@ function test_report(n; tag=nothing, sha=test_sha(n))
         "environment"=>TEST_ENVIRONMENT,
         "cases"=>[Dict("case_id"=>"test/publication", "description"=>"Synthetic publication fixture",
             "parameters"=>Dict(), "measurement_parameters"=>Dict("seed"=>1, "evals"=>1,
-                "seconds_budget"=>1.0, "samples_budget"=>2), "samples"=>2,
+                "seconds_budget"=>1.0, "samples_budget"=>samples), "samples"=>samples,
             "median_time_ns"=>1.0, "allocated_bytes"=>0, "allocations"=>0)])
 end
 
@@ -44,7 +44,7 @@ end
 
         tags = ("v1.1.0","v1.0.0","v2.0.0-rc1")
         for (n,tag) in enumerate(tags)
-            publish("release",n;tag)
+            publish("release",n;tag,samples=2)
         end
         archives = Dict(tag=>read(joinpath(root,"releases",tag,"report.json")) for tag in tags)
         push_branch("main",30)
@@ -72,4 +72,41 @@ end
             PerformanceSite.PerformanceSummary.read_summary(input);publishing="published",published_mode="main")
         @test occursin("performance/main)",String(take!(summary)))
     end
+end
+
+include("../harness.jl")
+
+module SweepSuiteTest
+using BenchmarkTools, Random
+using ..BenchmarkHarness
+include("../benchmarks.jl")
+
+const created = Tuple{Tuple{String,Int},Vector{String}}[]
+function PerformanceFixtures.build_fixture(rng::Xoshiro, model::NamedTuple, kind::String, D::Int)
+    env = String[]
+    push!(created,((kind,D),env))
+    return (;env,parameters=Dict())
+end
+sweep!(env::Vector{String},operation,D) = push!(env,operation)
+end
+
+@testset "Single-sample sweeps with staggered dimensions" begin
+    cases = filter(case->case.parameters["model"]=="hubbard_u1u1",
+        SweepSuiteTest.benchmark_suite(BenchmarkHarness.ExecutionConfig()))
+    results = BenchmarkHarness.measure_suite(cases; progress=devnull)
+    @test all(case["samples"]==1 for case in results)
+    @test SweepSuiteTest.created == [
+        (("ground",128),["2-DMRG","2-DMRG"]),
+        (("ground",256),["2-DMRG","CBE-DMRG","CBE-DMRG"]),
+        (("ground",512),["2-DMRG","CBE-DMRG"]),
+        (("ground",1024),["CBE-DMRG"]),
+        (("thermal",128),["2-TDVP","2-TDVP"]),
+        (("thermal",256),["2-TDVP","CBE-TDVP","CBE-TDVP"]),
+        (("thermal",512),["2-TDVP","CBE-TDVP"]),
+        (("thermal",1024),["CBE-TDVP"])]
+    @test [(case.parameters["cbe_target"],case.parameters["continuation_after"])
+        for case in cases if case.parameters["nominal_D"]==1024] == [(2048,nothing),(1152,nothing)]
+    report = test_report(1)
+    report["cases"] = results
+    BenchmarkHarness.PerformanceReports.validate_report(report)
 end
