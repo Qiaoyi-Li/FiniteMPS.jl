@@ -145,6 +145,18 @@ function action(x::AbstractMPSTensor, PH::SimpleProjectiveHamiltonian, TO::Union
 	y = _action_initialize(x, PH)
 	return action!(y, x, PH, TO, timer_path)
 end
+
+# Reuse the two-site MPO kernels; only the MPS kernels currently cache intermediates.
+function action(x::CompositeMPSTensor{2,T}, PH::SimpleProjectiveHamiltonian{2},
+                TO::Union{TimerOutput,Nothing}=nothing, timer_path=String[]) where {T<:NTuple{2,MPSTensor{4}}}
+    if isnothing(TO)
+        result = _action2(x, PH.El, PH.H..., PH.Er)
+    else
+        result, local_timer = _action2(x, PH.El, PH.H..., PH.Er, true)
+        merge!(TO, local_timer; tree_point=timer_path)
+    end
+    return CompositeMPSTensor{2,T}(result)
+end
 _replace_first_space(P::ProductSpace{S,N}, V) where {S,N} =
 	ProductSpace(ntuple(i -> i == 1 ? V : P[i], Val(N)))
 _replace_last_space(P::ProductSpace{S,N}, V) where {S,N} =

@@ -10,7 +10,10 @@ Apply left-to-right or right-to-left 2-site TDVP`[https://doi.org/10.1103/PhysRe
 Wrap `TDVPSweep2!` with a symmetric integrator, i.e., sweeping from left to right and then from right to left with the same step length `dt / 2`.
 
 # Kwargs
-     krylovalg::KrylovKit.KrylovAlgorithm = TDVPDefaultLanczos
+     K::Int64 = 32
+     tol::Float64 = 1e-8
+The maximum Krylov dimension and tolerance in the Lanczos exponential method.
+
      trunc = trunctol(; atol=MPSDefault.tol) & truncrank(MPSDefault.D)
      GCstep::Bool = false
      GCsweep::Bool = false
@@ -20,7 +23,8 @@ Apply `exp(dt(H - E_shift))` to avoid possible `Inf` in imaginary time evolution
 """
 function TDVPSweep2!(Env::SparseEnvironment{L,3,T}, dt::Number, ::SweepL2R; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,DenseMPS}}
      # left to right sweep
-     krylovalg = get(kwargs, :krylovalg, TDVPDefaultLanczos)
+     K = get(kwargs, :K, 32)
+     tol = get(kwargs, :tol, 1e-8)
      trunc = get(kwargs, :trunc, trunctol(; atol=MPSDefault.tol) & truncrank(MPSDefault.D))
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
@@ -42,7 +46,11 @@ function TDVPSweep2!(Env::SparseEnvironment{L,3,T}, dt::Number, ::SweepL2R; kwar
           @timeit TimerStep "pushEnv" canonicalize!(Env, si, si + 1)
           Ar = Ψ[si+1]
 
-          @timeit TimerStep "TDVPUpdate2" x2, Norm, info_Lanczos = _TDVPUpdate2(ProjHam(Env, si, si + 1; E₀=E₀), Al, Ar, dt, krylovalg; kwargs...)
+          PH = CompositeProjectiveHamiltonian(Env.El[si], Env.Er[si+1], (Env[2][si], Env[2][si+1]), E₀)
+          @timeit TimerStep "TDVPUpdate2" x2, info_Lanczos = LanczosExp(action, CompositeMPSTensor(Al, Ar), dt, PH, TimerStep, ["TDVPUpdate2"]; K=K, tol=tol, verbose=false)
+          finalize(PH)
+          Norm = norm(x2)
+          rmul!(x2, 1 / Norm)
           @timeit TimerStep "svd" Ψ[si], Al, info_svd = leftorth(x2; trunc=trunc)
           # note svd may change the norm of Al
           normalize!(Al)
@@ -54,7 +62,11 @@ function TDVPSweep2!(Env::SparseEnvironment{L,3,T}, dt::Number, ::SweepL2R; kwar
           # backward evolution
           if si < L - 1
                @timeit TimerStep "pushEnv" canonicalize!(Env, si + 1, si + 1)
-               @timeit TimerStep "TDVPUpdate1" Al, Norm, info_Lanczos = _TDVPUpdate1(ProjHam(Env, si + 1, si + 1; E₀=E₀), Al, -dt, krylovalg; kwargs...)
+               PH = CompositeProjectiveHamiltonian(Env.El[si+1], Env.Er[si+1], (Env[2][si+1],), E₀)
+               @timeit TimerStep "TDVPUpdate1" Al, info_Lanczos = LanczosExp(action, Al, -dt, PH, TimerStep, ["TDVPUpdate1"]; K=K, tol=tol, verbose=false)
+               finalize(PH)
+               Norm = norm(Al)
+               rmul!(Al, 1 / Norm)
                rmul!(Ψ, Norm * exp(-dt * (E₀ - E_shift)))
                info_backward[si] = TDVPInfo{1}(-dt, info_Lanczos, BondInfo(Al, :R))
 
@@ -66,8 +78,6 @@ function TDVPSweep2!(Env::SparseEnvironment{L,3,T}, dt::Number, ::SweepL2R; kwar
           GCstep && manualGC(TimerStep)
 
           # show
-          merge!(TimerStep, get_timer("action2"); tree_point=["TDVPUpdate2"])
-          si < L - 1 && merge!(TimerStep, get_timer("action1"); tree_point=["TDVPUpdate1"])
           merge!(TimerSweep, TimerStep; tree_point=["TDVPSweep2>>"])
           if verbose ≥ 2
                show(TimerStep; title="site $(si)->$(si+1)")
@@ -94,7 +104,8 @@ end
 
 function TDVPSweep2!(Env::SparseEnvironment{L,3,T}, dt::Number, ::SweepR2L; kwargs...) where {L,T<:Tuple{AdjointMPS,SparseMPO,DenseMPS}}
      # right to left sweep
-     krylovalg = get(kwargs, :krylovalg, TDVPDefaultLanczos)
+     K = get(kwargs, :K, 32)
+     tol = get(kwargs, :tol, 1e-8)
      trunc = get(kwargs, :trunc, trunctol(; atol=MPSDefault.tol) & truncrank(MPSDefault.D))
      GCstep = get(kwargs, :GCstep, false)
      GCsweep = get(kwargs, :GCsweep, false)
@@ -116,7 +127,11 @@ function TDVPSweep2!(Env::SparseEnvironment{L,3,T}, dt::Number, ::SweepR2L; kwar
           @timeit TimerStep "pushEnv" canonicalize!(Env, si - 1, si)
           Al = Ψ[si-1]
 
-          @timeit TimerStep "TDVPUpdate2" x2, Norm, info_Lanczos = _TDVPUpdate2(ProjHam(Env, si - 1, si; E₀=E₀), Al, Ar, dt, krylovalg; kwargs...)
+          PH = CompositeProjectiveHamiltonian(Env.El[si-1], Env.Er[si], (Env[2][si-1], Env[2][si]), E₀)
+          @timeit TimerStep "TDVPUpdate2" x2, info_Lanczos = LanczosExp(action, CompositeMPSTensor(Al, Ar), dt, PH, TimerStep, ["TDVPUpdate2"]; K=K, tol=tol, verbose=false)
+          finalize(PH)
+          Norm = norm(x2)
+          rmul!(x2, 1 / Norm)
           @timeit TimerStep "svd" Ar, Ψ[si], info_svd = rightorth(x2; trunc=trunc)
           normalize!(Ar)
           # remember to change Center of Ψ manually
@@ -127,7 +142,11 @@ function TDVPSweep2!(Env::SparseEnvironment{L,3,T}, dt::Number, ::SweepR2L; kwar
           # backward evolution
           if si > 2
                @timeit TimerStep "pushEnv" canonicalize!(Env, si - 1, si - 1)
-               @timeit TimerStep "TDVPUpdate1" Ar, Norm, info_Lanczos = _TDVPUpdate1(ProjHam(Env, si - 1, si - 1; E₀=E₀), Ar, -dt, krylovalg; kwargs...)
+               PH = CompositeProjectiveHamiltonian(Env.El[si-1], Env.Er[si-1], (Env[2][si-1],), E₀)
+               @timeit TimerStep "TDVPUpdate1" Ar, info_Lanczos = LanczosExp(action, Ar, -dt, PH, TimerStep, ["TDVPUpdate1"]; K=K, tol=tol, verbose=false)
+               finalize(PH)
+               Norm = norm(Ar)
+               rmul!(Ar, 1 / Norm)
                rmul!(Ψ, Norm * exp(-dt * (E₀ - E_shift)))
                info_backward[si-2] = TDVPInfo{1}(-dt, info_Lanczos, BondInfo(Ar, :L))
 
@@ -139,8 +158,6 @@ function TDVPSweep2!(Env::SparseEnvironment{L,3,T}, dt::Number, ::SweepR2L; kwar
           GCstep && manualGC(TimerStep)
 
           # show
-          merge!(TimerStep, get_timer("action2"); tree_point=["TDVPUpdate2"])
-          si > 2 && merge!(TimerStep, get_timer("action1"); tree_point=["TDVPUpdate1"])
           merge!(TimerSweep, TimerStep; tree_point=["TDVPSweep2<<"])
           if verbose ≥ 2
                show(TimerStep; title="site $(si-1)<-$(si)")

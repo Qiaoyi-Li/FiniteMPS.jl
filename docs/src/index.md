@@ -2,6 +2,8 @@
 
 *A julia package for finite MPS/MPO-based computations of ground-state, finite-temperature and dynamical properties.*
 
+[Performance benchmarks](https://Qiaoyi-Li.github.io/FiniteMPS.jl/performance/)
+
 ```@meta
 CurrentModule = FiniteMPS
 ```

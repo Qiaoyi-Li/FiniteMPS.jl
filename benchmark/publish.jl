@@ -250,13 +250,16 @@ function render_trend(data)
     return page("Performance history", String(take!(io)); script)
 end
 
-function render_index(archives, dev)
+function render_index(archives, branches)
     io = IOBuffer()
     println(io, "<h1>Performance reports</h1><nav><a href=\"../\">Project documentation</a><a href=\"stable/\">Latest stable release</a><a href=\"trend/\">Performance history</a></nav>")
-    if dev === nothing
-        println(io, "<h2>Development branch</h2><p>No successful dev-branch measurements have been published yet.</p>")
-    else
-        println(io, "<h2><a href=\"dev/\">Development branch performance report</a></h2><p>Latest published successful dev-branch measurement: commit <code>", html_escape(dev["source"]["commit_sha"]), "</code>, measured at ", html_escape(dev["run"]["measured_at_utc"]), ". This report is retained if later runs fail.</p>")
+    for branch in ("dev", "main")
+        report = get(branches, branch, nothing)
+        if report === nothing
+            println(io, "<h2>$branch</h2><p>No measurements yet.</p>")
+        else
+            println(io, "<h2><a href=\"$branch/\">$branch</a></h2><p>Commit <code>", html_escape(report["source"]["commit_sha"]), "</code>, measured at ", html_escape(report["run"]["measured_at_utc"]), ".</p>")
+        end
     end
     println(io, "<h2>Release archives</h2>")
     if isempty(archives)
@@ -298,7 +301,7 @@ function publish_collection(collection_path, site; mode, dry_run=false, expected
 end
 
 function publish_snapshot(report, payload, files, site; mode, dry_run, expected_sha, expected_tag)
-    mode in ("dev", "release") || error("Mode must be dev or release")
+    mode in ("dev", "main", "release") || error("Mode must be dev, main or release")
     source, run = report["source"], report["run"]
     expected_sha === nothing || source["commit_sha"] == expected_sha || error("Report SHA does not match expected target")
     expected_tag === nothing || source["tag"] == expected_tag || error("Report tag does not match expected target")
@@ -306,30 +309,34 @@ function publish_snapshot(report, payload, files, site; mode, dry_run, expected_
         source["tag"] === nothing && error("Release publication requires a version tag")
         version_tag(source["tag"])
     else
-        source["tag"] === nothing || error("Dev publication cannot have a tag")
-        run["event_name"] == "push" || error("Dev publication requires a dev push report")
-        all(run[key] !== nothing for key in ("workflow", "run_id", "run_number", "run_attempt")) || error("Dev publication requires workflow ordering metadata")
+        source["tag"] === nothing || error("Branch publication cannot have a tag")
+        run["event_name"] == "push" || error("Branch publication requires a push report")
+        all(run[key] !== nothing for key in ("workflow", "run_id", "run_number", "run_attempt")) || error("Branch publication requires workflow ordering metadata")
     end
     root = inspect_site(site)
     archives = read_archives(root)
-    devpath = joinpath(root, "dev")
+    branches = Dict{String, Any}()
     previous_snapshot = nothing
-    if ispath(devpath)
-        previous_snapshot = try
-            read_snapshot(devpath)
+    for branch in ("dev", "main")
+        path = joinpath(root, branch)
+        ispath(path) || continue
+        snapshot = try
+            read_snapshot(path)
         catch exception
-            @warn "Ignoring unreadable development snapshot; it will be overwritten." exception
+            @warn "Ignoring unreadable $branch snapshot." exception
             nothing
         end
-    end
-    dev = previous_snapshot === nothing ? nothing : previous_snapshot.record
-    if dev !== nothing
-        dev["source"]["tag"] === nothing || error("Dev archive contains a tag")
+        snapshot === nothing && continue
+        branches[branch] = snapshot.record
+        branch == mode && (previous_snapshot = snapshot)
     end
     for old in values(archives)
         old["source"]["repository"] == source["repository"] || error("Mixed repositories in release archives")
     end
-    dev === nothing || dev["source"]["repository"] == source["repository"] || error("Dev belongs to another repository")
+    for (branch, record) in branches
+        record["source"]["tag"] === nothing || error("$branch snapshot contains a tag")
+        record["source"]["repository"] == source["repository"] || error("$branch belongs to another repository")
+    end
     planned = Dict{String, String}()
     if mode == "release"
         tag = source["tag"]
@@ -340,28 +347,28 @@ function publish_snapshot(report, payload, files, site; mode, dry_run, expected_
         archives[tag] = report
         snapshot_path = "releases/$tag"
     else
-        if dev !== nothing
-            previous = dev["run"]
-            previous["workflow"] == run["workflow"] || error("Dev workflow identity changed; run numbers are not comparable")
-            all(previous[key] !== nothing for key in ("run_id", "run_number", "run_attempt")) || error("Existing dev lacks ordering metadata")
+        if previous_snapshot !== nothing
+            previous = previous_snapshot.record["run"]
+            previous["workflow"] == run["workflow"] || error("$mode workflow identity changed; run numbers are not comparable")
+            all(previous[key] !== nothing for key in ("run_id", "run_number", "run_attempt")) || error("Existing $mode lacks ordering metadata")
             old_order, new_order = (previous["run_number"], previous["run_attempt"]), (run["run_number"], run["run_attempt"])
-            old_order > new_order && return "older-dev-skipped"
+            old_order > new_order && return "older-$mode-skipped"
             if previous["run_number"] == run["run_number"]
                 previous["run_id"] == run["run_id"] || error("Same run number has a different run ID")
-                dev["source"]["commit_sha"] == source["commit_sha"] || error("Rerun changed the measured SHA")
+                previous_snapshot.record["source"]["commit_sha"] == source["commit_sha"] || error("Rerun changed the measured SHA")
             end
             if old_order == new_order
                 previous_snapshot.payload == payload && return "no-op"
-                error("A completed run attempt already has a different dev report")
+                error("A completed run attempt already has a different $mode report")
             end
         end
-        dev = report
-        snapshot_path = "dev"
+        branches[mode] = report
+        snapshot_path = mode
     end
     for (relative, contents) in files
         planned[joinpath(snapshot_path, relative)] = contents
     end
-    planned["index.html"] = render_index(archives, dev)
+    planned["index.html"] = render_index(archives, branches)
     if mode == "release" || !isfile(joinpath(root, "trend", "data.json"))
         data = trend_data(archives)
         planned["trend/data.json"] = json_text(data)
@@ -383,7 +390,7 @@ function publish_snapshot(report, payload, files, site; mode, dry_run, expected_
     changed = filter(pair -> !isfile(joinpath(root, first(pair))) || read(joinpath(root, first(pair)), String) != last(pair), planned)
     isempty(changed) && return "no-op"
     dry_run && return "published"
-    # Install a complete snapshot directory together, so changing dev between the
+    # Install a complete snapshot directory together, so changing a branch between the
     # single-report and collection formats cannot leave a stale second manifest.
     destination = joinpath(root, snapshot_path)
     mkpath(dirname(destination))
@@ -444,7 +451,7 @@ function main(args)
         end
         index += 1
     end
-    all(haskey(options, key) for key in ("--site", "--mode")) && xor(haskey(options, "--report"), haskey(options, "--collection")) || error("Usage: publish.jl --report PATH | --collection PATH --site PATH --mode dev|release [--dry-run] [--expected-sha SHA] [--expected-tag TAG]")
+    all(haskey(options, key) for key in ("--site", "--mode")) && xor(haskey(options, "--report"), haskey(options, "--collection")) || error("Usage: publish.jl --report PATH | --collection PATH --site PATH --mode dev|main|release [--dry-run] [--expected-sha SHA] [--expected-tag TAG]")
     publisher, input = haskey(options, "--collection") ? (publish_collection, options["--collection"]) : (publish_report, options["--report"])
     status = publisher(input, options["--site"]; mode=options["--mode"], dry_run,
                             expected_sha=get(options, "--expected-sha", nothing), expected_tag=get(options, "--expected-tag", nothing))

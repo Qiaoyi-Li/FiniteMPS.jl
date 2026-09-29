@@ -2,7 +2,7 @@ name: Performance
 
 on:
   push:
-    branches: [dev]
+    branches: [dev, main]
     tags: ['v*']
   release:
     types: [published]
@@ -29,7 +29,7 @@ env:
   OPENBLAS_NUM_THREADS: '1'
   PERFORMANCE_RUNNER_LABEL: ubuntu-24.04
 
-# Do not cancel or combine dev measurements. Only site writes are serialized.
+# Do not cancel or combine branch measurements. Only site writes are serialized.
 jobs:
   benchmark:
     runs-on: ubuntu-24.04
@@ -59,6 +59,8 @@ jobs:
           delete-old-caches: 'false'
       - name: Instantiate workflow control environment
         run: julia --startup-file=no --threads=2 --gcthreads=1 --project=control/benchmark -e 'using Pkg; Pkg.instantiate()'
+      - name: Check report publication
+        run: julia --startup-file=no --threads=2 --gcthreads=1 --project=control/benchmark control/benchmark/test/publishing.jl
       - name: Resolve immutable measurement target
         id: target
         env:
@@ -75,7 +77,8 @@ jobs:
         if: steps.target.outputs.should_run == 'true'
         run: |
           for file in Project.toml Manifest.toml run.jl collect.jl collection_reports.jl build.jl benchmarks.jl \
-                      harness.jl metadata.jl reports.jl workload_labels.jl; do
+                      harness.jl metadata.jl reports.jl workload_labels.jl models.jl fixtures.jl \
+                      presets/hubbard_u1u1_ground_D64.json; do
             if [ ! -f "source/benchmark/$file" ]; then
               echo 'Selected target does not contain a supported benchmark harness. Historical suite backports are not automatic.' >&2
               exit 1
@@ -97,7 +100,7 @@ jobs:
           if [ -n "$TARGET_TAG" ]; then
             args+=(--tag "$TARGET_TAG" --prerelease "$TARGET_PRERELEASE")
           fi
-          julia --startup-file=no --threads=2 --gcthreads=1 --project=benchmark benchmark/collect.jl "${args[@]}" --samples 3 --seconds 300
+          julia --startup-file=no --threads=2 --gcthreads=1 --project=benchmark benchmark/collect.jl "${args[@]}" --samples 3 --seconds 600
       - name: Validate result and write Actions summary
         if: steps.target.outputs.should_run == 'true'
         id: result

@@ -53,8 +53,8 @@ function main(args=ARGS)
         end
         index += 1
     end
-    directory !== nothing && mode in ("none", "dev", "release") ||
-        error("Usage: check_run.jl DIRECTORY --mode none|dev|release")
+    directory !== nothing && mode in ("none", "dev", "main", "release") ||
+        error("Usage: check_run.jl DIRECTORY --mode none|dev|main|release")
     measured = check_run(directory)
     open(ENV["GITHUB_OUTPUT"], "a") do stream
         println(stream, "measured=", measured)

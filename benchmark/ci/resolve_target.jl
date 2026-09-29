@@ -36,11 +36,11 @@ function select_target(event_name::AbstractString, event::AbstractDict,
     if event_name == "push"
         get(event, "deleted", false) && return skipped("Deleted refs are not benchmarked.")
         ref = get(event, "ref", context_ref)
-        if ref == "refs/heads/dev"
+        if ref in ("refs/heads/dev", "refs/heads/main")
             sha = get(event, "after", context_sha)
             is_sha(sha) && sha != repeat("0", 40) ||
-                error("A dev push requires a nonzero full event commit SHA.")
-            return merge(result, Dict("target_ref" => sha, "publish_mode" => "dev"))
+                error("A branch push requires a nonzero full event commit SHA.")
+            return merge(result, Dict("target_ref" => sha, "publish_mode" => last(split(ref, '/'))))
         end
         if ref isa AbstractString && startswith(ref, "refs/tags/")
             tag = replace(ref, r"^refs/tags/" => ""; count=1)
@@ -51,7 +51,7 @@ function select_target(event_name::AbstractString, event::AbstractDict,
             return merge(result, Dict("target_ref" => ref, "event_object" => after, "tag" => tag,
                 "prerelease" => is_prerelease(tag), "publish_mode" => "release"))
         end
-        return skipped("Only dev and version tag pushes are supported.")
+        return skipped("Only dev, main and version tag pushes are supported.")
     elseif event_name == "release"
         release = get(event, "release", Dict{String,Any}())
         if get(event, "action", nothing) != "published" || get(release, "draft", false)
@@ -93,7 +93,7 @@ function resolve(selected::AbstractDict, repo::AbstractString)
     selected["should_run"] || return selected
     result = Dict{String,Any}(selected)
     ref = pop!(result, "target_ref")
-    # Fetch this exact ref after selection, rather than checking out moving dev.
+    # Fetch the exact selected ref, including the event SHA for branch pushes.
     git(repo, "fetch", "--no-tags", "origin", ref)
     object_sha = git(repo, "rev-parse", "--verify", "FETCH_HEAD")
     event_object = pop!(result, "event_object", nothing)

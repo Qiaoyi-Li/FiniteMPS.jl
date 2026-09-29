@@ -113,8 +113,8 @@ function parse_arguments(args)
     end
     (haskey(options,"--report") ⊻ haskey(options,"--collection")) &&
         all(haskey(options, key) for key in ("--site", "--publisher", "--project", "--mode", "--expected-sha")) ||
-        error("Usage: publish_site.jl (--report PATH | --collection PATH) --site PATH --publisher PATH --project PATH --mode dev|release --expected-sha SHA [--expected-tag TAG]")
-    options["--mode"] in ("dev", "release") || error("Publishing mode must be dev or release")
+        error("Usage: publish_site.jl (--report PATH | --collection PATH) --site PATH --publisher PATH --project PATH --mode dev|main|release --expected-sha SHA [--expected-tag TAG]")
+    options["--mode"] in ("dev", "main", "release") || error("Publishing mode must be dev, main or release")
     return options
 end
 
@@ -142,7 +142,7 @@ function main(args=ARGS)
     lines = split(strip(completed), '\n'; keepempty=false)
     isempty(lines) && error("Publisher did not return a recognized completion status")
     status = last(lines)
-    status in ("published", "already-archived", "older-dev-skipped", "no-op") ||
+    status in ("published", "already-archived", "older-dev-skipped", "older-main-skipped", "no-op") ||
         error("Publisher did not return a recognized completion status")
     changed = commit_site(site, isempty(tag) ? options["--expected-sha"] : tag)
     if changed

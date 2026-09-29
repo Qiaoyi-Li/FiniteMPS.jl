@@ -82,8 +82,8 @@ function write_summary(io::IO, metadata; publishing::AbstractString, git_push=no
         sha isa AbstractString && occursin(r"^[0-9a-fA-F]{40}$", sha) &&
             push!(links, "[Measured commit](https://github.com/$repository/commit/$sha)")
         tag = get(source, "tag", nothing)
-        if published_mode == "dev"
-            push!(links, "[Current published files](https://github.com/$repository/tree/gh-pages/performance/dev)")
+        if published_mode in ("dev", "main")
+            push!(links, "[Current published files](https://github.com/$repository/tree/gh-pages/performance/$published_mode)")
         elseif published_mode == "release" && tag isa AbstractString && ncodeunits(tag) <= 256
             push!(links, "[Archived files](https://github.com/$repository/tree/gh-pages/performance/releases/$(url_segment(tag)))")
         end

@@ -129,6 +129,23 @@ function render_facts(io, rows)
     println(io, "</dl>")
 end
 
+function ordered_groups(report)
+    groups = Dict{Tuple{String,String},Vector{Any}}()
+    order = Tuple{String,String}[]
+    for case in report["cases"]
+        p = case["parameters"]
+        key = (get(p,"model",case["case_id"]), get(p,"operation",""))
+        haskey(groups,key) || push!(order,key)
+        push!(get!(groups,key,Any[]),case)
+    end
+    return [sort!(groups[key];by=case->get(case["parameters"],"nominal_D",0)) for key in order]
+end
+
+function group_title(rows)
+    p = first(rows)["parameters"]
+    return haskey(p,"operation") ? "$(p["model_name"]) · $(p["operation"])" : case_name(first(rows))
+end
+
 function render_collection(bundle)
     validate_collection(bundle.index, bundle.reports)
     first_report = first(bundle.reports)
@@ -136,7 +153,7 @@ function render_collection(bundle)
     io = IOBuffer()
     println(io, "<h1>Performance report</h1><p><strong>", html_escape(something(source["tag"], "Development or local build")),
         "</strong></p>")
-    println(io, "<p>This report contains ", sum(length(report["cases"]) for report in bundle.reports), " measurements.</p>")
+    println(io, "<p>This report contains ", length(ordered_groups(first_report)), " comparison tables and ", sum(length(report["cases"]) for report in bundle.reports), " measurements.</p>")
     println(io, "<p>First measurement timestamp (UTC): ", html_escape(run["measured_at_utc"]), ". Julia uses 1, 2, or 4 compute threads; the linear algebra backend and garbage collector each use 1 thread.</p>")
     get(source, "working_tree_dirty", false) && println(io, "<p class=\"notice\">These measurements include uncommitted changes in the source checkout.</p>")
     println(io, "<nav><a href=\"collection.json\">Download the raw data index</a>")
@@ -145,7 +162,7 @@ function render_collection(bundle)
         println(io, "<a href=\"configurations/$id/index.html\">Detailed report: $threads ", threads == 1 ? "thread" : "threads", "</a>")
     end
     println(io, "</nav><p><label for=\"metric\">Display metric: </label><select id=\"metric\"><option value=\"time\">Median execution time</option><option value=\"speedup\">Speedup relative to one thread</option><option value=\"bytes\">Total allocated bytes</option><option value=\"allocations\">Memory allocation count</option></select></p>")
-    println(io, "<p class=\"muted\">Each row is one benchmark case and each column is a thread configuration. Speedup compares the same case against its single-thread measurement. Allocated bytes measure cumulative allocation, not peak memory.</p>")
+    println(io, "<p class=\"muted\">Each table is one model and algorithm; rows are full bond dimension caps and columns are thread configurations. Each sample is a complete double sweep. The two-site algorithm runs first and its CBE partner continues the same state and environment; samples also continue without resets. Speedup compares against one thread. Allocated bytes measure cumulative allocation, not peak memory.</p>")
     cpu = first_report["environment"]["cpu"]
     println(io, "<p>Processor: ", html_escape(join(cpu["cpu_models"], ", ")),
         "; visible logical processors: ", cpu["logical_cpus_visible"], ".</p>")
@@ -158,17 +175,20 @@ function render_collection(bundle)
     render_facts(io, package_rows(first_report))
     println(io, "</details>")
     lookups = [Dict(case["case_id"] => case for case in report["cases"]) for report in bundle.reports]
-    println(io, "<table><thead><tr><th>Benchmark case</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>")
-    for case in ordered_cases(first_report)
-        println(io, "<tr><td>", html_escape(case_name(case)), "</td>")
-        for lookup in lookups
-            value = lookup[case["case_id"]]
-            println(io, "<td data-time=\"", value["median_time_ns"], "\" data-reference=\"", case["median_time_ns"],
-                "\" data-bytes=\"", value["allocated_bytes"], "\" data-allocations=\"", value["allocations"], "\">", time_text(value["median_time_ns"]), "</td>")
+    for rows in ordered_groups(first_report)
+        println(io, "<h2>", html_escape(group_title(rows)), "</h2>")
+        println(io, "<table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>")
+        for case in rows
+            println(io, "<tr><td>", get(case["parameters"],"nominal_D",case_name(case)), "</td>")
+            for lookup in lookups
+                value = lookup[case["case_id"]]
+                println(io, "<td data-time=\"", value["median_time_ns"], "\" data-reference=\"", case["median_time_ns"],
+                    "\" data-bytes=\"", value["allocated_bytes"], "\" data-allocations=\"", value["allocations"], "\">", time_text(value["median_time_ns"]), "</td>")
+            end
+            println(io, "</tr>")
         end
-        println(io, "</tr>")
+        println(io, "</tbody></table>")
     end
-    println(io, "</tbody></table>")
     for case in ordered_cases(first_report)
         println(io, "<details><summary>", html_escape(case_name(case)), ": Input and sampling settings</summary><p>", html_escape(workload_description(case)), "</p>")
         render_facts(io, workload_facts(case))
@@ -190,10 +210,13 @@ function render_collection_markdown(bundle)
         println(io, "| $threads ", threads == 1 ? "thread" : "threads", " | ", length(report["cases"]), " | ", report["run"]["measured_at_utc"], " | [Input and sampling details](configurations/$(configuration_id(threads))/report.md) |")
     end
     lookups = [Dict(case["case_id"]=>case for case in report["cases"]) for report in bundle.reports]
-    println(io, "\n| Benchmark case | 1 thread | 2 threads | 4 threads |\n| --- | ---: | ---: | ---: |")
-    for case in ordered_cases(first(bundle.reports))
-        values = [time_text(lookup[case["case_id"]]["median_time_ns"]) for lookup in lookups]
-        println(io, "| ", PerformanceReports.markdown_escape(case_name(case)), " | ", join(values, " | "), " |")
+    println(io, "\nEach sample is a complete double sweep. Samples continue the same state, and each CBE algorithm continues its two-site partner's state and environment.\n")
+    for rows in ordered_groups(first(bundle.reports))
+        println(io, "\n## ", group_title(rows), "\n\n| D | 1 thread | 2 threads | 4 threads |\n| --- | ---: | ---: | ---: |")
+        for case in rows
+            values = [time_text(lookup[case["case_id"]]["median_time_ns"]) for lookup in lookups]
+            println(io, "| ", get(case["parameters"],"nominal_D",case_name(case)), " | ", join(values, " | "), " |")
+        end
     end
     return String(take!(io))
 end

@@ -49,10 +49,11 @@ json_parameters(value) = value
 Register one stable workload. `build(rng)` returns
 `(; benchmark = @benchmarkable(...))` with optional `parameters` and `cleanup`
 fields. Constructed parameters add JSON metadata after inputs exist and cannot
-replace declared keys. `cleanup()` releases the fixture even if timing fails.
+replace declared keys. `cleanup()` runs even if timing fails.
 The builder prepares inputs outside timing; the benchmark defines its own setup
-and teardown. Mutating workloads must declare `mutates=true`, use `evals=1`, and
-restore input state in BenchmarkTools' per-sample setup. Cases with the same
+and teardown. Mutating workloads declare `mutates=true` and use `evals=1`.
+The sweep suite deliberately continues its state across samples and from the
+two-site algorithm into its CBE partner, sharing their fixture. Cases with the same
 `warmup_group` share compiled methods. The selected case with the smallest
 `warmup_size` runs first with one warmup sample; the remaining cases proceed
 directly to measured samples. The default gives each case its own group.

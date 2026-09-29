@@ -21,5 +21,6 @@ else
           include("ObsTree.jl")
           include("fermion_regressions.jl")
           include("upgrade_sweep.jl")
+          include("tdvp_sweep.jl")
      end
 end
