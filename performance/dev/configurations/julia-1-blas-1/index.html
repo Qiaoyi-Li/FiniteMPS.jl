@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Performance measurement report: Development or local build</title><style>body{font:16px/1.55 system-ui,sans-serif;color:#162235;background:#f7f9fc;margin:0}main{max-width:1150px;margin:auto;padding:32px 24px}h1,h2{line-height:1.2}a{color:#1757a4}table{border-collapse:collapse;width:100%;background:white;margin:16px 0;display:block;overflow:auto}th,td{padding:10px 14px;text-align:left;border-bottom:1px solid #dce3eb;vertical-align:top}th{background:#eaf0f8}code,pre{font:13px/1.5 ui-monospace,monospace;overflow-wrap:anywhere}pre{white-space:pre-wrap;background:#edf2f8;padding:16px}dl{display:grid;grid-template-columns:minmax(140px,240px) 1fr;gap:8px 20px;background:white;padding:20px;border:1px solid #dce3eb}dt{font-weight:600}dd{margin:0;overflow-wrap:anywhere}.muted{color:#56657a}.notice{padding:12px 16px;background:#eaf0f8;border-left:4px solid #3576b6}nav{display:flex;gap:20px;flex-wrap:wrap}select{font:inherit;max-width:100%;padding:6px;margin:8px}svg{width:100%;height:auto;background:white;border:1px solid #dce3eb}details{margin:16px 0}summary{cursor:pointer} @media(max-width:600px){main{padding:20px 12px}dl{grid-template-columns:1fr;gap:2px}dd{margin-bottom:12px}}
 </style></head><body><main><style>.resource-summary{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 28px;margin:12px 0}.resource-summary dt{font-size:13px;color:#56657a}.resource-summary dd{margin:0}.report-identity{overflow-wrap:anywhere;margin:12px 0}.report-identity code{font-size:14px}@media(max-width:600px){.resource-summary{grid-template-columns:1fr;gap:10px}}</style>
-<h1>Performance measurement report: Development or local build</h1><nav><a href="https://github.com/Qiaoyi-Li/FiniteMPS.jl/commit/9c9f59b69914e9096191d9295449d06d7fee2f44">View measured source</a><a href="report.json">Download raw data (JSON)</a><a href="https://github.com/Qiaoyi-Li/FiniteMPS.jl/actions/runs/36596136560">View workflow run</a></nav>
-<p class="report-identity"><strong>Source commit:</strong> <code>9c9f59b69914e9096191d9295449d06d7fee2f44</code><br><strong>Measured at (UTC):</strong> 2026-09-29T16:21:36.270Z · Development or local build</p>
+<h1>Performance measurement report: Development or local build</h1><nav><a href="https://github.com/Qiaoyi-Li/FiniteMPS.jl/commit/5ea641a53f5176f1bd676ad08e1f037c0706c9b5">View measured source</a><a href="report.json">Download raw data (JSON)</a><a href="https://github.com/Qiaoyi-Li/FiniteMPS.jl/actions/runs/36639230982">View workflow run</a></nav>
+<p class="report-identity"><strong>Source commit:</strong> <code>5ea641a53f5176f1bd676ad08e1f037c0706c9b5</code><br><strong>Measured at (UTC):</strong> 2026-09-29T22:36:03.513Z · Development or local build</p>
 <h2>Measurement environment and thread settings</h2><dl class="resource-summary">
-<div><dt>Processor model</dt><dd>AMD EPYC 9V45 96-Core Processor</dd></div>
+<div><dt>Processor model</dt><dd>AMD EPYC 9V74 80-Core Processor</dd></div>
 <div><dt>Julia version</dt><dd>1.11.6</dd></div>
 <div><dt>Visible logical processors</dt><dd>4</dd></div>
 <div><dt>Processors available to this process</dt><dd>4</dd></div>
@@ -15,7 +15,7 @@
 <div><dt>Operating system</dt><dd>Linux</dd></div>
 </dl><details><summary>Additional run metadata</summary><dl>
 <dt>Repository</dt><dd>Qiaoyi-Li/FiniteMPS.jl</dd>
-<dt>Benchmark definition commit</dt><dd>9c9f59b69914e9096191d9295449d06d7fee2f44</dd>
+<dt>Benchmark definition commit</dt><dd>5ea641a53f5176f1bd676ad08e1f037c0706c9b5</dd>
 <dt>Uncommitted changes</dt><dd>No</dd>
 <dt>Version tag</dt><dd>Not recorded</dd>
 <dt>Algorithm library version</dt><dd>1.8.3</dd>
@@ -30,67 +30,67 @@
 <dt>Visible system memory (bytes)</dt><dd>16766414848</dd>
 <dt>Run trigger</dt><dd>Commit push</dd>
 <dt>Automation workflow</dt><dd>Performance</dd>
-<dt>Run identifier</dt><dd>36596136560</dd>
-<dt>Workflow run number</dt><dd>1</dd>
+<dt>Run identifier</dt><dd>36639230982</dd>
+<dt>Workflow run number</dt><dd>2</dd>
 <dt>Run attempt</dt><dd>1</dd>
 <dt>Benchmark definition file</dt><dd>benchmark/benchmarks.jl</dd>
 <dt>Benchmark definition source</dt><dd>Current source checkout</dd>
 </dl></details><p class="muted">Processor counts and thread settings describe available resources, not runtime core utilization. Visible system memory is the system capacity.</p>
 <h2>Measurements</h2><table><thead><tr><th>Operation and size</th><th>Median time</th><th>Total allocated bytes</th><th>Memory allocation count</th><th>Samples</th></tr></thead><tbody>
-<tr><td>Hubbard / U1SU2 · 2-DMRG · D=128</td><td>12.444 seconds</td><td>14653005288</td><td>140728301</td><td>3</td></tr>
-<tr><td>Hubbard / U1SU2 · 2-DMRG · D=256</td><td>16.826 seconds</td><td>19021111152</td><td>170687806</td><td>3</td></tr>
-<tr><td>Hubbard / U1SU2 · 2-DMRG · D=64</td><td>9.0402 seconds</td><td>10407104752</td><td>104671159</td><td>3</td></tr>
-<tr><td>Hubbard / U1SU2 · 2-TDVP · D=128</td><td>206.01 seconds</td><td>160258652136</td><td>1388277828</td><td>3</td></tr>
-<tr><td>Hubbard / U1SU2 · 2-TDVP · D=256</td><td>333.89 seconds</td><td>314590960880</td><td>2490890088</td><td>2</td></tr>
-<tr><td>Hubbard / U1SU2 · 2-TDVP · D=64</td><td>97.239 seconds</td><td>77181031496</td><td>768935142</td><td>3</td></tr>
-<tr><td>Hubbard / U1SU2 · CBE-DMRG · D=128</td><td>4.8898 seconds</td><td>5283670256</td><td>53500824</td><td>3</td></tr>
-<tr><td>Hubbard / U1SU2 · CBE-DMRG · D=256</td><td>6.2561 seconds</td><td>7104998664</td><td>65698341</td><td>3</td></tr>
-<tr><td>Hubbard / U1SU2 · CBE-DMRG · D=64</td><td>3.1323 seconds</td><td>3918411312</td><td>41388965</td><td>3</td></tr>
-<tr><td>Hubbard / U1SU2 · CBE-TDVP · D=128</td><td>17.46 seconds</td><td>22678903200</td><td>193046962</td><td>3</td></tr>
-<tr><td>Hubbard / U1SU2 · CBE-TDVP · D=256</td><td>20.962 seconds</td><td>30558048216</td><td>245986996</td><td>3</td></tr>
-<tr><td>Hubbard / U1SU2 · CBE-TDVP · D=64</td><td>11.748 seconds</td><td>14254947480</td><td>127666053</td><td>3</td></tr>
-<tr><td>Hubbard / U1U1 · 2-DMRG · D=128</td><td>13.857 seconds</td><td>15378756976</td><td>165982174</td><td>3</td></tr>
-<tr><td>Hubbard / U1U1 · 2-DMRG · D=256</td><td>23.701 seconds</td><td>26181764888</td><td>196981518</td><td>3</td></tr>
-<tr><td>Hubbard / U1U1 · 2-DMRG · D=64</td><td>9.2695 seconds</td><td>11686714160</td><td>147667609</td><td>3</td></tr>
-<tr><td>Hubbard / U1U1 · 2-TDVP · D=128</td><td>191.53 seconds</td><td>238353295992</td><td>1972665165</td><td>3</td></tr>
-<tr><td>Hubbard / U1U1 · 2-TDVP · D=256</td><td>399.72 seconds</td><td>444334270872</td><td>2768670292</td><td>2</td></tr>
-<tr><td>Hubbard / U1U1 · 2-TDVP · D=64</td><td>123.67 seconds</td><td>162346226744</td><td>1567105398</td><td>3</td></tr>
-<tr><td>Hubbard / U1U1 · CBE-DMRG · D=128</td><td>4.6991 seconds</td><td>4595905008</td><td>44471607</td><td>3</td></tr>
-<tr><td>Hubbard / U1U1 · CBE-DMRG · D=256</td><td>8.0547 seconds</td><td>9227124200</td><td>51692276</td><td>3</td></tr>
-<tr><td>Hubbard / U1U1 · CBE-DMRG · D=64</td><td>3.0351 seconds</td><td>2956917504</td><td>37459565</td><td>3</td></tr>
-<tr><td>Hubbard / U1U1 · CBE-TDVP · D=128</td><td>11.384 seconds</td><td>13393461464</td><td>126101949</td><td>3</td></tr>
-<tr><td>Hubbard / U1U1 · CBE-TDVP · D=256</td><td>23.493 seconds</td><td>27311049896</td><td>165841203</td><td>3</td></tr>
-<tr><td>Hubbard / U1U1 · CBE-TDVP · D=64</td><td>7.235 seconds</td><td>8778875992</td><td>105094175</td><td>3</td></tr>
-<tr><td>Hubbard / Z2SU2 · 2-DMRG · D=128</td><td>3.3172 seconds</td><td>3227277592</td><td>31885731</td><td>3</td></tr>
-<tr><td>Hubbard / Z2SU2 · 2-DMRG · D=256</td><td>6.1201 seconds</td><td>5990857352</td><td>35627728</td><td>3</td></tr>
-<tr><td>Hubbard / Z2SU2 · 2-DMRG · D=64</td><td>2.0601 seconds</td><td>2103960144</td><td>26352779</td><td>3</td></tr>
-<tr><td>Hubbard / Z2SU2 · 2-TDVP · D=128</td><td>34.187 seconds</td><td>37761286344</td><td>176955603</td><td>3</td></tr>
-<tr><td>Hubbard / Z2SU2 · 2-TDVP · D=256</td><td>116.49 seconds</td><td>100496194504</td><td>229565540</td><td>3</td></tr>
-<tr><td>Hubbard / Z2SU2 · 2-TDVP · D=64</td><td>14.769 seconds</td><td>17006355712</td><td>121242468</td><td>3</td></tr>
-<tr><td>Hubbard / Z2SU2 · CBE-DMRG · D=128</td><td>1.2056 seconds</td><td>1320206688</td><td>10918229</td><td>3</td></tr>
-<tr><td>Hubbard / Z2SU2 · CBE-DMRG · D=256</td><td>2.2876 seconds</td><td>2740724752</td><td>11880473</td><td>3</td></tr>
-<tr><td>Hubbard / Z2SU2 · CBE-DMRG · D=64</td><td>849.04 milliseconds</td><td>778343912</td><td>9785745</td><td>3</td></tr>
-<tr><td>Hubbard / Z2SU2 · CBE-TDVP · D=128</td><td>3.1645 seconds</td><td>3732712880</td><td>21868438</td><td>3</td></tr>
-<tr><td>Hubbard / Z2SU2 · CBE-TDVP · D=256</td><td>9.3171 seconds</td><td>9950278728</td><td>28481221</td><td>3</td></tr>
-<tr><td>Hubbard / Z2SU2 · CBE-TDVP · D=64</td><td>1.6813 seconds</td><td>1728036112</td><td>16285743</td><td>3</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · 2-DMRG · D=128</td><td>8.8031 seconds</td><td>8867402224</td><td>92297790</td><td>3</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · 2-DMRG · D=256</td><td>9.6204 seconds</td><td>11023761448</td><td>105488610</td><td>3</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · 2-DMRG · D=64</td><td>5.5339 seconds</td><td>7052629824</td><td>77711160</td><td>3</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · 2-TDVP · D=128</td><td>106.37 seconds</td><td>117207023336</td><td>1055144095</td><td>3</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · 2-TDVP · D=256</td><td>116.08 seconds</td><td>127615274584</td><td>1092572616</td><td>3</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · 2-TDVP · D=64</td><td>63.937 seconds</td><td>72313764008</td><td>653474359</td><td>3</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · CBE-DMRG · D=128</td><td>3.5361 seconds</td><td>4189521352</td><td>44119338</td><td>3</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · CBE-DMRG · D=256</td><td>5.0143 seconds</td><td>5961287592</td><td>54990868</td><td>3</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · CBE-DMRG · D=64</td><td>2.6505 seconds</td><td>3219642088</td><td>36094944</td><td>3</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · CBE-TDVP · D=128</td><td>15.647 seconds</td><td>20005040720</td><td>181076819</td><td>3</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · CBE-TDVP · D=256</td><td>17.087 seconds</td><td>23134885168</td><td>196897236</td><td>3</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · CBE-TDVP · D=64</td><td>8.2889 seconds</td><td>9909478416</td><td>91084028</td><td>3</td></tr>
+<tr><td>Hubbard / U1SU2 · 2-DMRG · D=128</td><td>14.387 seconds</td><td>12240900824</td><td>110210376</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · 2-DMRG · D=256</td><td>16.771 seconds</td><td>14489621928</td><td>123472180</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · 2-DMRG · D=512</td><td>24.102 seconds</td><td>19155412960</td><td>144575038</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · 2-TDVP · D=128</td><td>146.85 seconds</td><td>116563375520</td><td>953663266</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · 2-TDVP · D=256</td><td>383.01 seconds</td><td>317057618504</td><td>2396497470</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · 2-TDVP · D=512</td><td>543.72 seconds</td><td>398722024904</td><td>2791195113</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · CBE-DMRG · D=1024</td><td>30.922 seconds</td><td>18117174312</td><td>73893499</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · CBE-DMRG · D=256</td><td>7.6204 seconds</td><td>6892672064</td><td>63631312</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · CBE-DMRG · D=512</td><td>11.482 seconds</td><td>10006651936</td><td>77019496</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · CBE-TDVP · D=1024</td><td>102.93 seconds</td><td>66456396232</td><td>372306226</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · CBE-TDVP · D=256</td><td>30.998 seconds</td><td>30269660552</td><td>243815703</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · CBE-TDVP · D=512</td><td>44.911 seconds</td><td>38342890648</td><td>274000599</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · 2-DMRG · D=128</td><td>11.827 seconds</td><td>8422016448</td><td>90125144</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · 2-DMRG · D=256</td><td>21.021 seconds</td><td>13119668736</td><td>88417305</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · 2-DMRG · D=512</td><td>61.21 seconds</td><td>30946839936</td><td>98982968</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · 2-TDVP · D=128</td><td>151.18 seconds</td><td>121846037272</td><td>994835183</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · 2-TDVP · D=256</td><td>320.84 seconds</td><td>228523886896</td><td>1406495765</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · 2-TDVP · D=512</td><td>833.5 seconds</td><td>484491575520</td><td>1584822320</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · CBE-DMRG · D=1024</td><td>165.41 seconds</td><td>65350434088</td><td>33856569</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · CBE-DMRG · D=256</td><td>9.949 seconds</td><td>6292114736</td><td>34209703</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · CBE-DMRG · D=512</td><td>30.49 seconds</td><td>17161051840</td><td>37142666</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · CBE-TDVP · D=1024</td><td>322.27 seconds</td><td>137933672592</td><td>141166833</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · CBE-TDVP · D=256</td><td>26.032 seconds</td><td>17826182360</td><td>111741308</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · CBE-TDVP · D=512</td><td>76.103 seconds</td><td>43370057792</td><td>122535066</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · 2-DMRG · D=128</td><td>3.607 seconds</td><td>1819159368</td><td>16570406</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · 2-DMRG · D=256</td><td>7.2065 seconds</td><td>3533745064</td><td>18688336</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · 2-DMRG · D=512</td><td>23.79 seconds</td><td>9325263448</td><td>22456843</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · 2-TDVP · D=128</td><td>37.189 seconds</td><td>21007407640</td><td>100549103</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · 2-TDVP · D=256</td><td>130.81 seconds</td><td>62186056968</td><td>185848150</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · 2-TDVP · D=512</td><td>465.41 seconds</td><td>161303048520</td><td>205899053</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · CBE-DMRG · D=1024</td><td>84.333 seconds</td><td>25686137248</td><td>9364589</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · CBE-DMRG · D=256</td><td>4.1677 seconds</td><td>2370214208</td><td>8953657</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · CBE-DMRG · D=512</td><td>15.371 seconds</td><td>6839303216</td><td>10379745</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · CBE-TDVP · D=1024</td><td>255.7 seconds</td><td>71421238632</td><td>39954240</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · CBE-TDVP · D=256</td><td>13.405 seconds</td><td>7135692656</td><td>21596058</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · CBE-TDVP · D=512</td><td>49.418 seconds</td><td>20737909784</td><td>28774748</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · 2-DMRG · D=128</td><td>8.4531 seconds</td><td>7235168160</td><td>70041096</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · 2-DMRG · D=256</td><td>11.053 seconds</td><td>8343699512</td><td>75565770</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · 2-DMRG · D=512</td><td>15.774 seconds</td><td>11513435128</td><td>88625331</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · 2-TDVP · D=128</td><td>106.87 seconds</td><td>86870661368</td><td>743131533</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · 2-TDVP · D=256</td><td>131.81 seconds</td><td>105455562320</td><td>863257194</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · 2-TDVP · D=512</td><td>212.04 seconds</td><td>158801665408</td><td>1152531203</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · CBE-DMRG · D=1024</td><td>26.05 seconds</td><td>15260760792</td><td>55247063</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · CBE-DMRG · D=256</td><td>6.3015 seconds</td><td>5449870672</td><td>49635674</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · CBE-DMRG · D=512</td><td>10.076 seconds</td><td>7993807184</td><td>57175314</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · CBE-TDVP · D=1024</td><td>78.188 seconds</td><td>53891059032</td><td>315046633</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · CBE-TDVP · D=256</td><td>21.542 seconds</td><td>19940171016</td><td>165820829</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · CBE-TDVP · D=512</td><td>33.315 seconds</td><td>27713586760</td><td>192015041</td><td>1</td></tr>
 </tbody></table><p>Allocated memory is the amount allocated by the measured operation, not peak process memory.</p>
-<details><summary>Hubbard / U1SU2 · 2-DMRG · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / U1SU2 · 2-DMRG · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
+<dt>K</dt><dd>4</dd>
 <dt>bond_dimensions</dt><dd>1, 4, 16, 64, 126, 126, 128, 128, 128, 127, 125, 128, 126, 128, 127, 128, 128, 128, 128, 128, 128, 126, 125, 127, 128, 128, 127, 127, 126, 64, 16, 4, 1</dd>
 <dt>cbe_target</dt><dd>Not recorded</dd>
 <dt>cbe_tolerance</dt><dd>Not recorded</dd>
@@ -102,7 +102,7 @@
 <dt>nominal_D</dt><dd>128</dd>
 <dt>operation</dt><dd>2-DMRG</dd>
 <dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
 <dt>sector_preset</dt><dd>presets/hubbard_u1su2_ground_D128.json</dd>
 <dt>state</dt><dd>ground</dd>
@@ -110,13 +110,13 @@
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>0</dd>
+<dt>Warmup samples</dt><dd>1</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
 <dt>Garbage collection before each trial</dt><dd>No</dd>
 <dt>Garbage collection after each completed case</dt><dd>Yes</dd>
@@ -127,11 +127,11 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / U1SU2 · 2-DMRG · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / U1SU2 · 2-DMRG · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
+<dt>K</dt><dd>4</dd>
 <dt>bond_dimensions</dt><dd>1, 4, 16, 64, 255, 255, 255, 256, 254, 256, 256, 255, 253, 253, 256, 256, 256, 256, 254, 254, 254, 254, 255, 255, 253, 256, 256, 256, 253, 64, 16, 4, 1</dd>
 <dt>cbe_target</dt><dd>Not recorded</dd>
 <dt>cbe_tolerance</dt><dd>Not recorded</dd>
@@ -143,7 +143,7 @@
 <dt>nominal_D</dt><dd>256</dd>
 <dt>operation</dt><dd>2-DMRG</dd>
 <dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
 <dt>sector_preset</dt><dd>presets/hubbard_u1su2_ground_D256.json</dd>
 <dt>state</dt><dd>ground</dd>
@@ -151,11 +151,11 @@
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>0</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -168,12 +168,12 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / U1SU2 · 2-DMRG · D=64: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / U1SU2 · 2-DMRG · D=512: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 64, 63, 64, 64, 64, 62, 64, 64, 63, 64, 62, 63, 64, 64, 62, 63, 63, 62, 63, 64, 64, 63, 62, 62, 63, 57, 16, 4, 1</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 511, 511, 512, 511, 508, 510, 510, 511, 512, 512, 511, 511, 512, 512, 512, 511, 510, 509, 512, 512, 508, 512, 512, 256, 64, 16, 4, 1</dd>
 <dt>cbe_target</dt><dd>Not recorded</dd>
 <dt>cbe_tolerance</dt><dd>Not recorded</dd>
 <dt>continuation_after</dt><dd>Not recorded</dd>
@@ -181,24 +181,24 @@
 <dt>model</dt><dd>hubbard_u1su2</dd>
 <dt>model_name</dt><dd>Hubbard / U1SU2</dd>
 <dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>64</dd>
+<dt>nominal_D</dt><dd>512</dd>
 <dt>operation</dt><dd>2-DMRG</dd>
 <dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/hubbard_u1su2_ground_D64.json</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1su2_ground_D512.json</dd>
 <dt>state</dt><dd>ground</dd>
 <dt>symmetry</dt><dd>U1SU2</dd>
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
 <dt>Garbage collection before each trial</dt><dd>No</dd>
 <dt>Garbage collection after each completed case</dt><dd>Yes</dd>
@@ -209,11 +209,11 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / U1SU2 · 2-TDVP · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / U1SU2 · 2-TDVP · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
+<dt>K</dt><dd>4</dd>
 <dt>bond_dimensions</dt><dd>1, 16, 127, 128, 127, 128, 125, 128, 126, 128, 127, 126, 126, 126, 127, 128, 126, 128, 127, 128, 126, 128, 127, 127, 126, 126, 126, 128, 128, 128, 127, 16, 1</dd>
 <dt>cbe_target</dt><dd>Not recorded</dd>
 <dt>cbe_tolerance</dt><dd>Not recorded</dd>
@@ -225,7 +225,7 @@
 <dt>nominal_D</dt><dd>128</dd>
 <dt>operation</dt><dd>2-TDVP</dd>
 <dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
 <dt>sector_preset</dt><dd>presets/hubbard_u1su2_thermal_D128.json</dd>
 <dt>state</dt><dd>thermal</dd>
@@ -233,93 +233,11 @@
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
-<dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>0</dd>
-<dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
-<dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
-<dt>Operation mutates its input</dt><dd>Yes</dd>
-<dt>Garbage collection before each trial</dt><dd>No</dd>
-<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
-<dt>Garbage collection before each sample</dt><dd>No</dd>
-<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
-<dt>blas_threads</dt><dd>1</dd>
-<dt>gc_threads</dt><dd>1</dd>
-<dt>julia_threads</dt><dd>1</dd>
-</dl>
-</details>
-<details><summary>Hubbard / U1SU2 · 2-TDVP · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
-<h3>Workload details</h3><dl>
-<dt>GCstep</dt><dd>No</dd>
-<dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 16, 256, 255, 256, 254, 256, 255, 255, 256, 254, 253, 255, 256, 256, 255, 256, 255, 254, 254, 253, 255, 256, 256, 256, 254, 256, 256, 255, 255, 256, 16, 1</dd>
-<dt>cbe_target</dt><dd>Not recorded</dd>
-<dt>cbe_tolerance</dt><dd>Not recorded</dd>
-<dt>continuation_after</dt><dd>Not recorded</dd>
-<dt>dt</dt><dd>-0.1</dd>
-<dt>model</dt><dd>hubbard_u1su2</dd>
-<dt>model_name</dt><dd>Hubbard / U1SU2</dd>
-<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>256</dd>
-<dt>operation</dt><dd>2-TDVP</dd>
-<dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
-<dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/hubbard_u1su2_thermal_D256.json</dd>
-<dt>state</dt><dd>thermal</dd>
-<dt>symmetry</dt><dd>U1SU2</dd>
-<dt>truncation</dt><dd>truncrank(D)</dd>
-</dl>
-<h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>2</dd>
-<dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>0</dd>
-<dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
-<dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
-<dt>Operation mutates its input</dt><dd>Yes</dd>
-<dt>Garbage collection before each trial</dt><dd>No</dd>
-<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
-<dt>Garbage collection before each sample</dt><dd>No</dd>
-<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
-<dt>blas_threads</dt><dd>1</dd>
-<dt>gc_threads</dt><dd>1</dd>
-<dt>julia_threads</dt><dd>1</dd>
-</dl>
-</details>
-<details><summary>Hubbard / U1SU2 · 2-TDVP · D=64: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
-<h3>Workload details</h3><dl>
-<dt>GCstep</dt><dd>No</dd>
-<dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 16, 63, 63, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 63, 63, 64, 63, 16, 1</dd>
-<dt>cbe_target</dt><dd>Not recorded</dd>
-<dt>cbe_tolerance</dt><dd>Not recorded</dd>
-<dt>continuation_after</dt><dd>Not recorded</dd>
-<dt>dt</dt><dd>-0.1</dd>
-<dt>model</dt><dd>hubbard_u1su2</dd>
-<dt>model_name</dt><dd>Hubbard / U1SU2</dd>
-<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>64</dd>
-<dt>operation</dt><dd>2-TDVP</dd>
-<dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
-<dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/hubbard_u1su2_thermal_D64.json</dd>
-<dt>state</dt><dd>thermal</dd>
-<dt>symmetry</dt><dd>U1SU2</dd>
-<dt>truncation</dt><dd>truncrank(D)</dd>
-</dl>
-<h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>1</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -332,35 +250,35 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / U1SU2 · CBE-DMRG · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / U1SU2 · 2-TDVP · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 126, 126, 128, 128, 128, 127, 125, 128, 126, 128, 127, 128, 128, 128, 128, 128, 128, 126, 125, 127, 128, 128, 127, 127, 126, 64, 16, 4, 1</dd>
-<dt>cbe_target</dt><dd>256</dd>
-<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
-<dt>continuation_after</dt><dd>2-DMRG</dd>
-<dt>dt</dt><dd>Not recorded</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 255, 256, 254, 256, 255, 255, 256, 254, 253, 255, 256, 256, 255, 256, 255, 254, 254, 253, 255, 256, 256, 256, 254, 256, 256, 255, 255, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
 <dt>model</dt><dd>hubbard_u1su2</dd>
 <dt>model_name</dt><dd>Hubbard / U1SU2</dd>
 <dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>128</dd>
-<dt>operation</dt><dd>CBE-DMRG</dd>
-<dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>nominal_D</dt><dd>256</dd>
+<dt>operation</dt><dd>2-TDVP</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/hubbard_u1su2_ground_D128.json</dd>
-<dt>state</dt><dd>ground</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1su2_thermal_D256.json</dd>
+<dt>state</dt><dd>thermal</dd>
 <dt>symmetry</dt><dd>U1SU2</dd>
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>0</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -373,11 +291,93 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / U1SU2 · CBE-DMRG · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / U1SU2 · 2-TDVP · D=512: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 510, 512, 511, 512, 511, 512, 509, 510, 512, 512, 512, 512, 509, 512, 510, 512, 511, 512, 511, 512, 509, 512, 509, 510, 512, 511, 512, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_u1su2</dd>
+<dt>model_name</dt><dd>Hubbard / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>2-TDVP</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1su2_thermal_D512.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling and execution settings</h3><dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1SU2 · CBE-DMRG · D=1024: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
+<h3>Workload details</h3><dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 1016, 1023, 1024, 1023, 1024, 1022, 1020, 1022, 1024, 1024, 1023, 1022, 1022, 1024, 1023, 1020, 1024, 1023, 1023, 1022, 1024, 1024, 1015, 256, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>2048</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>hubbard_u1su2</dd>
+<dt>model_name</dt><dd>Hubbard / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>1024</dd>
+<dt>operation</dt><dd>CBE-DMRG</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1su2_ground_D1024.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling and execution settings</h3><dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1SU2 · CBE-DMRG · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
+<h3>Workload details</h3><dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
 <dt>bond_dimensions</dt><dd>1, 4, 16, 64, 255, 255, 255, 256, 254, 256, 256, 255, 253, 253, 256, 256, 256, 256, 254, 254, 254, 254, 255, 255, 253, 256, 256, 256, 253, 64, 16, 4, 1</dd>
 <dt>cbe_target</dt><dd>512</dd>
 <dt>cbe_tolerance</dt><dd>1.0e-8</dd>
@@ -389,7 +389,7 @@
 <dt>nominal_D</dt><dd>256</dd>
 <dt>operation</dt><dd>CBE-DMRG</dd>
 <dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
 <dt>sector_preset</dt><dd>presets/hubbard_u1su2_ground_D256.json</dd>
 <dt>state</dt><dd>ground</dd>
@@ -397,52 +397,11 @@
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
-<dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>0</dd>
-<dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
-<dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
-<dt>Operation mutates its input</dt><dd>Yes</dd>
-<dt>Garbage collection before each trial</dt><dd>No</dd>
-<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
-<dt>Garbage collection before each sample</dt><dd>No</dd>
-<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
-<dt>blas_threads</dt><dd>1</dd>
-<dt>gc_threads</dt><dd>1</dd>
-<dt>julia_threads</dt><dd>1</dd>
-</dl>
-</details>
-<details><summary>Hubbard / U1SU2 · CBE-DMRG · D=64: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
-<h3>Workload details</h3><dl>
-<dt>GCstep</dt><dd>No</dd>
-<dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 64, 63, 64, 64, 64, 62, 64, 64, 63, 64, 62, 63, 64, 64, 62, 63, 63, 62, 63, 64, 64, 63, 62, 62, 63, 57, 16, 4, 1</dd>
-<dt>cbe_target</dt><dd>128</dd>
-<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
-<dt>continuation_after</dt><dd>2-DMRG</dd>
-<dt>dt</dt><dd>Not recorded</dd>
-<dt>model</dt><dd>hubbard_u1su2</dd>
-<dt>model_name</dt><dd>Hubbard / U1SU2</dd>
-<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>64</dd>
-<dt>operation</dt><dd>CBE-DMRG</dd>
-<dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
-<dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/hubbard_u1su2_ground_D64.json</dd>
-<dt>state</dt><dd>ground</dd>
-<dt>symmetry</dt><dd>U1SU2</dd>
-<dt>truncation</dt><dd>truncrank(D)</dd>
-</dl>
-<h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>1</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -455,35 +414,35 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / U1SU2 · CBE-TDVP · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / U1SU2 · CBE-DMRG · D=512: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 16, 127, 128, 127, 128, 125, 128, 126, 128, 127, 126, 126, 126, 127, 128, 126, 128, 127, 128, 126, 128, 127, 127, 126, 126, 126, 128, 128, 128, 127, 16, 1</dd>
-<dt>cbe_target</dt><dd>144</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 511, 511, 512, 511, 508, 510, 510, 511, 512, 512, 511, 511, 512, 512, 512, 511, 510, 509, 512, 512, 508, 512, 512, 256, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>1024</dd>
 <dt>cbe_tolerance</dt><dd>1.0e-8</dd>
-<dt>continuation_after</dt><dd>2-TDVP</dd>
-<dt>dt</dt><dd>-0.1</dd>
+<dt>continuation_after</dt><dd>2-DMRG</dd>
+<dt>dt</dt><dd>Not recorded</dd>
 <dt>model</dt><dd>hubbard_u1su2</dd>
 <dt>model_name</dt><dd>Hubbard / U1SU2</dd>
 <dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>128</dd>
-<dt>operation</dt><dd>CBE-TDVP</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>CBE-DMRG</dd>
 <dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/hubbard_u1su2_thermal_D128.json</dd>
-<dt>state</dt><dd>thermal</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1su2_ground_D512.json</dd>
+<dt>state</dt><dd>ground</dd>
 <dt>symmetry</dt><dd>U1SU2</dd>
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>0</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -496,11 +455,52 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / U1SU2 · CBE-TDVP · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / U1SU2 · CBE-TDVP · D=1024: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 1022, 1024, 1024, 1024, 1023, 1022, 1022, 1023, 1022, 1022, 1020, 1022, 1023, 1024, 1024, 1024, 1024, 1021, 1022, 1024, 1024, 1023, 1024, 1023, 1023, 1023, 1022, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>1152</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_u1su2</dd>
+<dt>model_name</dt><dd>Hubbard / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>1024</dd>
+<dt>operation</dt><dd>CBE-TDVP</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1su2_thermal_D1024.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling and execution settings</h3><dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1SU2 · CBE-TDVP · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
+<h3>Workload details</h3><dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
 <dt>bond_dimensions</dt><dd>1, 16, 256, 255, 256, 254, 256, 255, 255, 256, 254, 253, 255, 256, 256, 255, 256, 255, 254, 254, 253, 255, 256, 256, 256, 254, 256, 256, 255, 255, 256, 16, 1</dd>
 <dt>cbe_target</dt><dd>288</dd>
 <dt>cbe_tolerance</dt><dd>1.0e-8</dd>
@@ -512,7 +512,7 @@
 <dt>nominal_D</dt><dd>256</dd>
 <dt>operation</dt><dd>CBE-TDVP</dd>
 <dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
 <dt>sector_preset</dt><dd>presets/hubbard_u1su2_thermal_D256.json</dd>
 <dt>state</dt><dd>thermal</dd>
@@ -520,13 +520,13 @@
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>0</dd>
+<dt>Warmup samples</dt><dd>1</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
 <dt>Garbage collection before each trial</dt><dd>No</dd>
 <dt>Garbage collection after each completed case</dt><dd>Yes</dd>
@@ -537,37 +537,37 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / U1SU2 · CBE-TDVP · D=64: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / U1SU2 · CBE-TDVP · D=512: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 16, 63, 63, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 63, 63, 64, 63, 16, 1</dd>
-<dt>cbe_target</dt><dd>72</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 510, 512, 511, 512, 511, 512, 509, 510, 512, 512, 512, 512, 509, 512, 510, 512, 511, 512, 511, 512, 509, 512, 509, 510, 512, 511, 512, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>576</dd>
 <dt>cbe_tolerance</dt><dd>1.0e-8</dd>
 <dt>continuation_after</dt><dd>2-TDVP</dd>
 <dt>dt</dt><dd>-0.1</dd>
 <dt>model</dt><dd>hubbard_u1su2</dd>
 <dt>model_name</dt><dd>Hubbard / U1SU2</dd>
 <dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>64</dd>
+<dt>nominal_D</dt><dd>512</dd>
 <dt>operation</dt><dd>CBE-TDVP</dd>
 <dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/hubbard_u1su2_thermal_D64.json</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1su2_thermal_D512.json</dd>
 <dt>state</dt><dd>thermal</dd>
 <dt>symmetry</dt><dd>U1SU2</dd>
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
 <dt>Garbage collection before each trial</dt><dd>No</dd>
 <dt>Garbage collection after each completed case</dt><dd>Yes</dd>
@@ -578,11 +578,11 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / U1U1 · 2-DMRG · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / U1U1 · 2-DMRG · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
+<dt>K</dt><dd>4</dd>
 <dt>bond_dimensions</dt><dd>1, 4, 16, 64, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 64, 16, 4, 1</dd>
 <dt>cbe_target</dt><dd>Not recorded</dd>
 <dt>cbe_tolerance</dt><dd>Not recorded</dd>
@@ -594,7 +594,7 @@
 <dt>nominal_D</dt><dd>128</dd>
 <dt>operation</dt><dd>2-DMRG</dd>
 <dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
 <dt>sector_preset</dt><dd>presets/hubbard_u1u1_ground_D128.json</dd>
 <dt>state</dt><dd>ground</dd>
@@ -602,13 +602,13 @@
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>0</dd>
+<dt>Warmup samples</dt><dd>1</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
 <dt>Garbage collection before each trial</dt><dd>No</dd>
 <dt>Garbage collection after each completed case</dt><dd>Yes</dd>
@@ -619,11 +619,11 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / U1U1 · 2-DMRG · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / U1U1 · 2-DMRG · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
+<dt>K</dt><dd>4</dd>
 <dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 255, 64, 16, 4, 1</dd>
 <dt>cbe_target</dt><dd>Not recorded</dd>
 <dt>cbe_tolerance</dt><dd>Not recorded</dd>
@@ -635,7 +635,7 @@
 <dt>nominal_D</dt><dd>256</dd>
 <dt>operation</dt><dd>2-DMRG</dd>
 <dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
 <dt>sector_preset</dt><dd>presets/hubbard_u1u1_ground_D256.json</dd>
 <dt>state</dt><dd>ground</dd>
@@ -643,11 +643,11 @@
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>0</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -660,12 +660,12 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / U1U1 · 2-DMRG · D=64: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / U1U1 · 2-DMRG · D=512: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 58, 16, 4, 1</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 256, 64, 16, 4, 1</dd>
 <dt>cbe_target</dt><dd>Not recorded</dd>
 <dt>cbe_tolerance</dt><dd>Not recorded</dd>
 <dt>continuation_after</dt><dd>Not recorded</dd>
@@ -673,24 +673,24 @@
 <dt>model</dt><dd>hubbard_u1u1</dd>
 <dt>model_name</dt><dd>Hubbard / U1U1</dd>
 <dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>64</dd>
+<dt>nominal_D</dt><dd>512</dd>
 <dt>operation</dt><dd>2-DMRG</dd>
 <dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/hubbard_u1u1_ground_D64.json</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1u1_ground_D512.json</dd>
 <dt>state</dt><dd>ground</dd>
 <dt>symmetry</dt><dd>U1U1</dd>
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
 <dt>Garbage collection before each trial</dt><dd>No</dd>
 <dt>Garbage collection after each completed case</dt><dd>Yes</dd>
@@ -701,11 +701,11 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / U1U1 · 2-TDVP · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / U1U1 · 2-TDVP · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
+<dt>K</dt><dd>4</dd>
 <dt>bond_dimensions</dt><dd>1, 16, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 16, 1</dd>
 <dt>cbe_target</dt><dd>Not recorded</dd>
 <dt>cbe_tolerance</dt><dd>Not recorded</dd>
@@ -717,7 +717,7 @@
 <dt>nominal_D</dt><dd>128</dd>
 <dt>operation</dt><dd>2-TDVP</dd>
 <dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
 <dt>sector_preset</dt><dd>presets/hubbard_u1u1_thermal_D128.json</dd>
 <dt>state</dt><dd>thermal</dd>
@@ -725,93 +725,11 @@
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
-<dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>0</dd>
-<dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
-<dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
-<dt>Operation mutates its input</dt><dd>Yes</dd>
-<dt>Garbage collection before each trial</dt><dd>No</dd>
-<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
-<dt>Garbage collection before each sample</dt><dd>No</dd>
-<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
-<dt>blas_threads</dt><dd>1</dd>
-<dt>gc_threads</dt><dd>1</dd>
-<dt>julia_threads</dt><dd>1</dd>
-</dl>
-</details>
-<details><summary>Hubbard / U1U1 · 2-TDVP · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
-<h3>Workload details</h3><dl>
-<dt>GCstep</dt><dd>No</dd>
-<dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 16, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 16, 1</dd>
-<dt>cbe_target</dt><dd>Not recorded</dd>
-<dt>cbe_tolerance</dt><dd>Not recorded</dd>
-<dt>continuation_after</dt><dd>Not recorded</dd>
-<dt>dt</dt><dd>-0.1</dd>
-<dt>model</dt><dd>hubbard_u1u1</dd>
-<dt>model_name</dt><dd>Hubbard / U1U1</dd>
-<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>256</dd>
-<dt>operation</dt><dd>2-TDVP</dd>
-<dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
-<dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/hubbard_u1u1_thermal_D256.json</dd>
-<dt>state</dt><dd>thermal</dd>
-<dt>symmetry</dt><dd>U1U1</dd>
-<dt>truncation</dt><dd>truncrank(D)</dd>
-</dl>
-<h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>2</dd>
-<dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>0</dd>
-<dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
-<dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
-<dt>Operation mutates its input</dt><dd>Yes</dd>
-<dt>Garbage collection before each trial</dt><dd>No</dd>
-<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
-<dt>Garbage collection before each sample</dt><dd>No</dd>
-<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
-<dt>blas_threads</dt><dd>1</dd>
-<dt>gc_threads</dt><dd>1</dd>
-<dt>julia_threads</dt><dd>1</dd>
-</dl>
-</details>
-<details><summary>Hubbard / U1U1 · 2-TDVP · D=64: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
-<h3>Workload details</h3><dl>
-<dt>GCstep</dt><dd>No</dd>
-<dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 16, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 16, 1</dd>
-<dt>cbe_target</dt><dd>Not recorded</dd>
-<dt>cbe_tolerance</dt><dd>Not recorded</dd>
-<dt>continuation_after</dt><dd>Not recorded</dd>
-<dt>dt</dt><dd>-0.1</dd>
-<dt>model</dt><dd>hubbard_u1u1</dd>
-<dt>model_name</dt><dd>Hubbard / U1U1</dd>
-<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>64</dd>
-<dt>operation</dt><dd>2-TDVP</dd>
-<dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
-<dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/hubbard_u1u1_thermal_D64.json</dd>
-<dt>state</dt><dd>thermal</dd>
-<dt>symmetry</dt><dd>U1U1</dd>
-<dt>truncation</dt><dd>truncrank(D)</dd>
-</dl>
-<h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>1</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -824,35 +742,35 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / U1U1 · CBE-DMRG · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / U1U1 · 2-TDVP · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 64, 16, 4, 1</dd>
-<dt>cbe_target</dt><dd>256</dd>
-<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
-<dt>continuation_after</dt><dd>2-DMRG</dd>
-<dt>dt</dt><dd>Not recorded</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
 <dt>model</dt><dd>hubbard_u1u1</dd>
 <dt>model_name</dt><dd>Hubbard / U1U1</dd>
 <dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>128</dd>
-<dt>operation</dt><dd>CBE-DMRG</dd>
-<dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>nominal_D</dt><dd>256</dd>
+<dt>operation</dt><dd>2-TDVP</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/hubbard_u1u1_ground_D128.json</dd>
-<dt>state</dt><dd>ground</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1u1_thermal_D256.json</dd>
+<dt>state</dt><dd>thermal</dd>
 <dt>symmetry</dt><dd>U1U1</dd>
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>0</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -865,11 +783,93 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / U1U1 · CBE-DMRG · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / U1U1 · 2-TDVP · D=512: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_u1u1</dd>
+<dt>model_name</dt><dd>Hubbard / U1U1</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>2-TDVP</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1u1_thermal_D512.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1U1</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling and execution settings</h3><dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1U1 · CBE-DMRG · D=1024: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
+<h3>Workload details</h3><dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 1017, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1017, 256, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>2048</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>hubbard_u1u1</dd>
+<dt>model_name</dt><dd>Hubbard / U1U1</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>1024</dd>
+<dt>operation</dt><dd>CBE-DMRG</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1u1_ground_D1024.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1U1</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling and execution settings</h3><dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1U1 · CBE-DMRG · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
+<h3>Workload details</h3><dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
 <dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 255, 64, 16, 4, 1</dd>
 <dt>cbe_target</dt><dd>512</dd>
 <dt>cbe_tolerance</dt><dd>1.0e-8</dd>
@@ -881,7 +881,7 @@
 <dt>nominal_D</dt><dd>256</dd>
 <dt>operation</dt><dd>CBE-DMRG</dd>
 <dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
 <dt>sector_preset</dt><dd>presets/hubbard_u1u1_ground_D256.json</dd>
 <dt>state</dt><dd>ground</dd>
@@ -889,52 +889,11 @@
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
-<dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>0</dd>
-<dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
-<dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
-<dt>Operation mutates its input</dt><dd>Yes</dd>
-<dt>Garbage collection before each trial</dt><dd>No</dd>
-<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
-<dt>Garbage collection before each sample</dt><dd>No</dd>
-<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
-<dt>blas_threads</dt><dd>1</dd>
-<dt>gc_threads</dt><dd>1</dd>
-<dt>julia_threads</dt><dd>1</dd>
-</dl>
-</details>
-<details><summary>Hubbard / U1U1 · CBE-DMRG · D=64: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
-<h3>Workload details</h3><dl>
-<dt>GCstep</dt><dd>No</dd>
-<dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 58, 16, 4, 1</dd>
-<dt>cbe_target</dt><dd>128</dd>
-<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
-<dt>continuation_after</dt><dd>2-DMRG</dd>
-<dt>dt</dt><dd>Not recorded</dd>
-<dt>model</dt><dd>hubbard_u1u1</dd>
-<dt>model_name</dt><dd>Hubbard / U1U1</dd>
-<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>64</dd>
-<dt>operation</dt><dd>CBE-DMRG</dd>
-<dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
-<dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/hubbard_u1u1_ground_D64.json</dd>
-<dt>state</dt><dd>ground</dd>
-<dt>symmetry</dt><dd>U1U1</dd>
-<dt>truncation</dt><dd>truncrank(D)</dd>
-</dl>
-<h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>1</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -947,35 +906,35 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / U1U1 · CBE-TDVP · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / U1U1 · CBE-DMRG · D=512: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 16, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 16, 1</dd>
-<dt>cbe_target</dt><dd>144</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 256, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>1024</dd>
 <dt>cbe_tolerance</dt><dd>1.0e-8</dd>
-<dt>continuation_after</dt><dd>2-TDVP</dd>
-<dt>dt</dt><dd>-0.1</dd>
+<dt>continuation_after</dt><dd>2-DMRG</dd>
+<dt>dt</dt><dd>Not recorded</dd>
 <dt>model</dt><dd>hubbard_u1u1</dd>
 <dt>model_name</dt><dd>Hubbard / U1U1</dd>
 <dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>128</dd>
-<dt>operation</dt><dd>CBE-TDVP</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>CBE-DMRG</dd>
 <dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/hubbard_u1u1_thermal_D128.json</dd>
-<dt>state</dt><dd>thermal</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1u1_ground_D512.json</dd>
+<dt>state</dt><dd>ground</dd>
 <dt>symmetry</dt><dd>U1U1</dd>
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>0</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -988,11 +947,52 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / U1U1 · CBE-TDVP · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / U1U1 · CBE-TDVP · D=1024: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>1152</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_u1u1</dd>
+<dt>model_name</dt><dd>Hubbard / U1U1</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>1024</dd>
+<dt>operation</dt><dd>CBE-TDVP</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1u1_thermal_D1024.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1U1</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling and execution settings</h3><dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1U1 · CBE-TDVP · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
+<h3>Workload details</h3><dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
 <dt>bond_dimensions</dt><dd>1, 16, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 16, 1</dd>
 <dt>cbe_target</dt><dd>288</dd>
 <dt>cbe_tolerance</dt><dd>1.0e-8</dd>
@@ -1004,7 +1004,7 @@
 <dt>nominal_D</dt><dd>256</dd>
 <dt>operation</dt><dd>CBE-TDVP</dd>
 <dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
 <dt>sector_preset</dt><dd>presets/hubbard_u1u1_thermal_D256.json</dd>
 <dt>state</dt><dd>thermal</dd>
@@ -1012,13 +1012,13 @@
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>0</dd>
+<dt>Warmup samples</dt><dd>1</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
 <dt>Garbage collection before each trial</dt><dd>No</dd>
 <dt>Garbage collection after each completed case</dt><dd>Yes</dd>
@@ -1029,37 +1029,37 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / U1U1 · CBE-TDVP · D=64: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / U1U1 · CBE-TDVP · D=512: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 16, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 16, 1</dd>
-<dt>cbe_target</dt><dd>72</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>576</dd>
 <dt>cbe_tolerance</dt><dd>1.0e-8</dd>
 <dt>continuation_after</dt><dd>2-TDVP</dd>
 <dt>dt</dt><dd>-0.1</dd>
 <dt>model</dt><dd>hubbard_u1u1</dd>
 <dt>model_name</dt><dd>Hubbard / U1U1</dd>
 <dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>64</dd>
+<dt>nominal_D</dt><dd>512</dd>
 <dt>operation</dt><dd>CBE-TDVP</dd>
 <dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/hubbard_u1u1_thermal_D64.json</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1u1_thermal_D512.json</dd>
 <dt>state</dt><dd>thermal</dd>
 <dt>symmetry</dt><dd>U1U1</dd>
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
 <dt>Garbage collection before each trial</dt><dd>No</dd>
 <dt>Garbage collection after each completed case</dt><dd>Yes</dd>
@@ -1070,11 +1070,11 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / Z2SU2 · 2-DMRG · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / Z2SU2 · 2-DMRG · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
+<dt>K</dt><dd>4</dd>
 <dt>bond_dimensions</dt><dd>1, 4, 16, 64, 128, 128, 128, 128, 127, 128, 128, 128, 127, 128, 128, 128, 127, 128, 128, 128, 127, 128, 128, 128, 127, 128, 128, 128, 128, 64, 16, 4, 1</dd>
 <dt>cbe_target</dt><dd>Not recorded</dd>
 <dt>cbe_tolerance</dt><dd>Not recorded</dd>
@@ -1086,7 +1086,7 @@
 <dt>nominal_D</dt><dd>128</dd>
 <dt>operation</dt><dd>2-DMRG</dd>
 <dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
 <dt>sector_preset</dt><dd>presets/hubbard_z2su2_ground_D128.json</dd>
 <dt>state</dt><dd>ground</dd>
@@ -1094,13 +1094,13 @@
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>0</dd>
+<dt>Warmup samples</dt><dd>1</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
 <dt>Garbage collection before each trial</dt><dd>No</dd>
 <dt>Garbage collection after each completed case</dt><dd>Yes</dd>
@@ -1111,11 +1111,11 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / Z2SU2 · 2-DMRG · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / Z2SU2 · 2-DMRG · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
+<dt>K</dt><dd>4</dd>
 <dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 253, 255, 254, 256, 256, 256, 256, 255, 253, 256, 256, 256, 253, 256, 256, 255, 256, 256, 256, 256, 254, 256, 253, 256, 64, 16, 4, 1</dd>
 <dt>cbe_target</dt><dd>Not recorded</dd>
 <dt>cbe_tolerance</dt><dd>Not recorded</dd>
@@ -1127,7 +1127,7 @@
 <dt>nominal_D</dt><dd>256</dd>
 <dt>operation</dt><dd>2-DMRG</dd>
 <dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
 <dt>sector_preset</dt><dd>presets/hubbard_z2su2_ground_D256.json</dd>
 <dt>state</dt><dd>ground</dd>
@@ -1135,11 +1135,11 @@
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>0</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -1152,12 +1152,12 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / Z2SU2 · 2-DMRG · D=64: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / Z2SU2 · 2-DMRG · D=512: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 64, 63, 62, 62, 64, 63, 64, 64, 64, 64, 62, 64, 62, 64, 64, 61, 63, 63, 60, 63, 63, 64, 63, 64, 61, 64, 16, 4, 1</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 510, 509, 509, 512, 510, 510, 511, 510, 510, 510, 512, 510, 511, 510, 510, 510, 512, 508, 511, 510, 511, 508, 511, 256, 64, 16, 4, 1</dd>
 <dt>cbe_target</dt><dd>Not recorded</dd>
 <dt>cbe_tolerance</dt><dd>Not recorded</dd>
 <dt>continuation_after</dt><dd>Not recorded</dd>
@@ -1165,24 +1165,24 @@
 <dt>model</dt><dd>hubbard_z2su2</dd>
 <dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
 <dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>64</dd>
+<dt>nominal_D</dt><dd>512</dd>
 <dt>operation</dt><dd>2-DMRG</dd>
 <dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/hubbard_z2su2_ground_D64.json</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_z2su2_ground_D512.json</dd>
 <dt>state</dt><dd>ground</dd>
 <dt>symmetry</dt><dd>Z2SU2</dd>
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
 <dt>Garbage collection before each trial</dt><dd>No</dd>
 <dt>Garbage collection after each completed case</dt><dd>Yes</dd>
@@ -1193,11 +1193,11 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / Z2SU2 · 2-TDVP · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / Z2SU2 · 2-TDVP · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
+<dt>K</dt><dd>4</dd>
 <dt>bond_dimensions</dt><dd>1, 16, 127, 128, 127, 128, 128, 126, 126, 126, 127, 126, 128, 126, 127, 126, 126, 126, 127, 126, 126, 126, 125, 128, 126, 126, 127, 128, 128, 128, 127, 16, 1</dd>
 <dt>cbe_target</dt><dd>Not recorded</dd>
 <dt>cbe_tolerance</dt><dd>Not recorded</dd>
@@ -1209,7 +1209,7 @@
 <dt>nominal_D</dt><dd>128</dd>
 <dt>operation</dt><dd>2-TDVP</dd>
 <dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
 <dt>sector_preset</dt><dd>presets/hubbard_z2su2_thermal_D128.json</dd>
 <dt>state</dt><dd>thermal</dd>
@@ -1217,93 +1217,11 @@
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
-<dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>0</dd>
-<dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
-<dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
-<dt>Operation mutates its input</dt><dd>Yes</dd>
-<dt>Garbage collection before each trial</dt><dd>No</dd>
-<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
-<dt>Garbage collection before each sample</dt><dd>No</dd>
-<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
-<dt>blas_threads</dt><dd>1</dd>
-<dt>gc_threads</dt><dd>1</dd>
-<dt>julia_threads</dt><dd>1</dd>
-</dl>
-</details>
-<details><summary>Hubbard / Z2SU2 · 2-TDVP · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
-<h3>Workload details</h3><dl>
-<dt>GCstep</dt><dd>No</dd>
-<dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 16, 256, 255, 255, 254, 256, 255, 255, 256, 256, 256, 255, 255, 256, 255, 255, 254, 256, 256, 256, 256, 254, 255, 253, 253, 254, 254, 255, 256, 256, 16, 1</dd>
-<dt>cbe_target</dt><dd>Not recorded</dd>
-<dt>cbe_tolerance</dt><dd>Not recorded</dd>
-<dt>continuation_after</dt><dd>Not recorded</dd>
-<dt>dt</dt><dd>-0.1</dd>
-<dt>model</dt><dd>hubbard_z2su2</dd>
-<dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
-<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>256</dd>
-<dt>operation</dt><dd>2-TDVP</dd>
-<dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
-<dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/hubbard_z2su2_thermal_D256.json</dd>
-<dt>state</dt><dd>thermal</dd>
-<dt>symmetry</dt><dd>Z2SU2</dd>
-<dt>truncation</dt><dd>truncrank(D)</dd>
-</dl>
-<h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
-<dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>0</dd>
-<dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
-<dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
-<dt>Operation mutates its input</dt><dd>Yes</dd>
-<dt>Garbage collection before each trial</dt><dd>No</dd>
-<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
-<dt>Garbage collection before each sample</dt><dd>No</dd>
-<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
-<dt>blas_threads</dt><dd>1</dd>
-<dt>gc_threads</dt><dd>1</dd>
-<dt>julia_threads</dt><dd>1</dd>
-</dl>
-</details>
-<details><summary>Hubbard / Z2SU2 · 2-TDVP · D=64: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
-<h3>Workload details</h3><dl>
-<dt>GCstep</dt><dd>No</dd>
-<dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 16, 63, 63, 64, 64, 64, 64, 64, 64, 63, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 63, 63, 16, 1</dd>
-<dt>cbe_target</dt><dd>Not recorded</dd>
-<dt>cbe_tolerance</dt><dd>Not recorded</dd>
-<dt>continuation_after</dt><dd>Not recorded</dd>
-<dt>dt</dt><dd>-0.1</dd>
-<dt>model</dt><dd>hubbard_z2su2</dd>
-<dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
-<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>64</dd>
-<dt>operation</dt><dd>2-TDVP</dd>
-<dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
-<dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/hubbard_z2su2_thermal_D64.json</dd>
-<dt>state</dt><dd>thermal</dd>
-<dt>symmetry</dt><dd>Z2SU2</dd>
-<dt>truncation</dt><dd>truncrank(D)</dd>
-</dl>
-<h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>1</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -1316,35 +1234,35 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / Z2SU2 · CBE-DMRG · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / Z2SU2 · 2-TDVP · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 128, 128, 128, 128, 127, 128, 128, 128, 127, 128, 128, 128, 127, 128, 128, 128, 127, 128, 128, 128, 127, 128, 128, 128, 128, 64, 16, 4, 1</dd>
-<dt>cbe_target</dt><dd>256</dd>
-<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
-<dt>continuation_after</dt><dd>2-DMRG</dd>
-<dt>dt</dt><dd>Not recorded</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 255, 255, 254, 256, 255, 255, 256, 256, 256, 255, 255, 256, 255, 255, 254, 256, 256, 256, 256, 254, 255, 253, 253, 254, 254, 255, 256, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
 <dt>model</dt><dd>hubbard_z2su2</dd>
 <dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
 <dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>128</dd>
-<dt>operation</dt><dd>CBE-DMRG</dd>
-<dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>nominal_D</dt><dd>256</dd>
+<dt>operation</dt><dd>2-TDVP</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/hubbard_z2su2_ground_D128.json</dd>
-<dt>state</dt><dd>ground</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_z2su2_thermal_D256.json</dd>
+<dt>state</dt><dd>thermal</dd>
 <dt>symmetry</dt><dd>Z2SU2</dd>
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>0</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -1357,11 +1275,93 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / Z2SU2 · CBE-DMRG · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / Z2SU2 · 2-TDVP · D=512: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 510, 510, 512, 510, 509, 512, 511, 512, 510, 512, 510, 510, 511, 512, 511, 512, 510, 512, 510, 512, 511, 512, 509, 510, 510, 511, 512, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_z2su2</dd>
+<dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>2-TDVP</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_z2su2_thermal_D512.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>Z2SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling and execution settings</h3><dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+</details>
+<details><summary>Hubbard / Z2SU2 · CBE-DMRG · D=1024: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
+<h3>Workload details</h3><dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 1024, 1023, 1024, 1023, 1023, 1022, 1024, 1023, 1022, 1022, 1022, 1022, 1020, 1022, 1023, 1023, 1022, 1022, 1020, 1023, 1024, 1023, 1024, 256, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>2048</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>hubbard_z2su2</dd>
+<dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>1024</dd>
+<dt>operation</dt><dd>CBE-DMRG</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_z2su2_ground_D1024.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>Z2SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling and execution settings</h3><dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+</details>
+<details><summary>Hubbard / Z2SU2 · CBE-DMRG · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
+<h3>Workload details</h3><dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
 <dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 253, 255, 254, 256, 256, 256, 256, 255, 253, 256, 256, 256, 253, 256, 256, 255, 256, 256, 256, 256, 254, 256, 253, 256, 64, 16, 4, 1</dd>
 <dt>cbe_target</dt><dd>512</dd>
 <dt>cbe_tolerance</dt><dd>1.0e-8</dd>
@@ -1373,7 +1373,7 @@
 <dt>nominal_D</dt><dd>256</dd>
 <dt>operation</dt><dd>CBE-DMRG</dd>
 <dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
 <dt>sector_preset</dt><dd>presets/hubbard_z2su2_ground_D256.json</dd>
 <dt>state</dt><dd>ground</dd>
@@ -1381,52 +1381,11 @@
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
-<dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>0</dd>
-<dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
-<dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
-<dt>Operation mutates its input</dt><dd>Yes</dd>
-<dt>Garbage collection before each trial</dt><dd>No</dd>
-<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
-<dt>Garbage collection before each sample</dt><dd>No</dd>
-<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
-<dt>blas_threads</dt><dd>1</dd>
-<dt>gc_threads</dt><dd>1</dd>
-<dt>julia_threads</dt><dd>1</dd>
-</dl>
-</details>
-<details><summary>Hubbard / Z2SU2 · CBE-DMRG · D=64: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
-<h3>Workload details</h3><dl>
-<dt>GCstep</dt><dd>No</dd>
-<dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 64, 63, 62, 62, 64, 63, 64, 64, 64, 64, 62, 64, 62, 64, 64, 61, 63, 63, 60, 63, 63, 64, 63, 64, 61, 64, 16, 4, 1</dd>
-<dt>cbe_target</dt><dd>128</dd>
-<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
-<dt>continuation_after</dt><dd>2-DMRG</dd>
-<dt>dt</dt><dd>Not recorded</dd>
-<dt>model</dt><dd>hubbard_z2su2</dd>
-<dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
-<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>64</dd>
-<dt>operation</dt><dd>CBE-DMRG</dd>
-<dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
-<dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/hubbard_z2su2_ground_D64.json</dd>
-<dt>state</dt><dd>ground</dd>
-<dt>symmetry</dt><dd>Z2SU2</dd>
-<dt>truncation</dt><dd>truncrank(D)</dd>
-</dl>
-<h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>1</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -1439,35 +1398,35 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / Z2SU2 · CBE-TDVP · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / Z2SU2 · CBE-DMRG · D=512: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 16, 127, 128, 127, 128, 128, 126, 126, 126, 127, 126, 128, 126, 127, 126, 126, 126, 127, 126, 126, 126, 125, 128, 126, 126, 127, 128, 128, 128, 127, 16, 1</dd>
-<dt>cbe_target</dt><dd>144</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 510, 509, 509, 512, 510, 510, 511, 510, 510, 510, 512, 510, 511, 510, 510, 510, 512, 508, 511, 510, 511, 508, 511, 256, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>1024</dd>
 <dt>cbe_tolerance</dt><dd>1.0e-8</dd>
-<dt>continuation_after</dt><dd>2-TDVP</dd>
-<dt>dt</dt><dd>-0.1</dd>
+<dt>continuation_after</dt><dd>2-DMRG</dd>
+<dt>dt</dt><dd>Not recorded</dd>
 <dt>model</dt><dd>hubbard_z2su2</dd>
 <dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
 <dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>128</dd>
-<dt>operation</dt><dd>CBE-TDVP</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>CBE-DMRG</dd>
 <dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/hubbard_z2su2_thermal_D128.json</dd>
-<dt>state</dt><dd>thermal</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_z2su2_ground_D512.json</dd>
+<dt>state</dt><dd>ground</dd>
 <dt>symmetry</dt><dd>Z2SU2</dd>
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>0</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -1480,11 +1439,52 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>Hubbard / Z2SU2 · CBE-TDVP · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / Z2SU2 · CBE-TDVP · D=1024: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 1022, 1024, 1024, 1024, 1021, 1022, 1023, 1023, 1023, 1024, 1023, 1023, 1024, 1023, 1022, 1024, 1024, 1021, 1023, 1022, 1024, 1023, 1021, 1023, 1024, 1024, 1022, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>1152</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_z2su2</dd>
+<dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>1024</dd>
+<dt>operation</dt><dd>CBE-TDVP</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_z2su2_thermal_D1024.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>Z2SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling and execution settings</h3><dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+</details>
+<details><summary>Hubbard / Z2SU2 · CBE-TDVP · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
+<h3>Workload details</h3><dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
 <dt>bond_dimensions</dt><dd>1, 16, 256, 255, 255, 254, 256, 255, 255, 256, 256, 256, 255, 255, 256, 255, 255, 254, 256, 256, 256, 256, 254, 255, 253, 253, 254, 254, 255, 256, 256, 16, 1</dd>
 <dt>cbe_target</dt><dd>288</dd>
 <dt>cbe_tolerance</dt><dd>1.0e-8</dd>
@@ -1496,7 +1496,7 @@
 <dt>nominal_D</dt><dd>256</dd>
 <dt>operation</dt><dd>CBE-TDVP</dd>
 <dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
 <dt>sector_preset</dt><dd>presets/hubbard_z2su2_thermal_D256.json</dd>
 <dt>state</dt><dd>thermal</dd>
@@ -1504,52 +1504,11 @@
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
-<dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>0</dd>
-<dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
-<dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
-<dt>Operation mutates its input</dt><dd>Yes</dd>
-<dt>Garbage collection before each trial</dt><dd>No</dd>
-<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
-<dt>Garbage collection before each sample</dt><dd>No</dd>
-<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
-<dt>blas_threads</dt><dd>1</dd>
-<dt>gc_threads</dt><dd>1</dd>
-<dt>julia_threads</dt><dd>1</dd>
-</dl>
-</details>
-<details><summary>Hubbard / Z2SU2 · CBE-TDVP · D=64: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
-<h3>Workload details</h3><dl>
-<dt>GCstep</dt><dd>No</dd>
-<dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 16, 63, 63, 64, 64, 64, 64, 64, 64, 63, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 63, 63, 16, 1</dd>
-<dt>cbe_target</dt><dd>72</dd>
-<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
-<dt>continuation_after</dt><dd>2-TDVP</dd>
-<dt>dt</dt><dd>-0.1</dd>
-<dt>model</dt><dd>hubbard_z2su2</dd>
-<dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
-<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>64</dd>
-<dt>operation</dt><dd>CBE-TDVP</dd>
-<dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
-<dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/hubbard_z2su2_thermal_D64.json</dd>
-<dt>state</dt><dd>thermal</dd>
-<dt>symmetry</dt><dd>Z2SU2</dd>
-<dt>truncation</dt><dd>truncrank(D)</dd>
-</dl>
-<h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>1</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -1562,35 +1521,35 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>t-t′-J-J′ / U1SU2 · 2-DMRG · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>Hubbard / Z2SU2 · CBE-TDVP · D=512: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 3, 9, 26, 72, 128, 128, 128, 128, 128, 128, 126, 127, 126, 128, 124, 127, 127, 126, 126, 126, 128, 128, 128, 125, 126, 128, 127, 74, 27, 9, 3, 1</dd>
-<dt>cbe_target</dt><dd>Not recorded</dd>
-<dt>cbe_tolerance</dt><dd>Not recorded</dd>
-<dt>continuation_after</dt><dd>Not recorded</dd>
-<dt>dt</dt><dd>Not recorded</dd>
-<dt>model</dt><dd>tj_u1su2</dd>
-<dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 510, 510, 512, 510, 509, 512, 511, 512, 510, 512, 510, 510, 511, 512, 511, 512, 510, 512, 510, 512, 511, 512, 509, 510, 510, 511, 512, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>576</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>2-TDVP</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_z2su2</dd>
+<dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
 <dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>128</dd>
-<dt>operation</dt><dd>2-DMRG</dd>
-<dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>CBE-TDVP</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/tj_u1su2_ground_D128.json</dd>
-<dt>state</dt><dd>ground</dd>
-<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_z2su2_thermal_D512.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>Z2SU2</dd>
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>0</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -1603,11 +1562,52 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>t-t′-J-J′ / U1SU2 · 2-DMRG · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>t-t′-J-J′ / U1SU2 · 2-DMRG · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 3, 9, 26, 72, 128, 128, 128, 128, 128, 128, 126, 127, 126, 128, 124, 127, 127, 126, 126, 126, 128, 128, 128, 125, 126, 128, 127, 74, 27, 9, 3, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>tj_u1su2</dd>
+<dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>128</dd>
+<dt>operation</dt><dd>2-DMRG</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/tj_u1su2_ground_D128.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling and execution settings</h3><dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+</details>
+<details><summary>t-t′-J-J′ / U1SU2 · 2-DMRG · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
+<h3>Workload details</h3><dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
 <dt>bond_dimensions</dt><dd>1, 3, 9, 26, 72, 192, 253, 256, 255, 255, 255, 256, 255, 254, 255, 255, 255, 255, 256, 253, 256, 254, 253, 254, 256, 254, 254, 192, 72, 26, 9, 3, 1</dd>
 <dt>cbe_target</dt><dd>Not recorded</dd>
 <dt>cbe_tolerance</dt><dd>Not recorded</dd>
@@ -1619,7 +1619,7 @@
 <dt>nominal_D</dt><dd>256</dd>
 <dt>operation</dt><dd>2-DMRG</dd>
 <dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
 <dt>sector_preset</dt><dd>presets/tj_u1su2_ground_D256.json</dd>
 <dt>state</dt><dd>ground</dd>
@@ -1627,11 +1627,11 @@
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>0</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -1644,12 +1644,12 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>t-t′-J-J′ / U1SU2 · 2-DMRG · D=64: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>t-t′-J-J′ / U1SU2 · 2-DMRG · D=512: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 3, 9, 24, 36, 63, 42, 63, 42, 63, 42, 64, 42, 61, 63, 61, 59, 63, 62, 64, 63, 64, 64, 61, 63, 64, 63, 61, 57, 27, 9, 3, 1</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 3, 9, 27, 80, 232, 509, 510, 512, 511, 511, 511, 511, 511, 512, 512, 510, 512, 512, 509, 512, 512, 509, 510, 510, 509, 511, 218, 80, 27, 9, 3, 1</dd>
 <dt>cbe_target</dt><dd>Not recorded</dd>
 <dt>cbe_tolerance</dt><dd>Not recorded</dd>
 <dt>continuation_after</dt><dd>Not recorded</dd>
@@ -1657,24 +1657,24 @@
 <dt>model</dt><dd>tj_u1su2</dd>
 <dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
 <dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>64</dd>
+<dt>nominal_D</dt><dd>512</dd>
 <dt>operation</dt><dd>2-DMRG</dd>
 <dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/tj_u1su2_ground_D64.json</dd>
+<dt>sector_preset</dt><dd>presets/tj_u1su2_ground_D512.json</dd>
 <dt>state</dt><dd>ground</dd>
 <dt>symmetry</dt><dd>U1SU2</dd>
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
 <dt>Garbage collection before each trial</dt><dd>No</dd>
 <dt>Garbage collection after each completed case</dt><dd>Yes</dd>
@@ -1685,11 +1685,11 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>t-t′-J-J′ / U1SU2 · 2-TDVP · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>t-t′-J-J′ / U1SU2 · 2-TDVP · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
+<dt>K</dt><dd>4</dd>
 <dt>bond_dimensions</dt><dd>1, 9, 81, 127, 128, 126, 128, 126, 128, 128, 128, 126, 128, 127, 128, 128, 128, 128, 128, 126, 126, 128, 128, 127, 125, 128, 125, 128, 128, 128, 81, 9, 1</dd>
 <dt>cbe_target</dt><dd>Not recorded</dd>
 <dt>cbe_tolerance</dt><dd>Not recorded</dd>
@@ -1701,7 +1701,7 @@
 <dt>nominal_D</dt><dd>128</dd>
 <dt>operation</dt><dd>2-TDVP</dd>
 <dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
 <dt>sector_preset</dt><dd>presets/tj_u1su2_thermal_D128.json</dd>
 <dt>state</dt><dd>thermal</dd>
@@ -1709,93 +1709,11 @@
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
-<dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>0</dd>
-<dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
-<dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
-<dt>Operation mutates its input</dt><dd>Yes</dd>
-<dt>Garbage collection before each trial</dt><dd>No</dd>
-<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
-<dt>Garbage collection before each sample</dt><dd>No</dd>
-<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
-<dt>blas_threads</dt><dd>1</dd>
-<dt>gc_threads</dt><dd>1</dd>
-<dt>julia_threads</dt><dd>1</dd>
-</dl>
-</details>
-<details><summary>t-t′-J-J′ / U1SU2 · 2-TDVP · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
-<h3>Workload details</h3><dl>
-<dt>GCstep</dt><dd>No</dd>
-<dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 9, 81, 254, 256, 256, 256, 256, 253, 256, 256, 256, 253, 256, 256, 256, 255, 256, 256, 255, 254, 256, 256, 256, 255, 256, 256, 256, 256, 254, 81, 9, 1</dd>
-<dt>cbe_target</dt><dd>Not recorded</dd>
-<dt>cbe_tolerance</dt><dd>Not recorded</dd>
-<dt>continuation_after</dt><dd>Not recorded</dd>
-<dt>dt</dt><dd>-0.1</dd>
-<dt>model</dt><dd>tj_u1su2</dd>
-<dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
-<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>256</dd>
-<dt>operation</dt><dd>2-TDVP</dd>
-<dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
-<dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/tj_u1su2_thermal_D256.json</dd>
-<dt>state</dt><dd>thermal</dd>
-<dt>symmetry</dt><dd>U1SU2</dd>
-<dt>truncation</dt><dd>truncrank(D)</dd>
-</dl>
-<h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
-<dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>0</dd>
-<dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
-<dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
-<dt>Operation mutates its input</dt><dd>Yes</dd>
-<dt>Garbage collection before each trial</dt><dd>No</dd>
-<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
-<dt>Garbage collection before each sample</dt><dd>No</dd>
-<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
-<dt>blas_threads</dt><dd>1</dd>
-<dt>gc_threads</dt><dd>1</dd>
-<dt>julia_threads</dt><dd>1</dd>
-</dl>
-</details>
-<details><summary>t-t′-J-J′ / U1SU2 · 2-TDVP · D=64: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
-<h3>Workload details</h3><dl>
-<dt>GCstep</dt><dd>No</dd>
-<dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 9, 63, 64, 64, 64, 64, 63, 64, 63, 64, 64, 64, 64, 64, 63, 64, 63, 64, 64, 64, 64, 64, 63, 64, 63, 64, 64, 64, 63, 63, 9, 1</dd>
-<dt>cbe_target</dt><dd>Not recorded</dd>
-<dt>cbe_tolerance</dt><dd>Not recorded</dd>
-<dt>continuation_after</dt><dd>Not recorded</dd>
-<dt>dt</dt><dd>-0.1</dd>
-<dt>model</dt><dd>tj_u1su2</dd>
-<dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
-<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>64</dd>
-<dt>operation</dt><dd>2-TDVP</dd>
-<dt>rsvd</dt><dd>No</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
-<dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/tj_u1su2_thermal_D64.json</dd>
-<dt>state</dt><dd>thermal</dd>
-<dt>symmetry</dt><dd>U1SU2</dd>
-<dt>truncation</dt><dd>truncrank(D)</dd>
-</dl>
-<h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>1</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -1808,35 +1726,35 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>t-t′-J-J′ / U1SU2 · CBE-DMRG · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>t-t′-J-J′ / U1SU2 · 2-TDVP · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 3, 9, 26, 72, 128, 128, 128, 128, 128, 128, 126, 127, 126, 128, 124, 127, 127, 126, 126, 126, 128, 128, 128, 125, 126, 128, 127, 74, 27, 9, 3, 1</dd>
-<dt>cbe_target</dt><dd>256</dd>
-<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
-<dt>continuation_after</dt><dd>2-DMRG</dd>
-<dt>dt</dt><dd>Not recorded</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 9, 81, 254, 256, 256, 256, 256, 253, 256, 256, 256, 253, 256, 256, 256, 255, 256, 256, 255, 254, 256, 256, 256, 255, 256, 256, 256, 256, 254, 81, 9, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
 <dt>model</dt><dd>tj_u1su2</dd>
 <dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
 <dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>128</dd>
-<dt>operation</dt><dd>CBE-DMRG</dd>
-<dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>nominal_D</dt><dd>256</dd>
+<dt>operation</dt><dd>2-TDVP</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/tj_u1su2_ground_D128.json</dd>
-<dt>state</dt><dd>ground</dd>
+<dt>sector_preset</dt><dd>presets/tj_u1su2_thermal_D256.json</dd>
+<dt>state</dt><dd>thermal</dd>
 <dt>symmetry</dt><dd>U1SU2</dd>
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>0</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -1849,11 +1767,93 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>t-t′-J-J′ / U1SU2 · CBE-DMRG · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>t-t′-J-J′ / U1SU2 · 2-TDVP · D=512: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 9, 81, 510, 508, 511, 511, 509, 510, 512, 511, 509, 510, 511, 511, 510, 510, 510, 510, 510, 512, 510, 511, 510, 511, 510, 511, 510, 510, 510, 81, 9, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>tj_u1su2</dd>
+<dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>2-TDVP</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/tj_u1su2_thermal_D512.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling and execution settings</h3><dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+</details>
+<details><summary>t-t′-J-J′ / U1SU2 · CBE-DMRG · D=1024: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
+<h3>Workload details</h3><dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 3, 9, 27, 81, 242, 676, 1023, 1024, 1024, 1024, 1022, 1024, 1019, 1024, 1020, 1024, 1024, 1024, 1024, 1024, 1023, 1023, 1024, 1024, 1023, 672, 242, 81, 27, 9, 3, 1</dd>
+<dt>cbe_target</dt><dd>2048</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>tj_u1su2</dd>
+<dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>1024</dd>
+<dt>operation</dt><dd>CBE-DMRG</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/tj_u1su2_ground_D1024.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling and execution settings</h3><dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+</details>
+<details><summary>t-t′-J-J′ / U1SU2 · CBE-DMRG · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
+<h3>Workload details</h3><dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
 <dt>bond_dimensions</dt><dd>1, 3, 9, 26, 72, 192, 253, 256, 255, 255, 255, 256, 255, 254, 255, 255, 255, 255, 256, 253, 256, 254, 253, 254, 256, 254, 254, 192, 72, 26, 9, 3, 1</dd>
 <dt>cbe_target</dt><dd>512</dd>
 <dt>cbe_tolerance</dt><dd>1.0e-8</dd>
@@ -1865,7 +1865,7 @@
 <dt>nominal_D</dt><dd>256</dd>
 <dt>operation</dt><dd>CBE-DMRG</dd>
 <dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
 <dt>sector_preset</dt><dd>presets/tj_u1su2_ground_D256.json</dd>
 <dt>state</dt><dd>ground</dd>
@@ -1873,52 +1873,11 @@
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
-<dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>0</dd>
-<dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
-<dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
-<dt>Operation mutates its input</dt><dd>Yes</dd>
-<dt>Garbage collection before each trial</dt><dd>No</dd>
-<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
-<dt>Garbage collection before each sample</dt><dd>No</dd>
-<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
-<dt>blas_threads</dt><dd>1</dd>
-<dt>gc_threads</dt><dd>1</dd>
-<dt>julia_threads</dt><dd>1</dd>
-</dl>
-</details>
-<details><summary>t-t′-J-J′ / U1SU2 · CBE-DMRG · D=64: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
-<h3>Workload details</h3><dl>
-<dt>GCstep</dt><dd>No</dd>
-<dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 3, 9, 24, 36, 63, 42, 63, 42, 63, 42, 64, 42, 61, 63, 61, 59, 63, 62, 64, 63, 64, 64, 61, 63, 64, 63, 61, 57, 27, 9, 3, 1</dd>
-<dt>cbe_target</dt><dd>128</dd>
-<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
-<dt>continuation_after</dt><dd>2-DMRG</dd>
-<dt>dt</dt><dd>Not recorded</dd>
-<dt>model</dt><dd>tj_u1su2</dd>
-<dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
-<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>64</dd>
-<dt>operation</dt><dd>CBE-DMRG</dd>
-<dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
-<dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/tj_u1su2_ground_D64.json</dd>
-<dt>state</dt><dd>ground</dd>
-<dt>symmetry</dt><dd>U1SU2</dd>
-<dt>truncation</dt><dd>truncrank(D)</dd>
-</dl>
-<h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>1</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -1931,35 +1890,35 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>t-t′-J-J′ / U1SU2 · CBE-TDVP · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>t-t′-J-J′ / U1SU2 · CBE-DMRG · D=512: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 9, 81, 127, 128, 126, 128, 126, 128, 128, 128, 126, 128, 127, 128, 128, 128, 128, 128, 126, 126, 128, 128, 127, 125, 128, 125, 128, 128, 128, 81, 9, 1</dd>
-<dt>cbe_target</dt><dd>144</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 3, 9, 27, 80, 232, 509, 510, 512, 511, 511, 511, 511, 511, 512, 512, 510, 512, 512, 509, 512, 512, 509, 510, 510, 509, 511, 218, 80, 27, 9, 3, 1</dd>
+<dt>cbe_target</dt><dd>1024</dd>
 <dt>cbe_tolerance</dt><dd>1.0e-8</dd>
-<dt>continuation_after</dt><dd>2-TDVP</dd>
-<dt>dt</dt><dd>-0.1</dd>
+<dt>continuation_after</dt><dd>2-DMRG</dd>
+<dt>dt</dt><dd>Not recorded</dd>
 <dt>model</dt><dd>tj_u1su2</dd>
 <dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
 <dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>128</dd>
-<dt>operation</dt><dd>CBE-TDVP</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>CBE-DMRG</dd>
 <dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/tj_u1su2_thermal_D128.json</dd>
-<dt>state</dt><dd>thermal</dd>
+<dt>sector_preset</dt><dd>presets/tj_u1su2_ground_D512.json</dd>
+<dt>state</dt><dd>ground</dd>
 <dt>symmetry</dt><dd>U1SU2</dd>
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
 <dt>Warmup samples</dt><dd>0</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
 <dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
@@ -1972,11 +1931,52 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>t-t′-J-J′ / U1SU2 · CBE-TDVP · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>t-t′-J-J′ / U1SU2 · CBE-TDVP · D=1024: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 9, 81, 729, 1024, 1022, 1021, 1023, 1022, 1021, 1024, 1022, 1023, 1021, 1022, 1023, 1023, 1021, 1022, 1022, 1023, 1021, 1022, 1023, 1023, 1021, 1021, 1022, 1024, 729, 81, 9, 1</dd>
+<dt>cbe_target</dt><dd>1152</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>tj_u1su2</dd>
+<dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>1024</dd>
+<dt>operation</dt><dd>CBE-TDVP</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/tj_u1su2_thermal_D1024.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling and execution settings</h3><dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+</details>
+<details><summary>t-t′-J-J′ / U1SU2 · CBE-TDVP · D=256: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
+<h3>Workload details</h3><dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
 <dt>bond_dimensions</dt><dd>1, 9, 81, 254, 256, 256, 256, 256, 253, 256, 256, 256, 253, 256, 256, 256, 255, 256, 256, 255, 254, 256, 256, 256, 255, 256, 256, 256, 256, 254, 81, 9, 1</dd>
 <dt>cbe_target</dt><dd>288</dd>
 <dt>cbe_tolerance</dt><dd>1.0e-8</dd>
@@ -1988,7 +1988,7 @@
 <dt>nominal_D</dt><dd>256</dd>
 <dt>operation</dt><dd>CBE-TDVP</dd>
 <dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
 <dt>sector_preset</dt><dd>presets/tj_u1su2_thermal_D256.json</dd>
 <dt>state</dt><dd>thermal</dd>
@@ -1996,13 +1996,13 @@
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>0</dd>
+<dt>Warmup samples</dt><dd>1</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
 <dt>Garbage collection before each trial</dt><dd>No</dd>
 <dt>Garbage collection after each completed case</dt><dd>Yes</dd>
@@ -2013,37 +2013,37 @@
 <dt>julia_threads</dt><dd>1</dd>
 </dl>
 </details>
-<details><summary>t-t′-J-J′ / U1SU2 · CBE-TDVP · D=64: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep. Samples continue the same state; the CBE algorithm follows its two-site partner.</p>
+<details><summary>t-t′-J-J′ / U1SU2 · CBE-TDVP · D=512: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
 <h3>Workload details</h3><dl>
 <dt>GCstep</dt><dd>No</dd>
 <dt>GCsweep</dt><dd>No</dd>
-<dt>K</dt><dd>8</dd>
-<dt>bond_dimensions</dt><dd>1, 9, 63, 64, 64, 64, 64, 63, 64, 63, 64, 64, 64, 64, 64, 63, 64, 63, 64, 64, 64, 64, 64, 63, 64, 63, 64, 64, 64, 63, 63, 9, 1</dd>
-<dt>cbe_target</dt><dd>72</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 9, 81, 510, 508, 511, 511, 509, 510, 512, 511, 509, 510, 511, 511, 510, 510, 510, 510, 510, 512, 510, 511, 510, 511, 510, 511, 510, 510, 510, 81, 9, 1</dd>
+<dt>cbe_target</dt><dd>576</dd>
 <dt>cbe_tolerance</dt><dd>1.0e-8</dd>
 <dt>continuation_after</dt><dd>2-TDVP</dd>
 <dt>dt</dt><dd>-0.1</dd>
 <dt>model</dt><dd>tj_u1su2</dd>
 <dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
 <dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
-<dt>nominal_D</dt><dd>64</dd>
+<dt>nominal_D</dt><dd>512</dd>
 <dt>operation</dt><dd>CBE-TDVP</dd>
 <dt>rsvd</dt><dd>Yes</dd>
-<dt>sampling_state</dt><dd>continue across warmup, samples and paired algorithms</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
 <dt>scalar_type</dt><dd>Float64</dd>
-<dt>sector_preset</dt><dd>presets/tj_u1su2_thermal_D64.json</dd>
+<dt>sector_preset</dt><dd>presets/tj_u1su2_thermal_D512.json</dd>
 <dt>state</dt><dd>thermal</dd>
 <dt>symmetry</dt><dd>U1SU2</dd>
 <dt>truncation</dt><dd>truncrank(D)</dd>
 </dl>
 <h3>Sampling and execution settings</h3><dl>
-<dt>Collected samples</dt><dd>3</dd>
+<dt>Collected samples</dt><dd>1</dd>
 <dt>Evaluations per sample</dt><dd>1</dd>
-<dt>Warmup samples</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
 <dt>Random seed</dt><dd>20260929</dd>
-<dt>Sample limit</dt><dd>3</dd>
+<dt>Sample limit</dt><dd>1</dd>
 <dt>Time budget per case</dt><dd>600 seconds</dd>
-<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
 <dt>Operation mutates its input</dt><dd>Yes</dd>
 <dt>Garbage collection before each trial</dt><dd>No</dd>
 <dt>Garbage collection after each completed case</dt><dd>Yes</dd>
