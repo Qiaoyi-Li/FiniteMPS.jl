@@ -2,12 +2,12 @@
 
 A julia package for finite MPS/MPO-based computations of ground-state, finite-temperature and dynamical properties.
 
-[![][docs-stable-img]][docs-stable-url] [![][docs-dev-img]][docs-dev-url] [![CI][ci-img]][ci-url] [![codecov][codecov-img]][codecov-url]
+[![][docs-stable-img]][docs-stable-url] [![][docs-main-img]][docs-main-url] [![CI][ci-img]][ci-url] [![codecov][codecov-img]][codecov-url]
 
 [docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
 [docs-stable-url]: https://qiaoyi-li.github.io/FiniteMPS.jl/stable
-[docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
-[docs-dev-url]: https://qiaoyi-li.github.io/FiniteMPS.jl/dev
+[docs-main-img]: https://img.shields.io/badge/docs-main-blue.svg
+[docs-main-url]: https://qiaoyi-li.github.io/FiniteMPS.jl/main
 [ci-img]: https://github.com/Qiaoyi-Li/FiniteMPS.jl/actions/workflows/CI.yml/badge.svg?branch=main
 [ci-url]: https://github.com/Qiaoyi-Li/FiniteMPS.jl/actions/workflows/CI.yml
 [codecov-img]: https://codecov.io/gh/Qiaoyi-Li/FiniteMPS.jl/graph/badge.svg?branch=main

@@ -37,11 +37,11 @@ makedocs(;
 if haskey(ENV, "GITHUB_REF")
 	@show ENV["GITHUB_REF"]
 	devbranch = ENV["GITHUB_REF"] == "refs/heads/main" ? "main" : "dev"
-	devurl = devbranch == "main" ? "stable" : "dev"
 	deploydocs(
 		repo = "github.com/Qiaoyi-Li/FiniteMPS.jl",
 		devbranch = devbranch,
-		devurl = devurl,
+		devurl = devbranch,
+		versions = ["stable" => "v^", "main" => "main", "dev" => "dev"],
 		push_preview = true,
 	)
 end
