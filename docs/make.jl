@@ -41,7 +41,7 @@ if haskey(ENV, "GITHUB_REF")
 		repo = "github.com/Qiaoyi-Li/FiniteMPS.jl",
 		devbranch = devbranch,
 		devurl = devbranch,
-		versions = ["stable" => "v^", "main" => "main", "dev" => "dev"],
+		versions = ["stable" => "v^", "main" => "main", "dev" => "dev", "v#.#"],
 		push_preview = true,
 	)
 end
