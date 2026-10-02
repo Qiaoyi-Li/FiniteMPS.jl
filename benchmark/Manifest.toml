@@ -167,7 +167,7 @@ version = "0.1.11"
 deps = ["AbstractTrees", "Distributed", "LinearAlgebra", "MatrixAlgebraKit", "Random", "Reexport", "Serialization", "SerializedElementArrays", "SparseArrays", "TensorKit", "TimerOutputs"]
 path = ".."
 uuid = "6b572690-f317-4dad-a5fe-5fe73a0b7d42"
-version = "1.8.3"
+version = "2.0.0"
 
     [deps.FiniteMPS.extensions]
     FiniteMPSMKLExt = "MKL_jll"
