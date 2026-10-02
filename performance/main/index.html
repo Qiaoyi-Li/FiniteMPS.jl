@@ -1,0 +1,4182 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Performance report</title><style>body{font:16px/1.55 system-ui,sans-serif;color:#162235;background:#f7f9fc;margin:0}main{max-width:1150px;margin:auto;padding:32px 24px}h1,h2{line-height:1.2}a{color:#1757a4}table{border-collapse:collapse;width:100%;background:white;margin:16px 0;display:block;overflow:auto}th,td{padding:10px 14px;text-align:left;border-bottom:1px solid #dce3eb;vertical-align:top}th{background:#eaf0f8}code,pre{font:13px/1.5 ui-monospace,monospace;overflow-wrap:anywhere}pre{white-space:pre-wrap;background:#edf2f8;padding:16px}dl{display:grid;grid-template-columns:minmax(140px,240px) 1fr;gap:8px 20px;background:white;padding:20px;border:1px solid #dce3eb}dt{font-weight:600}dd{margin:0;overflow-wrap:anywhere}.muted{color:#56657a}.notice{padding:12px 16px;background:#eaf0f8;border-left:4px solid #3576b6}nav{display:flex;gap:20px;flex-wrap:wrap}select{font:inherit;max-width:100%;padding:6px;margin:8px}svg{width:100%;height:auto;background:white;border:1px solid #dce3eb}details{margin:16px 0}summary{cursor:pointer} @media(max-width:600px){main{padding:20px 12px}dl{grid-template-columns:1fr;gap:2px}dd{margin-bottom:12px}}
+</style></head><body><main><h1>Performance report</h1><p><strong>Development or local build</strong></p>
+<p>This report contains 16 comparison tables and 144 measurements.</p>
+<p>First measurement timestamp (UTC): 2026-10-02T11:49:08.738Z. Julia uses 1, 2, or 4 compute threads; the linear algebra backend and garbage collector each use 1 thread.</p>
+<nav><a href="collection.json">Download the raw data index</a>
+<a href="configurations/julia-1-blas-1/index.html">Detailed report: 1 thread</a>
+<a href="configurations/julia-2-blas-1/index.html">Detailed report: 2 threads</a>
+<a href="configurations/julia-4-blas-1/index.html">Detailed report: 4 threads</a>
+</nav><p><label for="metric">Display metric: </label><select id="metric"><option value="time">Median execution time</option><option value="speedup">Speedup relative to one thread</option><option value="bytes">Total allocated bytes</option><option value="allocations">Memory allocation count</option></select></p>
+<p class="muted">Each table is one model and algorithm; rows are full bond dimension caps and columns are thread configurations. Each sample is a complete double sweep. Speedup compares against one thread. Allocated bytes measure cumulative allocation, not peak memory.</p>
+<p>Processor: AMD EPYC 7763 64-Core Processor; visible logical processors: 4.</p>
+<details><summary>Source version, hardware, and runtime settings</summary>
+<h3>Runtime with 1 thread</h3>
+<dl>
+<dt>Repository</dt><dd>Qiaoyi-Li/FiniteMPS.jl</dd>
+<dt>Source commit</dt><dd>a5d972830d50d43a5ddfa58242ee44556cad2b9e</dd>
+<dt>Benchmark definition commit</dt><dd>a5d972830d50d43a5ddfa58242ee44556cad2b9e</dd>
+<dt>Uncommitted changes</dt><dd>No</dd>
+<dt>Version tag</dt><dd>Not recorded</dd>
+<dt>Release type</dt><dd>Development or local build</dd>
+<dt>Algorithm library version</dt><dd>1.8.3</dd>
+<dt>Measured at (UTC)</dt><dd>2026-10-02T11:49:08.738Z</dd>
+<dt>Processor model</dt><dd>AMD EPYC 7763 64-Core Processor</dd>
+<dt>Processor architecture</dt><dd>64-bit x86</dd>
+<dt>Visible logical processors</dt><dd>4</dd>
+<dt>Processors available to this process</dt><dd>4</dd>
+<dt>Allowed processor identifiers</dt><dd>0-3</dd>
+<dt>Visible physical cores</dt><dd>2</dd>
+<dt>Julia version</dt><dd>1.11.6</dd>
+<dt>Julia computation threads</dt><dd>1</dd>
+<dt>Julia interactive threads</dt><dd>0</dd>
+<dt>Garbage collection threads</dt><dd>1</dd>
+<dt>Matrix computation threads</dt><dd>1</dd>
+<dt>Matrix computation backend</dt><dd>OpenBLAS</dd>
+<dt>Runner label</dt><dd>ubuntu-24.04</dd>
+<dt>Runner type</dt><dd>GitHub-hosted runner</dd>
+<dt>Runner image version</dt><dd>20260927.320.1</dd>
+<dt>Operating system</dt><dd>Linux</dd>
+<dt>System kernel</dt><dd>6.17.0-1022-azure</dd>
+<dt>Visible system memory (bytes)</dt><dd>16766414848</dd>
+<dt>Run trigger</dt><dd>Commit push</dd>
+<dt>Automation workflow</dt><dd>Performance</dd>
+<dt>Run identifier</dt><dd>37001879445</dd>
+<dt>Workflow run number</dt><dd>3</dd>
+<dt>Run attempt</dt><dd>1</dd>
+<dt>Benchmark definition file</dt><dd>benchmark/benchmarks.jl</dd>
+<dt>Benchmark definition source</dt><dd>Current source checkout</dd>
+</dl>
+<h3>Runtime with 2 threads</h3>
+<dl>
+<dt>Repository</dt><dd>Qiaoyi-Li/FiniteMPS.jl</dd>
+<dt>Source commit</dt><dd>a5d972830d50d43a5ddfa58242ee44556cad2b9e</dd>
+<dt>Benchmark definition commit</dt><dd>a5d972830d50d43a5ddfa58242ee44556cad2b9e</dd>
+<dt>Uncommitted changes</dt><dd>No</dd>
+<dt>Version tag</dt><dd>Not recorded</dd>
+<dt>Release type</dt><dd>Development or local build</dd>
+<dt>Algorithm library version</dt><dd>1.8.3</dd>
+<dt>Measured at (UTC)</dt><dd>2026-10-02T13:38:24.954Z</dd>
+<dt>Processor model</dt><dd>AMD EPYC 7763 64-Core Processor</dd>
+<dt>Processor architecture</dt><dd>64-bit x86</dd>
+<dt>Visible logical processors</dt><dd>4</dd>
+<dt>Processors available to this process</dt><dd>4</dd>
+<dt>Allowed processor identifiers</dt><dd>0-3</dd>
+<dt>Visible physical cores</dt><dd>2</dd>
+<dt>Julia version</dt><dd>1.11.6</dd>
+<dt>Julia computation threads</dt><dd>2</dd>
+<dt>Julia interactive threads</dt><dd>0</dd>
+<dt>Garbage collection threads</dt><dd>1</dd>
+<dt>Matrix computation threads</dt><dd>1</dd>
+<dt>Matrix computation backend</dt><dd>OpenBLAS</dd>
+<dt>Runner label</dt><dd>ubuntu-24.04</dd>
+<dt>Runner type</dt><dd>GitHub-hosted runner</dd>
+<dt>Runner image version</dt><dd>20260927.320.1</dd>
+<dt>Operating system</dt><dd>Linux</dd>
+<dt>System kernel</dt><dd>6.17.0-1022-azure</dd>
+<dt>Visible system memory (bytes)</dt><dd>16766414848</dd>
+<dt>Run trigger</dt><dd>Commit push</dd>
+<dt>Automation workflow</dt><dd>Performance</dd>
+<dt>Run identifier</dt><dd>37001879445</dd>
+<dt>Workflow run number</dt><dd>3</dd>
+<dt>Run attempt</dt><dd>1</dd>
+<dt>Benchmark definition file</dt><dd>benchmark/benchmarks.jl</dd>
+<dt>Benchmark definition source</dt><dd>Current source checkout</dd>
+</dl>
+<h3>Runtime with 4 threads</h3>
+<dl>
+<dt>Repository</dt><dd>Qiaoyi-Li/FiniteMPS.jl</dd>
+<dt>Source commit</dt><dd>a5d972830d50d43a5ddfa58242ee44556cad2b9e</dd>
+<dt>Benchmark definition commit</dt><dd>a5d972830d50d43a5ddfa58242ee44556cad2b9e</dd>
+<dt>Uncommitted changes</dt><dd>No</dd>
+<dt>Version tag</dt><dd>Not recorded</dd>
+<dt>Release type</dt><dd>Development or local build</dd>
+<dt>Algorithm library version</dt><dd>1.8.3</dd>
+<dt>Measured at (UTC)</dt><dd>2026-10-02T14:56:17.274Z</dd>
+<dt>Processor model</dt><dd>AMD EPYC 7763 64-Core Processor</dd>
+<dt>Processor architecture</dt><dd>64-bit x86</dd>
+<dt>Visible logical processors</dt><dd>4</dd>
+<dt>Processors available to this process</dt><dd>4</dd>
+<dt>Allowed processor identifiers</dt><dd>0-3</dd>
+<dt>Visible physical cores</dt><dd>2</dd>
+<dt>Julia version</dt><dd>1.11.6</dd>
+<dt>Julia computation threads</dt><dd>4</dd>
+<dt>Julia interactive threads</dt><dd>0</dd>
+<dt>Garbage collection threads</dt><dd>1</dd>
+<dt>Matrix computation threads</dt><dd>1</dd>
+<dt>Matrix computation backend</dt><dd>OpenBLAS</dd>
+<dt>Runner label</dt><dd>ubuntu-24.04</dd>
+<dt>Runner type</dt><dd>GitHub-hosted runner</dd>
+<dt>Runner image version</dt><dd>20260927.320.1</dd>
+<dt>Operating system</dt><dd>Linux</dd>
+<dt>System kernel</dt><dd>6.17.0-1022-azure</dd>
+<dt>Visible system memory (bytes)</dt><dd>16766414848</dd>
+<dt>Run trigger</dt><dd>Commit push</dd>
+<dt>Automation workflow</dt><dd>Performance</dd>
+<dt>Run identifier</dt><dd>37001879445</dd>
+<dt>Workflow run number</dt><dd>3</dd>
+<dt>Run attempt</dt><dd>1</dd>
+<dt>Benchmark definition file</dt><dd>benchmark/benchmarks.jl</dd>
+<dt>Benchmark definition source</dt><dd>Current source checkout</dd>
+</dl>
+<h3>Software versions</h3>
+<dl>
+<dt>Timing tools (BenchmarkTools)</dt><dd>1.6.0</dd>
+<dt>Matrix product state library (FiniteMPS)</dt><dd>1.8.3</dd>
+<dt>Matrix factorization library (MatrixAlgebraKit)</dt><dd>0.6.9</dd>
+<dt>Tensor computation library (TensorKit)</dt><dd>0.17.2</dd>
+<dt>Tensor contraction library (TensorOperations)</dt><dd>5.8.1</dd>
+</dl>
+</details>
+<h2>Hubbard / U1U1 · 2-DMRG</h2>
+<table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
+<tr><td>128</td>
+<td data-time="11249183171" data-reference="11249183171" data-bytes="8423439176" data-allocations="90152091">11.249 seconds</td>
+<td data-time="7169849471" data-reference="11249183171" data-bytes="8487906248" data-allocations="90730049">7.1698 seconds</td>
+<td data-time="6371145445" data-reference="11249183171" data-bytes="8558795008" data-allocations="90790092">6.3711 seconds</td>
+</tr>
+<tr><td>256</td>
+<td data-time="19833447244" data-reference="19833447244" data-bytes="13120705200" data-allocations="88438444">19.833 seconds</td>
+<td data-time="12138415119" data-reference="19833447244" data-bytes="13187713760" data-allocations="89020038">12.138 seconds</td>
+<td data-time="10338533470" data-reference="19833447244" data-bytes="13254938432" data-allocations="89087134">10.339 seconds</td>
+</tr>
+<tr><td>512</td>
+<td data-time="58259370562" data-reference="58259370562" data-bytes="30944554064" data-allocations="98939609">58.259 seconds</td>
+<td data-time="35566225387" data-reference="58259370562" data-bytes="31016383672" data-allocations="99514373">35.566 seconds</td>
+<td data-time="29731228468" data-reference="58259370562" data-bytes="31060100024" data-allocations="99557964">29.731 seconds</td>
+</tr>
+</tbody></table>
+<h2>Hubbard / U1U1 · CBE-DMRG</h2>
+<table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
+<tr><td>256</td>
+<td data-time="9428341246" data-reference="9428341246" data-bytes="6292225424" data-allocations="34210847">9.4283 seconds</td>
+<td data-time="6236819564" data-reference="9428341246" data-bytes="6336127840" data-allocations="34587388">6.2368 seconds</td>
+<td data-time="5457002264" data-reference="9428341246" data-bytes="6386934400" data-allocations="34804480">5.457 seconds</td>
+</tr>
+<tr><td>512</td>
+<td data-time="28162675333" data-reference="28162675333" data-bytes="17159526528" data-allocations="37113563">28.163 seconds</td>
+<td data-time="17165441445" data-reference="28162675333" data-bytes="17204419688" data-allocations="37468952">17.165 seconds</td>
+<td data-time="15466507099" data-reference="28162675333" data-bytes="17255196848" data-allocations="37577622">15.467 seconds</td>
+</tr>
+<tr><td>1024</td>
+<td data-time="152501421113" data-reference="152501421113" data-bytes="65350463864" data-allocations="33856162">152.5 seconds</td>
+<td data-time="92279598572" data-reference="152501421113" data-bytes="65390289096" data-allocations="34188408">92.28 seconds</td>
+<td data-time="81123163830" data-reference="152501421113" data-bytes="65415168320" data-allocations="34243244">81.123 seconds</td>
+</tr>
+</tbody></table>
+<h2>Hubbard / U1U1 · 2-TDVP</h2>
+<table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
+<tr><td>128</td>
+<td data-time="143541007273" data-reference="143541007273" data-bytes="121847330096" data-allocations="994859653">143.54 seconds</td>
+<td data-time="95538359480" data-reference="143541007273" data-bytes="122179709232" data-allocations="995684382">95.538 seconds</td>
+<td data-time="85843805974" data-reference="143541007273" data-bytes="123089273560" data-allocations="995807366">85.844 seconds</td>
+</tr>
+<tr><td>256</td>
+<td data-time="296754260792" data-reference="296754260792" data-bytes="228517819568" data-allocations="1406379622">296.75 seconds</td>
+<td data-time="190733293775" data-reference="296754260792" data-bytes="229034189856" data-allocations="1407258762">190.73 seconds</td>
+<td data-time="168286791735" data-reference="296754260792" data-bytes="229993402440" data-allocations="1407343006">168.29 seconds</td>
+</tr>
+<tr><td>512</td>
+<td data-time="787737459722" data-reference="787737459722" data-bytes="484489277176" data-allocations="1584779840">787.74 seconds</td>
+<td data-time="475843957390" data-reference="787737459722" data-bytes="484985813704" data-allocations="1585633424">475.84 seconds</td>
+<td data-time="415746464568" data-reference="787737459722" data-bytes="486227038856" data-allocations="1585715047">415.75 seconds</td>
+</tr>
+</tbody></table>
+<h2>Hubbard / U1U1 · CBE-TDVP</h2>
+<table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
+<tr><td>256</td>
+<td data-time="24669235436" data-reference="24669235436" data-bytes="17831574216" data-allocations="111839675">24.669 seconds</td>
+<td data-time="15133740989" data-reference="24669235436" data-bytes="17905402960" data-allocations="112319179">15.134 seconds</td>
+<td data-time="13146248182" data-reference="24669235436" data-bytes="17973813856" data-allocations="112379785">13.146 seconds</td>
+</tr>
+<tr><td>512</td>
+<td data-time="73527914442" data-reference="73527914442" data-bytes="43373141728" data-allocations="122593337">73.528 seconds</td>
+<td data-time="43337352431" data-reference="73527914442" data-bytes="43474566152" data-allocations="123131125">43.337 seconds</td>
+<td data-time="37877515349" data-reference="73527914442" data-bytes="43578262456" data-allocations="123187885">37.878 seconds</td>
+</tr>
+<tr><td>1024</td>
+<td data-time="309311146514" data-reference="309311146514" data-bytes="137932667240" data-allocations="141145129">309.31 seconds</td>
+<td data-time="182746971875" data-reference="309311146514" data-bytes="137988609456" data-allocations="141656308">182.75 seconds</td>
+<td data-time="157781063456" data-reference="309311146514" data-bytes="138012876192" data-allocations="141687599">157.78 seconds</td>
+</tr>
+</tbody></table>
+<h2>Hubbard / U1SU2 · 2-DMRG</h2>
+<table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
+<tr><td>128</td>
+<td data-time="13109068288" data-reference="13109068288" data-bytes="12234767752" data-allocations="110253109">13.109 seconds</td>
+<td data-time="9038754816" data-reference="13109068288" data-bytes="13895645360" data-allocations="124812718">9.0388 seconds</td>
+<td data-time="9744071759" data-reference="13109068288" data-bytes="17173402544" data-allocations="152022136">9.7441 seconds</td>
+</tr>
+<tr><td>256</td>
+<td data-time="15636722261" data-reference="15636722261" data-bytes="14489846520" data-allocations="123477538">15.637 seconds</td>
+<td data-time="11208665652" data-reference="15636722261" data-bytes="16346416448" data-allocations="139903315">11.209 seconds</td>
+<td data-time="11460217198" data-reference="15636722261" data-bytes="20016609888" data-allocations="170736617">11.46 seconds</td>
+</tr>
+<tr><td>512</td>
+<td data-time="22460484987" data-reference="22460484987" data-bytes="19157930400" data-allocations="144622548">22.46 seconds</td>
+<td data-time="15356486263" data-reference="22460484987" data-bytes="21218810704" data-allocations="163087431">15.356 seconds</td>
+<td data-time="15563631953" data-reference="22460484987" data-bytes="25749662568" data-allocations="201395259">15.564 seconds</td>
+</tr>
+</tbody></table>
+<h2>Hubbard / U1SU2 · CBE-DMRG</h2>
+<table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
+<tr><td>256</td>
+<td data-time="6858213558" data-reference="6858213558" data-bytes="6891055504" data-allocations="63598566">6.8582 seconds</td>
+<td data-time="5308969012" data-reference="6858213558" data-bytes="7966848912" data-allocations="74292335">5.309 seconds</td>
+<td data-time="5680647210" data-reference="6858213558" data-bytes="9889541560" data-allocations="92774473">5.6806 seconds</td>
+</tr>
+<tr><td>512</td>
+<td data-time="10653862052" data-reference="10653862052" data-bytes="10005325040" data-allocations="76994532">10.654 seconds</td>
+<td data-time="7831126045" data-reference="10653862052" data-bytes="11249335664" data-allocations="89559993">7.8311 seconds</td>
+<td data-time="8151204120" data-reference="10653862052" data-bytes="13449065296" data-allocations="111181058">8.1512 seconds</td>
+</tr>
+<tr><td>1024</td>
+<td data-time="29297981036" data-reference="29297981036" data-bytes="18118455896" data-allocations="73917820">29.298 seconds</td>
+<td data-time="18874443826" data-reference="29297981036" data-bytes="19123427560" data-allocations="83897687">18.874 seconds</td>
+<td data-time="17288340568" data-reference="29297981036" data-bytes="21049540976" data-allocations="102656811">17.288 seconds</td>
+</tr>
+</tbody></table>
+<h2>Hubbard / U1SU2 · 2-TDVP</h2>
+<table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
+<tr><td>128</td>
+<td data-time="137979923376" data-reference="137979923376" data-bytes="116566543584" data-allocations="953725882">137.98 seconds</td>
+<td data-time="95917114805" data-reference="137979923376" data-bytes="134066863368" data-allocations="1080403091">95.917 seconds</td>
+<td data-time="99851118979" data-reference="137979923376" data-bytes="161361327376" data-allocations="1275414879">99.851 seconds</td>
+</tr>
+<tr><td>256</td>
+<td data-time="352817018896" data-reference="352817018896" data-bytes="317057809744" data-allocations="2396500592">352.82 seconds</td>
+<td data-time="265446292951" data-reference="352817018896" data-bytes="382574044376" data-allocations="2873872949">265.45 seconds</td>
+<td data-time="296742894202" data-reference="352817018896" data-bytes="496475432088" data-allocations="3696229541">296.74 seconds</td>
+</tr>
+<tr><td>512</td>
+<td data-time="492308272696" data-reference="492308272696" data-bytes="398722497800" data-allocations="2791203316">492.31 seconds</td>
+<td data-time="361930110842" data-reference="492308272696" data-bytes="474025226816" data-allocations="3342560596">361.93 seconds</td>
+<td data-time="393942652681" data-reference="492308272696" data-bytes="608666761312" data-allocations="4320402303">393.94 seconds</td>
+</tr>
+</tbody></table>
+<h2>Hubbard / U1SU2 · CBE-TDVP</h2>
+<table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
+<tr><td>256</td>
+<td data-time="28898382386" data-reference="28898382386" data-bytes="30269723944" data-allocations="243818014">28.898 seconds</td>
+<td data-time="22850749263" data-reference="28898382386" data-bytes="35302883744" data-allocations="287587122">22.851 seconds</td>
+<td data-time="24511801208" data-reference="28898382386" data-bytes="42192851304" data-allocations="345394843">24.512 seconds</td>
+</tr>
+<tr><td>512</td>
+<td data-time="40764139642" data-reference="40764139642" data-bytes="38340543640" data-allocations="273956177">40.764 seconds</td>
+<td data-time="29008985019" data-reference="40764139642" data-bytes="43492771584" data-allocations="318902556">29.009 seconds</td>
+<td data-time="30236501381" data-reference="40764139642" data-bytes="51790679424" data-allocations="388653562">30.237 seconds</td>
+</tr>
+<tr><td>1024</td>
+<td data-time="92722925867" data-reference="92722925867" data-bytes="66456786728" data-allocations="372314263">92.723 seconds</td>
+<td data-time="61290734551" data-reference="92722925867" data-bytes="72828610408" data-allocations="429385160">61.291 seconds</td>
+<td data-time="60225941198" data-reference="92722925867" data-bytes="84340222928" data-allocations="529068533">60.226 seconds</td>
+</tr>
+</tbody></table>
+<h2>Hubbard / Z2SU2 · 2-DMRG</h2>
+<table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
+<tr><td>128</td>
+<td data-time="3633867970" data-reference="3633867970" data-bytes="1822748272" data-allocations="16636629">3.6339 seconds</td>
+<td data-time="2409147724" data-reference="3633867970" data-bytes="1942488600" data-allocations="17817880">2.4091 seconds</td>
+<td data-time="2245083364" data-reference="3633867970" data-bytes="2065645000" data-allocations="19027324">2.2451 seconds</td>
+</tr>
+<tr><td>256</td>
+<td data-time="7217576838" data-reference="7217576838" data-bytes="3533914120" data-allocations="18691282">7.2176 seconds</td>
+<td data-time="4461028689" data-reference="7217576838" data-bytes="3723323888" data-allocations="20574965">4.461 seconds</td>
+<td data-time="3977512844" data-reference="7217576838" data-bytes="3915751616" data-allocations="22307991">3.9775 seconds</td>
+</tr>
+<tr><td>512</td>
+<td data-time="23289879785" data-reference="23289879785" data-bytes="9327028584" data-allocations="22489870">23.29 seconds</td>
+<td data-time="13387877320" data-reference="23289879785" data-bytes="9741224656" data-allocations="25920936">13.388 seconds</td>
+<td data-time="11640634161" data-reference="23289879785" data-bytes="10124850072" data-allocations="29045596">11.641 seconds</td>
+</tr>
+</tbody></table>
+<h2>Hubbard / Z2SU2 · CBE-DMRG</h2>
+<table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
+<tr><td>256</td>
+<td data-time="4039893670" data-reference="4039893670" data-bytes="2369078784" data-allocations="8931203">4.0399 seconds</td>
+<td data-time="2661320035" data-reference="4039893670" data-bytes="2468152904" data-allocations="10175842">2.6613 seconds</td>
+<td data-time="2553841929" data-reference="4039893670" data-bytes="2588965136" data-allocations="11568497">2.5538 seconds</td>
+</tr>
+<tr><td>512</td>
+<td data-time="14190005468" data-reference="14190005468" data-bytes="6839879184" data-allocations="10387621">14.19 seconds</td>
+<td data-time="8550149881" data-reference="14190005468" data-bytes="6928264024" data-allocations="11720082">8.5501 seconds</td>
+<td data-time="7852130113" data-reference="14190005468" data-bytes="7061743504" data-allocations="13070535">7.8521 seconds</td>
+</tr>
+<tr><td>1024</td>
+<td data-time="81760051920" data-reference="81760051920" data-bytes="25684693360" data-allocations="9337151">81.76 seconds</td>
+<td data-time="46675841100" data-reference="81760051920" data-bytes="25762572136" data-allocations="10316669">46.676 seconds</td>
+<td data-time="42471109051" data-reference="81760051920" data-bytes="25854810216" data-allocations="11331716">42.471 seconds</td>
+</tr>
+</tbody></table>
+<h2>Hubbard / Z2SU2 · 2-TDVP</h2>
+<table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
+<tr><td>128</td>
+<td data-time="35902333577" data-reference="35902333577" data-bytes="21001836088" data-allocations="100443563">35.902 seconds</td>
+<td data-time="23646685295" data-reference="35902333577" data-bytes="22307071344" data-allocations="109403591">23.647 seconds</td>
+<td data-time="20629649362" data-reference="35902333577" data-bytes="23866308808" data-allocations="119596126">20.63 seconds</td>
+</tr>
+<tr><td>256</td>
+<td data-time="123662747084" data-reference="123662747084" data-bytes="62185392896" data-allocations="185836453">123.66 seconds</td>
+<td data-time="80614814517" data-reference="123662747084" data-bytes="68673701248" data-allocations="229040687">80.615 seconds</td>
+<td data-time="73121347139" data-reference="123662747084" data-bytes="76572869632" data-allocations="281411448">73.121 seconds</td>
+</tr>
+<tr><td>512</td>
+<td data-time="449252939806" data-reference="449252939806" data-bytes="161306167648" data-allocations="205958415">449.25 seconds</td>
+<td data-time="279568038032" data-reference="449252939806" data-bytes="166555980456" data-allocations="241249963">279.57 seconds</td>
+<td data-time="247696112453" data-reference="449252939806" data-bytes="173912164008" data-allocations="290659577">247.7 seconds</td>
+</tr>
+</tbody></table>
+<h2>Hubbard / Z2SU2 · CBE-TDVP</h2>
+<table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
+<tr><td>256</td>
+<td data-time="12668348499" data-reference="12668348499" data-bytes="7135532928" data-allocations="21591170">12.668 seconds</td>
+<td data-time="8291682844" data-reference="12668348499" data-bytes="7670813224" data-allocations="25722290">8.2917 seconds</td>
+<td data-time="7502621500" data-reference="12668348499" data-bytes="8104207840" data-allocations="29135046">7.5026 seconds</td>
+</tr>
+<tr><td>512</td>
+<td data-time="49051028184" data-reference="49051028184" data-bytes="20735036824" data-allocations="28720060">49.051 seconds</td>
+<td data-time="28636521352" data-reference="49051028184" data-bytes="21508684864" data-allocations="34572186">28.637 seconds</td>
+<td data-time="25600963632" data-reference="49051028184" data-bytes="22383501376" data-allocations="41056430">25.601 seconds</td>
+</tr>
+<tr><td>1024</td>
+<td data-time="237860404718" data-reference="237860404718" data-bytes="71421418136" data-allocations="39958028">237.86 seconds</td>
+<td data-time="142560423613" data-reference="237860404718" data-bytes="72445277520" data-allocations="47618504">142.56 seconds</td>
+<td data-time="126006185010" data-reference="237860404718" data-bytes="73692765488" data-allocations="56979958">126.01 seconds</td>
+</tr>
+</tbody></table>
+<h2>t-t′-J-J′ / U1SU2 · 2-DMRG</h2>
+<table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
+<tr><td>128</td>
+<td data-time="8017865912" data-reference="8017865912" data-bytes="7235516912" data-allocations="70045588">8.0179 seconds</td>
+<td data-time="6308498946" data-reference="8017865912" data-bytes="8041508032" data-allocations="77167002">6.3085 seconds</td>
+<td data-time="6492072097" data-reference="8017865912" data-bytes="9577329952" data-allocations="89712842">6.4921 seconds</td>
+</tr>
+<tr><td>256</td>
+<td data-time="10756699027" data-reference="10756699027" data-bytes="8345098984" data-allocations="75594068">10.757 seconds</td>
+<td data-time="7769909976" data-reference="10756699027" data-bytes="9220380912" data-allocations="83310338">7.7699 seconds</td>
+<td data-time="7408154672" data-reference="10756699027" data-bytes="10909016936" data-allocations="97282973">7.4082 seconds</td>
+</tr>
+<tr><td>512</td>
+<td data-time="14724420460" data-reference="14724420460" data-bytes="11513470200" data-allocations="88623371">14.724 seconds</td>
+<td data-time="10226538999" data-reference="14724420460" data-bytes="12513106272" data-allocations="97413572">10.227 seconds</td>
+<td data-time="9925118166" data-reference="14724420460" data-bytes="14497911080" data-allocations="114041974">9.9251 seconds</td>
+</tr>
+</tbody></table>
+<h2>t-t′-J-J′ / U1SU2 · CBE-DMRG</h2>
+<table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
+<tr><td>256</td>
+<td data-time="5968376058" data-reference="5968376058" data-bytes="5449820960" data-allocations="49635236">5.9684 seconds</td>
+<td data-time="5184493707" data-reference="5968376058" data-bytes="6090106088" data-allocations="56047693">5.1845 seconds</td>
+<td data-time="4947215217" data-reference="5968376058" data-bytes="6862806464" data-allocations="63318833">4.9472 seconds</td>
+</tr>
+<tr><td>512</td>
+<td data-time="9729177757" data-reference="9729177757" data-bytes="7993745120" data-allocations="57174790">9.7292 seconds</td>
+<td data-time="6785170060" data-reference="9729177757" data-bytes="8699022344" data-allocations="64228662">6.7852 seconds</td>
+<td data-time="6405137768" data-reference="9729177757" data-bytes="9637472896" data-allocations="73177188">6.4051 seconds</td>
+</tr>
+<tr><td>1024</td>
+<td data-time="24248806103" data-reference="24248806103" data-bytes="15259359000" data-allocations="55220131">24.249 seconds</td>
+<td data-time="14924675569" data-reference="24248806103" data-bytes="15886566048" data-allocations="61562380">14.925 seconds</td>
+<td data-time="13455510252" data-reference="24248806103" data-bytes="16678192184" data-allocations="68817976">13.456 seconds</td>
+</tr>
+</tbody></table>
+<h2>t-t′-J-J′ / U1SU2 · 2-TDVP</h2>
+<table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
+<tr><td>128</td>
+<td data-time="98307138710" data-reference="98307138710" data-bytes="86872137544" data-allocations="743159238">98.307 seconds</td>
+<td data-time="71178701419" data-reference="98307138710" data-bytes="101004774848" data-allocations="851184707">71.179 seconds</td>
+<td data-time="73178427585" data-reference="98307138710" data-bytes="123374191712" data-allocations="1021804396">73.178 seconds</td>
+</tr>
+<tr><td>256</td>
+<td data-time="123342592996" data-reference="123342592996" data-bytes="105455383728" data-allocations="863255905">123.34 seconds</td>
+<td data-time="87193967581" data-reference="123342592996" data-bytes="121352335800" data-allocations="985051825">87.194 seconds</td>
+<td data-time="89835761996" data-reference="123342592996" data-bytes="148805953960" data-allocations="1194861306">89.836 seconds</td>
+</tr>
+<tr><td>512</td>
+<td data-time="202081833260" data-reference="202081833260" data-bytes="158809042576" data-allocations="1152669122">202.08 seconds</td>
+<td data-time="136312577260" data-reference="202081833260" data-bytes="180766841400" data-allocations="1321879420">136.31 seconds</td>
+<td data-time="140229486254" data-reference="202081833260" data-bytes="220702822888" data-allocations="1628042831">140.23 seconds</td>
+</tr>
+</tbody></table>
+<h2>t-t′-J-J′ / U1SU2 · CBE-TDVP</h2>
+<table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
+<tr><td>256</td>
+<td data-time="20286515410" data-reference="20286515410" data-bytes="19940195416" data-allocations="165821708">20.287 seconds</td>
+<td data-time="14940108544" data-reference="20286515410" data-bytes="22359640768" data-allocations="186351681">14.94 seconds</td>
+<td data-time="14852548632" data-reference="20286515410" data-bytes="25729204776" data-allocations="214148950">14.853 seconds</td>
+</tr>
+<tr><td>512</td>
+<td data-time="30854980414" data-reference="30854980414" data-bytes="27715413096" data-allocations="192048165">30.855 seconds</td>
+<td data-time="21631249279" data-reference="30854980414" data-bytes="30271885888" data-allocations="213935890">21.631 seconds</td>
+<td data-time="20580205184" data-reference="30854980414" data-bytes="34245302656" data-allocations="246883183">20.58 seconds</td>
+</tr>
+<tr><td>1024</td>
+<td data-time="72963337964" data-reference="72963337964" data-bytes="53890772712" data-allocations="315041390">72.963 seconds</td>
+<td data-time="46757684287" data-reference="72963337964" data-bytes="58221379736" data-allocations="353340875">46.758 seconds</td>
+<td data-time="45466500119" data-reference="72963337964" data-bytes="64667903072" data-allocations="409537392">45.467 seconds</td>
+</tr>
+</tbody></table>
+<details><summary>Hubbard / U1SU2 · 2-DMRG · D=128: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 126, 126, 128, 128, 128, 127, 125, 128, 126, 128, 127, 128, 128, 128, 128, 128, 128, 126, 125, 127, 128, 128, 127, 127, 126, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>hubbard_u1su2</dd>
+<dt>model_name</dt><dd>Hubbard / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>128</dd>
+<dt>operation</dt><dd>2-DMRG</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1su2_ground_D128.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1SU2 · 2-DMRG · D=256: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 255, 255, 255, 256, 254, 256, 256, 255, 253, 253, 256, 256, 256, 256, 254, 254, 254, 254, 255, 255, 253, 256, 256, 256, 253, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>hubbard_u1su2</dd>
+<dt>model_name</dt><dd>Hubbard / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>256</dd>
+<dt>operation</dt><dd>2-DMRG</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1su2_ground_D256.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1SU2 · 2-DMRG · D=512: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 511, 511, 512, 511, 508, 510, 510, 511, 512, 512, 511, 511, 512, 512, 512, 511, 510, 509, 512, 512, 508, 512, 512, 256, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>hubbard_u1su2</dd>
+<dt>model_name</dt><dd>Hubbard / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>2-DMRG</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1su2_ground_D512.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1SU2 · 2-TDVP · D=128: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 127, 128, 127, 128, 125, 128, 126, 128, 127, 126, 126, 126, 127, 128, 126, 128, 127, 128, 126, 128, 127, 127, 126, 126, 126, 128, 128, 128, 127, 16, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_u1su2</dd>
+<dt>model_name</dt><dd>Hubbard / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>128</dd>
+<dt>operation</dt><dd>2-TDVP</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1su2_thermal_D128.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1SU2 · 2-TDVP · D=256: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 255, 256, 254, 256, 255, 255, 256, 254, 253, 255, 256, 256, 255, 256, 255, 254, 254, 253, 255, 256, 256, 256, 254, 256, 256, 255, 255, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_u1su2</dd>
+<dt>model_name</dt><dd>Hubbard / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>256</dd>
+<dt>operation</dt><dd>2-TDVP</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1su2_thermal_D256.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1SU2 · 2-TDVP · D=512: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 510, 512, 511, 512, 511, 512, 509, 510, 512, 512, 512, 512, 509, 512, 510, 512, 511, 512, 511, 512, 509, 512, 509, 510, 512, 511, 512, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_u1su2</dd>
+<dt>model_name</dt><dd>Hubbard / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>2-TDVP</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1su2_thermal_D512.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1SU2 · CBE-DMRG · D=1024: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 1016, 1023, 1024, 1023, 1024, 1022, 1020, 1022, 1024, 1024, 1023, 1022, 1022, 1024, 1023, 1020, 1024, 1023, 1023, 1022, 1024, 1024, 1015, 256, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>2048</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>hubbard_u1su2</dd>
+<dt>model_name</dt><dd>Hubbard / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>1024</dd>
+<dt>operation</dt><dd>CBE-DMRG</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1su2_ground_D1024.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1SU2 · CBE-DMRG · D=256: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 255, 255, 255, 256, 254, 256, 256, 255, 253, 253, 256, 256, 256, 256, 254, 254, 254, 254, 255, 255, 253, 256, 256, 256, 253, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>512</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>2-DMRG</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>hubbard_u1su2</dd>
+<dt>model_name</dt><dd>Hubbard / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>256</dd>
+<dt>operation</dt><dd>CBE-DMRG</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1su2_ground_D256.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1SU2 · CBE-DMRG · D=512: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 511, 511, 512, 511, 508, 510, 510, 511, 512, 512, 511, 511, 512, 512, 512, 511, 510, 509, 512, 512, 508, 512, 512, 256, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>1024</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>2-DMRG</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>hubbard_u1su2</dd>
+<dt>model_name</dt><dd>Hubbard / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>CBE-DMRG</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1su2_ground_D512.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1SU2 · CBE-TDVP · D=1024: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 1022, 1024, 1024, 1024, 1023, 1022, 1022, 1023, 1022, 1022, 1020, 1022, 1023, 1024, 1024, 1024, 1024, 1021, 1022, 1024, 1024, 1023, 1024, 1023, 1023, 1023, 1022, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>1152</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_u1su2</dd>
+<dt>model_name</dt><dd>Hubbard / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>1024</dd>
+<dt>operation</dt><dd>CBE-TDVP</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1su2_thermal_D1024.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1SU2 · CBE-TDVP · D=256: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 255, 256, 254, 256, 255, 255, 256, 254, 253, 255, 256, 256, 255, 256, 255, 254, 254, 253, 255, 256, 256, 256, 254, 256, 256, 255, 255, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>288</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>2-TDVP</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_u1su2</dd>
+<dt>model_name</dt><dd>Hubbard / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>256</dd>
+<dt>operation</dt><dd>CBE-TDVP</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1su2_thermal_D256.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1SU2 · CBE-TDVP · D=512: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 510, 512, 511, 512, 511, 512, 509, 510, 512, 512, 512, 512, 509, 512, 510, 512, 511, 512, 511, 512, 509, 512, 509, 510, 512, 511, 512, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>576</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>2-TDVP</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_u1su2</dd>
+<dt>model_name</dt><dd>Hubbard / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>CBE-TDVP</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1su2_thermal_D512.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1U1 · 2-DMRG · D=128: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>hubbard_u1u1</dd>
+<dt>model_name</dt><dd>Hubbard / U1U1</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>128</dd>
+<dt>operation</dt><dd>2-DMRG</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1u1_ground_D128.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1U1</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1U1 · 2-DMRG · D=256: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 255, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>hubbard_u1u1</dd>
+<dt>model_name</dt><dd>Hubbard / U1U1</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>256</dd>
+<dt>operation</dt><dd>2-DMRG</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1u1_ground_D256.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1U1</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1U1 · 2-DMRG · D=512: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 256, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>hubbard_u1u1</dd>
+<dt>model_name</dt><dd>Hubbard / U1U1</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>2-DMRG</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1u1_ground_D512.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1U1</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1U1 · 2-TDVP · D=128: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 16, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_u1u1</dd>
+<dt>model_name</dt><dd>Hubbard / U1U1</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>128</dd>
+<dt>operation</dt><dd>2-TDVP</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1u1_thermal_D128.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1U1</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1U1 · 2-TDVP · D=256: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_u1u1</dd>
+<dt>model_name</dt><dd>Hubbard / U1U1</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>256</dd>
+<dt>operation</dt><dd>2-TDVP</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1u1_thermal_D256.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1U1</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1U1 · 2-TDVP · D=512: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_u1u1</dd>
+<dt>model_name</dt><dd>Hubbard / U1U1</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>2-TDVP</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1u1_thermal_D512.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1U1</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1U1 · CBE-DMRG · D=1024: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 1017, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1017, 256, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>2048</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>hubbard_u1u1</dd>
+<dt>model_name</dt><dd>Hubbard / U1U1</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>1024</dd>
+<dt>operation</dt><dd>CBE-DMRG</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1u1_ground_D1024.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1U1</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1U1 · CBE-DMRG · D=256: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 255, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>512</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>2-DMRG</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>hubbard_u1u1</dd>
+<dt>model_name</dt><dd>Hubbard / U1U1</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>256</dd>
+<dt>operation</dt><dd>CBE-DMRG</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1u1_ground_D256.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1U1</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1U1 · CBE-DMRG · D=512: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 256, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>1024</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>2-DMRG</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>hubbard_u1u1</dd>
+<dt>model_name</dt><dd>Hubbard / U1U1</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>CBE-DMRG</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1u1_ground_D512.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1U1</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1U1 · CBE-TDVP · D=1024: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>1152</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_u1u1</dd>
+<dt>model_name</dt><dd>Hubbard / U1U1</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>1024</dd>
+<dt>operation</dt><dd>CBE-TDVP</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1u1_thermal_D1024.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1U1</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1U1 · CBE-TDVP · D=256: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>288</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>2-TDVP</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_u1u1</dd>
+<dt>model_name</dt><dd>Hubbard / U1U1</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>256</dd>
+<dt>operation</dt><dd>CBE-TDVP</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1u1_thermal_D256.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1U1</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / U1U1 · CBE-TDVP · D=512: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 512, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>576</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>2-TDVP</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_u1u1</dd>
+<dt>model_name</dt><dd>Hubbard / U1U1</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>CBE-TDVP</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_u1u1_thermal_D512.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1U1</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / Z2SU2 · 2-DMRG · D=128: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 128, 128, 128, 128, 127, 128, 128, 128, 127, 128, 128, 128, 127, 128, 128, 128, 127, 128, 128, 128, 127, 128, 128, 128, 128, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>hubbard_z2su2</dd>
+<dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>128</dd>
+<dt>operation</dt><dd>2-DMRG</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_z2su2_ground_D128.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>Z2SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / Z2SU2 · 2-DMRG · D=256: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 253, 255, 254, 256, 256, 256, 256, 255, 253, 256, 256, 256, 253, 256, 256, 255, 256, 256, 256, 256, 254, 256, 253, 256, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>hubbard_z2su2</dd>
+<dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>256</dd>
+<dt>operation</dt><dd>2-DMRG</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_z2su2_ground_D256.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>Z2SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / Z2SU2 · 2-DMRG · D=512: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 510, 509, 509, 512, 510, 510, 511, 510, 510, 510, 512, 510, 511, 510, 510, 510, 512, 508, 511, 510, 511, 508, 511, 256, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>hubbard_z2su2</dd>
+<dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>2-DMRG</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_z2su2_ground_D512.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>Z2SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / Z2SU2 · 2-TDVP · D=128: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 127, 128, 127, 128, 128, 126, 126, 126, 127, 126, 128, 126, 127, 126, 126, 126, 127, 126, 126, 126, 125, 128, 126, 126, 127, 128, 128, 128, 127, 16, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_z2su2</dd>
+<dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>128</dd>
+<dt>operation</dt><dd>2-TDVP</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_z2su2_thermal_D128.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>Z2SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / Z2SU2 · 2-TDVP · D=256: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 255, 255, 254, 256, 255, 255, 256, 256, 256, 255, 255, 256, 255, 255, 254, 256, 256, 256, 256, 254, 255, 253, 253, 254, 254, 255, 256, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_z2su2</dd>
+<dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>256</dd>
+<dt>operation</dt><dd>2-TDVP</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_z2su2_thermal_D256.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>Z2SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / Z2SU2 · 2-TDVP · D=512: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 510, 510, 512, 510, 509, 512, 511, 512, 510, 512, 510, 510, 511, 512, 511, 512, 510, 512, 510, 512, 511, 512, 509, 510, 510, 511, 512, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_z2su2</dd>
+<dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>2-TDVP</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_z2su2_thermal_D512.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>Z2SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / Z2SU2 · CBE-DMRG · D=1024: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 1024, 1023, 1024, 1023, 1023, 1022, 1024, 1023, 1022, 1022, 1022, 1022, 1020, 1022, 1023, 1023, 1022, 1022, 1020, 1023, 1024, 1023, 1024, 256, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>2048</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>hubbard_z2su2</dd>
+<dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>1024</dd>
+<dt>operation</dt><dd>CBE-DMRG</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_z2su2_ground_D1024.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>Z2SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / Z2SU2 · CBE-DMRG · D=256: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 253, 255, 254, 256, 256, 256, 256, 255, 253, 256, 256, 256, 253, 256, 256, 255, 256, 256, 256, 256, 254, 256, 253, 256, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>512</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>2-DMRG</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>hubbard_z2su2</dd>
+<dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>256</dd>
+<dt>operation</dt><dd>CBE-DMRG</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_z2su2_ground_D256.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>Z2SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / Z2SU2 · CBE-DMRG · D=512: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 4, 16, 64, 256, 510, 509, 509, 512, 510, 510, 511, 510, 510, 510, 512, 510, 511, 510, 510, 510, 512, 508, 511, 510, 511, 508, 511, 256, 64, 16, 4, 1</dd>
+<dt>cbe_target</dt><dd>1024</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>2-DMRG</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>hubbard_z2su2</dd>
+<dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>CBE-DMRG</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_z2su2_ground_D512.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>Z2SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / Z2SU2 · CBE-TDVP · D=1024: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 1022, 1024, 1024, 1024, 1021, 1022, 1023, 1023, 1023, 1024, 1023, 1023, 1024, 1023, 1022, 1024, 1024, 1021, 1023, 1022, 1024, 1023, 1021, 1023, 1024, 1024, 1022, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>1152</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_z2su2</dd>
+<dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>1024</dd>
+<dt>operation</dt><dd>CBE-TDVP</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_z2su2_thermal_D1024.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>Z2SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / Z2SU2 · CBE-TDVP · D=256: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 255, 255, 254, 256, 255, 255, 256, 256, 256, 255, 255, 256, 255, 255, 254, 256, 256, 256, 256, 254, 255, 253, 253, 254, 254, 255, 256, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>288</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>2-TDVP</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_z2su2</dd>
+<dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>256</dd>
+<dt>operation</dt><dd>CBE-TDVP</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_z2su2_thermal_D256.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>Z2SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>Hubbard / Z2SU2 · CBE-TDVP · D=512: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 16, 256, 510, 510, 512, 510, 509, 512, 511, 512, 510, 512, 510, 510, 511, 512, 511, 512, 510, 512, 510, 512, 511, 512, 509, 510, 510, 511, 512, 256, 16, 1</dd>
+<dt>cbe_target</dt><dd>576</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>2-TDVP</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>hubbard_z2su2</dd>
+<dt>model_name</dt><dd>Hubbard / Z2SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>CBE-TDVP</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/hubbard_z2su2_thermal_D512.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>Z2SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>t-t′-J-J′ / U1SU2 · 2-DMRG · D=128: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 3, 9, 26, 72, 128, 128, 128, 128, 128, 128, 126, 127, 126, 128, 124, 127, 127, 126, 126, 126, 128, 128, 128, 125, 126, 128, 127, 74, 27, 9, 3, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>tj_u1su2</dd>
+<dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>128</dd>
+<dt>operation</dt><dd>2-DMRG</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/tj_u1su2_ground_D128.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>t-t′-J-J′ / U1SU2 · 2-DMRG · D=256: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 3, 9, 26, 72, 192, 253, 256, 255, 255, 255, 256, 255, 254, 255, 255, 255, 255, 256, 253, 256, 254, 253, 254, 256, 254, 254, 192, 72, 26, 9, 3, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>tj_u1su2</dd>
+<dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>256</dd>
+<dt>operation</dt><dd>2-DMRG</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/tj_u1su2_ground_D256.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>t-t′-J-J′ / U1SU2 · 2-DMRG · D=512: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 3, 9, 27, 80, 232, 509, 510, 512, 511, 511, 511, 511, 511, 512, 512, 510, 512, 512, 509, 512, 512, 509, 510, 510, 509, 511, 218, 80, 27, 9, 3, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>tj_u1su2</dd>
+<dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>2-DMRG</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/tj_u1su2_ground_D512.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>t-t′-J-J′ / U1SU2 · 2-TDVP · D=128: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 9, 81, 127, 128, 126, 128, 126, 128, 128, 128, 126, 128, 127, 128, 128, 128, 128, 128, 126, 126, 128, 128, 127, 125, 128, 125, 128, 128, 128, 81, 9, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>tj_u1su2</dd>
+<dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>128</dd>
+<dt>operation</dt><dd>2-TDVP</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/tj_u1su2_thermal_D128.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>t-t′-J-J′ / U1SU2 · 2-TDVP · D=256: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 9, 81, 254, 256, 256, 256, 256, 253, 256, 256, 256, 253, 256, 256, 256, 255, 256, 256, 255, 254, 256, 256, 256, 255, 256, 256, 256, 256, 254, 81, 9, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>tj_u1su2</dd>
+<dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>256</dd>
+<dt>operation</dt><dd>2-TDVP</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/tj_u1su2_thermal_D256.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>t-t′-J-J′ / U1SU2 · 2-TDVP · D=512: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 9, 81, 510, 508, 511, 511, 509, 510, 512, 511, 509, 510, 511, 511, 510, 510, 510, 510, 510, 512, 510, 511, 510, 511, 510, 511, 510, 510, 510, 81, 9, 1</dd>
+<dt>cbe_target</dt><dd>Not recorded</dd>
+<dt>cbe_tolerance</dt><dd>Not recorded</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>tj_u1su2</dd>
+<dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>2-TDVP</dd>
+<dt>rsvd</dt><dd>No</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/tj_u1su2_thermal_D512.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>t-t′-J-J′ / U1SU2 · CBE-DMRG · D=1024: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 3, 9, 27, 81, 242, 676, 1023, 1024, 1024, 1024, 1022, 1024, 1019, 1024, 1020, 1024, 1024, 1024, 1024, 1024, 1023, 1023, 1024, 1024, 1023, 672, 242, 81, 27, 9, 3, 1</dd>
+<dt>cbe_target</dt><dd>2048</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>tj_u1su2</dd>
+<dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>1024</dd>
+<dt>operation</dt><dd>CBE-DMRG</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/tj_u1su2_ground_D1024.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>t-t′-J-J′ / U1SU2 · CBE-DMRG · D=256: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 3, 9, 26, 72, 192, 253, 256, 255, 255, 255, 256, 255, 254, 255, 255, 255, 255, 256, 253, 256, 254, 253, 254, 256, 254, 254, 192, 72, 26, 9, 3, 1</dd>
+<dt>cbe_target</dt><dd>512</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>2-DMRG</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>tj_u1su2</dd>
+<dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>256</dd>
+<dt>operation</dt><dd>CBE-DMRG</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/tj_u1su2_ground_D256.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>t-t′-J-J′ / U1SU2 · CBE-DMRG · D=512: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-DMRG sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 3, 9, 27, 80, 232, 509, 510, 512, 511, 511, 511, 511, 511, 512, 512, 510, 512, 512, 509, 512, 512, 509, 510, 510, 509, 511, 218, 80, 27, 9, 3, 1</dd>
+<dt>cbe_target</dt><dd>1024</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>2-DMRG</dd>
+<dt>dt</dt><dd>Not recorded</dd>
+<dt>model</dt><dd>tj_u1su2</dd>
+<dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>CBE-DMRG</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/tj_u1su2_ground_D512.json</dd>
+<dt>state</dt><dd>ground</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>t-t′-J-J′ / U1SU2 · CBE-TDVP · D=1024: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 9, 81, 729, 1024, 1022, 1021, 1023, 1022, 1021, 1024, 1022, 1023, 1021, 1022, 1023, 1023, 1021, 1022, 1022, 1023, 1021, 1022, 1023, 1023, 1021, 1021, 1022, 1024, 729, 81, 9, 1</dd>
+<dt>cbe_target</dt><dd>1152</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>Not recorded</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>tj_u1su2</dd>
+<dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>1024</dd>
+<dt>operation</dt><dd>CBE-TDVP</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/tj_u1su2_thermal_D1024.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>t-t′-J-J′ / U1SU2 · CBE-TDVP · D=256: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 9, 81, 254, 256, 256, 256, 256, 253, 256, 256, 256, 253, 256, 256, 256, 255, 256, 256, 255, 254, 256, 256, 256, 255, 256, 256, 256, 256, 254, 81, 9, 1</dd>
+<dt>cbe_target</dt><dd>288</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>2-TDVP</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>tj_u1su2</dd>
+<dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>256</dd>
+<dt>operation</dt><dd>CBE-TDVP</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/tj_u1su2_thermal_D256.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>1</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>One sample at the smallest input for this operation</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+<details><summary>t-t′-J-J′ / U1SU2 · CBE-TDVP · D=512: Input and sampling settings</summary><p>One complete left-to-right and right-to-left CBE-TDVP sweep.</p>
+<dl>
+<dt>GCstep</dt><dd>No</dd>
+<dt>GCsweep</dt><dd>No</dd>
+<dt>K</dt><dd>4</dd>
+<dt>bond_dimensions</dt><dd>1, 9, 81, 510, 508, 511, 511, 509, 510, 512, 511, 509, 510, 511, 511, 510, 510, 510, 510, 510, 512, 510, 511, 510, 511, 510, 511, 510, 510, 510, 81, 9, 1</dd>
+<dt>cbe_target</dt><dd>576</dd>
+<dt>cbe_tolerance</dt><dd>1.0e-8</dd>
+<dt>continuation_after</dt><dd>2-TDVP</dd>
+<dt>dt</dt><dd>-0.1</dd>
+<dt>model</dt><dd>tj_u1su2</dd>
+<dt>model_name</dt><dd>t-t′-J-J′ / U1SU2</dd>
+<dt>model_parameters</dt><dd>Structured parameter; see the raw data</dd>
+<dt>nominal_D</dt><dd>512</dd>
+<dt>operation</dt><dd>CBE-TDVP</dd>
+<dt>rsvd</dt><dd>Yes</dd>
+<dt>sampling_state</dt><dd>continue across warmup and measurement</dd>
+<dt>scalar_type</dt><dd>Float64</dd>
+<dt>sector_preset</dt><dd>presets/tj_u1su2_thermal_D512.json</dd>
+<dt>state</dt><dd>thermal</dd>
+<dt>symmetry</dt><dd>U1SU2</dd>
+<dt>truncation</dt><dd>truncrank(D)</dd>
+</dl>
+<h3>Sampling with 1 thread</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>1</dd>
+</dl>
+<h3>Sampling with 2 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>2</dd>
+</dl>
+<h3>Sampling with 4 threads</h3>
+<dl>
+<dt>Collected samples</dt><dd>1</dd>
+<dt>Evaluations per sample</dt><dd>1</dd>
+<dt>Warmup samples</dt><dd>0</dd>
+<dt>Random seed</dt><dd>20260929</dd>
+<dt>Sample limit</dt><dd>1</dd>
+<dt>Time budget per case</dt><dd>600 seconds</dd>
+<dt>Compilation warmup</dt><dd>Reused from the smallest input for this operation in the same Julia process</dd>
+<dt>Operation mutates its input</dt><dd>Yes</dd>
+<dt>Garbage collection before each trial</dt><dd>No</dd>
+<dt>Garbage collection after each completed case</dt><dd>Yes</dd>
+<dt>Garbage collection before each sample</dt><dd>No</dd>
+<dt>Timing overhead correction</dt><dd>0 nanoseconds</dd>
+<dt>blas_threads</dt><dd>1</dd>
+<dt>gc_threads</dt><dd>1</dd>
+<dt>julia_threads</dt><dd>4</dd>
+</dl>
+</details>
+</main><script>
+(() => {
+  const selector = document.getElementById('metric');
+  function show() {
+    document.querySelectorAll('td[data-time]').forEach(cell => {
+      const time = Number(cell.dataset.time), reference = Number(cell.dataset.reference);
+      if (selector.value === 'speedup') cell.textContent = time > 0 ? (reference / time).toPrecision(4) + ' ×' : 'Unavailable (measured time is zero)';
+      else if (selector.value === 'bytes') cell.textContent = cell.dataset.bytes + ' bytes';
+      else if (selector.value === 'allocations') cell.textContent = cell.dataset.allocations + ' allocations';
+      else {
+        const divisor = time >= 1e9 ? 1e9 : time >= 1e6 ? 1e6 : time >= 1e3 ? 1e3 : 1;
+        const unit = divisor === 1e9 ? 'seconds' : divisor === 1e6 ? 'milliseconds' : divisor === 1e3 ? 'microseconds' : 'nanoseconds';
+        cell.textContent = Number((time / divisor).toPrecision(5)).toString() + ' ' + unit;
+      }
+    });
+  }
+  selector.addEventListener('change', show);
+})();
+</script>
+</body></html>
