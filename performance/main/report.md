@@ -1,14 +1,14 @@
 # Performance report
 
-Source commit: `a5d972830d50d43a5ddfa58242ee44556cad2b9e`
+Source commit: `74ab3410e8fe4584e9d12c8ebd4b870397b410b1`
 
 Julia uses 1, 2, or 4 compute threads; the linear algebra backend and garbage collector each use 1 thread.
 
 | Thread configuration | Measurements | Measurement timestamp (UTC) | Detailed report |
 | --- | ---: | --- | --- |
-| 1 thread | 48 | 2026-10-02T11:49:08.738Z | [Input and sampling details](configurations/julia-1-blas-1/report.md) |
-| 2 threads | 48 | 2026-10-02T13:38:24.954Z | [Input and sampling details](configurations/julia-2-blas-1/report.md) |
-| 4 threads | 48 | 2026-10-02T14:56:17.274Z | [Input and sampling details](configurations/julia-4-blas-1/report.md) |
+| 1 thread | 48 | 2026-10-02T12:10:07.646Z | [Input and sampling details](configurations/julia-1-blas-1/report.md) |
+| 2 threads | 48 | 2026-10-02T14:10:38.060Z | [Input and sampling details](configurations/julia-2-blas-1/report.md) |
+| 4 threads | 48 | 2026-10-02T15:33:40.106Z | [Input and sampling details](configurations/julia-4-blas-1/report.md) |
 
 Each sample is a complete double sweep. Samples continue the same state, and each CBE algorithm continues its two-site partner's state and environment.
 
@@ -17,126 +17,126 @@ Each sample is a complete double sweep. Samples continue the same state, and eac
 
 | D | 1 thread | 2 threads | 4 threads |
 | --- | ---: | ---: | ---: |
-| 128 | 11.249 seconds | 7.1698 seconds | 6.3711 seconds |
-| 256 | 19.833 seconds | 12.138 seconds | 10.339 seconds |
-| 512 | 58.259 seconds | 35.566 seconds | 29.731 seconds |
+| 128 | 13.279 seconds | 8.6251 seconds | 7.7512 seconds |
+| 256 | 22.263 seconds | 13.786 seconds | 12.166 seconds |
+| 512 | 67.613 seconds | 40.847 seconds | 33.737 seconds |
 
 ## Hubbard / U1U1 · CBE-DMRG
 
 | D | 1 thread | 2 threads | 4 threads |
 | --- | ---: | ---: | ---: |
-| 256 | 9.4283 seconds | 6.2368 seconds | 5.457 seconds |
-| 512 | 28.163 seconds | 17.165 seconds | 15.467 seconds |
-| 1024 | 152.5 seconds | 92.28 seconds | 81.123 seconds |
+| 256 | 10.262 seconds | 6.9876 seconds | 6.1329 seconds |
+| 512 | 30.733 seconds | 18.936 seconds | 17.414 seconds |
+| 1024 | 162.39 seconds | 98.541 seconds | 86.229 seconds |
 
 ## Hubbard / U1U1 · 2-TDVP
 
 | D | 1 thread | 2 threads | 4 threads |
 | --- | ---: | ---: | ---: |
-| 128 | 143.54 seconds | 95.538 seconds | 85.844 seconds |
-| 256 | 296.75 seconds | 190.73 seconds | 168.29 seconds |
-| 512 | 787.74 seconds | 475.84 seconds | 415.75 seconds |
+| 128 | 167.17 seconds | 102.3 seconds | 94.418 seconds |
+| 256 | 340.4 seconds | 207.51 seconds | 184.95 seconds |
+| 512 | 885.96 seconds | 524.24 seconds | 477.12 seconds |
 
 ## Hubbard / U1U1 · CBE-TDVP
 
 | D | 1 thread | 2 threads | 4 threads |
 | --- | ---: | ---: | ---: |
-| 256 | 24.669 seconds | 15.134 seconds | 13.146 seconds |
-| 512 | 73.528 seconds | 43.337 seconds | 37.878 seconds |
-| 1024 | 309.31 seconds | 182.75 seconds | 157.78 seconds |
+| 256 | 28.855 seconds | 17.499 seconds | 15.509 seconds |
+| 512 | 86.88 seconds | 51.578 seconds | 43.055 seconds |
+| 1024 | 330.73 seconds | 195.41 seconds | 173.44 seconds |
 
 ## Hubbard / U1SU2 · 2-DMRG
 
 | D | 1 thread | 2 threads | 4 threads |
 | --- | ---: | ---: | ---: |
-| 128 | 13.109 seconds | 9.0388 seconds | 9.7441 seconds |
-| 256 | 15.637 seconds | 11.209 seconds | 11.46 seconds |
-| 512 | 22.46 seconds | 15.356 seconds | 15.564 seconds |
+| 128 | 14.532 seconds | 10.144 seconds | 10.91 seconds |
+| 256 | 17.205 seconds | 11.883 seconds | 12.788 seconds |
+| 512 | 25.77 seconds | 16.912 seconds | 17.489 seconds |
 
 ## Hubbard / U1SU2 · CBE-DMRG
 
 | D | 1 thread | 2 threads | 4 threads |
 | --- | ---: | ---: | ---: |
-| 256 | 6.8582 seconds | 5.309 seconds | 5.6806 seconds |
-| 512 | 10.654 seconds | 7.8311 seconds | 8.1512 seconds |
-| 1024 | 29.298 seconds | 18.874 seconds | 17.288 seconds |
+| 256 | 8.1336 seconds | 6.3607 seconds | 6.7814 seconds |
+| 512 | 12.21 seconds | 8.682 seconds | 9.2893 seconds |
+| 1024 | 33.516 seconds | 21.051 seconds | 19.633 seconds |
 
 ## Hubbard / U1SU2 · 2-TDVP
 
 | D | 1 thread | 2 threads | 4 threads |
 | --- | ---: | ---: | ---: |
-| 128 | 137.98 seconds | 95.917 seconds | 99.851 seconds |
-| 256 | 352.82 seconds | 265.45 seconds | 296.74 seconds |
-| 512 | 492.31 seconds | 361.93 seconds | 393.94 seconds |
+| 128 | 154.89 seconds | 105.12 seconds | 108.71 seconds |
+| 256 | 383.33 seconds | 280.52 seconds | 309.91 seconds |
+| 512 | 543.36 seconds | 387.93 seconds | 412 seconds |
 
 ## Hubbard / U1SU2 · CBE-TDVP
 
 | D | 1 thread | 2 threads | 4 threads |
 | --- | ---: | ---: | ---: |
-| 256 | 28.898 seconds | 22.851 seconds | 24.512 seconds |
-| 512 | 40.764 seconds | 29.009 seconds | 30.237 seconds |
-| 1024 | 92.723 seconds | 61.291 seconds | 60.226 seconds |
+| 256 | 32.59 seconds | 24.429 seconds | 25.072 seconds |
+| 512 | 45.801 seconds | 32.159 seconds | 32.604 seconds |
+| 1024 | 105.56 seconds | 67.785 seconds | 65.325 seconds |
 
 ## Hubbard / Z2SU2 · 2-DMRG
 
 | D | 1 thread | 2 threads | 4 threads |
 | --- | ---: | ---: | ---: |
-| 128 | 3.6339 seconds | 2.4091 seconds | 2.2451 seconds |
-| 256 | 7.2176 seconds | 4.461 seconds | 3.9775 seconds |
-| 512 | 23.29 seconds | 13.388 seconds | 11.641 seconds |
+| 128 | 4.4379 seconds | 2.8048 seconds | 2.5689 seconds |
+| 256 | 8.2565 seconds | 4.8125 seconds | 4.4283 seconds |
+| 512 | 27.074 seconds | 15.443 seconds | 13.638 seconds |
 
 ## Hubbard / Z2SU2 · CBE-DMRG
 
 | D | 1 thread | 2 threads | 4 threads |
 | --- | ---: | ---: | ---: |
-| 256 | 4.0399 seconds | 2.6613 seconds | 2.5538 seconds |
-| 512 | 14.19 seconds | 8.5501 seconds | 7.8521 seconds |
-| 1024 | 81.76 seconds | 46.676 seconds | 42.471 seconds |
+| 256 | 4.5315 seconds | 3.1339 seconds | 2.9263 seconds |
+| 512 | 15.342 seconds | 9.5031 seconds | 8.5044 seconds |
+| 1024 | 80.384 seconds | 47.769 seconds | 44.175 seconds |
 
 ## Hubbard / Z2SU2 · 2-TDVP
 
 | D | 1 thread | 2 threads | 4 threads |
 | --- | ---: | ---: | ---: |
-| 128 | 35.902 seconds | 23.647 seconds | 20.63 seconds |
-| 256 | 123.66 seconds | 80.615 seconds | 73.121 seconds |
-| 512 | 449.25 seconds | 279.57 seconds | 247.7 seconds |
+| 128 | 41.864 seconds | 26.684 seconds | 23.441 seconds |
+| 256 | 142.36 seconds | 88.573 seconds | 83.107 seconds |
+| 512 | 523.8 seconds | 314.78 seconds | 290.37 seconds |
 
 ## Hubbard / Z2SU2 · CBE-TDVP
 
 | D | 1 thread | 2 threads | 4 threads |
 | --- | ---: | ---: | ---: |
-| 256 | 12.668 seconds | 8.2917 seconds | 7.5026 seconds |
-| 512 | 49.051 seconds | 28.637 seconds | 25.601 seconds |
-| 1024 | 237.86 seconds | 142.56 seconds | 126.01 seconds |
+| 256 | 14.384 seconds | 9.2489 seconds | 8.7467 seconds |
+| 512 | 53.539 seconds | 31.782 seconds | 27.794 seconds |
+| 1024 | 251.53 seconds | 145.19 seconds | 132.09 seconds |
 
 ## t-t′-J-J′ / U1SU2 · 2-DMRG
 
 | D | 1 thread | 2 threads | 4 threads |
 | --- | ---: | ---: | ---: |
-| 128 | 8.0179 seconds | 6.3085 seconds | 6.4921 seconds |
-| 256 | 10.757 seconds | 7.7699 seconds | 7.4082 seconds |
-| 512 | 14.724 seconds | 10.227 seconds | 9.9251 seconds |
+| 128 | 9.3985 seconds | 7.3069 seconds | 7.5386 seconds |
+| 256 | 12.322 seconds | 8.4075 seconds | 8.5379 seconds |
+| 512 | 17.596 seconds | 11.177 seconds | 11.082 seconds |
 
 ## t-t′-J-J′ / U1SU2 · CBE-DMRG
 
 | D | 1 thread | 2 threads | 4 threads |
 | --- | ---: | ---: | ---: |
-| 256 | 5.9684 seconds | 5.1845 seconds | 4.9472 seconds |
-| 512 | 9.7292 seconds | 6.7852 seconds | 6.4051 seconds |
-| 1024 | 24.249 seconds | 14.925 seconds | 13.456 seconds |
+| 256 | 7.33 seconds | 5.8264 seconds | 5.9597 seconds |
+| 512 | 11.355 seconds | 7.7334 seconds | 7.3576 seconds |
+| 1024 | 28.068 seconds | 16.832 seconds | 15.081 seconds |
 
 ## t-t′-J-J′ / U1SU2 · 2-TDVP
 
 | D | 1 thread | 2 threads | 4 threads |
 | --- | ---: | ---: | ---: |
-| 128 | 98.307 seconds | 71.179 seconds | 73.178 seconds |
-| 256 | 123.34 seconds | 87.194 seconds | 89.836 seconds |
-| 512 | 202.08 seconds | 136.31 seconds | 140.23 seconds |
+| 128 | 112.12 seconds | 77.091 seconds | 82.947 seconds |
+| 256 | 137.54 seconds | 92.059 seconds | 99.562 seconds |
+| 512 | 222.89 seconds | 149.71 seconds | 153.92 seconds |
 
 ## t-t′-J-J′ / U1SU2 · CBE-TDVP
 
 | D | 1 thread | 2 threads | 4 threads |
 | --- | ---: | ---: | ---: |
-| 256 | 20.287 seconds | 14.94 seconds | 14.853 seconds |
-| 512 | 30.855 seconds | 21.631 seconds | 20.58 seconds |
-| 1024 | 72.963 seconds | 46.758 seconds | 45.467 seconds |
+| 256 | 23.227 seconds | 16.444 seconds | 16.854 seconds |
+| 512 | 33.149 seconds | 23.339 seconds | 22.351 seconds |
+| 1024 | 82.52 seconds | 51.019 seconds | 49.634 seconds |

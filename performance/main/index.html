@@ -2,26 +2,26 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Performance report</title><style>body{font:16px/1.55 system-ui,sans-serif;color:#162235;background:#f7f9fc;margin:0}main{max-width:1150px;margin:auto;padding:32px 24px}h1,h2{line-height:1.2}a{color:#1757a4}table{border-collapse:collapse;width:100%;background:white;margin:16px 0;display:block;overflow:auto}th,td{padding:10px 14px;text-align:left;border-bottom:1px solid #dce3eb;vertical-align:top}th{background:#eaf0f8}code,pre{font:13px/1.5 ui-monospace,monospace;overflow-wrap:anywhere}pre{white-space:pre-wrap;background:#edf2f8;padding:16px}dl{display:grid;grid-template-columns:minmax(140px,240px) 1fr;gap:8px 20px;background:white;padding:20px;border:1px solid #dce3eb}dt{font-weight:600}dd{margin:0;overflow-wrap:anywhere}.muted{color:#56657a}.notice{padding:12px 16px;background:#eaf0f8;border-left:4px solid #3576b6}nav{display:flex;gap:20px;flex-wrap:wrap}select{font:inherit;max-width:100%;padding:6px;margin:8px}svg{width:100%;height:auto;background:white;border:1px solid #dce3eb}details{margin:16px 0}summary{cursor:pointer} @media(max-width:600px){main{padding:20px 12px}dl{grid-template-columns:1fr;gap:2px}dd{margin-bottom:12px}}
 </style></head><body><main><h1>Performance report</h1><p><strong>Development or local build</strong></p>
 <p>This report contains 16 comparison tables and 144 measurements.</p>
-<p>First measurement timestamp (UTC): 2026-10-02T11:49:08.738Z. Julia uses 1, 2, or 4 compute threads; the linear algebra backend and garbage collector each use 1 thread.</p>
+<p>First measurement timestamp (UTC): 2026-10-02T12:10:07.646Z. Julia uses 1, 2, or 4 compute threads; the linear algebra backend and garbage collector each use 1 thread.</p>
 <nav><a href="collection.json">Download the raw data index</a>
 <a href="configurations/julia-1-blas-1/index.html">Detailed report: 1 thread</a>
 <a href="configurations/julia-2-blas-1/index.html">Detailed report: 2 threads</a>
 <a href="configurations/julia-4-blas-1/index.html">Detailed report: 4 threads</a>
 </nav><p><label for="metric">Display metric: </label><select id="metric"><option value="time">Median execution time</option><option value="speedup">Speedup relative to one thread</option><option value="bytes">Total allocated bytes</option><option value="allocations">Memory allocation count</option></select></p>
 <p class="muted">Each table is one model and algorithm; rows are full bond dimension caps and columns are thread configurations. Each sample is a complete double sweep. Speedup compares against one thread. Allocated bytes measure cumulative allocation, not peak memory.</p>
-<p>Processor: AMD EPYC 7763 64-Core Processor; visible logical processors: 4.</p>
+<p>Processor: Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz; visible logical processors: 4.</p>
 <details><summary>Source version, hardware, and runtime settings</summary>
 <h3>Runtime with 1 thread</h3>
 <dl>
 <dt>Repository</dt><dd>Qiaoyi-Li/FiniteMPS.jl</dd>
-<dt>Source commit</dt><dd>a5d972830d50d43a5ddfa58242ee44556cad2b9e</dd>
-<dt>Benchmark definition commit</dt><dd>a5d972830d50d43a5ddfa58242ee44556cad2b9e</dd>
+<dt>Source commit</dt><dd>74ab3410e8fe4584e9d12c8ebd4b870397b410b1</dd>
+<dt>Benchmark definition commit</dt><dd>74ab3410e8fe4584e9d12c8ebd4b870397b410b1</dd>
 <dt>Uncommitted changes</dt><dd>No</dd>
 <dt>Version tag</dt><dd>Not recorded</dd>
 <dt>Release type</dt><dd>Development or local build</dd>
-<dt>Algorithm library version</dt><dd>1.8.3</dd>
-<dt>Measured at (UTC)</dt><dd>2026-10-02T11:49:08.738Z</dd>
-<dt>Processor model</dt><dd>AMD EPYC 7763 64-Core Processor</dd>
+<dt>Algorithm library version</dt><dd>2.0.0</dd>
+<dt>Measured at (UTC)</dt><dd>2026-10-02T12:10:07.646Z</dd>
+<dt>Processor model</dt><dd>Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz</dd>
 <dt>Processor architecture</dt><dd>64-bit x86</dd>
 <dt>Visible logical processors</dt><dd>4</dd>
 <dt>Processors available to this process</dt><dd>4</dd>
@@ -38,11 +38,11 @@
 <dt>Runner image version</dt><dd>20260927.320.1</dd>
 <dt>Operating system</dt><dd>Linux</dd>
 <dt>System kernel</dt><dd>6.17.0-1022-azure</dd>
-<dt>Visible system memory (bytes)</dt><dd>16766414848</dd>
+<dt>Visible system memory (bytes)</dt><dd>16765378560</dd>
 <dt>Run trigger</dt><dd>Commit push</dd>
 <dt>Automation workflow</dt><dd>Performance</dd>
-<dt>Run identifier</dt><dd>37001879445</dd>
-<dt>Workflow run number</dt><dd>3</dd>
+<dt>Run identifier</dt><dd>37003845127</dd>
+<dt>Workflow run number</dt><dd>4</dd>
 <dt>Run attempt</dt><dd>1</dd>
 <dt>Benchmark definition file</dt><dd>benchmark/benchmarks.jl</dd>
 <dt>Benchmark definition source</dt><dd>Current source checkout</dd>
@@ -50,14 +50,14 @@
 <h3>Runtime with 2 threads</h3>
 <dl>
 <dt>Repository</dt><dd>Qiaoyi-Li/FiniteMPS.jl</dd>
-<dt>Source commit</dt><dd>a5d972830d50d43a5ddfa58242ee44556cad2b9e</dd>
-<dt>Benchmark definition commit</dt><dd>a5d972830d50d43a5ddfa58242ee44556cad2b9e</dd>
+<dt>Source commit</dt><dd>74ab3410e8fe4584e9d12c8ebd4b870397b410b1</dd>
+<dt>Benchmark definition commit</dt><dd>74ab3410e8fe4584e9d12c8ebd4b870397b410b1</dd>
 <dt>Uncommitted changes</dt><dd>No</dd>
 <dt>Version tag</dt><dd>Not recorded</dd>
 <dt>Release type</dt><dd>Development or local build</dd>
-<dt>Algorithm library version</dt><dd>1.8.3</dd>
-<dt>Measured at (UTC)</dt><dd>2026-10-02T13:38:24.954Z</dd>
-<dt>Processor model</dt><dd>AMD EPYC 7763 64-Core Processor</dd>
+<dt>Algorithm library version</dt><dd>2.0.0</dd>
+<dt>Measured at (UTC)</dt><dd>2026-10-02T14:10:38.060Z</dd>
+<dt>Processor model</dt><dd>Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz</dd>
 <dt>Processor architecture</dt><dd>64-bit x86</dd>
 <dt>Visible logical processors</dt><dd>4</dd>
 <dt>Processors available to this process</dt><dd>4</dd>
@@ -74,11 +74,11 @@
 <dt>Runner image version</dt><dd>20260927.320.1</dd>
 <dt>Operating system</dt><dd>Linux</dd>
 <dt>System kernel</dt><dd>6.17.0-1022-azure</dd>
-<dt>Visible system memory (bytes)</dt><dd>16766414848</dd>
+<dt>Visible system memory (bytes)</dt><dd>16765378560</dd>
 <dt>Run trigger</dt><dd>Commit push</dd>
 <dt>Automation workflow</dt><dd>Performance</dd>
-<dt>Run identifier</dt><dd>37001879445</dd>
-<dt>Workflow run number</dt><dd>3</dd>
+<dt>Run identifier</dt><dd>37003845127</dd>
+<dt>Workflow run number</dt><dd>4</dd>
 <dt>Run attempt</dt><dd>1</dd>
 <dt>Benchmark definition file</dt><dd>benchmark/benchmarks.jl</dd>
 <dt>Benchmark definition source</dt><dd>Current source checkout</dd>
@@ -86,14 +86,14 @@
 <h3>Runtime with 4 threads</h3>
 <dl>
 <dt>Repository</dt><dd>Qiaoyi-Li/FiniteMPS.jl</dd>
-<dt>Source commit</dt><dd>a5d972830d50d43a5ddfa58242ee44556cad2b9e</dd>
-<dt>Benchmark definition commit</dt><dd>a5d972830d50d43a5ddfa58242ee44556cad2b9e</dd>
+<dt>Source commit</dt><dd>74ab3410e8fe4584e9d12c8ebd4b870397b410b1</dd>
+<dt>Benchmark definition commit</dt><dd>74ab3410e8fe4584e9d12c8ebd4b870397b410b1</dd>
 <dt>Uncommitted changes</dt><dd>No</dd>
 <dt>Version tag</dt><dd>Not recorded</dd>
 <dt>Release type</dt><dd>Development or local build</dd>
-<dt>Algorithm library version</dt><dd>1.8.3</dd>
-<dt>Measured at (UTC)</dt><dd>2026-10-02T14:56:17.274Z</dd>
-<dt>Processor model</dt><dd>AMD EPYC 7763 64-Core Processor</dd>
+<dt>Algorithm library version</dt><dd>2.0.0</dd>
+<dt>Measured at (UTC)</dt><dd>2026-10-02T15:33:40.106Z</dd>
+<dt>Processor model</dt><dd>Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz</dd>
 <dt>Processor architecture</dt><dd>64-bit x86</dd>
 <dt>Visible logical processors</dt><dd>4</dd>
 <dt>Processors available to this process</dt><dd>4</dd>
@@ -110,11 +110,11 @@
 <dt>Runner image version</dt><dd>20260927.320.1</dd>
 <dt>Operating system</dt><dd>Linux</dd>
 <dt>System kernel</dt><dd>6.17.0-1022-azure</dd>
-<dt>Visible system memory (bytes)</dt><dd>16766414848</dd>
+<dt>Visible system memory (bytes)</dt><dd>16765378560</dd>
 <dt>Run trigger</dt><dd>Commit push</dd>
 <dt>Automation workflow</dt><dd>Performance</dd>
-<dt>Run identifier</dt><dd>37001879445</dd>
-<dt>Workflow run number</dt><dd>3</dd>
+<dt>Run identifier</dt><dd>37003845127</dd>
+<dt>Workflow run number</dt><dd>4</dd>
 <dt>Run attempt</dt><dd>1</dd>
 <dt>Benchmark definition file</dt><dd>benchmark/benchmarks.jl</dd>
 <dt>Benchmark definition source</dt><dd>Current source checkout</dd>
@@ -122,7 +122,7 @@
 <h3>Software versions</h3>
 <dl>
 <dt>Timing tools (BenchmarkTools)</dt><dd>1.6.0</dd>
-<dt>Matrix product state library (FiniteMPS)</dt><dd>1.8.3</dd>
+<dt>Matrix product state library (FiniteMPS)</dt><dd>2.0.0</dd>
 <dt>Matrix factorization library (MatrixAlgebraKit)</dt><dd>0.6.9</dd>
 <dt>Tensor computation library (TensorKit)</dt><dd>0.17.2</dd>
 <dt>Tensor contraction library (TensorOperations)</dt><dd>5.8.1</dd>
@@ -131,289 +131,289 @@
 <h2>Hubbard / U1U1 · 2-DMRG</h2>
 <table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
 <tr><td>128</td>
-<td data-time="11249183171" data-reference="11249183171" data-bytes="8423439176" data-allocations="90152091">11.249 seconds</td>
-<td data-time="7169849471" data-reference="11249183171" data-bytes="8487906248" data-allocations="90730049">7.1698 seconds</td>
-<td data-time="6371145445" data-reference="11249183171" data-bytes="8558795008" data-allocations="90790092">6.3711 seconds</td>
+<td data-time="13278643569" data-reference="13278643569" data-bytes="8425966016" data-allocations="90199675">13.279 seconds</td>
+<td data-time="8625081579" data-reference="13278643569" data-bytes="8494362768" data-allocations="90780941">8.6251 seconds</td>
+<td data-time="7751211062" data-reference="13278643569" data-bytes="8559333600" data-allocations="90839241">7.7512 seconds</td>
 </tr>
 <tr><td>256</td>
-<td data-time="19833447244" data-reference="19833447244" data-bytes="13120705200" data-allocations="88438444">19.833 seconds</td>
-<td data-time="12138415119" data-reference="19833447244" data-bytes="13187713760" data-allocations="89020038">12.138 seconds</td>
-<td data-time="10338533470" data-reference="19833447244" data-bytes="13254938432" data-allocations="89087134">10.339 seconds</td>
+<td data-time="22262740060" data-reference="22262740060" data-bytes="13123327144" data-allocations="88488439">22.263 seconds</td>
+<td data-time="13786403449" data-reference="22262740060" data-bytes="13188186776" data-allocations="89069067">13.786 seconds</td>
+<td data-time="12166243725" data-reference="22262740060" data-bytes="13251936280" data-allocations="89127782">12.166 seconds</td>
 </tr>
 <tr><td>512</td>
-<td data-time="58259370562" data-reference="58259370562" data-bytes="30944554064" data-allocations="98939609">58.259 seconds</td>
-<td data-time="35566225387" data-reference="58259370562" data-bytes="31016383672" data-allocations="99514373">35.566 seconds</td>
-<td data-time="29731228468" data-reference="58259370562" data-bytes="31060100024" data-allocations="99557964">29.731 seconds</td>
+<td data-time="67613392330" data-reference="67613392330" data-bytes="30946893664" data-allocations="98985346">67.613 seconds</td>
+<td data-time="40846874465" data-reference="67613392330" data-bytes="31012675464" data-allocations="99561884">40.847 seconds</td>
+<td data-time="33737050549" data-reference="67613392330" data-bytes="31066941208" data-allocations="99584726">33.737 seconds</td>
 </tr>
 </tbody></table>
 <h2>Hubbard / U1U1 · CBE-DMRG</h2>
 <table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
 <tr><td>256</td>
-<td data-time="9428341246" data-reference="9428341246" data-bytes="6292225424" data-allocations="34210847">9.4283 seconds</td>
-<td data-time="6236819564" data-reference="9428341246" data-bytes="6336127840" data-allocations="34587388">6.2368 seconds</td>
-<td data-time="5457002264" data-reference="9428341246" data-bytes="6386934400" data-allocations="34804480">5.457 seconds</td>
+<td data-time="10262306201" data-reference="10262306201" data-bytes="6294268464" data-allocations="34306332">10.262 seconds</td>
+<td data-time="6987554091" data-reference="10262306201" data-bytes="6335291000" data-allocations="34595762">6.9876 seconds</td>
+<td data-time="6132856269" data-reference="10262306201" data-bytes="6379306800" data-allocations="34684453">6.1329 seconds</td>
 </tr>
 <tr><td>512</td>
-<td data-time="28162675333" data-reference="28162675333" data-bytes="17159526528" data-allocations="37113563">28.163 seconds</td>
-<td data-time="17165441445" data-reference="28162675333" data-bytes="17204419688" data-allocations="37468952">17.165 seconds</td>
-<td data-time="15466507099" data-reference="28162675333" data-bytes="17255196848" data-allocations="37577622">15.467 seconds</td>
+<td data-time="30732645916" data-reference="30732645916" data-bytes="17149595016" data-allocations="37074252">30.733 seconds</td>
+<td data-time="18936263583" data-reference="30732645916" data-bytes="17192140768" data-allocations="37476993">18.936 seconds</td>
+<td data-time="17414208995" data-reference="30732645916" data-bytes="17241520136" data-allocations="37562819">17.414 seconds</td>
 </tr>
 <tr><td>1024</td>
-<td data-time="152501421113" data-reference="152501421113" data-bytes="65350463864" data-allocations="33856162">152.5 seconds</td>
-<td data-time="92279598572" data-reference="152501421113" data-bytes="65390289096" data-allocations="34188408">92.28 seconds</td>
-<td data-time="81123163830" data-reference="152501421113" data-bytes="65415168320" data-allocations="34243244">81.123 seconds</td>
+<td data-time="162392206427" data-reference="162392206427" data-bytes="65352826840" data-allocations="33855643">162.39 seconds</td>
+<td data-time="98540841828" data-reference="162392206427" data-bytes="65389441352" data-allocations="34234074">98.541 seconds</td>
+<td data-time="86229259748" data-reference="162392206427" data-bytes="65415499960" data-allocations="34269516">86.229 seconds</td>
 </tr>
 </tbody></table>
 <h2>Hubbard / U1U1 · 2-TDVP</h2>
 <table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
 <tr><td>128</td>
-<td data-time="143541007273" data-reference="143541007273" data-bytes="121847330096" data-allocations="994859653">143.54 seconds</td>
-<td data-time="95538359480" data-reference="143541007273" data-bytes="122179709232" data-allocations="995684382">95.538 seconds</td>
-<td data-time="85843805974" data-reference="143541007273" data-bytes="123089273560" data-allocations="995807366">85.844 seconds</td>
+<td data-time="167168213026" data-reference="167168213026" data-bytes="121845497640" data-allocations="994824494">167.17 seconds</td>
+<td data-time="102302971243" data-reference="167168213026" data-bytes="122162077248" data-allocations="995675175">102.3 seconds</td>
+<td data-time="94418445577" data-reference="167168213026" data-bytes="122952447248" data-allocations="995782945">94.418 seconds</td>
 </tr>
 <tr><td>256</td>
-<td data-time="296754260792" data-reference="296754260792" data-bytes="228517819568" data-allocations="1406379622">296.75 seconds</td>
-<td data-time="190733293775" data-reference="296754260792" data-bytes="229034189856" data-allocations="1407258762">190.73 seconds</td>
-<td data-time="168286791735" data-reference="296754260792" data-bytes="229993402440" data-allocations="1407343006">168.29 seconds</td>
+<td data-time="340402357503" data-reference="340402357503" data-bytes="228517163072" data-allocations="1406366764">340.4 seconds</td>
+<td data-time="207505529339" data-reference="340402357503" data-bytes="228968669304" data-allocations="1407215859">207.51 seconds</td>
+<td data-time="184952817448" data-reference="340402357503" data-bytes="229806105016" data-allocations="1407295251">184.95 seconds</td>
 </tr>
 <tr><td>512</td>
-<td data-time="787737459722" data-reference="787737459722" data-bytes="484489277176" data-allocations="1584779840">787.74 seconds</td>
-<td data-time="475843957390" data-reference="787737459722" data-bytes="484985813704" data-allocations="1585633424">475.84 seconds</td>
-<td data-time="415746464568" data-reference="787737459722" data-bytes="486227038856" data-allocations="1585715047">415.75 seconds</td>
+<td data-time="885956978460" data-reference="885956978460" data-bytes="484483058688" data-allocations="1584662310">885.96 seconds</td>
+<td data-time="524242159036" data-reference="885956978460" data-bytes="484876924792" data-allocations="1585557994">524.24 seconds</td>
+<td data-time="477121159940" data-reference="885956978460" data-bytes="485958912264" data-allocations="1585681457">477.12 seconds</td>
 </tr>
 </tbody></table>
 <h2>Hubbard / U1U1 · CBE-TDVP</h2>
 <table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
 <tr><td>256</td>
-<td data-time="24669235436" data-reference="24669235436" data-bytes="17831574216" data-allocations="111839675">24.669 seconds</td>
-<td data-time="15133740989" data-reference="24669235436" data-bytes="17905402960" data-allocations="112319179">15.134 seconds</td>
-<td data-time="13146248182" data-reference="24669235436" data-bytes="17973813856" data-allocations="112379785">13.146 seconds</td>
+<td data-time="28855001651" data-reference="28855001651" data-bytes="17831127568" data-allocations="111811571">28.855 seconds</td>
+<td data-time="17498862459" data-reference="28855001651" data-bytes="17899184376" data-allocations="112256941">17.499 seconds</td>
+<td data-time="15508918399" data-reference="28855001651" data-bytes="17968417816" data-allocations="112334250">15.509 seconds</td>
 </tr>
 <tr><td>512</td>
-<td data-time="73527914442" data-reference="73527914442" data-bytes="43373141728" data-allocations="122593337">73.528 seconds</td>
-<td data-time="43337352431" data-reference="73527914442" data-bytes="43474566152" data-allocations="123131125">43.337 seconds</td>
-<td data-time="37877515349" data-reference="73527914442" data-bytes="43578262456" data-allocations="123187885">37.878 seconds</td>
+<td data-time="86880155053" data-reference="86880155053" data-bytes="43373748704" data-allocations="122589304">86.88 seconds</td>
+<td data-time="51577521523" data-reference="86880155053" data-bytes="43458373480" data-allocations="123124430">51.578 seconds</td>
+<td data-time="43054821809" data-reference="86880155053" data-bytes="43557098568" data-allocations="123182579">43.055 seconds</td>
 </tr>
 <tr><td>1024</td>
-<td data-time="309311146514" data-reference="309311146514" data-bytes="137932667240" data-allocations="141145129">309.31 seconds</td>
-<td data-time="182746971875" data-reference="309311146514" data-bytes="137988609456" data-allocations="141656308">182.75 seconds</td>
-<td data-time="157781063456" data-reference="309311146514" data-bytes="138012876192" data-allocations="141687599">157.78 seconds</td>
+<td data-time="330725243467" data-reference="330725243467" data-bytes="137933192576" data-allocations="141154232">330.73 seconds</td>
+<td data-time="195406203136" data-reference="330725243467" data-bytes="137978221216" data-allocations="141605009">195.41 seconds</td>
+<td data-time="173435980622" data-reference="330725243467" data-bytes="138005120920" data-allocations="141644346">173.44 seconds</td>
 </tr>
 </tbody></table>
 <h2>Hubbard / U1SU2 · 2-DMRG</h2>
 <table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
 <tr><td>128</td>
-<td data-time="13109068288" data-reference="13109068288" data-bytes="12234767752" data-allocations="110253109">13.109 seconds</td>
-<td data-time="9038754816" data-reference="13109068288" data-bytes="13895645360" data-allocations="124812718">9.0388 seconds</td>
-<td data-time="9744071759" data-reference="13109068288" data-bytes="17173402544" data-allocations="152022136">9.7441 seconds</td>
+<td data-time="14532357168" data-reference="14532357168" data-bytes="12236010296" data-allocations="110275938">14.532 seconds</td>
+<td data-time="10143848747" data-reference="14532357168" data-bytes="13979600880" data-allocations="125557817">10.144 seconds</td>
+<td data-time="10909941552" data-reference="14532357168" data-bytes="17310166696" data-allocations="153063819">10.91 seconds</td>
 </tr>
 <tr><td>256</td>
-<td data-time="15636722261" data-reference="15636722261" data-bytes="14489846520" data-allocations="123477538">15.637 seconds</td>
-<td data-time="11208665652" data-reference="15636722261" data-bytes="16346416448" data-allocations="139903315">11.209 seconds</td>
-<td data-time="11460217198" data-reference="15636722261" data-bytes="20016609888" data-allocations="170736617">11.46 seconds</td>
+<td data-time="17205301518" data-reference="17205301518" data-bytes="14491287112" data-allocations="123503193">17.205 seconds</td>
+<td data-time="11882975142" data-reference="17205301518" data-bytes="16458617536" data-allocations="140859548">11.883 seconds</td>
+<td data-time="12787995416" data-reference="17205301518" data-bytes="20175846688" data-allocations="172081759">12.788 seconds</td>
 </tr>
 <tr><td>512</td>
-<td data-time="22460484987" data-reference="22460484987" data-bytes="19157930400" data-allocations="144622548">22.46 seconds</td>
-<td data-time="15356486263" data-reference="22460484987" data-bytes="21218810704" data-allocations="163087431">15.356 seconds</td>
-<td data-time="15563631953" data-reference="22460484987" data-bytes="25749662568" data-allocations="201395259">15.564 seconds</td>
+<td data-time="25770218396" data-reference="25770218396" data-bytes="19155790768" data-allocations="144581583">25.77 seconds</td>
+<td data-time="16911875435" data-reference="25770218396" data-bytes="21321807144" data-allocations="163994317">16.912 seconds</td>
+<td data-time="17488590938" data-reference="25770218396" data-bytes="25831979576" data-allocations="202110228">17.489 seconds</td>
 </tr>
 </tbody></table>
 <h2>Hubbard / U1SU2 · CBE-DMRG</h2>
 <table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
 <tr><td>256</td>
-<td data-time="6858213558" data-reference="6858213558" data-bytes="6891055504" data-allocations="63598566">6.8582 seconds</td>
-<td data-time="5308969012" data-reference="6858213558" data-bytes="7966848912" data-allocations="74292335">5.309 seconds</td>
-<td data-time="5680647210" data-reference="6858213558" data-bytes="9889541560" data-allocations="92774473">5.6806 seconds</td>
+<td data-time="8133587773" data-reference="8133587773" data-bytes="6896657520" data-allocations="63617901">8.1336 seconds</td>
+<td data-time="6360746215" data-reference="8133587773" data-bytes="8008434656" data-allocations="74743094">6.3607 seconds</td>
+<td data-time="6781382430" data-reference="8133587773" data-bytes="9858170024" data-allocations="92524560">6.7814 seconds</td>
 </tr>
 <tr><td>512</td>
-<td data-time="10653862052" data-reference="10653862052" data-bytes="10005325040" data-allocations="76994532">10.654 seconds</td>
-<td data-time="7831126045" data-reference="10653862052" data-bytes="11249335664" data-allocations="89559993">7.8311 seconds</td>
-<td data-time="8151204120" data-reference="10653862052" data-bytes="13449065296" data-allocations="111181058">8.1512 seconds</td>
+<td data-time="12209649312" data-reference="12209649312" data-bytes="10013968552" data-allocations="77089992">12.21 seconds</td>
+<td data-time="8681976642" data-reference="12209649312" data-bytes="11272695624" data-allocations="89719149">8.682 seconds</td>
+<td data-time="9289308537" data-reference="12209649312" data-bytes="13498310832" data-allocations="111510502">9.2893 seconds</td>
 </tr>
 <tr><td>1024</td>
-<td data-time="29297981036" data-reference="29297981036" data-bytes="18118455896" data-allocations="73917820">29.298 seconds</td>
-<td data-time="18874443826" data-reference="29297981036" data-bytes="19123427560" data-allocations="83897687">18.874 seconds</td>
-<td data-time="17288340568" data-reference="29297981036" data-bytes="21049540976" data-allocations="102656811">17.288 seconds</td>
+<td data-time="33515807693" data-reference="33515807693" data-bytes="18117395752" data-allocations="73890112">33.516 seconds</td>
+<td data-time="21050528434" data-reference="33515807693" data-bytes="19128153528" data-allocations="83970152">21.051 seconds</td>
+<td data-time="19633020785" data-reference="33515807693" data-bytes="21031175304" data-allocations="102523055">19.633 seconds</td>
 </tr>
 </tbody></table>
 <h2>Hubbard / U1SU2 · 2-TDVP</h2>
 <table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
 <tr><td>128</td>
-<td data-time="137979923376" data-reference="137979923376" data-bytes="116566543584" data-allocations="953725882">137.98 seconds</td>
-<td data-time="95917114805" data-reference="137979923376" data-bytes="134066863368" data-allocations="1080403091">95.917 seconds</td>
-<td data-time="99851118979" data-reference="137979923376" data-bytes="161361327376" data-allocations="1275414879">99.851 seconds</td>
+<td data-time="154891367759" data-reference="154891367759" data-bytes="116565981768" data-allocations="953712985">154.89 seconds</td>
+<td data-time="105121199192" data-reference="154891367759" data-bytes="134348514816" data-allocations="1082587312">105.12 seconds</td>
+<td data-time="108705308459" data-reference="154891367759" data-bytes="161656786080" data-allocations="1277031569">108.71 seconds</td>
 </tr>
 <tr><td>256</td>
-<td data-time="352817018896" data-reference="352817018896" data-bytes="317057809744" data-allocations="2396500592">352.82 seconds</td>
-<td data-time="265446292951" data-reference="352817018896" data-bytes="382574044376" data-allocations="2873872949">265.45 seconds</td>
-<td data-time="296742894202" data-reference="352817018896" data-bytes="496475432088" data-allocations="3696229541">296.74 seconds</td>
+<td data-time="383327197663" data-reference="383327197663" data-bytes="317055967864" data-allocations="2396466621">383.33 seconds</td>
+<td data-time="280515826780" data-reference="383327197663" data-bytes="384714406256" data-allocations="2888353490">280.52 seconds</td>
+<td data-time="309911235896" data-reference="383327197663" data-bytes="499571390824" data-allocations="3716531073">309.91 seconds</td>
 </tr>
 <tr><td>512</td>
-<td data-time="492308272696" data-reference="492308272696" data-bytes="398722497800" data-allocations="2791203316">492.31 seconds</td>
-<td data-time="361930110842" data-reference="492308272696" data-bytes="474025226816" data-allocations="3342560596">361.93 seconds</td>
-<td data-time="393942652681" data-reference="492308272696" data-bytes="608666761312" data-allocations="4320402303">393.94 seconds</td>
+<td data-time="543355569313" data-reference="543355569313" data-bytes="398722791984" data-allocations="2791208505">543.36 seconds</td>
+<td data-time="387933617569" data-reference="543355569313" data-bytes="476314106408" data-allocations="3357371139">387.93 seconds</td>
+<td data-time="411999368037" data-reference="543355569313" data-bytes="608758873464" data-allocations="4319734272">412 seconds</td>
 </tr>
 </tbody></table>
 <h2>Hubbard / U1SU2 · CBE-TDVP</h2>
 <table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
 <tr><td>256</td>
-<td data-time="28898382386" data-reference="28898382386" data-bytes="30269723944" data-allocations="243818014">28.898 seconds</td>
-<td data-time="22850749263" data-reference="28898382386" data-bytes="35302883744" data-allocations="287587122">22.851 seconds</td>
-<td data-time="24511801208" data-reference="28898382386" data-bytes="42192851304" data-allocations="345394843">24.512 seconds</td>
+<td data-time="32590163133" data-reference="32590163133" data-bytes="30270112728" data-allocations="243824727">32.59 seconds</td>
+<td data-time="24428920308" data-reference="32590163133" data-bytes="35439428040" data-allocations="288807350">24.429 seconds</td>
+<td data-time="25071545737" data-reference="32590163133" data-bytes="42534427952" data-allocations="348290811">25.072 seconds</td>
 </tr>
 <tr><td>512</td>
-<td data-time="40764139642" data-reference="40764139642" data-bytes="38340543640" data-allocations="273956177">40.764 seconds</td>
-<td data-time="29008985019" data-reference="40764139642" data-bytes="43492771584" data-allocations="318902556">29.009 seconds</td>
-<td data-time="30236501381" data-reference="40764139642" data-bytes="51790679424" data-allocations="388653562">30.237 seconds</td>
+<td data-time="45800894476" data-reference="45800894476" data-bytes="38347241320" data-allocations="274082001">45.801 seconds</td>
+<td data-time="32159241789" data-reference="45800894476" data-bytes="43528127496" data-allocations="319574097">32.159 seconds</td>
+<td data-time="32604318504" data-reference="45800894476" data-bytes="51874996888" data-allocations="389760208">32.604 seconds</td>
 </tr>
 <tr><td>1024</td>
-<td data-time="92722925867" data-reference="92722925867" data-bytes="66456786728" data-allocations="372314263">92.723 seconds</td>
-<td data-time="61290734551" data-reference="92722925867" data-bytes="72828610408" data-allocations="429385160">61.291 seconds</td>
-<td data-time="60225941198" data-reference="92722925867" data-bytes="84340222928" data-allocations="529068533">60.226 seconds</td>
+<td data-time="105564288521" data-reference="105564288521" data-bytes="66459149768" data-allocations="372357982">105.56 seconds</td>
+<td data-time="67785325041" data-reference="105564288521" data-bytes="73061180472" data-allocations="431217475">67.785 seconds</td>
+<td data-time="65325354085" data-reference="105564288521" data-bytes="84556164384" data-allocations="531047028">65.325 seconds</td>
 </tr>
 </tbody></table>
 <h2>Hubbard / Z2SU2 · 2-DMRG</h2>
 <table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
 <tr><td>128</td>
-<td data-time="3633867970" data-reference="3633867970" data-bytes="1822748272" data-allocations="16636629">3.6339 seconds</td>
-<td data-time="2409147724" data-reference="3633867970" data-bytes="1942488600" data-allocations="17817880">2.4091 seconds</td>
-<td data-time="2245083364" data-reference="3633867970" data-bytes="2065645000" data-allocations="19027324">2.2451 seconds</td>
+<td data-time="4437871820" data-reference="4437871820" data-bytes="1822460376" data-allocations="16631152">4.4379 seconds</td>
+<td data-time="2804812552" data-reference="4437871820" data-bytes="1934102248" data-allocations="17724484">2.8048 seconds</td>
+<td data-time="2568903883" data-reference="4437871820" data-bytes="2057901672" data-allocations="18921701">2.5689 seconds</td>
 </tr>
 <tr><td>256</td>
-<td data-time="7217576838" data-reference="7217576838" data-bytes="3533914120" data-allocations="18691282">7.2176 seconds</td>
-<td data-time="4461028689" data-reference="7217576838" data-bytes="3723323888" data-allocations="20574965">4.461 seconds</td>
-<td data-time="3977512844" data-reference="7217576838" data-bytes="3915751616" data-allocations="22307991">3.9775 seconds</td>
+<td data-time="8256545250" data-reference="8256545250" data-bytes="3535012904" data-allocations="18711117">8.2565 seconds</td>
+<td data-time="4812476140" data-reference="8256545250" data-bytes="3716853296" data-allocations="20487987">4.8125 seconds</td>
+<td data-time="4428265874" data-reference="8256545250" data-bytes="3900006800" data-allocations="22152869">4.4283 seconds</td>
 </tr>
 <tr><td>512</td>
-<td data-time="23289879785" data-reference="23289879785" data-bytes="9327028584" data-allocations="22489870">23.29 seconds</td>
-<td data-time="13387877320" data-reference="23289879785" data-bytes="9741224656" data-allocations="25920936">13.388 seconds</td>
-<td data-time="11640634161" data-reference="23289879785" data-bytes="10124850072" data-allocations="29045596">11.641 seconds</td>
+<td data-time="27073872232" data-reference="27073872232" data-bytes="9329485080" data-allocations="22535914">27.074 seconds</td>
+<td data-time="15443497690" data-reference="27073872232" data-bytes="9720012960" data-allocations="25818117">15.443 seconds</td>
+<td data-time="13638353236" data-reference="27073872232" data-bytes="10058013744" data-allocations="28574082">13.638 seconds</td>
 </tr>
 </tbody></table>
 <h2>Hubbard / Z2SU2 · CBE-DMRG</h2>
 <table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
 <tr><td>256</td>
-<td data-time="4039893670" data-reference="4039893670" data-bytes="2369078784" data-allocations="8931203">4.0399 seconds</td>
-<td data-time="2661320035" data-reference="4039893670" data-bytes="2468152904" data-allocations="10175842">2.6613 seconds</td>
-<td data-time="2553841929" data-reference="4039893670" data-bytes="2588965136" data-allocations="11568497">2.5538 seconds</td>
+<td data-time="4531515895" data-reference="4531515895" data-bytes="2361899568" data-allocations="8921606">4.5315 seconds</td>
+<td data-time="3133887104" data-reference="4531515895" data-bytes="2467250808" data-allocations="10174810">3.1339 seconds</td>
+<td data-time="2926331771" data-reference="4531515895" data-bytes="2592395792" data-allocations="11483512">2.9263 seconds</td>
 </tr>
 <tr><td>512</td>
-<td data-time="14190005468" data-reference="14190005468" data-bytes="6839879184" data-allocations="10387621">14.19 seconds</td>
-<td data-time="8550149881" data-reference="14190005468" data-bytes="6928264024" data-allocations="11720082">8.5501 seconds</td>
-<td data-time="7852130113" data-reference="14190005468" data-bytes="7061743504" data-allocations="13070535">7.8521 seconds</td>
+<td data-time="15341746382" data-reference="15341746382" data-bytes="6836012888" data-allocations="10409448">15.342 seconds</td>
+<td data-time="9503091107" data-reference="15341746382" data-bytes="6933845784" data-allocations="11647714">9.5031 seconds</td>
+<td data-time="8504442629" data-reference="15341746382" data-bytes="7070058632" data-allocations="13056660">8.5044 seconds</td>
 </tr>
 <tr><td>1024</td>
-<td data-time="81760051920" data-reference="81760051920" data-bytes="25684693360" data-allocations="9337151">81.76 seconds</td>
-<td data-time="46675841100" data-reference="81760051920" data-bytes="25762572136" data-allocations="10316669">46.676 seconds</td>
-<td data-time="42471109051" data-reference="81760051920" data-bytes="25854810216" data-allocations="11331716">42.471 seconds</td>
+<td data-time="80384275587" data-reference="80384275587" data-bytes="25684538784" data-allocations="9309513">80.384 seconds</td>
+<td data-time="47769214506" data-reference="80384275587" data-bytes="25763448680" data-allocations="10282134">47.769 seconds</td>
+<td data-time="44174510939" data-reference="80384275587" data-bytes="25865841480" data-allocations="11423540">44.175 seconds</td>
 </tr>
 </tbody></table>
 <h2>Hubbard / Z2SU2 · 2-TDVP</h2>
 <table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
 <tr><td>128</td>
-<td data-time="35902333577" data-reference="35902333577" data-bytes="21001836088" data-allocations="100443563">35.902 seconds</td>
-<td data-time="23646685295" data-reference="35902333577" data-bytes="22307071344" data-allocations="109403591">23.647 seconds</td>
-<td data-time="20629649362" data-reference="35902333577" data-bytes="23866308808" data-allocations="119596126">20.63 seconds</td>
+<td data-time="41863550471" data-reference="41863550471" data-bytes="20999129048" data-allocations="100390145">41.864 seconds</td>
+<td data-time="26684100648" data-reference="41863550471" data-bytes="22246715160" data-allocations="109000267">26.684 seconds</td>
+<td data-time="23441286413" data-reference="41863550471" data-bytes="23837018856" data-allocations="119311569">23.441 seconds</td>
 </tr>
 <tr><td>256</td>
-<td data-time="123662747084" data-reference="123662747084" data-bytes="62185392896" data-allocations="185836453">123.66 seconds</td>
-<td data-time="80614814517" data-reference="123662747084" data-bytes="68673701248" data-allocations="229040687">80.615 seconds</td>
-<td data-time="73121347139" data-reference="123662747084" data-bytes="76572869632" data-allocations="281411448">73.121 seconds</td>
+<td data-time="142362609839" data-reference="142362609839" data-bytes="62186092312" data-allocations="185850180">142.36 seconds</td>
+<td data-time="88573339235" data-reference="142362609839" data-bytes="68475220248" data-allocations="227801302">88.573 seconds</td>
+<td data-time="83107315577" data-reference="142362609839" data-bytes="76029509368" data-allocations="278190615">83.107 seconds</td>
 </tr>
 <tr><td>512</td>
-<td data-time="449252939806" data-reference="449252939806" data-bytes="161306167648" data-allocations="205958415">449.25 seconds</td>
-<td data-time="279568038032" data-reference="449252939806" data-bytes="166555980456" data-allocations="241249963">279.57 seconds</td>
-<td data-time="247696112453" data-reference="449252939806" data-bytes="173912164008" data-allocations="290659577">247.7 seconds</td>
+<td data-time="523795982728" data-reference="523795982728" data-bytes="161304696128" data-allocations="205929044">523.8 seconds</td>
+<td data-time="314777728156" data-reference="523795982728" data-bytes="166158122520" data-allocations="238660767">314.78 seconds</td>
+<td data-time="290369868215" data-reference="523795982728" data-bytes="172921453480" data-allocations="284656226">290.37 seconds</td>
 </tr>
 </tbody></table>
 <h2>Hubbard / Z2SU2 · CBE-TDVP</h2>
 <table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
 <tr><td>256</td>
-<td data-time="12668348499" data-reference="12668348499" data-bytes="7135532928" data-allocations="21591170">12.668 seconds</td>
-<td data-time="8291682844" data-reference="12668348499" data-bytes="7670813224" data-allocations="25722290">8.2917 seconds</td>
-<td data-time="7502621500" data-reference="12668348499" data-bytes="8104207840" data-allocations="29135046">7.5026 seconds</td>
+<td data-time="14383512571" data-reference="14383512571" data-bytes="7136811328" data-allocations="21618994">14.384 seconds</td>
+<td data-time="9248857641" data-reference="14383512571" data-bytes="7640301296" data-allocations="25555140">9.2489 seconds</td>
+<td data-time="8746707550" data-reference="14383512571" data-bytes="8068911544" data-allocations="28922342">8.7467 seconds</td>
 </tr>
 <tr><td>512</td>
-<td data-time="49051028184" data-reference="49051028184" data-bytes="20735036824" data-allocations="28720060">49.051 seconds</td>
-<td data-time="28636521352" data-reference="49051028184" data-bytes="21508684864" data-allocations="34572186">28.637 seconds</td>
-<td data-time="25600963632" data-reference="49051028184" data-bytes="22383501376" data-allocations="41056430">25.601 seconds</td>
+<td data-time="53538769571" data-reference="53538769571" data-bytes="20735479352" data-allocations="28728597">53.539 seconds</td>
+<td data-time="31781699500" data-reference="53538769571" data-bytes="21446205632" data-allocations="34159077">31.782 seconds</td>
+<td data-time="27794279045" data-reference="53538769571" data-bytes="22305744064" data-allocations="40553705">27.794 seconds</td>
 </tr>
 <tr><td>1024</td>
-<td data-time="237860404718" data-reference="237860404718" data-bytes="71421418136" data-allocations="39958028">237.86 seconds</td>
-<td data-time="142560423613" data-reference="237860404718" data-bytes="72445277520" data-allocations="47618504">142.56 seconds</td>
-<td data-time="126006185010" data-reference="237860404718" data-bytes="73692765488" data-allocations="56979958">126.01 seconds</td>
+<td data-time="251534026555" data-reference="251534026555" data-bytes="71419023544" data-allocations="39912518">251.53 seconds</td>
+<td data-time="145188228441" data-reference="251534026555" data-bytes="72372570672" data-allocations="47146927">145.19 seconds</td>
+<td data-time="132085929116" data-reference="251534026555" data-bytes="73477399640" data-allocations="55403768">132.09 seconds</td>
 </tr>
 </tbody></table>
 <h2>t-t′-J-J′ / U1SU2 · 2-DMRG</h2>
 <table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
 <tr><td>128</td>
-<td data-time="8017865912" data-reference="8017865912" data-bytes="7235516912" data-allocations="70045588">8.0179 seconds</td>
-<td data-time="6308498946" data-reference="8017865912" data-bytes="8041508032" data-allocations="77167002">6.3085 seconds</td>
-<td data-time="6492072097" data-reference="8017865912" data-bytes="9577329952" data-allocations="89712842">6.4921 seconds</td>
+<td data-time="9398507364" data-reference="9398507364" data-bytes="7235252288" data-allocations="70042602">9.3985 seconds</td>
+<td data-time="7306850940" data-reference="9398507364" data-bytes="8041142976" data-allocations="77120580">7.3069 seconds</td>
+<td data-time="7538608506" data-reference="9398507364" data-bytes="9543485560" data-allocations="89468307">7.5386 seconds</td>
 </tr>
 <tr><td>256</td>
-<td data-time="10756699027" data-reference="10756699027" data-bytes="8345098984" data-allocations="75594068">10.757 seconds</td>
-<td data-time="7769909976" data-reference="10756699027" data-bytes="9220380912" data-allocations="83310338">7.7699 seconds</td>
-<td data-time="7408154672" data-reference="10756699027" data-bytes="10909016936" data-allocations="97282973">7.4082 seconds</td>
+<td data-time="12321905078" data-reference="12321905078" data-bytes="8344120776" data-allocations="75574094">12.322 seconds</td>
+<td data-time="8407471863" data-reference="12321905078" data-bytes="9216080128" data-allocations="83263741">8.4075 seconds</td>
+<td data-time="8537929247" data-reference="12321905078" data-bytes="10870636448" data-allocations="96950354">8.5379 seconds</td>
 </tr>
 <tr><td>512</td>
-<td data-time="14724420460" data-reference="14724420460" data-bytes="11513470200" data-allocations="88623371">14.724 seconds</td>
-<td data-time="10226538999" data-reference="14724420460" data-bytes="12513106272" data-allocations="97413572">10.227 seconds</td>
-<td data-time="9925118166" data-reference="14724420460" data-bytes="14497911080" data-allocations="114041974">9.9251 seconds</td>
+<td data-time="17595933699" data-reference="17595933699" data-bytes="11513531736" data-allocations="88626610">17.596 seconds</td>
+<td data-time="11177358988" data-reference="17595933699" data-bytes="12461589920" data-allocations="97015759">11.177 seconds</td>
+<td data-time="11081517624" data-reference="17595933699" data-bytes="14484544728" data-allocations="113955979">11.082 seconds</td>
 </tr>
 </tbody></table>
 <h2>t-t′-J-J′ / U1SU2 · CBE-DMRG</h2>
 <table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
 <tr><td>256</td>
-<td data-time="5968376058" data-reference="5968376058" data-bytes="5449820960" data-allocations="49635236">5.9684 seconds</td>
-<td data-time="5184493707" data-reference="5968376058" data-bytes="6090106088" data-allocations="56047693">5.1845 seconds</td>
-<td data-time="4947215217" data-reference="5968376058" data-bytes="6862806464" data-allocations="63318833">4.9472 seconds</td>
+<td data-time="7330047082" data-reference="7330047082" data-bytes="5450043888" data-allocations="49640060">7.33 seconds</td>
+<td data-time="5826400824" data-reference="7330047082" data-bytes="6097942768" data-allocations="56092619">5.8264 seconds</td>
+<td data-time="5959699632" data-reference="7330047082" data-bytes="6851646824" data-allocations="63204791">5.9597 seconds</td>
 </tr>
 <tr><td>512</td>
-<td data-time="9729177757" data-reference="9729177757" data-bytes="7993745120" data-allocations="57174790">9.7292 seconds</td>
-<td data-time="6785170060" data-reference="9729177757" data-bytes="8699022344" data-allocations="64228662">6.7852 seconds</td>
-<td data-time="6405137768" data-reference="9729177757" data-bytes="9637472896" data-allocations="73177188">6.4051 seconds</td>
+<td data-time="11355301432" data-reference="11355301432" data-bytes="7981370320" data-allocations="57043964">11.355 seconds</td>
+<td data-time="7733382589" data-reference="11355301432" data-bytes="8680773048" data-allocations="64064870">7.7334 seconds</td>
+<td data-time="7357622163" data-reference="11355301432" data-bytes="9607208576" data-allocations="72978494">7.3576 seconds</td>
 </tr>
 <tr><td>1024</td>
-<td data-time="24248806103" data-reference="24248806103" data-bytes="15259359000" data-allocations="55220131">24.249 seconds</td>
-<td data-time="14924675569" data-reference="24248806103" data-bytes="15886566048" data-allocations="61562380">14.925 seconds</td>
-<td data-time="13455510252" data-reference="24248806103" data-bytes="16678192184" data-allocations="68817976">13.456 seconds</td>
+<td data-time="28067816369" data-reference="28067816369" data-bytes="15412919656" data-allocations="56177452">28.068 seconds</td>
+<td data-time="16831928355" data-reference="28067816369" data-bytes="15943765368" data-allocations="61292163">16.832 seconds</td>
+<td data-time="15080631978" data-reference="28067816369" data-bytes="16621922464" data-allocations="68213708">15.081 seconds</td>
 </tr>
 </tbody></table>
 <h2>t-t′-J-J′ / U1SU2 · 2-TDVP</h2>
 <table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
 <tr><td>128</td>
-<td data-time="98307138710" data-reference="98307138710" data-bytes="86872137544" data-allocations="743159238">98.307 seconds</td>
-<td data-time="71178701419" data-reference="98307138710" data-bytes="101004774848" data-allocations="851184707">71.179 seconds</td>
-<td data-time="73178427585" data-reference="98307138710" data-bytes="123374191712" data-allocations="1021804396">73.178 seconds</td>
+<td data-time="112123835531" data-reference="112123835531" data-bytes="86871557272" data-allocations="743147439">112.12 seconds</td>
+<td data-time="77091439992" data-reference="112123835531" data-bytes="100871641344" data-allocations="850002971">77.091 seconds</td>
+<td data-time="82946514789" data-reference="112123835531" data-bytes="123941172744" data-allocations="1025528420">82.947 seconds</td>
 </tr>
 <tr><td>256</td>
-<td data-time="123342592996" data-reference="123342592996" data-bytes="105455383728" data-allocations="863255905">123.34 seconds</td>
-<td data-time="87193967581" data-reference="123342592996" data-bytes="121352335800" data-allocations="985051825">87.194 seconds</td>
-<td data-time="89835761996" data-reference="123342592996" data-bytes="148805953960" data-allocations="1194861306">89.836 seconds</td>
+<td data-time="137542967049" data-reference="137542967049" data-bytes="105454319728" data-allocations="863233556">137.54 seconds</td>
+<td data-time="92058892102" data-reference="137542967049" data-bytes="121473337888" data-allocations="985633371">92.059 seconds</td>
+<td data-time="99562236220" data-reference="137542967049" data-bytes="149586517848" data-allocations="1199688937">99.562 seconds</td>
 </tr>
 <tr><td>512</td>
-<td data-time="202081833260" data-reference="202081833260" data-bytes="158809042576" data-allocations="1152669122">202.08 seconds</td>
-<td data-time="136312577260" data-reference="202081833260" data-bytes="180766841400" data-allocations="1321879420">136.31 seconds</td>
-<td data-time="140229486254" data-reference="202081833260" data-bytes="220702822888" data-allocations="1628042831">140.23 seconds</td>
+<td data-time="222892360038" data-reference="222892360038" data-bytes="158805311472" data-allocations="1152601022">222.89 seconds</td>
+<td data-time="149705963204" data-reference="222892360038" data-bytes="180907030560" data-allocations="1322540597">149.71 seconds</td>
+<td data-time="153923664614" data-reference="222892360038" data-bytes="220840921600" data-allocations="1628631950">153.92 seconds</td>
 </tr>
 </tbody></table>
 <h2>t-t′-J-J′ / U1SU2 · CBE-TDVP</h2>
 <table><thead><tr><th>D</th><th>1 thread</th><th>2 threads</th><th>4 threads</th></tr></thead><tbody>
 <tr><td>256</td>
-<td data-time="20286515410" data-reference="20286515410" data-bytes="19940195416" data-allocations="165821708">20.287 seconds</td>
-<td data-time="14940108544" data-reference="20286515410" data-bytes="22359640768" data-allocations="186351681">14.94 seconds</td>
-<td data-time="14852548632" data-reference="20286515410" data-bytes="25729204776" data-allocations="214148950">14.853 seconds</td>
+<td data-time="23226874544" data-reference="23226874544" data-bytes="19924442960" data-allocations="165681243">23.227 seconds</td>
+<td data-time="16443565677" data-reference="23226874544" data-bytes="22400198016" data-allocations="186748255">16.444 seconds</td>
+<td data-time="16854031612" data-reference="23226874544" data-bytes="25733245256" data-allocations="214113403">16.854 seconds</td>
 </tr>
 <tr><td>512</td>
-<td data-time="30854980414" data-reference="30854980414" data-bytes="27715413096" data-allocations="192048165">30.855 seconds</td>
-<td data-time="21631249279" data-reference="30854980414" data-bytes="30271885888" data-allocations="213935890">21.631 seconds</td>
-<td data-time="20580205184" data-reference="30854980414" data-bytes="34245302656" data-allocations="246883183">20.58 seconds</td>
+<td data-time="33148637951" data-reference="33148637951" data-bytes="27713581624" data-allocations="192013941">33.149 seconds</td>
+<td data-time="23339063491" data-reference="33148637951" data-bytes="30327878776" data-allocations="214383693">23.339 seconds</td>
+<td data-time="22350619130" data-reference="33148637951" data-bytes="34109115000" data-allocations="245798601">22.351 seconds</td>
 </tr>
 <tr><td>1024</td>
-<td data-time="72963337964" data-reference="72963337964" data-bytes="53890772712" data-allocations="315041390">72.963 seconds</td>
-<td data-time="46757684287" data-reference="72963337964" data-bytes="58221379736" data-allocations="353340875">46.758 seconds</td>
-<td data-time="45466500119" data-reference="72963337964" data-bytes="64667903072" data-allocations="409537392">45.467 seconds</td>
+<td data-time="82519520631" data-reference="82519520631" data-bytes="53890600936" data-allocations="315038011">82.52 seconds</td>
+<td data-time="51019097652" data-reference="82519520631" data-bytes="58233047632" data-allocations="353401071">51.019 seconds</td>
+<td data-time="49633884447" data-reference="82519520631" data-bytes="64531458248" data-allocations="408659641">49.634 seconds</td>
 </tr>
 </tbody></table>
 <details><summary>Hubbard / U1SU2 · 2-DMRG · D=128: Input and sampling settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
