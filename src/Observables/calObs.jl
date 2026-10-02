@@ -56,11 +56,10 @@ function calObs!(Tree::ObservableTree{L}, Ψ::AbstractMPS{L}, Φ::AbstractMPS{L}
     end
     timer = _evaluate_tree!(Tree, prepare, pushenv, left, right, alg;
         disk, maxsize, verbose, showtimes, GCspacing)
-    if !normalize
-        factor = coef(Ψ) * coef(Φ)
-        for targets in values(Tree.Refs), ref in values(targets)
-            ref[] *= factor
-        end
+    factor = conj(coef(Ψ)) * coef(Φ)
+    normalize && (factor /= norm(Ψ) * norm(Φ))
+    for targets in values(Tree.Refs), ref in values(targets)
+        ref[] *= factor
     end
     return timer
 end

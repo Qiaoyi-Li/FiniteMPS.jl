@@ -86,9 +86,10 @@ end
           kwargs...)
           -> u::AbstractTensorMap, s::DiagonalTensorMap, vd::AbstractTensorMap, info::BondInfo
 
-Compute a compact or truncated SVD, returning `BondInfo` instead of the 2-norm truncation error.
+Compute a compact or truncated SVD, returning `BondInfo` instead of the 2-norm truncation error. Only `p=2` is supported.
 """
 function tsvd(A::AbstractTensorWrapper, p₁::NTuple{N₁,Int64}, p₂::NTuple{N₂,Int64}; kwargs...) where {N₁,N₂}
+     get(kwargs, :p, 2) == 2 || throw(ArgumentError("tsvd supports only p=2"))
      trunc = get(kwargs, :trunc, notrunc())
      alg = get(kwargs, :alg, MatrixAlgebraKit.DivideAndConquer(fixgauge = false))
      u, s, v, ϵ = _raw_svd(A.A, (p₁, p₂); trunc, alg)

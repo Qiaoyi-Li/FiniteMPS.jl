@@ -19,3 +19,16 @@
         @test getproperty(values, Symbol("Sz", length(indices)))[indices] ≈ reference
     end
 end
+
+@testset "Complex observable coefficients" begin
+    p = ℂ^2
+    site = TensorMap(ComplexF64[1, 0], ℂ^1 ⊗ p, ℂ^1)
+    Ψ, Φ = MPS([site], 1.0im), MPS([site], 2.0 + 3.0im)
+    tree = ObservableTree(1)
+    addObs!(tree, id(p), 1; name = :Identity)
+    for (bra, ket, normalize, expected) in ((Ψ, Ψ, false, 1),
+        (Ψ, Φ, false, 3 - 2im), (Ψ, Φ, true, (3 - 2im) / sqrt(13)))
+        calObs!(tree, bra, ket; normalize)
+        @test tree.Refs["Identity"][(1,)][] ≈ expected
+    end
+end
