@@ -1,3 +1,9 @@
+@testset "tJBoson local space exports" begin
+    @test U₁SU₂tJBoson === U1SU2tJBoson
+    @test U₁U₁tJBoson === U1U1tJBoson
+    @test SU₂tJBoson === SU2tJBoson
+end
+
 @testset "String auxiliary channels" begin
     rng, V = MersenneTwister(81), ComplexSpace(2)
     A = randn(rng, ComplexF64, V ← V ⊗ V)
