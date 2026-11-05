@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Performance measurement report: Development or local build</title><style>body{font:16px/1.55 system-ui,sans-serif;color:#162235;background:#f7f9fc;margin:0}main{max-width:1150px;margin:auto;padding:32px 24px}h1,h2{line-height:1.2}a{color:#1757a4}table{border-collapse:collapse;width:100%;background:white;margin:16px 0;display:block;overflow:auto}th,td{padding:10px 14px;text-align:left;border-bottom:1px solid #dce3eb;vertical-align:top}th{background:#eaf0f8}code,pre{font:13px/1.5 ui-monospace,monospace;overflow-wrap:anywhere}pre{white-space:pre-wrap;background:#edf2f8;padding:16px}dl{display:grid;grid-template-columns:minmax(140px,240px) 1fr;gap:8px 20px;background:white;padding:20px;border:1px solid #dce3eb}dt{font-weight:600}dd{margin:0;overflow-wrap:anywhere}.muted{color:#56657a}.notice{padding:12px 16px;background:#eaf0f8;border-left:4px solid #3576b6}nav{display:flex;gap:20px;flex-wrap:wrap}select{font:inherit;max-width:100%;padding:6px;margin:8px}svg{width:100%;height:auto;background:white;border:1px solid #dce3eb}details{margin:16px 0}summary{cursor:pointer} @media(max-width:600px){main{padding:20px 12px}dl{grid-template-columns:1fr;gap:2px}dd{margin-bottom:12px}}
 </style></head><body><main><style>.resource-summary{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 28px;margin:12px 0}.resource-summary dt{font-size:13px;color:#56657a}.resource-summary dd{margin:0}.report-identity{overflow-wrap:anywhere;margin:12px 0}.report-identity code{font-size:14px}@media(max-width:600px){.resource-summary{grid-template-columns:1fr;gap:10px}}</style>
-<h1>Performance measurement report: Development or local build</h1><nav><a href="https://github.com/Qiaoyi-Li/FiniteMPS.jl/commit/74ab3410e8fe4584e9d12c8ebd4b870397b410b1">View measured source</a><a href="report.json">Download raw data (JSON)</a><a href="https://github.com/Qiaoyi-Li/FiniteMPS.jl/actions/runs/37003845127">View workflow run</a></nav>
-<p class="report-identity"><strong>Source commit:</strong> <code>74ab3410e8fe4584e9d12c8ebd4b870397b410b1</code><br><strong>Measured at (UTC):</strong> 2026-10-02T12:10:07.646Z · Development or local build</p>
+<h1>Performance measurement report: Development or local build</h1><nav><a href="https://github.com/Qiaoyi-Li/FiniteMPS.jl/commit/a19056f4b950167a7207ace2ca4c845c2d644393">View measured source</a><a href="report.json">Download raw data (JSON)</a><a href="https://github.com/Qiaoyi-Li/FiniteMPS.jl/actions/runs/42017838766">View workflow run</a></nav>
+<p class="report-identity"><strong>Source commit:</strong> <code>a19056f4b950167a7207ace2ca4c845c2d644393</code><br><strong>Measured at (UTC):</strong> 2026-11-05T11:32:28.754Z · Development or local build</p>
 <h2>Measurement environment and thread settings</h2><dl class="resource-summary">
-<div><dt>Processor model</dt><dd>Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz</dd></div>
+<div><dt>Processor model</dt><dd>AMD EPYC 7763 64-Core Processor</dd></div>
 <div><dt>Julia version</dt><dd>1.11.6</dd></div>
 <div><dt>Visible logical processors</dt><dd>4</dd></div>
 <div><dt>Processors available to this process</dt><dd>4</dd></div>
@@ -15,7 +15,7 @@
 <div><dt>Operating system</dt><dd>Linux</dd></div>
 </dl><details><summary>Additional run metadata</summary><dl>
 <dt>Repository</dt><dd>Qiaoyi-Li/FiniteMPS.jl</dd>
-<dt>Benchmark definition commit</dt><dd>74ab3410e8fe4584e9d12c8ebd4b870397b410b1</dd>
+<dt>Benchmark definition commit</dt><dd>a19056f4b950167a7207ace2ca4c845c2d644393</dd>
 <dt>Uncommitted changes</dt><dd>No</dd>
 <dt>Version tag</dt><dd>Not recorded</dd>
 <dt>Algorithm library version</dt><dd>2.0.0</dd>
@@ -25,66 +25,66 @@
 <dt>Garbage collection threads</dt><dd>1</dd>
 <dt>Matrix computation backend</dt><dd>OpenBLAS</dd>
 <dt>Runner type</dt><dd>GitHub-hosted runner</dd>
-<dt>Runner image version</dt><dd>20260927.320.1</dd>
-<dt>System kernel</dt><dd>6.17.0-1022-azure</dd>
-<dt>Visible system memory (bytes)</dt><dd>16765378560</dd>
+<dt>Runner image version</dt><dd>20261026.354.1</dd>
+<dt>System kernel</dt><dd>7.0.0-1017-azure</dd>
+<dt>Visible system memory (bytes)</dt><dd>16760344576</dd>
 <dt>Run trigger</dt><dd>Commit push</dd>
 <dt>Automation workflow</dt><dd>Performance</dd>
-<dt>Run identifier</dt><dd>37003845127</dd>
-<dt>Workflow run number</dt><dd>4</dd>
+<dt>Run identifier</dt><dd>42017838766</dd>
+<dt>Workflow run number</dt><dd>6</dd>
 <dt>Run attempt</dt><dd>1</dd>
 <dt>Benchmark definition file</dt><dd>benchmark/benchmarks.jl</dd>
 <dt>Benchmark definition source</dt><dd>Current source checkout</dd>
 </dl></details><p class="muted">Processor counts and thread settings describe available resources, not runtime core utilization. Visible system memory is the system capacity.</p>
 <h2>Measurements</h2><table><thead><tr><th>Operation and size</th><th>Median time</th><th>Total allocated bytes</th><th>Memory allocation count</th><th>Samples</th></tr></thead><tbody>
-<tr><td>Hubbard / U1SU2 · 2-DMRG · D=128</td><td>14.532 seconds</td><td>12236010296</td><td>110275938</td><td>1</td></tr>
-<tr><td>Hubbard / U1SU2 · 2-DMRG · D=256</td><td>17.205 seconds</td><td>14491287112</td><td>123503193</td><td>1</td></tr>
-<tr><td>Hubbard / U1SU2 · 2-DMRG · D=512</td><td>25.77 seconds</td><td>19155790768</td><td>144581583</td><td>1</td></tr>
-<tr><td>Hubbard / U1SU2 · 2-TDVP · D=128</td><td>154.89 seconds</td><td>116565981768</td><td>953712985</td><td>1</td></tr>
-<tr><td>Hubbard / U1SU2 · 2-TDVP · D=256</td><td>383.33 seconds</td><td>317055967864</td><td>2396466621</td><td>1</td></tr>
-<tr><td>Hubbard / U1SU2 · 2-TDVP · D=512</td><td>543.36 seconds</td><td>398722791984</td><td>2791208505</td><td>1</td></tr>
-<tr><td>Hubbard / U1SU2 · CBE-DMRG · D=1024</td><td>33.516 seconds</td><td>18117395752</td><td>73890112</td><td>1</td></tr>
-<tr><td>Hubbard / U1SU2 · CBE-DMRG · D=256</td><td>8.1336 seconds</td><td>6896657520</td><td>63617901</td><td>1</td></tr>
-<tr><td>Hubbard / U1SU2 · CBE-DMRG · D=512</td><td>12.21 seconds</td><td>10013968552</td><td>77089992</td><td>1</td></tr>
-<tr><td>Hubbard / U1SU2 · CBE-TDVP · D=1024</td><td>105.56 seconds</td><td>66459149768</td><td>372357982</td><td>1</td></tr>
-<tr><td>Hubbard / U1SU2 · CBE-TDVP · D=256</td><td>32.59 seconds</td><td>30270112728</td><td>243824727</td><td>1</td></tr>
-<tr><td>Hubbard / U1SU2 · CBE-TDVP · D=512</td><td>45.801 seconds</td><td>38347241320</td><td>274082001</td><td>1</td></tr>
-<tr><td>Hubbard / U1U1 · 2-DMRG · D=128</td><td>13.279 seconds</td><td>8425966016</td><td>90199675</td><td>1</td></tr>
-<tr><td>Hubbard / U1U1 · 2-DMRG · D=256</td><td>22.263 seconds</td><td>13123327144</td><td>88488439</td><td>1</td></tr>
-<tr><td>Hubbard / U1U1 · 2-DMRG · D=512</td><td>67.613 seconds</td><td>30946893664</td><td>98985346</td><td>1</td></tr>
-<tr><td>Hubbard / U1U1 · 2-TDVP · D=128</td><td>167.17 seconds</td><td>121845497640</td><td>994824494</td><td>1</td></tr>
-<tr><td>Hubbard / U1U1 · 2-TDVP · D=256</td><td>340.4 seconds</td><td>228517163072</td><td>1406366764</td><td>1</td></tr>
-<tr><td>Hubbard / U1U1 · 2-TDVP · D=512</td><td>885.96 seconds</td><td>484483058688</td><td>1584662310</td><td>1</td></tr>
-<tr><td>Hubbard / U1U1 · CBE-DMRG · D=1024</td><td>162.39 seconds</td><td>65352826840</td><td>33855643</td><td>1</td></tr>
-<tr><td>Hubbard / U1U1 · CBE-DMRG · D=256</td><td>10.262 seconds</td><td>6294268464</td><td>34306332</td><td>1</td></tr>
-<tr><td>Hubbard / U1U1 · CBE-DMRG · D=512</td><td>30.733 seconds</td><td>17149595016</td><td>37074252</td><td>1</td></tr>
-<tr><td>Hubbard / U1U1 · CBE-TDVP · D=1024</td><td>330.73 seconds</td><td>137933192576</td><td>141154232</td><td>1</td></tr>
-<tr><td>Hubbard / U1U1 · CBE-TDVP · D=256</td><td>28.855 seconds</td><td>17831127568</td><td>111811571</td><td>1</td></tr>
-<tr><td>Hubbard / U1U1 · CBE-TDVP · D=512</td><td>86.88 seconds</td><td>43373748704</td><td>122589304</td><td>1</td></tr>
-<tr><td>Hubbard / Z2SU2 · 2-DMRG · D=128</td><td>4.4379 seconds</td><td>1822460376</td><td>16631152</td><td>1</td></tr>
-<tr><td>Hubbard / Z2SU2 · 2-DMRG · D=256</td><td>8.2565 seconds</td><td>3535012904</td><td>18711117</td><td>1</td></tr>
-<tr><td>Hubbard / Z2SU2 · 2-DMRG · D=512</td><td>27.074 seconds</td><td>9329485080</td><td>22535914</td><td>1</td></tr>
-<tr><td>Hubbard / Z2SU2 · 2-TDVP · D=128</td><td>41.864 seconds</td><td>20999129048</td><td>100390145</td><td>1</td></tr>
-<tr><td>Hubbard / Z2SU2 · 2-TDVP · D=256</td><td>142.36 seconds</td><td>62186092312</td><td>185850180</td><td>1</td></tr>
-<tr><td>Hubbard / Z2SU2 · 2-TDVP · D=512</td><td>523.8 seconds</td><td>161304696128</td><td>205929044</td><td>1</td></tr>
-<tr><td>Hubbard / Z2SU2 · CBE-DMRG · D=1024</td><td>80.384 seconds</td><td>25684538784</td><td>9309513</td><td>1</td></tr>
-<tr><td>Hubbard / Z2SU2 · CBE-DMRG · D=256</td><td>4.5315 seconds</td><td>2361899568</td><td>8921606</td><td>1</td></tr>
-<tr><td>Hubbard / Z2SU2 · CBE-DMRG · D=512</td><td>15.342 seconds</td><td>6836012888</td><td>10409448</td><td>1</td></tr>
-<tr><td>Hubbard / Z2SU2 · CBE-TDVP · D=1024</td><td>251.53 seconds</td><td>71419023544</td><td>39912518</td><td>1</td></tr>
-<tr><td>Hubbard / Z2SU2 · CBE-TDVP · D=256</td><td>14.384 seconds</td><td>7136811328</td><td>21618994</td><td>1</td></tr>
-<tr><td>Hubbard / Z2SU2 · CBE-TDVP · D=512</td><td>53.539 seconds</td><td>20735479352</td><td>28728597</td><td>1</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · 2-DMRG · D=128</td><td>9.3985 seconds</td><td>7235252288</td><td>70042602</td><td>1</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · 2-DMRG · D=256</td><td>12.322 seconds</td><td>8344120776</td><td>75574094</td><td>1</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · 2-DMRG · D=512</td><td>17.596 seconds</td><td>11513531736</td><td>88626610</td><td>1</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · 2-TDVP · D=128</td><td>112.12 seconds</td><td>86871557272</td><td>743147439</td><td>1</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · 2-TDVP · D=256</td><td>137.54 seconds</td><td>105454319728</td><td>863233556</td><td>1</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · 2-TDVP · D=512</td><td>222.89 seconds</td><td>158805311472</td><td>1152601022</td><td>1</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · CBE-DMRG · D=1024</td><td>28.068 seconds</td><td>15412919656</td><td>56177452</td><td>1</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · CBE-DMRG · D=256</td><td>7.33 seconds</td><td>5450043888</td><td>49640060</td><td>1</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · CBE-DMRG · D=512</td><td>11.355 seconds</td><td>7981370320</td><td>57043964</td><td>1</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · CBE-TDVP · D=1024</td><td>82.52 seconds</td><td>53890600936</td><td>315038011</td><td>1</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · CBE-TDVP · D=256</td><td>23.227 seconds</td><td>19924442960</td><td>165681243</td><td>1</td></tr>
-<tr><td>t-t′-J-J′ / U1SU2 · CBE-TDVP · D=512</td><td>33.149 seconds</td><td>27713581624</td><td>192013941</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · 2-DMRG · D=128</td><td>13.421 seconds</td><td>12230963392</td><td>110181736</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · 2-DMRG · D=256</td><td>16.221 seconds</td><td>14492517368</td><td>123523769</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · 2-DMRG · D=512</td><td>23.48 seconds</td><td>19156893120</td><td>144602527</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · 2-TDVP · D=128</td><td>149.28 seconds</td><td>116571330160</td><td>953815617</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · 2-TDVP · D=256</td><td>376.02 seconds</td><td>317054923624</td><td>2396445916</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · 2-TDVP · D=512</td><td>525.68 seconds</td><td>398732866120</td><td>2791397881</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · CBE-DMRG · D=1024</td><td>29.988 seconds</td><td>18118401544</td><td>73917647</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · CBE-DMRG · D=256</td><td>7.1709 seconds</td><td>6889710896</td><td>63573038</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · CBE-DMRG · D=512</td><td>11.357 seconds</td><td>10005225088</td><td>76992872</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · CBE-TDVP · D=1024</td><td>98.022 seconds</td><td>66456240312</td><td>372302555</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · CBE-TDVP · D=256</td><td>30.986 seconds</td><td>30265723800</td><td>243742964</td><td>1</td></tr>
+<tr><td>Hubbard / U1SU2 · CBE-TDVP · D=512</td><td>44.325 seconds</td><td>38345222856</td><td>274044141</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · 2-DMRG · D=128</td><td>12.834 seconds</td><td>8421933656</td><td>90123576</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · 2-DMRG · D=256</td><td>23.723 seconds</td><td>13117743480</td><td>88382560</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · 2-DMRG · D=512</td><td>62.909 seconds</td><td>30950113216</td><td>99045013</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · 2-TDVP · D=128</td><td>155.02 seconds</td><td>121847224392</td><td>994858562</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · 2-TDVP · D=256</td><td>319.69 seconds</td><td>228520545664</td><td>1406437779</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · 2-TDVP · D=512</td><td>858.34 seconds</td><td>484494150536</td><td>1584870124</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · CBE-DMRG · D=1024</td><td>166.46 seconds</td><td>65350502104</td><td>33857421</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · CBE-DMRG · D=256</td><td>10.026 seconds</td><td>6290886400</td><td>34183749</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · CBE-DMRG · D=512</td><td>29.572 seconds</td><td>17159490544</td><td>37113167</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · CBE-TDVP · D=1024</td><td>334.96 seconds</td><td>137935045360</td><td>141191347</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · CBE-TDVP · D=256</td><td>25.957 seconds</td><td>17830293512</td><td>111815794</td><td>1</td></tr>
+<tr><td>Hubbard / U1U1 · CBE-TDVP · D=512</td><td>74.152 seconds</td><td>43369067480</td><td>122514413</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · 2-DMRG · D=128</td><td>3.8535 seconds</td><td>1817232696</td><td>16533182</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · 2-DMRG · D=256</td><td>7.5814 seconds</td><td>3539141848</td><td>18791647</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · 2-DMRG · D=512</td><td>24.744 seconds</td><td>9328234312</td><td>22511107</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · 2-TDVP · D=128</td><td>36.858 seconds</td><td>20998908360</td><td>100387253</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · 2-TDVP · D=256</td><td>130.93 seconds</td><td>62183571472</td><td>185795356</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · 2-TDVP · D=512</td><td>476.15 seconds</td><td>161308738808</td><td>206004475</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · CBE-DMRG · D=1024</td><td>82.575 seconds</td><td>25683503440</td><td>9313241</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · CBE-DMRG · D=256</td><td>4.5263 seconds</td><td>2374329280</td><td>9032966</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · CBE-DMRG · D=512</td><td>14.359 seconds</td><td>6839367120</td><td>10381042</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · CBE-TDVP · D=1024</td><td>254.02 seconds</td><td>71423678472</td><td>39999318</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · CBE-TDVP · D=256</td><td>13.501 seconds</td><td>7136766544</td><td>21616958</td><td>1</td></tr>
+<tr><td>Hubbard / Z2SU2 · CBE-TDVP · D=512</td><td>49.976 seconds</td><td>20737567864</td><td>28768122</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · 2-DMRG · D=128</td><td>8.643 seconds</td><td>7235322192</td><td>70043517</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · 2-DMRG · D=256</td><td>11.81 seconds</td><td>8343792968</td><td>75567496</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · 2-DMRG · D=512</td><td>16.433 seconds</td><td>11513492072</td><td>88625107</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · 2-TDVP · D=128</td><td>110.08 seconds</td><td>86867899560</td><td>743081250</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · 2-TDVP · D=256</td><td>137.97 seconds</td><td>105457243720</td><td>863289034</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · 2-TDVP · D=512</td><td>217.24 seconds</td><td>158804654328</td><td>1152582208</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · CBE-DMRG · D=1024</td><td>26.136 seconds</td><td>15259455352</td><td>55221157</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · CBE-DMRG · D=256</td><td>6.6977 seconds</td><td>5449995488</td><td>49637989</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · CBE-DMRG · D=512</td><td>10.439 seconds</td><td>7993830832</td><td>57176008</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · CBE-TDVP · D=1024</td><td>78.371 seconds</td><td>53892342968</td><td>315070256</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · CBE-TDVP · D=256</td><td>22.881 seconds</td><td>19940620352</td><td>165825912</td><td>1</td></tr>
+<tr><td>t-t′-J-J′ / U1SU2 · CBE-TDVP · D=512</td><td>34.205 seconds</td><td>27713510312</td><td>192012970</td><td>1</td></tr>
 </tbody></table><p>Allocated memory is the amount allocated by the measured operation, not peak process memory.</p>
 <details><summary>Hubbard / U1SU2 · 2-DMRG · D=128: Workload and measurement settings</summary><p>One complete left-to-right and right-to-left 2-DMRG sweep.</p>
 <h3>Workload details</h3><dl>

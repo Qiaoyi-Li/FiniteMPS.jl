@@ -1,20 +1,20 @@
 # Performance measurement report
 
-[View measured source](https://github.com/Qiaoyi-Li/FiniteMPS.jl/commit/74ab3410e8fe4584e9d12c8ebd4b870397b410b1) · [Download raw data (JSON)](report.json) · [View workflow run](https://github.com/Qiaoyi-Li/FiniteMPS.jl/actions/runs/37003845127)
+[View measured source](https://github.com/Qiaoyi-Li/FiniteMPS.jl/commit/a19056f4b950167a7207ace2ca4c845c2d644393) · [Download raw data (JSON)](report.json) · [View workflow run](https://github.com/Qiaoyi-Li/FiniteMPS.jl/actions/runs/42017838766)
 
 ## Measurement environment and thread settings
 
 | Field | Recorded at measurement time |
 | --- | --- |
 | Repository | Qiaoyi-Li/FiniteMPS.jl |
-| Source commit | 74ab3410e8fe4584e9d12c8ebd4b870397b410b1 |
-| Benchmark definition commit | 74ab3410e8fe4584e9d12c8ebd4b870397b410b1 |
+| Source commit | a19056f4b950167a7207ace2ca4c845c2d644393 |
+| Benchmark definition commit | a19056f4b950167a7207ace2ca4c845c2d644393 |
 | Uncommitted changes | No |
 | Version tag | Not recorded |
 | Release type | Development or local build |
 | Algorithm library version | 2.0.0 |
-| Measured at (UTC) | 2026-10-02T15:33:40.106Z |
-| Processor model | Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz |
+| Measured at (UTC) | 2026-11-05T14:52:17.159Z |
+| Processor model | AMD EPYC 7763 64-Core Processor |
 | Processor architecture | 64-bit x86 |
 | Visible logical processors | 4 |
 | Processors available to this process | 4 |
@@ -28,14 +28,14 @@
 | Matrix computation backend | OpenBLAS |
 | Runner label | ubuntu-24.04 |
 | Runner type | GitHub-hosted runner |
-| Runner image version | 20260927.320.1 |
+| Runner image version | 20261026.354.1 |
 | Operating system | Linux |
-| System kernel | 6.17.0-1022-azure |
-| Visible system memory (bytes) | 16765378560 |
+| System kernel | 7.0.0-1017-azure |
+| Visible system memory (bytes) | 16760344576 |
 | Run trigger | Commit push |
 | Automation workflow | Performance |
-| Run identifier | 37003845127 |
-| Workflow run number | 4 |
+| Run identifier | 42017838766 |
+| Workflow run number | 6 |
 | Run attempt | 1 |
 | Benchmark definition file | benchmark/benchmarks.jl |
 | Benchmark definition source | Current source checkout |
@@ -46,54 +46,54 @@ Processor counts and thread settings describe available resources, not runtime c
 
 | Operation and size | Median time | Total allocated bytes | Memory allocation count | Samples |
 | --- | ---: | ---: | ---: | ---: |
-| Hubbard / U1SU2 · 2-DMRG · D=128 | 10.91 seconds | 17310166696 | 153063819 | 1 |
-| Hubbard / U1SU2 · 2-DMRG · D=256 | 12.788 seconds | 20175846688 | 172081759 | 1 |
-| Hubbard / U1SU2 · 2-DMRG · D=512 | 17.489 seconds | 25831979576 | 202110228 | 1 |
-| Hubbard / U1SU2 · 2-TDVP · D=128 | 108.71 seconds | 161656786080 | 1277031569 | 1 |
-| Hubbard / U1SU2 · 2-TDVP · D=256 | 309.91 seconds | 499571390824 | 3716531073 | 1 |
-| Hubbard / U1SU2 · 2-TDVP · D=512 | 412 seconds | 608758873464 | 4319734272 | 1 |
-| Hubbard / U1SU2 · CBE-DMRG · D=1024 | 19.633 seconds | 21031175304 | 102523055 | 1 |
-| Hubbard / U1SU2 · CBE-DMRG · D=256 | 6.7814 seconds | 9858170024 | 92524560 | 1 |
-| Hubbard / U1SU2 · CBE-DMRG · D=512 | 9.2893 seconds | 13498310832 | 111510502 | 1 |
-| Hubbard / U1SU2 · CBE-TDVP · D=1024 | 65.325 seconds | 84556164384 | 531047028 | 1 |
-| Hubbard / U1SU2 · CBE-TDVP · D=256 | 25.072 seconds | 42534427952 | 348290811 | 1 |
-| Hubbard / U1SU2 · CBE-TDVP · D=512 | 32.604 seconds | 51874996888 | 389760208 | 1 |
-| Hubbard / U1U1 · 2-DMRG · D=128 | 7.7512 seconds | 8559333600 | 90839241 | 1 |
-| Hubbard / U1U1 · 2-DMRG · D=256 | 12.166 seconds | 13251936280 | 89127782 | 1 |
-| Hubbard / U1U1 · 2-DMRG · D=512 | 33.737 seconds | 31066941208 | 99584726 | 1 |
-| Hubbard / U1U1 · 2-TDVP · D=128 | 94.418 seconds | 122952447248 | 995782945 | 1 |
-| Hubbard / U1U1 · 2-TDVP · D=256 | 184.95 seconds | 229806105016 | 1407295251 | 1 |
-| Hubbard / U1U1 · 2-TDVP · D=512 | 477.12 seconds | 485958912264 | 1585681457 | 1 |
-| Hubbard / U1U1 · CBE-DMRG · D=1024 | 86.229 seconds | 65415499960 | 34269516 | 1 |
-| Hubbard / U1U1 · CBE-DMRG · D=256 | 6.1329 seconds | 6379306800 | 34684453 | 1 |
-| Hubbard / U1U1 · CBE-DMRG · D=512 | 17.414 seconds | 17241520136 | 37562819 | 1 |
-| Hubbard / U1U1 · CBE-TDVP · D=1024 | 173.44 seconds | 138005120920 | 141644346 | 1 |
-| Hubbard / U1U1 · CBE-TDVP · D=256 | 15.509 seconds | 17968417816 | 112334250 | 1 |
-| Hubbard / U1U1 · CBE-TDVP · D=512 | 43.055 seconds | 43557098568 | 123182579 | 1 |
-| Hubbard / Z2SU2 · 2-DMRG · D=128 | 2.5689 seconds | 2057901672 | 18921701 | 1 |
-| Hubbard / Z2SU2 · 2-DMRG · D=256 | 4.4283 seconds | 3900006800 | 22152869 | 1 |
-| Hubbard / Z2SU2 · 2-DMRG · D=512 | 13.638 seconds | 10058013744 | 28574082 | 1 |
-| Hubbard / Z2SU2 · 2-TDVP · D=128 | 23.441 seconds | 23837018856 | 119311569 | 1 |
-| Hubbard / Z2SU2 · 2-TDVP · D=256 | 83.107 seconds | 76029509368 | 278190615 | 1 |
-| Hubbard / Z2SU2 · 2-TDVP · D=512 | 290.37 seconds | 172921453480 | 284656226 | 1 |
-| Hubbard / Z2SU2 · CBE-DMRG · D=1024 | 44.175 seconds | 25865841480 | 11423540 | 1 |
-| Hubbard / Z2SU2 · CBE-DMRG · D=256 | 2.9263 seconds | 2592395792 | 11483512 | 1 |
-| Hubbard / Z2SU2 · CBE-DMRG · D=512 | 8.5044 seconds | 7070058632 | 13056660 | 1 |
-| Hubbard / Z2SU2 · CBE-TDVP · D=1024 | 132.09 seconds | 73477399640 | 55403768 | 1 |
-| Hubbard / Z2SU2 · CBE-TDVP · D=256 | 8.7467 seconds | 8068911544 | 28922342 | 1 |
-| Hubbard / Z2SU2 · CBE-TDVP · D=512 | 27.794 seconds | 22305744064 | 40553705 | 1 |
-| t-t′-J-J′ / U1SU2 · 2-DMRG · D=128 | 7.5386 seconds | 9543485560 | 89468307 | 1 |
-| t-t′-J-J′ / U1SU2 · 2-DMRG · D=256 | 8.5379 seconds | 10870636448 | 96950354 | 1 |
-| t-t′-J-J′ / U1SU2 · 2-DMRG · D=512 | 11.082 seconds | 14484544728 | 113955979 | 1 |
-| t-t′-J-J′ / U1SU2 · 2-TDVP · D=128 | 82.947 seconds | 123941172744 | 1025528420 | 1 |
-| t-t′-J-J′ / U1SU2 · 2-TDVP · D=256 | 99.562 seconds | 149586517848 | 1199688937 | 1 |
-| t-t′-J-J′ / U1SU2 · 2-TDVP · D=512 | 153.92 seconds | 220840921600 | 1628631950 | 1 |
-| t-t′-J-J′ / U1SU2 · CBE-DMRG · D=1024 | 15.081 seconds | 16621922464 | 68213708 | 1 |
-| t-t′-J-J′ / U1SU2 · CBE-DMRG · D=256 | 5.9597 seconds | 6851646824 | 63204791 | 1 |
-| t-t′-J-J′ / U1SU2 · CBE-DMRG · D=512 | 7.3576 seconds | 9607208576 | 72978494 | 1 |
-| t-t′-J-J′ / U1SU2 · CBE-TDVP · D=1024 | 49.634 seconds | 64531458248 | 408659641 | 1 |
-| t-t′-J-J′ / U1SU2 · CBE-TDVP · D=256 | 16.854 seconds | 25733245256 | 214113403 | 1 |
-| t-t′-J-J′ / U1SU2 · CBE-TDVP · D=512 | 22.351 seconds | 34109115000 | 245798601 | 1 |
+| Hubbard / U1SU2 · 2-DMRG · D=128 | 10.287 seconds | 17122519176 | 151654303 | 1 |
+| Hubbard / U1SU2 · 2-DMRG · D=256 | 12.16 seconds | 20048504520 | 170961038 | 1 |
+| Hubbard / U1SU2 · 2-DMRG · D=512 | 16.666 seconds | 25565497936 | 199879287 | 1 |
+| Hubbard / U1SU2 · 2-TDVP · D=128 | 103.62 seconds | 160530135016 | 1269717660 | 1 |
+| Hubbard / U1SU2 · 2-TDVP · D=256 | 312.88 seconds | 495390378960 | 3688612780 | 1 |
+| Hubbard / U1SU2 · 2-TDVP · D=512 | 422.74 seconds | 606846669512 | 4307711575 | 1 |
+| Hubbard / U1SU2 · CBE-DMRG · D=1024 | 17.987 seconds | 21033365016 | 102447705 | 1 |
+| Hubbard / U1SU2 · CBE-DMRG · D=256 | 5.8552 seconds | 9872305904 | 92638843 | 1 |
+| Hubbard / U1SU2 · CBE-DMRG · D=512 | 8.6651 seconds | 13348617272 | 110118071 | 1 |
+| Hubbard / U1SU2 · CBE-TDVP · D=1024 | 62.69 seconds | 84303227968 | 528651859 | 1 |
+| Hubbard / U1SU2 · CBE-TDVP · D=256 | 25.737 seconds | 42159086968 | 345177542 | 1 |
+| Hubbard / U1SU2 · CBE-TDVP · D=512 | 32.056 seconds | 51530333192 | 386518801 | 1 |
+| Hubbard / U1U1 · 2-DMRG · D=128 | 6.526 seconds | 8559010792 | 90763291 | 1 |
+| Hubbard / U1U1 · 2-DMRG · D=256 | 10.739 seconds | 13253370888 | 89031449 | 1 |
+| Hubbard / U1U1 · 2-DMRG · D=512 | 31.222 seconds | 31067886624 | 99638727 | 1 |
+| Hubbard / U1U1 · 2-TDVP · D=128 | 90.273 seconds | 123035037128 | 995798379 | 1 |
+| Hubbard / U1U1 · 2-TDVP · D=256 | 176.8 seconds | 229991368264 | 1407376472 | 1 |
+| Hubbard / U1U1 · 2-TDVP · D=512 | 452.54 seconds | 486120204336 | 1585800968 | 1 |
+| Hubbard / U1U1 · CBE-DMRG · D=1024 | 86.297 seconds | 65421735136 | 34306297 | 1 |
+| Hubbard / U1U1 · CBE-DMRG · D=256 | 5.4826 seconds | 6383284568 | 34768979 | 1 |
+| Hubbard / U1U1 · CBE-DMRG · D=512 | 16.03 seconds | 17250245424 | 37514426 | 1 |
+| Hubbard / U1U1 · CBE-TDVP · D=1024 | 171.27 seconds | 138037916744 | 141761971 | 1 |
+| Hubbard / U1U1 · CBE-TDVP · D=256 | 13.85 seconds | 17976557192 | 112339801 | 1 |
+| Hubbard / U1U1 · CBE-TDVP · D=512 | 39.594 seconds | 43583741584 | 123097087 | 1 |
+| Hubbard / Z2SU2 · 2-DMRG · D=128 | 2.1823 seconds | 2058614088 | 18907775 | 1 |
+| Hubbard / Z2SU2 · 2-DMRG · D=256 | 4.0812 seconds | 3920480360 | 22372211 | 1 |
+| Hubbard / Z2SU2 · 2-DMRG · D=512 | 12.377 seconds | 10145335584 | 29181935 | 1 |
+| Hubbard / Z2SU2 · 2-TDVP · D=128 | 21.744 seconds | 23822135616 | 119268058 | 1 |
+| Hubbard / Z2SU2 · 2-TDVP · D=256 | 77.902 seconds | 76612167264 | 281449073 | 1 |
+| Hubbard / Z2SU2 · 2-TDVP · D=512 | 262.72 seconds | 173978917824 | 290795131 | 1 |
+| Hubbard / Z2SU2 · CBE-DMRG · D=1024 | 43.417 seconds | 25863632840 | 11422701 | 1 |
+| Hubbard / Z2SU2 · CBE-DMRG · D=256 | 2.6009 seconds | 2592421312 | 11572951 | 1 |
+| Hubbard / Z2SU2 · CBE-DMRG · D=512 | 8.2318 seconds | 7071595824 | 13109536 | 1 |
+| Hubbard / Z2SU2 · CBE-TDVP · D=1024 | 133.11 seconds | 73798108472 | 57739171 | 1 |
+| Hubbard / Z2SU2 · CBE-TDVP · D=256 | 7.7435 seconds | 8099353584 | 29106819 | 1 |
+| Hubbard / Z2SU2 · CBE-TDVP · D=512 | 26.868 seconds | 22390589568 | 41135278 | 1 |
+| t-t′-J-J′ / U1SU2 · 2-DMRG · D=128 | 6.945 seconds | 9531133416 | 89381520 | 1 |
+| t-t′-J-J′ / U1SU2 · 2-DMRG · D=256 | 7.9759 seconds | 10908999848 | 97266528 | 1 |
+| t-t′-J-J′ / U1SU2 · 2-DMRG · D=512 | 10.491 seconds | 14526705088 | 114282055 | 1 |
+| t-t′-J-J′ / U1SU2 · 2-TDVP · D=128 | 78.719 seconds | 123162602088 | 1020242260 | 1 |
+| t-t′-J-J′ / U1SU2 · 2-TDVP · D=256 | 95.076 seconds | 148542509448 | 1192434498 | 1 |
+| t-t′-J-J′ / U1SU2 · 2-TDVP · D=512 | 148.04 seconds | 219842303672 | 1621562164 | 1 |
+| t-t′-J-J′ / U1SU2 · CBE-DMRG · D=1024 | 13.525 seconds | 16544056040 | 68112279 | 1 |
+| t-t′-J-J′ / U1SU2 · CBE-DMRG · D=256 | 5.3525 seconds | 6874898776 | 63409684 | 1 |
+| t-t′-J-J′ / U1SU2 · CBE-DMRG · D=512 | 6.769 seconds | 9650646208 | 73271861 | 1 |
+| t-t′-J-J′ / U1SU2 · CBE-TDVP · D=1024 | 48.167 seconds | 64584525464 | 408892729 | 1 |
+| t-t′-J-J′ / U1SU2 · CBE-TDVP · D=256 | 15.917 seconds | 25654010080 | 213589844 | 1 |
+| t-t′-J-J′ / U1SU2 · CBE-TDVP · D=512 | 21.688 seconds | 34074614968 | 245517764 | 1 |
 
 ### Hubbard / U1SU2 · 2-DMRG · D=128
 
